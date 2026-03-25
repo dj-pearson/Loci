@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Loci needs your location to pin voice notes to places and notify you when you return.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Loci needs your location to pin voice notes to places you visit.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Loci needs microphone access to record voice notes.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Loci uses speech recognition to transcribe your voice notes on-device.</string>
+</dict>
+</plist>

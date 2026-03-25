@@ -2,9 +2,9 @@
 ## Project: Loci — Your Spatial Memory
 ## Branch: ralph/loci-mvp
 ## Started: 2026-03-25
-## Status: NOT STARTED
+## Status: IN PROGRESS
 ## Total Stories: 120
-## Completed: 0/120
+## Completed: 1/120
 
 ---
 
@@ -42,7 +42,7 @@ Loci is a voice-first iOS app (SwiftUI, iOS 17+) that pins voice notes to GPS co
 ---
 
 ## Phase 1: Project Foundation (US-001 → US-008)
-- [ ] US-001: Create Xcode project structure with folder organization
+- [x] US-001: Create Xcode project structure with folder organization
 - [ ] US-002: Define LocusCategory enum with colors and icons
 - [ ] US-003: Define Locus SwiftData model
 - [ ] US-004: Define Household and HouseholdMember SwiftData models
