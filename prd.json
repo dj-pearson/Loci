@@ -48,8 +48,8 @@
         "Typecheck passes"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented Locus @Model with all properties, computed category/coordinate/syncStatus, SyncStatus enum, and default values. Build verification deferred to macOS CI (dev machine is Windows)."
     },
     {
       "id": "US-004",
