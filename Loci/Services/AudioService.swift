@@ -1,5 +1,6 @@
 import AVFoundation
 import Foundation
+import UIKit
 
 @Observable
 final class AudioService {
@@ -7,11 +8,13 @@ final class AudioService {
 
     private(set) var isRecording = false
     private(set) var currentRecordingURL: URL?
+    private(set) var currentAmplitude: Float = 0.0
     private(set) var audioError: AudioError?
     private(set) var permissionStatus: PermissionStatus = .notDetermined
 
     private var audioRecorder: AVAudioRecorder?
     private let audioSession = AVAudioSession.sharedInstance()
+    private var amplitudeTimer: Timer?
 
     // MARK: - Permission Status
 
@@ -105,12 +108,82 @@ final class AudioService {
         }
     }
 
+    // MARK: - Recording Controls
+
+    @discardableResult
+    func startRecording() throws -> URL {
+        guard permissionStatus == .granted else {
+            audioError = .microphonePermissionDenied
+            throw AudioError.microphonePermissionDenied
+        }
+
+        let url = try prepareRecorder()
+
+        guard let recorder = audioRecorder else {
+            audioError = .recordingFailed("Recorder not available")
+            throw AudioError.recordingFailed("Recorder not available")
+        }
+
+        recorder.isMeteringEnabled = true
+        recorder.record()
+        isRecording = true
+
+        startAmplitudeTimer()
+
+        let generator = UIImpactFeedbackGenerator(style: .medium)
+        generator.impactOccurred()
+
+        return url
+    }
+
+    func stopRecording() {
+        guard isRecording, let recorder = audioRecorder else { return }
+
+        recorder.stop()
+        stopAmplitudeTimer()
+        isRecording = false
+        currentAmplitude = 0.0
+
+        let generator = UIImpactFeedbackGenerator(style: .light)
+        generator.impactOccurred()
+    }
+
+    // MARK: - Amplitude Metering
+
+    private func startAmplitudeTimer() {
+        amplitudeTimer = Timer.scheduledTimer(withTimeInterval: 1.0 / 30.0, repeats: true) { [weak self] _ in
+            self?.updateAmplitude()
+        }
+    }
+
+    private func stopAmplitudeTimer() {
+        amplitudeTimer?.invalidate()
+        amplitudeTimer = nil
+    }
+
+    private func updateAmplitude() {
+        guard let recorder = audioRecorder, recorder.isRecording else {
+            currentAmplitude = 0.0
+            return
+        }
+
+        recorder.updateMeters()
+
+        // averagePower returns dB in range [-160, 0]. Normalize to [0, 1].
+        let power = recorder.averagePower(forChannel: 0)
+        let minDb: Float = -60.0
+        let normalizedPower = max(0.0, (power - minDb) / (-minDb))
+        currentAmplitude = normalizedPower
+    }
+
     // MARK: - Cleanup
 
     func cleanup() {
+        stopAmplitudeTimer()
         audioRecorder?.stop()
         audioRecorder = nil
         isRecording = false
+        currentAmplitude = 0.0
         currentRecordingURL = nil
         try? audioSession.setActive(false, options: .notifyOthersOnDeactivation)
     }

@@ -205,8 +205,8 @@
         "Typecheck passes"
       ],
       "priority": 13,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Added startRecording() -> URL method with permission guard, prepareRecorder(), metering enabled, and .medium haptic. stopRecording() stops recorder, invalidates amplitude timer, resets state, and fires .light haptic. currentAmplitude updated at 30Hz via Timer using averagePower(forChannel:) normalized from dB [-60, 0] to [0, 1]. cleanup() updated to stop amplitude timer. deleteRecording(at:) was already implemented in US-012. Build verification deferred to macOS CI."
     },
     {
       "id": "US-014",
