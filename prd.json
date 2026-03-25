@@ -507,8 +507,8 @@
         "Typecheck passes"
       ],
       "priority": 31,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "HomeMapView with Map, UserAnnotation, CategoryPinView annotations, callout preview, NavigationRouter deep-link, and floating record button."
     },
     {
       "id": "US-032",
