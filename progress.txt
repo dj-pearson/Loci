@@ -4,7 +4,7 @@
 ## Started: 2026-03-25
 ## Status: IN PROGRESS
 ## Total Stories: 120
-## Completed: 43/120
+## Completed: 44/120
 
 ---
 
@@ -97,7 +97,7 @@ Loci is a voice-first iOS app (SwiftUI, iOS 17+) that pins voice notes to GPS co
 - [x] US-043: Create contextual menus on locus items (long-press)
 
 ## Phase 7: Search (US-044 → US-046)
-- [ ] US-044: Create SearchService for keyword, category, and nearby queries
+- [x] US-044: Create SearchService for keyword, category, and nearby queries
 - [ ] US-045: Create SearchView with search bar and filter chips
 - [ ] US-046: Create SearchResultsView with highlighted matches
 
