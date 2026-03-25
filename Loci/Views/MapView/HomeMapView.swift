@@ -1,11 +1,16 @@
 import MapKit
 import SwiftData
 import SwiftUI
+import UIKit
 
 struct HomeMapView: View {
     @Query(filter: #Predicate<Locus> { !$0.isArchived },
            sort: \Locus.createdAt, order: .reverse)
     private var allLoci: [Locus]
+
+    @Query private var householdMembers: [HouseholdMember]
+
+    @Environment(\.modelContext) private var modelContext
 
     @Bindable var viewModel: HomeMapViewModel
     let navigationRouter: NavigationRouter
@@ -13,6 +18,15 @@ struct HomeMapView: View {
     @State private var selectedLocus: Locus?
     @State private var showRecordingView = false
     @State private var mapCameraPosition: MapCameraPosition = .automatic
+    @State private var locusToDelete: Locus?
+    @State private var showDeleteConfirmation = false
+    @State private var archivedLocus: Locus?
+    @State private var showUndoSnackbar = false
+    @State private var locusToEdit: Locus?
+
+    private var hasHousehold: Bool {
+        !householdMembers.isEmpty
+    }
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -75,6 +89,32 @@ struct HomeMapView: View {
                 } onDismiss: {
                     selectedLocus = nil
                 }
+                .locusContextMenu(
+                    locus: locus,
+                    hasHousehold: hasHousehold,
+                    onViewDetails: {
+                        navigationRouter.selectedLocusId = locus.id
+                        selectedLocus = nil
+                    },
+                    onEdit: {
+                        locusToEdit = locus
+                        selectedLocus = nil
+                    },
+                    onArchive: {
+                        LocusActions.archive(locus, modelContext: modelContext) { _ in
+                            archivedLocus = locus
+                            withAnimation {
+                                showUndoSnackbar = true
+                            }
+                        }
+                        selectedLocus = nil
+                    },
+                    onDelete: {
+                        locusToDelete = locus
+                        showDeleteConfirmation = true
+                        selectedLocus = nil
+                    }
+                )
                 .transition(.move(edge: .bottom).combined(with: .opacity))
                 .padding(.bottom, 80)
                 .padding(.horizontal, 16)
@@ -99,6 +139,52 @@ struct HomeMapView: View {
         .sheet(isPresented: $showRecordingView) {
             // Placeholder — RecordingView will be wired here
             Text(String(localized: "Recording View"))
+        }
+        .sheet(item: $locusToEdit) { locus in
+            let editViewModel = LocusDetailViewModel(locus: locus)
+            EditLocusSheet(viewModel: editViewModel)
+                .onAppear {
+                    editViewModel.modelContext = modelContext
+                }
+        }
+        .overlay(alignment: .bottom) {
+            if showUndoSnackbar, let locus = archivedLocus {
+                UndoSnackbar(
+                    message: String(localized: "Voice note archived"),
+                    onUndo: {
+                        locus.isArchived = false
+                        locus.updatedAt = Date()
+                        try? modelContext.save()
+                        NotificationCenter.default.post(name: .locusDidCreate, object: nil)
+                        let generator = UINotificationFeedbackGenerator()
+                        generator.notificationOccurred(.success)
+                        withAnimation {
+                            showUndoSnackbar = false
+                            archivedLocus = nil
+                        }
+                    },
+                    onDismiss: {
+                        showUndoSnackbar = false
+                        archivedLocus = nil
+                    }
+                )
+                .padding(.bottom, Theme.Spacing.lg)
+            }
+        }
+        .alert(
+            String(localized: "Delete Voice Note"),
+            isPresented: $showDeleteConfirmation,
+            presenting: locusToDelete
+        ) { locus in
+            Button(String(localized: "Delete"), role: .destructive) {
+                LocusActions.delete(locus, modelContext: modelContext)
+                locusToDelete = nil
+            }
+            Button(String(localized: "Cancel"), role: .cancel) {
+                locusToDelete = nil
+            }
+        } message: { _ in
+            Text(String(localized: "This will permanently delete the voice note and its audio recording."))
         }
     }
 

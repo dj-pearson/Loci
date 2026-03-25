@@ -706,8 +706,8 @@
         "Typecheck passes"
       ],
       "priority": 43,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented as reusable LocusContextMenu ViewModifier in Views/Components/LocusContextMenu.swift. Applied to LocusRowView rows in LocusListView and LocusCalloutView in HomeMapView."
     },
     {
       "id": "US-044",

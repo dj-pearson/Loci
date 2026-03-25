@@ -4,7 +4,7 @@
 ## Started: 2026-03-25
 ## Status: IN PROGRESS
 ## Total Stories: 120
-## Completed: 42/120
+## Completed: 43/120
 
 ---
 
@@ -94,7 +94,7 @@ Loci is a voice-first iOS app (SwiftUI, iOS 17+) that pins voice notes to GPS co
 - [x] US-040: Create EditLocusSheet for modifying existing loci
 - [x] US-041: Create archive and delete actions with undo support
 - [x] US-042: Create swipe actions on locus list items
-- [ ] US-043: Create contextual menus on locus items (long-press)
+- [x] US-043: Create contextual menus on locus items (long-press)
 
 ## Phase 7: Search (US-044 → US-046)
 - [ ] US-044: Create SearchService for keyword, category, and nearby queries

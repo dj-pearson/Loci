@@ -37,6 +37,7 @@ struct LocusListView: View {
     @State private var showDeleteConfirmation = false
     @State private var archivedLocus: Locus?
     @State private var showUndoSnackbar = false
+    @State private var locusToEdit: Locus?
 
     private var hasHousehold: Bool {
         !householdMembers.isEmpty
@@ -135,6 +136,23 @@ struct LocusListView: View {
                                 .tint(.green)
                             }
                         }
+                        .locusContextMenu(
+                            locus: locus,
+                            hasHousehold: hasHousehold,
+                            onViewDetails: {
+                                navigationRouter.selectedLocusId = locus.id
+                            },
+                            onEdit: {
+                                locusToEdit = locus
+                            },
+                            onArchive: {
+                                archiveLocus(locus)
+                            },
+                            onDelete: {
+                                locusToDelete = locus
+                                showDeleteConfirmation = true
+                            }
+                        )
                     }
                 } header: {
                     if !section.title.isEmpty {
@@ -196,6 +214,13 @@ struct LocusListView: View {
             }
         } message: { _ in
             Text(String(localized: "This will permanently delete the voice note and its audio recording."))
+        }
+        .sheet(item: $locusToEdit) { locus in
+            let editViewModel = LocusDetailViewModel(locus: locus)
+            EditLocusSheet(viewModel: editViewModel)
+                .onAppear {
+                    editViewModel.modelContext = modelContext
+                }
         }
     }
 
