@@ -1,5 +1,10 @@
 import CoreLocation
 import Foundation
+import UIKit
+
+extension Notification.Name {
+    static let locusDidCreate = Notification.Name("LocusDidCreate")
+}
 
 @Observable
 final class GeofenceManager {
@@ -13,6 +18,15 @@ final class GeofenceManager {
 
     private var monitor: CLMonitor?
     private var initTask: Task<Void, Never>?
+    private var refreshTask: Task<Void, Never>?
+    private var notificationObservers: [Any] = []
+
+    /// The last location used for a geofence refresh, to avoid redundant recalculations.
+    private var lastRefreshLocation: CLLocation?
+
+    /// Loci supplier closure — set by the app to provide current loci for rotation.
+    /// This avoids GeofenceManager needing direct SwiftData access.
+    var lociProvider: (() -> [Locus])?
 
     // MARK: - Initialization
 
@@ -20,10 +34,15 @@ final class GeofenceManager {
         initTask = Task {
             await self.setupMonitor()
         }
+        observeNotifications()
     }
 
     deinit {
         initTask?.cancel()
+        refreshTask?.cancel()
+        for observer in notificationObservers {
+            NotificationCenter.default.removeObserver(observer)
+        }
     }
 
     // MARK: - Monitor Setup
@@ -42,6 +61,79 @@ final class GeofenceManager {
         if let monitor { return monitor }
         await initTask?.value
         return monitor
+    }
+
+    // MARK: - Notification Observers
+
+    private func observeNotifications() {
+        let locationObserver = NotificationCenter.default.addObserver(
+            forName: .locationDidUpdate,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            guard let self,
+                  let location = notification.userInfo?["location"] as? CLLocation else { return }
+            self.scheduleRefresh(from: location.coordinate)
+        }
+        let locusObserver = NotificationCenter.default.addObserver(
+            forName: .locusDidCreate,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            guard let self, let location = self.lastRefreshLocation else { return }
+            self.scheduleRefresh(from: location.coordinate)
+        }
+        let foregroundObserver = NotificationCenter.default.addObserver(
+            forName: UIApplication.willEnterForegroundNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            guard let self, let location = self.lastRefreshLocation else { return }
+            self.scheduleRefresh(from: location.coordinate)
+        }
+        notificationObservers = [locationObserver, locusObserver, foregroundObserver]
+    }
+
+    // MARK: - Geofence Rotation
+
+    /// Schedules an async geofence refresh, cancelling any in-flight refresh.
+    private func scheduleRefresh(from coordinate: CLLocationCoordinate2D) {
+        refreshTask?.cancel()
+        refreshTask = Task {
+            guard let loci = lociProvider?() else { return }
+            await refreshGeofences(from: coordinate, loci: loci)
+        }
+    }
+
+    /// Recalculates which loci should be monitored based on proximity to the given location.
+    /// Registers the nearest 20 (or fewer) non-archived loci and removes any that fell out of range.
+    func refreshGeofences(from location: CLLocationCoordinate2D, loci: [Locus]) async {
+        guard await ensureMonitor() != nil else { return }
+
+        lastRefreshLocation = CLLocation(latitude: location.latitude, longitude: location.longitude)
+
+        // Filter to non-archived loci only (personal + shared)
+        let activeLoci = loci.filter { !$0.isArchived }
+
+        // Get nearest N loci sorted by Haversine distance
+        let nearest = activeLoci.nearest(AppConstants.maxGeofences, to: location)
+        let newIds = Set(nearest.map { $0.id.uuidString })
+
+        // Determine which regions to add and remove
+        let toRemove = monitoredRegionIds.subtracting(newIds)
+        let toAdd = nearest.filter { !monitoredRegionIds.contains($0.id.uuidString) }
+
+        // Remove regions no longer in the nearest set
+        for identifier in toRemove {
+            guard let monitor else { break }
+            await monitor.remove(identifier)
+            monitoredRegionIds.remove(identifier)
+        }
+
+        // Register new nearest regions
+        for locus in toAdd {
+            await registerRegion(for: locus)
+        }
     }
 
     // MARK: - Region Management

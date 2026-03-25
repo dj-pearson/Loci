@@ -289,8 +289,8 @@
         "Typecheck passes"
       ],
       "priority": 18,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented refreshGeofences(from:loci:) method in GeofenceManager. Filters non-archived loci, uses HaversineDistance nearest() for top 20, diffs with current monitored set to add/remove efficiently. Listens for LocationDidUpdate, LocusDidCreate, and willEnterForegroundNotification via closure-based NotificationCenter observers. Uses lociProvider closure for SwiftData decoupling. Build verification deferred to macOS CI."
     },
     {
       "id": "US-019",
