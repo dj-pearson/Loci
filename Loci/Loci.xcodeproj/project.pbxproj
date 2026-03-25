@@ -13,6 +13,8 @@
 		8F2A4C5D1B2E4F7A90D3E6C3 /* Locus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A4C5D1B2E4F7A90D3E6C3 /* Locus.swift */; };
 		8F2A4C5D1B2E4F7A90D3E6C4 /* Household.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A4C5D1B2E4F7A90D3E6C4 /* Household.swift */; };
 		8F2A4C5D1B2E4F7A90D3E6C5 /* HouseholdMember.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A4C5D1B2E4F7A90D3E6C5 /* HouseholdMember.swift */; };
+		8F2A4C5D1B2E4F7A90D3E6C6 /* UserProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A4C5D1B2E4F7A90D3E6C6 /* UserProfile.swift */; };
+		8F2A5C5D1B2E4F7A90D3E6C1 /* AppConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A5C5D1B2E4F7A90D3E6C1 /* AppConstants.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -25,6 +27,8 @@
 		8F1A4C5D1B2E4F7A90D3E6C3 /* Locus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Locus.swift; sourceTree = "<group>"; };
 		8F1A4C5D1B2E4F7A90D3E6C4 /* Household.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Household.swift; sourceTree = "<group>"; };
 		8F1A4C5D1B2E4F7A90D3E6C5 /* HouseholdMember.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HouseholdMember.swift; sourceTree = "<group>"; };
+		8F1A4C5D1B2E4F7A90D3E6C6 /* UserProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfile.swift; sourceTree = "<group>"; };
+		8F1A5C5D1B2E4F7A90D3E6C1 /* AppConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConstants.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,6 +74,7 @@
 				8F1A4C5D1B2E4F7A90D3E6C1 /* LocusCategory.swift */,
 				8F1A4C5D1B2E4F7A90D3E6C4 /* Household.swift */,
 				8F1A4C5D1B2E4F7A90D3E6C5 /* HouseholdMember.swift */,
+				8F1A4C5D1B2E4F7A90D3E6C6 /* UserProfile.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -111,6 +116,7 @@
 		8F3A3C5D1B2E4F7A90D3E6C6 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				8F1A5C5D1B2E4F7A90D3E6C1 /* AppConstants.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -231,6 +237,8 @@
 				8F2A4C5D1B2E4F7A90D3E6C3 /* Locus.swift in Sources */,
 				8F2A4C5D1B2E4F7A90D3E6C4 /* Household.swift in Sources */,
 				8F2A4C5D1B2E4F7A90D3E6C5 /* HouseholdMember.swift in Sources */,
+				8F2A4C5D1B2E4F7A90D3E6C6 /* UserProfile.swift in Sources */,
+				8F2A5C5D1B2E4F7A90D3E6C1 /* AppConstants.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
