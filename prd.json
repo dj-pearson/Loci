@@ -623,8 +623,8 @@
         "Typecheck passes"
       ],
       "priority": 38,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "LocusDetailView with category badge, location, full transcription, non-interactive map snippet, shared-by attribution, and toolbar actions for edit/archive/delete."
     },
     {
       "id": "US-039",
