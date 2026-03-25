@@ -1,6 +1,10 @@
 import CoreLocation
 import Foundation
 
+extension Notification.Name {
+    static let locationDidUpdate = Notification.Name("LocationDidUpdate")
+}
+
 @Observable
 final class LocationService: NSObject, CLLocationManagerDelegate {
     // MARK: - Properties
@@ -8,6 +12,7 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
     private(set) var currentLocation: CLLocation?
     private(set) var authorizationStatus: CLAuthorizationStatus
     private(set) var locationError: LocationError?
+    private(set) var isMonitoringSignificantChanges = false
 
     var isAuthorizedAlways: Bool {
         authorizationStatus == .authorizedAlways
@@ -39,6 +44,12 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
         super.init()
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        locationManager.allowsBackgroundLocationUpdates = true
+        locationManager.pausesLocationUpdatesAutomatically = false
+
+        if isAuthorized {
+            startMonitoringSignificantLocationChanges()
+        }
     }
 
     // MARK: - Permission Requests
@@ -59,6 +70,20 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
         }
     }
 
+    // MARK: - Location Tracking
+
+    func startMonitoringSignificantLocationChanges() {
+        guard isAuthorized, !isMonitoringSignificantChanges else { return }
+        locationManager.startMonitoringSignificantLocationChanges()
+        isMonitoringSignificantChanges = true
+    }
+
+    func stopMonitoringSignificantLocationChanges() {
+        guard isMonitoringSignificantChanges else { return }
+        locationManager.stopMonitoringSignificantLocationChanges()
+        isMonitoringSignificantChanges = false
+    }
+
     // MARK: - CLLocationManagerDelegate
 
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
@@ -68,12 +93,13 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
         switch manager.authorizationStatus {
         case .denied:
             locationError = .denied
-            locationManager.stopUpdatingLocation()
+            stopMonitoringSignificantLocationChanges()
         case .restricted:
             locationError = .restricted
-            locationManager.stopUpdatingLocation()
+            stopMonitoringSignificantLocationChanges()
         case .authorizedWhenInUse, .authorizedAlways:
             locationError = nil
+            startMonitoringSignificantLocationChanges()
         case .notDetermined:
             break
         @unknown default:
@@ -84,6 +110,11 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location = locations.last else { return }
         currentLocation = location
+        NotificationCenter.default.post(
+            name: .locationDidUpdate,
+            object: self,
+            userInfo: ["location": location]
+        )
     }
 
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {

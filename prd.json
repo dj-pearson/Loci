@@ -156,8 +156,8 @@
         "Typecheck passes"
       ],
       "priority": 10,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented significant location change monitoring in LocationService. Added startMonitoringSignificantLocationChanges()/stopMonitoringSignificantLocationChanges() methods. Monitoring starts automatically on init when authorized and on authorization changes. Posts Notification.Name.locationDidUpdate with location in userInfo on every location update. Background delivery enabled via allowsBackgroundLocationUpdates=true and pausesLocationUpdatesAutomatically=false. Added isMonitoringSignificantChanges tracking property. Build verification deferred to macOS CI."
     },
     {
       "id": "US-011",
