@@ -640,8 +640,8 @@
         "Typecheck passes"
       ],
       "priority": 39,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "AudioPlaybackBar with play/pause, draggable slider, mm:ss labels, AudioWaveformView. Integrated into LocusDetailView below transcription."
     },
     {
       "id": "US-040",

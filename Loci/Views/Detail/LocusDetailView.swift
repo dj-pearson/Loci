@@ -21,6 +21,13 @@ struct LocusDetailView: View {
                 // Transcription
                 transcriptionSection
 
+                // Audio playback
+                AudioPlaybackBar(
+                    playerService: viewModel.playerService,
+                    audioURL: viewModel.audioURL,
+                    waveformColor: locus.category.color
+                )
+
                 // Map snippet
                 mapSnippet
 
