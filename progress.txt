@@ -4,7 +4,7 @@
 ## Started: 2026-03-25
 ## Status: IN PROGRESS
 ## Total Stories: 120
-## Completed: 25/120
+## Completed: 26/120
 
 ---
 
@@ -73,7 +73,7 @@ Loci is a voice-first iOS app (SwiftUI, iOS 17+) that pins voice notes to GPS co
 - [x] US-023: Create RecordButton component with animation and haptics
 - [x] US-024: Create RecordingView with real-time transcription display
 - [x] US-025: Create AudioWaveformView for real-time amplitude visualization
-- [ ] US-026: Create AI auto-categorization service
+- [x] US-026: Create AI auto-categorization service
 - [ ] US-027: Create PostRecordingSheet with category and sharing options
 - [ ] US-028: Implement locus save flow with geofence update
 

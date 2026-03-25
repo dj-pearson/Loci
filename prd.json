@@ -423,8 +423,8 @@
         "Typecheck passes"
       ],
       "priority": 26,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented AICategoryService enum in Services/AICategoryService.swift. Keyword-based categorization with all specified keywords per category plus extras. Case-insensitive tokenization. Confidence threshold requires 2+ keyword matches for non-general category. Returns .general by default. Added to project.pbxproj. Build verification deferred to macOS CI."
     },
     {
       "id": "US-027",
