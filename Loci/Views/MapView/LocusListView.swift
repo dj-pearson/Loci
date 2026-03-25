@@ -1,6 +1,7 @@
 import CoreLocation
 import SwiftData
 import SwiftUI
+import UIKit
 
 enum LocusSortOrder: String, CaseIterable, Identifiable {
     case nearest
@@ -23,11 +24,23 @@ struct LocusListView: View {
            sort: \Locus.createdAt, order: .reverse)
     private var allLoci: [Locus]
 
+    @Query private var householdMembers: [HouseholdMember]
+
+    @Environment(\.modelContext) private var modelContext
+
     @Bindable var viewModel: HomeMapViewModel
     let locationService: LocationService
     let navigationRouter: NavigationRouter
 
     @State private var sortOrder: LocusSortOrder = .newest
+    @State private var locusToDelete: Locus?
+    @State private var showDeleteConfirmation = false
+    @State private var archivedLocus: Locus?
+    @State private var showUndoSnackbar = false
+
+    private var hasHousehold: Bool {
+        !householdMembers.isEmpty
+    }
 
     private var sortedLoci: [Locus] {
         let filtered = viewModel.filteredLoci(from: allLoci)
@@ -92,6 +105,36 @@ struct LocusListView: View {
                             )
                         }
                         .buttonStyle(.plain)
+                        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                            Button(role: .destructive) {
+                                locusToDelete = locus
+                                showDeleteConfirmation = true
+                            } label: {
+                                Label(String(localized: "Delete"), systemImage: "trash")
+                            }
+
+                            Button {
+                                archiveLocus(locus)
+                            } label: {
+                                Label(String(localized: "Archive"), systemImage: "archivebox")
+                            }
+                            .tint(.yellow)
+                        }
+                        .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                            if hasHousehold {
+                                Button {
+                                    toggleSharing(locus)
+                                } label: {
+                                    Label(
+                                        locus.isShared
+                                            ? String(localized: "Unshare")
+                                            : String(localized: "Share"),
+                                        systemImage: "person.2"
+                                    )
+                                }
+                                .tint(.green)
+                            }
+                        }
                     }
                 } header: {
                     if !section.title.isEmpty {
@@ -124,6 +167,71 @@ struct LocusListView: View {
                 )
             }
         }
+        .overlay(alignment: .bottom) {
+            if showUndoSnackbar, let locus = archivedLocus {
+                UndoSnackbar(
+                    message: String(localized: "Voice note archived"),
+                    onUndo: {
+                        undoArchive(locus)
+                    },
+                    onDismiss: {
+                        showUndoSnackbar = false
+                        archivedLocus = nil
+                    }
+                )
+                .padding(.bottom, Theme.Spacing.lg)
+            }
+        }
+        .alert(
+            String(localized: "Delete Voice Note"),
+            isPresented: $showDeleteConfirmation,
+            presenting: locusToDelete
+        ) { locus in
+            Button(String(localized: "Delete"), role: .destructive) {
+                LocusActions.delete(locus, modelContext: modelContext)
+                locusToDelete = nil
+            }
+            Button(String(localized: "Cancel"), role: .cancel) {
+                locusToDelete = nil
+            }
+        } message: { _ in
+            Text(String(localized: "This will permanently delete the voice note and its audio recording."))
+        }
+    }
+
+    // MARK: - Actions
+
+    private func archiveLocus(_ locus: Locus) {
+        LocusActions.archive(locus, modelContext: modelContext) { undo in
+            archivedLocus = locus
+            withAnimation {
+                showUndoSnackbar = true
+            }
+        }
+    }
+
+    private func undoArchive(_ locus: Locus) {
+        locus.isArchived = false
+        locus.updatedAt = Date()
+        try? modelContext.save()
+        NotificationCenter.default.post(name: .locusDidCreate, object: nil)
+
+        let generator = UINotificationFeedbackGenerator()
+        generator.notificationOccurred(.success)
+
+        withAnimation {
+            showUndoSnackbar = false
+            archivedLocus = nil
+        }
+    }
+
+    private func toggleSharing(_ locus: Locus) {
+        locus.isShared.toggle()
+        locus.updatedAt = Date()
+        try? modelContext.save()
+
+        let generator = UIImpactFeedbackGenerator(style: .medium)
+        generator.impactOccurred()
     }
 }
 

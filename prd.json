@@ -690,8 +690,8 @@
         "Typecheck passes"
       ],
       "priority": 42,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented in LocusListView.swift. Swipe actions use LocusActions helpers from UndoSnackbar.swift. Share toggle gated by @Query of HouseholdMember."
     },
     {
       "id": "US-043",
