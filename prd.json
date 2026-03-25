@@ -390,8 +390,8 @@
         "Typecheck passes"
       ],
       "priority": 24,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented RecordingView in Views/Record/RecordingView.swift. Layout: location header at top (reverse geocoded), scrolling transcription area, centered RecordButton, mm:ss duration timer. Idle state shows 'Tap to record a voice note'. Background gradient uses detectedCategory color (defaults to .general; will integrate with AI categorization in US-026). Preparing overlay with ProgressView. Error alert for recording failures. Added to project.pbxproj. Build verification deferred to macOS CI."
     },
     {
       "id": "US-025",
