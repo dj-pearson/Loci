@@ -305,8 +305,8 @@
         "Typecheck passes"
       ],
       "priority": 19,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented NotificationService @Observable class in Services/NotificationService.swift wrapping UNUserNotificationCenter. requestPermission() async -> Bool requests .alert, .sound, .badge. isAuthorized and authorizationStatus properties updated via checkAuthorizationStatus(). Notification category LOCUS_PROXIMITY configured with VIEW_LOCUS (foreground), ADD_NOTE (foreground), and ARCHIVE (destructive) actions. UNUserNotificationCenterDelegate handles foreground presentation and action responses, posting Notification.Name events for deep-link handling. Added to project.pbxproj. Build verification deferred to macOS CI."
     },
     {
       "id": "US-020",

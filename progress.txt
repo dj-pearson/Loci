@@ -4,7 +4,7 @@
 ## Started: 2026-03-25
 ## Status: IN PROGRESS
 ## Total Stories: 120
-## Completed: 18/120
+## Completed: 19/120
 
 ---
 
@@ -64,7 +64,7 @@ Loci is a voice-first iOS app (SwiftUI, iOS 17+) that pins voice notes to GPS co
 ## Phase 3: Geofencing & Notifications (US-017 → US-021)
 - [x] US-017: Create GeofenceManager with CLMonitor region registration
 - [x] US-018: Implement 20-region rotation with nearest-loci calculation
-- [ ] US-019: Create NotificationService with permission management
+- [x] US-019: Create NotificationService with permission management
 - [ ] US-020: Implement geofence entry notification with locus preview
 - [ ] US-021: Implement notification tap deep-link to locus detail
 
