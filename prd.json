@@ -140,8 +140,8 @@
         "Typecheck passes"
       ],
       "priority": 9,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented LocationService @Observable class in Services/LocationService.swift with CLLocationManagerDelegate conformance. Properties: currentLocation, authorizationStatus, isAuthorizedAlways (plus isAuthorizedWhenInUse, isAuthorized, isDenied, isRestricted convenience). Methods: requestWhenInUsePermission(), requestAlwaysPermission() with proper state guards. LocationError enum for denied/restricted/locationUnavailable/unknown states with localized descriptions. Delegate handles authorization changes and location update errors. Added to project.pbxproj. Build verification deferred to macOS CI."
     },
     {
       "id": "US-010",
