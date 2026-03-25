@@ -572,8 +572,8 @@
         "Typecheck passes"
       ],
       "priority": 35,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "ContentView with TabView (Map/List/Settings). Each tab has NavigationStack. Map tab has CategoryFilterBar overlay. LocationService injected via environment."
     },
     {
       "id": "US-036",

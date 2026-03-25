@@ -7,6 +7,7 @@ struct LociApp: App {
 
     @State private var navigationRouter = NavigationRouter()
     @State private var notificationService = NotificationService()
+    @State private var locationService = LocationService()
 
     init() {
         do {
@@ -21,6 +22,7 @@ struct LociApp: App {
             ContentView()
                 .environment(navigationRouter)
                 .environment(notificationService)
+                .environment(locationService)
         }
         .modelContainer(modelContainer)
     }
@@ -29,35 +31,94 @@ struct LociApp: App {
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(NavigationRouter.self) private var navigationRouter
+    @Environment(LocationService.self) private var locationService
     @Query(filter: #Predicate<Locus> { !$0.isArchived }) private var loci: [Locus]
+
+    @State private var selectedTab: AppTab = .map
+    @State private var mapViewModel: HomeMapViewModel?
 
     var body: some View {
         @Bindable var router = navigationRouter
 
-        NavigationStack {
-            VStack {
-                Text("Loci")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
+        TabView(selection: $selectedTab) {
+            // Map Tab
+            NavigationStack {
+                ZStack(alignment: .top) {
+                    if let vm = mapViewModel {
+                        HomeMapView(
+                            viewModel: vm,
+                            navigationRouter: navigationRouter
+                        )
+                    }
 
-                // Placeholder list of loci for deep-link navigation testing
-                ForEach(loci) { locus in
-                    NavigationLink(value: locus.id) {
-                        Text(locus.locationName ?? locus.category.displayName)
+                    if let vm = mapViewModel {
+                        CategoryFilterBar(
+                            selectedCategories: Bindable(vm).selectedCategories,
+                            lociCounts: lociCountsByCategory
+                        )
+                        .background(.ultraThinMaterial)
+                    }
+                }
+                .navigationDestination(item: $router.selectedLocusId) { locusId in
+                    LocusDeepLinkView(locusId: locusId)
+                }
+            }
+            .tabItem {
+                Label(String(localized: "Map"), systemImage: "map.fill")
+            }
+            .tag(AppTab.map)
+
+            // List Tab
+            NavigationStack {
+                if let vm = mapViewModel {
+                    LocusListView(
+                        viewModel: vm,
+                        locationService: locationService,
+                        navigationRouter: navigationRouter
+                    )
+                    .navigationTitle(String(localized: "Loci"))
+                    .navigationDestination(item: $router.selectedLocusId) { locusId in
+                        LocusDeepLinkView(locusId: locusId)
                     }
                 }
             }
-            .navigationDestination(for: UUID.self) { locusId in
-                LocusDeepLinkView(locusId: locusId)
+            .tabItem {
+                Label(String(localized: "List"), systemImage: "list.bullet")
             }
-            .navigationDestination(item: $router.selectedLocusId) { locusId in
-                LocusDeepLinkView(locusId: locusId)
+            .tag(AppTab.list)
+
+            // Settings Tab
+            NavigationStack {
+                Text(String(localized: "Settings"))
+                    .font(.title)
+                    .foregroundStyle(.secondary)
             }
+            .tabItem {
+                Label(String(localized: "Settings"), systemImage: "gearshape.fill")
+            }
+            .tag(AppTab.settings)
         }
         .onAppear {
+            if mapViewModel == nil {
+                mapViewModel = HomeMapViewModel(locationService: locationService)
+            }
             navigationRouter.consumePendingDeepLink()
         }
     }
+
+    private var lociCountsByCategory: [LocusCategory: Int] {
+        var counts: [LocusCategory: Int] = [:]
+        for locus in loci {
+            counts[locus.category, default: 0] += 1
+        }
+        return counts
+    }
+}
+
+enum AppTab: Hashable {
+    case map
+    case list
+    case settings
 }
 
 /// Temporary detail view for deep-linked locus navigation.
