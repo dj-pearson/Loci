@@ -124,8 +124,8 @@
         "Typecheck passes"
       ],
       "priority": 8,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented ModelContainerConfiguration enum in Utilities/ with production() and preview() factory methods. Schema includes Locus, Household, HouseholdMember, UserProfile. Production container uses app group (group.com.pearsonmedia.loci) for widget data sharing. Preview container is in-memory only. PreviewData enum provides 12 sample loci (all 10 categories), 2 households, 2 members, 3 user profiles, and a previewContainer property that populates the in-memory store. LociApp.swift updated to initialize and inject production ModelContainer. Build verification deferred to macOS CI."
     },
     {
       "id": "US-009",

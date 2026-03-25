@@ -17,6 +17,8 @@
 		8F2A5C5D1B2E4F7A90D3E6C1 /* AppConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A5C5D1B2E4F7A90D3E6C1 /* AppConstants.swift */; };
 		8F2A5C5D1B2E4F7A90D3E6C2 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A5C5D1B2E4F7A90D3E6C2 /* Theme.swift */; };
 		8F2A5C5D1B2E4F7A90D3E6C3 /* HaversineDistance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A5C5D1B2E4F7A90D3E6C3 /* HaversineDistance.swift */; };
+		8F2A5C5D1B2E4F7A90D3E6C4 /* ModelContainerConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A5C5D1B2E4F7A90D3E6C4 /* ModelContainerConfiguration.swift */; };
+		8F2A5C5D1B2E4F7A90D3E6C5 /* PreviewData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A5C5D1B2E4F7A90D3E6C5 /* PreviewData.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -33,6 +35,8 @@
 		8F1A5C5D1B2E4F7A90D3E6C1 /* AppConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConstants.swift; sourceTree = "<group>"; };
 		8F1A5C5D1B2E4F7A90D3E6C2 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		8F1A5C5D1B2E4F7A90D3E6C3 /* HaversineDistance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HaversineDistance.swift; sourceTree = "<group>"; };
+		8F1A5C5D1B2E4F7A90D3E6C4 /* ModelContainerConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelContainerConfiguration.swift; sourceTree = "<group>"; };
+		8F1A5C5D1B2E4F7A90D3E6C5 /* PreviewData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewData.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -122,6 +126,8 @@
 			children = (
 				8F1A5C5D1B2E4F7A90D3E6C1 /* AppConstants.swift */,
 				8F1A5C5D1B2E4F7A90D3E6C3 /* HaversineDistance.swift */,
+				8F1A5C5D1B2E4F7A90D3E6C4 /* ModelContainerConfiguration.swift */,
+				8F1A5C5D1B2E4F7A90D3E6C5 /* PreviewData.swift */,
 				8F1A5C5D1B2E4F7A90D3E6C2 /* Theme.swift */,
 			);
 			path = Utilities;
@@ -247,6 +253,8 @@
 				8F2A5C5D1B2E4F7A90D3E6C1 /* AppConstants.swift in Sources */,
 				8F2A5C5D1B2E4F7A90D3E6C2 /* Theme.swift in Sources */,
 				8F2A5C5D1B2E4F7A90D3E6C3 /* HaversineDistance.swift in Sources */,
+				8F2A5C5D1B2E4F7A90D3E6C4 /* ModelContainerConfiguration.swift in Sources */,
+				8F2A5C5D1B2E4F7A90D3E6C5 /* PreviewData.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
