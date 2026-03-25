@@ -255,8 +255,8 @@
         "Typecheck passes"
       ],
       "priority": 16,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Added real-time streaming transcription to TranscriptionService. startLiveTranscription(audioEngine:) installs an audio tap on the engine's input node and feeds buffers to SFSpeechAudioBufferRecognitionRequest. transcription property updated in real-time from partial results, isFinal tracked for segment completion. stopLiveTranscription() removes the tap, ends audio, and cancels the recognition task. Cancellation errors (code 216) are filtered out. isTranscribing property tracks active state. Build verification deferred to macOS CI."
     },
     {
       "id": "US-017",

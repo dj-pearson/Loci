@@ -1,3 +1,4 @@
+import AVFoundation
 import Foundation
 import Speech
 
@@ -8,8 +9,15 @@ final class TranscriptionService {
     private(set) var isAvailable = false
     private(set) var permissionStatus: PermissionStatus = .notDetermined
     private(set) var transcriptionError: TranscriptionError?
+    private(set) var transcription: String = ""
+    private(set) var isFinal = false
+    private(set) var isTranscribing = false
 
     private let speechRecognizer: SFSpeechRecognizer?
+    private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
+    private var recognitionTask: SFSpeechRecognitionTask?
+    private var audioEngine: AVAudioEngine?
+
     private var supportsOnDeviceRecognition: Bool {
         speechRecognizer?.supportsOnDeviceRecognition ?? false
     }
@@ -86,6 +94,96 @@ final class TranscriptionService {
         if #available(iOS 18.0, *) {
             request.addsPunctuation = true
         }
+    }
+
+    // MARK: - Live Streaming Transcription
+
+    func startLiveTranscription(audioEngine: AVAudioEngine) throws {
+        guard let recognizer = speechRecognizer, recognizer.isAvailable else {
+            let error = TranscriptionError.recognizerUnavailable
+            transcriptionError = error
+            throw error
+        }
+
+        guard permissionStatus == .granted else {
+            let error = TranscriptionError.permissionDenied
+            transcriptionError = error
+            throw error
+        }
+
+        // Cancel any existing task
+        stopLiveTranscription()
+
+        self.audioEngine = audioEngine
+        transcription = ""
+        isFinal = false
+        transcriptionError = nil
+
+        let request = SFSpeechAudioBufferRecognitionRequest()
+        configureRecognitionRequest(request)
+        request.shouldReportPartialResults = true
+        recognitionRequest = request
+
+        recognitionTask = recognizer.recognitionTask(with: request) { [weak self] result, error in
+            guard let self else { return }
+
+            if let result {
+                self.transcription = result.bestTranscription.formattedString
+                self.isFinal = result.isFinal
+
+                if result.isFinal {
+                    self.isTranscribing = false
+                }
+            }
+
+            if let error {
+                // Ignore cancellation errors from intentional stop
+                let nsError = error as NSError
+                if nsError.domain == "kAFAssistantErrorDomain" && nsError.code == 216 {
+                    // Recognition request was canceled — not a real error
+                    return
+                }
+
+                self.transcriptionError = .recognitionFailed(error.localizedDescription)
+                self.isTranscribing = false
+            }
+        }
+
+        // Install audio tap on the input node
+        let inputNode = audioEngine.inputNode
+        let recordingFormat = inputNode.outputFormat(forBus: 0)
+        inputNode.installTap(onBus: 0, bufferSize: 1024, format: recordingFormat) { [weak self] buffer, _ in
+            self?.recognitionRequest?.append(buffer)
+        }
+
+        if !audioEngine.isRunning {
+            do {
+                try audioEngine.start()
+            } catch {
+                stopLiveTranscription()
+                let engineError = TranscriptionError.audioEngineError(error.localizedDescription)
+                transcriptionError = engineError
+                throw engineError
+            }
+        }
+
+        isTranscribing = true
+    }
+
+    func stopLiveTranscription() {
+        // Remove the tap before stopping the engine
+        if let engine = audioEngine, engine.inputNode.numberOfInputs > 0 {
+            engine.inputNode.removeTap(onBus: 0)
+        }
+
+        recognitionRequest?.endAudio()
+        recognitionRequest = nil
+
+        recognitionTask?.cancel()
+        recognitionTask = nil
+
+        audioEngine = nil
+        isTranscribing = false
     }
 
     // MARK: - File Transcription
