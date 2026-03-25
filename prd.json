@@ -806,8 +806,8 @@
         "Typecheck passes"
       ],
       "priority": 49,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "LocationPermissionView with geofence explanation, bullet points (background, battery, privacy), Enable/Maybe Later buttons, authorization callback."
     },
     {
       "id": "US-050",
