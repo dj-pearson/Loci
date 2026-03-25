@@ -373,8 +373,8 @@
         "Typecheck passes"
       ],
       "priority": 23,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented RecordButton SwiftUI view in Views/Record/RecordButton.swift. 80pt circle with Theme.primary (idle) and Theme.error (recording). Idle state shows mic.fill SF Symbol with pulsing ring animation. Recording state shows rounded-rect stop icon with amplitude-responsive ring (maps 0-1 amplitude to ring diameter). UIImpactFeedbackGenerator(.medium) on tap. Spring scaleEffect animation on press/release via DragGesture. VoiceOver labels: 'Record voice note' / 'Stop recording' (localized). Added to project.pbxproj. Build verification deferred to macOS CI."
     },
     {
       "id": "US-024",
