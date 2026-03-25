@@ -356,8 +356,8 @@
         "Typecheck passes"
       ],
       "priority": 22,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented RecordViewModel @Observable class in ViewModels/RecordViewModel.swift. Injects LocationService, AudioService, and TranscriptionService. State properties: isRecording, isPreparing, transcription (delegated to TranscriptionService), currentLocation (delegated to LocationService), recordingDuration (1Hz timer), amplitude (delegated to AudioService), errorMessage. startRecording() validates mic and location permissions, requests transcription permission non-blocking, starts audio recording and live transcription simultaneously. stopRecording() returns tuple of (URL, String, CLLocationCoordinate2D) with file-based transcription fallback. cancelRecording() stops all services and deletes the audio file. User-friendly error messages for permission failures. Added to project.pbxproj. Build verification deferred to macOS CI."
     },
     {
       "id": "US-023",

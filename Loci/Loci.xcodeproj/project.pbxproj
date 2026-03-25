@@ -27,6 +27,7 @@
 		8F2A6C5D1B2E4F7A90D3E6C6 /* GeofenceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A6C5D1B2E4F7A90D3E6C6 /* GeofenceManager.swift */; };
 		8F2A6C5D1B2E4F7A90D3E6C7 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A6C5D1B2E4F7A90D3E6C7 /* NotificationService.swift */; };
 		8F2A7C5D1B2E4F7A90D3E6C1 /* NavigationRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A7C5D1B2E4F7A90D3E6C1 /* NavigationRouter.swift */; };
+		8F2A7C5D1B2E4F7A90D3E6C2 /* RecordViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A7C5D1B2E4F7A90D3E6C2 /* RecordViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -53,6 +54,7 @@
 		8F1A6C5D1B2E4F7A90D3E6C6 /* GeofenceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeofenceManager.swift; sourceTree = "<group>"; };
 		8F1A6C5D1B2E4F7A90D3E6C7 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		8F1A7C5D1B2E4F7A90D3E6C1 /* NavigationRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationRouter.swift; sourceTree = "<group>"; };
+		8F1A7C5D1B2E4F7A90D3E6C2 /* RecordViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -107,6 +109,7 @@
 			isa = PBXGroup;
 			children = (
 				8F1A7C5D1B2E4F7A90D3E6C1 /* NavigationRouter.swift */,
+				8F1A7C5D1B2E4F7A90D3E6C2 /* RecordViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -287,6 +290,7 @@
 				8F2A6C5D1B2E4F7A90D3E6C6 /* GeofenceManager.swift in Sources */,
 				8F2A6C5D1B2E4F7A90D3E6C7 /* NotificationService.swift in Sources */,
 				8F2A7C5D1B2E4F7A90D3E6C1 /* NavigationRouter.swift in Sources */,
+				8F2A7C5D1B2E4F7A90D3E6C2 /* RecordViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
