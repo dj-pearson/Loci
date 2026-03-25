@@ -539,8 +539,8 @@
         "Typecheck passes"
       ],
       "priority": 33,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "CategoryFilterBar with horizontal ScrollView, All chip, per-category chips with icon+name+count badge, toggle selection with color feedback."
     },
     {
       "id": "US-034",
