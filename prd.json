@@ -238,8 +238,8 @@
         "Typecheck passes"
       ],
       "priority": 15,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented TranscriptionService @Observable class in Services/TranscriptionService.swift. Uses SFSpeechRecognizer with on-device recognition preferred (requiresOnDeviceRecognition=true when supportsOnDeviceRecognition is true), falls back to server recognition otherwise. requestTranscriptionPermission() async -> Bool with SFSpeechRecognizer.requestAuthorization. isAvailable property checks recognizer availability AND permission status. configureRecognitionRequest() sets up on-device vs server recognition and partial results. transcribeFile(url:) for post-recording file transcription. PermissionStatus and TranscriptionError enums with localized descriptions. Added to project.pbxproj. Build verification deferred to macOS CI."
     },
     {
       "id": "US-016",

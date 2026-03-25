@@ -23,6 +23,7 @@
 		8F2A6C5D1B2E4F7A90D3E6C2 /* ReverseGeocodingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A6C5D1B2E4F7A90D3E6C2 /* ReverseGeocodingService.swift */; };
 		8F2A6C5D1B2E4F7A90D3E6C3 /* AudioService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A6C5D1B2E4F7A90D3E6C3 /* AudioService.swift */; };
 		8F2A6C5D1B2E4F7A90D3E6C4 /* AudioPlayerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A6C5D1B2E4F7A90D3E6C4 /* AudioPlayerService.swift */; };
+		8F2A6C5D1B2E4F7A90D3E6C5 /* TranscriptionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A6C5D1B2E4F7A90D3E6C5 /* TranscriptionService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -45,6 +46,7 @@
 		8F1A6C5D1B2E4F7A90D3E6C2 /* ReverseGeocodingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReverseGeocodingService.swift; sourceTree = "<group>"; };
 		8F1A6C5D1B2E4F7A90D3E6C3 /* AudioService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioService.swift; sourceTree = "<group>"; };
 		8F1A6C5D1B2E4F7A90D3E6C4 /* AudioPlayerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPlayerService.swift; sourceTree = "<group>"; };
+		8F1A6C5D1B2E4F7A90D3E6C5 /* TranscriptionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptionService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -122,6 +124,7 @@
 				8F1A6C5D1B2E4F7A90D3E6C3 /* AudioService.swift */,
 				8F1A6C5D1B2E4F7A90D3E6C1 /* LocationService.swift */,
 				8F1A6C5D1B2E4F7A90D3E6C2 /* ReverseGeocodingService.swift */,
+				8F1A6C5D1B2E4F7A90D3E6C5 /* TranscriptionService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -271,6 +274,7 @@
 				8F2A6C5D1B2E4F7A90D3E6C2 /* ReverseGeocodingService.swift in Sources */,
 				8F2A6C5D1B2E4F7A90D3E6C3 /* AudioService.swift in Sources */,
 				8F2A6C5D1B2E4F7A90D3E6C4 /* AudioPlayerService.swift in Sources */,
+				8F2A6C5D1B2E4F7A90D3E6C5 /* TranscriptionService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
