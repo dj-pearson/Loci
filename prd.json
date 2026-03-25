@@ -924,8 +924,8 @@
         "Typecheck passes"
       ],
       "priority": 56,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "AboutView with version/build, Privacy Policy, Terms of Service, Support links, Rate on App Store via requestReview, and credits."
     },
     {
       "id": "US-057",
