@@ -188,8 +188,8 @@
         "Typecheck passes"
       ],
       "priority": 12,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented AudioService @Observable class in Services/AudioService.swift. AVAudioSession configured with .playAndRecord category and .defaultToSpeaker option. Uses AppConstants.Audio.recorderSettings for M4A/AAC/64kbps/mono/44100Hz. requestMicrophonePermission() uses iOS 17+ AVAudioApplication.requestRecordPermission(). File naming: locus_{UUID}_{timestamp}.m4a in documents directory. PermissionStatus and AudioError enums with localized descriptions. prepareRecorder() creates and prepares AVAudioRecorder. cleanup() and deleteRecording() for resource management. Added to project.pbxproj. Build verification deferred to macOS CI."
     },
     {
       "id": "US-013",
