@@ -1,0 +1,261 @@
+# Loci - Ralph Progress Tracker
+## Project: Loci — Your Spatial Memory
+## Branch: ralph/loci-mvp
+## Started: 2026-03-25
+## Status: NOT STARTED
+## Total Stories: 120
+## Completed: 0/120
+
+---
+
+## Important Context for Ralph Iterations
+
+### Project Overview
+Loci is a voice-first iOS app (SwiftUI, iOS 17+) that pins voice notes to GPS coordinates with proximity-triggered push notifications and family sharing. Backend is self-hosted Supabase with PostGIS on Contabo/Coolify. Marketing site on Cloudflare Pages (Astro).
+
+### Tech Stack
+- **iOS**: Swift 5.9+, SwiftUI, SwiftData, CoreLocation (CLMonitor), AVFoundation, Apple Speech, MapKit, WidgetKit, RevenueCat, supabase-swift, TelemetryDeck
+- **Backend**: PostgreSQL 15+ with PostGIS, Supabase Auth/Storage/PostgREST, Node.js 20 + Hono (Docker sidecar)
+- **Web**: Astro + Tailwind on Cloudflare Pages
+- **CI/CD**: GitHub Actions, Fastlane, SwiftLint
+
+### Architecture
+- MVVM with @Observable classes (not Combine ObservableObject)
+- SwiftData for local persistence (not Core Data)
+- Offline-first: full functionality without network, sync is additive
+- CLMonitor for geofencing (iOS 17+ API, not legacy CLLocationManager regions)
+- 20-geofence iOS limit managed by nearest-rotation strategy
+
+### Key Decisions
+- Apple Speech over Whisper (free, on-device, private)
+- PostGIS over CloudKit (existing infra, spatial queries, household sync)
+- M4A over WAV (100KB/30s vs 5MB/30s)
+- CLMonitor over legacy geofence API (better reliability)
+- RevenueCat for subscriptions (free under $2.5K MRR)
+
+### Monetization Tiers
+- Free: 10 loci, no sharing, no AI, basic map
+- Premium ($3.99/mo, $29.99/yr): Unlimited, AI, sync, widget, search. 7-day trial.
+- Family ($5.99/mo, $44.99/yr): All Premium + household sharing (up to 6). Host needs Family plan.
+- Lifetime: $59.99 individual, $89.99 family (launch promo: $39.99/$59.99)
+
+---
+
+## Phase 1: Project Foundation (US-001 → US-008)
+- [ ] US-001: Create Xcode project structure with folder organization
+- [ ] US-002: Define LocusCategory enum with colors and icons
+- [ ] US-003: Define Locus SwiftData model
+- [ ] US-004: Define Household and HouseholdMember SwiftData models
+- [ ] US-005: Define UserProfile model and app constants
+- [ ] US-006: Create theme system with colors, fonts, and semantic tokens
+- [ ] US-007: Create Haversine distance utility and extensions
+- [ ] US-008: Create ModelContainer configuration and preview helpers
+
+## Phase 2: Core Services (US-009 → US-016)
+- [ ] US-009: Create LocationService with permission management
+- [ ] US-010: Add current location tracking and significant location changes
+- [ ] US-011: Create reverse geocoding service
+- [ ] US-012: Create AudioService with AVAudioRecorder configuration
+- [ ] US-013: Add recording start, stop, and save methods to AudioService
+- [ ] US-014: Create AudioPlayerService for playback controls
+- [ ] US-015: Create TranscriptionService with on-device speech recognition
+- [ ] US-016: Add real-time streaming transcription to TranscriptionService
+
+## Phase 3: Geofencing & Notifications (US-017 → US-021)
+- [ ] US-017: Create GeofenceManager with CLMonitor region registration
+- [ ] US-018: Implement 20-region rotation with nearest-loci calculation
+- [ ] US-019: Create NotificationService with permission management
+- [ ] US-020: Implement geofence entry notification with locus preview
+- [ ] US-021: Implement notification tap deep-link to locus detail
+
+## Phase 4: Recording Flow (US-022 → US-028)
+- [ ] US-022: Create RecordViewModel orchestrating audio, transcription, and GPS
+- [ ] US-023: Create RecordButton component with animation and haptics
+- [ ] US-024: Create RecordingView with real-time transcription display
+- [ ] US-025: Create AudioWaveformView for real-time amplitude visualization
+- [ ] US-026: Create AI auto-categorization service
+- [ ] US-027: Create PostRecordingSheet with category and sharing options
+- [ ] US-028: Implement locus save flow with geofence update
+
+## Phase 5: Map & Browse (US-029 → US-036)
+- [ ] US-029: Create HomeMapViewModel with filtered annotations
+- [ ] US-030: Create CategoryPinView custom map annotation
+- [ ] US-031: Create HomeMapView with MapKit and locus annotations
+- [ ] US-032: Create map annotation clustering for dense areas
+- [ ] US-033: Create CategoryFilterBar component
+- [ ] US-034: Create LocusListView as alternative to map view
+- [ ] US-035: Create tab-based navigation with map, list, and settings
+- [ ] US-036: Create EmptyStateView reusable component
+
+## Phase 6: Locus Detail (US-037 → US-043)
+- [ ] US-037: Create LocusDetailViewModel
+- [ ] US-038: Create LocusDetailView with transcription and metadata
+- [ ] US-039: Create AudioPlaybackBar with progress and controls
+- [ ] US-040: Create EditLocusSheet for modifying existing loci
+- [ ] US-041: Create archive and delete actions with undo support
+- [ ] US-042: Create swipe actions on locus list items
+- [ ] US-043: Create contextual menus on locus items (long-press)
+
+## Phase 7: Search (US-044 → US-046)
+- [ ] US-044: Create SearchService for keyword, category, and nearby queries
+- [ ] US-045: Create SearchView with search bar and filter chips
+- [ ] US-046: Create SearchResultsView with highlighted matches
+
+## Phase 8: Onboarding (US-047 → US-051)
+- [ ] US-047: Create OnboardingViewModel with step management
+- [ ] US-048: Create welcome onboarding screens with value propositions
+- [ ] US-049: Create location permission request screen
+- [ ] US-050: Create notification and microphone permission screens
+- [ ] US-051: Create first locus prompt in onboarding
+
+## Phase 9: Settings (US-052 → US-056)
+- [ ] US-052: Create SettingsViewModel with user preferences
+- [ ] US-053: Create SettingsView with organized sections
+- [ ] US-054: Create notification preferences with quiet hours
+- [ ] US-055: Create data management view with storage info
+- [ ] US-056: Create About view with legal links and app info
+
+## Phase 10: Backend — Schema & RLS (US-057 → US-062)
+- [ ] US-057: Create PostgreSQL schema migration for users table
+- [ ] US-058: Create PostgreSQL schema migration for loci table with PostGIS
+- [ ] US-059: Create PostgreSQL schema migration for households tables
+- [ ] US-060: Create Row Level Security policies for all tables
+- [ ] US-061: Create Supabase Storage bucket for audio files
+- [ ] US-062: Create database seed script with test data
+
+## Phase 11: Backend — Edge Functions (US-063 → US-068)
+- [ ] US-063: Create edge function project with Docker and Hono scaffold
+- [ ] US-064: Create household-invite edge function
+- [ ] US-065: Create contextual-select edge function
+- [ ] US-066: Create analyze-loci edge function for AI summaries
+- [ ] US-067: Create sync-subscription edge function for RevenueCat webhook
+- [ ] US-068: Create push-digest edge function for weekly summaries
+
+## Phase 12: Auth & Sync (US-069 → US-077)
+- [ ] US-069: Create SupabaseClient configuration with supabase-swift
+- [ ] US-070: Create AuthService with Apple Sign In
+- [ ] US-071: Create AuthService email/password flow
+- [ ] US-072: Create auth state management with session persistence
+- [ ] US-073: Create auth UI screens (sign in, sign up)
+- [ ] US-074: Create SyncService for uploading loci to Supabase
+- [ ] US-075: Create SyncService for downloading and merging remote loci
+- [ ] US-076: Create audio file sync to Supabase Storage
+- [ ] US-077: Create background sync manager
+
+## Phase 13: Family Sharing (US-078 → US-084)
+- [ ] US-078: Create HouseholdViewModel for family management
+- [ ] US-079: Create household creation UI
+- [ ] US-080: Create join household UI
+- [ ] US-081: Create household member management UI
+- [ ] US-082: Create share-with-family toggle on locus creation
+- [ ] US-083: Create shared loci display with creator attribution
+- [ ] US-084: Include shared loci in geofence rotation
+
+## Phase 14: Monetization (US-085 → US-089)
+- [ ] US-085: Create RevenueCat SDK configuration
+- [ ] US-086: Create SubscriptionService for purchase and tier management
+- [ ] US-087: Create PaywallView with tier comparison
+- [ ] US-088: Create tier enforcement for free plan limits
+- [ ] US-089: Create contextual upgrade prompts
+
+## Phase 15: Widget (US-090 → US-092)
+- [ ] US-090: Create WidgetKit timeline provider for nearby loci
+- [ ] US-091: Create NearbyLociWidget small and medium layouts
+- [ ] US-092: Create widget deep-link with AppIntent
+
+## Phase 16: Security Hardening (US-093 → US-098)
+- [ ] US-093: Create KeychainService for secure credential storage
+- [ ] US-094: Create biometric lock for app access
+- [ ] US-095: Create SSL certificate pinning for API calls
+- [ ] US-096: Create audio file encryption at rest
+- [ ] US-097: Create input sanitization service
+- [ ] US-098: Create rate limiting middleware for edge functions
+
+## Phase 17: Performance Optimization (US-099 → US-101)
+- [ ] US-099: Create efficient SwiftData pagination
+- [ ] US-100: Create audio file cache management
+- [ ] US-101: Create map viewport optimization for annotation loading
+
+## Phase 18: Accessibility & Polish (US-102 → US-108)
+- [ ] US-102: Create VoiceOver accessibility labels throughout app
+- [ ] US-103: Create Dynamic Type support across all views
+- [ ] US-104: Create Reduce Motion alternatives
+- [ ] US-105: Create haptic feedback manager
+- [ ] US-106: Create smooth view transition animations
+- [ ] US-107: Create skeleton loading states for async content
+- [ ] US-108: Create comprehensive error handling UI
+
+## Phase 19: Analytics & Theming (US-109 → US-110)
+- [ ] US-109: Create TelemetryDeck analytics integration
+- [ ] US-110: Create dark mode support with proper color adaptation
+
+## Phase 20: Marketing Website (US-111 → US-115)
+- [ ] US-111: Create Astro project for useloci.com marketing site
+- [ ] US-112: Create landing page with hero, features, and download CTA
+- [ ] US-113: Create privacy policy page
+- [ ] US-114: Create terms of service page
+- [ ] US-115: Create support and contact page
+
+## Phase 21: CI/CD & Deployment (US-116 → US-120)
+- [ ] US-116: Create GitHub Actions CI workflow for build and lint
+- [ ] US-117: Create GitHub Actions workflow for TestFlight deployment
+- [ ] US-118: Create app icon set and launch screen
+- [ ] US-119: Create App Store metadata and screenshot configuration
+- [ ] US-120: Create Coolify deployment configuration for Supabase and edge functions
+
+---
+
+## Features Added Beyond PRD (for MVP excellence)
+
+### UI Enhancements
+- Audio waveform visualization during recording and playback (US-025, US-039)
+- Map annotation clustering for dense areas (US-032)
+- Empty state views with helpful CTAs (US-036)
+- Swipe actions on list items (US-042)
+- Contextual long-press menus (US-043)
+- Skeleton loading placeholders (US-107)
+- Smooth view transitions and animations (US-106)
+- Undo support for archive actions (US-041)
+- Post-recording confirmation sheet (US-027)
+
+### UX Enhancements
+- Progressive onboarding with per-permission explanations (US-047–051)
+- Search with recent searches, filter chips, highlighted matches (US-044–046)
+- Notification quiet hours (US-054)
+- Data management with storage usage visibility (US-055)
+- Contextual upgrade prompts at enforcement points (US-089)
+- Deep-link from notifications to locus detail (US-021)
+- Tab-based navigation with map/list/settings (US-035)
+
+### Performance Enhancements
+- SwiftData pagination for large loci collections (US-099)
+- Audio file cache management with LRU cleanup (US-100)
+- Map viewport optimization for lazy annotation loading (US-101)
+
+### Security Enhancements
+- Keychain storage for all auth credentials (US-093)
+- Biometric lock (Face ID/Touch ID) option (US-094)
+- SSL certificate pinning for API calls (US-095)
+- Audio file encryption at rest (US-096)
+- Input sanitization for all user text (US-097)
+- Rate limiting on edge function endpoints (US-098)
+
+### Accessibility Enhancements
+- Full VoiceOver labels and hints (US-102)
+- Dynamic Type support across all views (US-103)
+- Reduce Motion alternatives for all animations (US-104)
+
+---
+
+## Notes for Ralph Iterations
+
+1. **iOS Build**: Use `xcodebuild -scheme Loci -sdk iphonesimulator` for build verification.
+2. **SwiftData requires iOS 17+**: All @Model classes use SwiftData, not Core Data.
+3. **CLMonitor is iOS 17+**: Do not use legacy CLLocationManager region monitoring.
+4. **@Observable not ObservableObject**: Use the Observation framework, not Combine.
+5. **No Whisper API in V1**: Transcription is Apple Speech framework only.
+6. **Offline-first**: Every feature must work without network. Sync is additive.
+7. **Free tier enforcement**: Check SubscriptionTier before premium features.
+8. **Audio format**: M4A/AAC at 64kbps mono, ~100KB per 30 seconds.
+9. **Geofence limit**: iOS enforces max 20 CLCircularRegions per app.
+10. **The edge functions are Node.js/Hono in Docker, NOT Supabase Edge Functions (Deno).**

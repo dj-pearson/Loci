@@ -1,0 +1,2010 @@
+{
+  "project": "Loci",
+  "branchName": "ralph/loci-mvp",
+  "description": "Loci - Voice-first iOS app that pins voice notes to GPS coordinates with proximity-triggered retrieval and family sharing. Built with SwiftUI, SwiftData, CoreLocation, PostGIS Supabase backend, and Cloudflare Pages marketing site.",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Create Xcode project structure with folder organization",
+      "description": "As a developer, I need a properly structured Xcode project so that all subsequent work has a clean foundation.",
+      "acceptanceCriteria": [
+        "Xcode project created with bundle ID com.pearsonmedia.loci, deployment target iOS 17.0",
+        "Folder structure: Models/, ViewModels/, Views/, Services/, Widget/, Utilities/",
+        "Views subfolders: MapView/, Record/, Detail/, Onboarding/, Settings/, Components/",
+        "App entry point (LociApp.swift) with @main and WindowGroup",
+        "App Group configured for widget data sharing (group.com.pearsonmedia.loci)",
+        "Info.plist includes NSLocationAlwaysAndWhenInUseUsageDescription, NSLocationWhenInUseUsageDescription, NSMicrophoneUsageDescription, NSSpeechRecognitionUsageDescription",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Define LocusCategory enum with colors and icons",
+      "description": "As a developer, I need a category system so that loci can be visually distinguished on the map and in lists.",
+      "acceptanceCriteria": [
+        "LocusCategory enum with cases: general, food, shopping, parking, health, travel, tip, warning, home, outdoor",
+        "Each case has displayName, systemImageName (SF Symbol), and color (SwiftUI Color) properties",
+        "Enum conforms to Codable, CaseIterable, Identifiable",
+        "Colors are distinct and accessible (sufficient contrast in both light/dark modes)",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Define Locus SwiftData model",
+      "description": "As a developer, I need the core Locus data model so that voice notes can be persisted locally.",
+      "acceptanceCriteria": [
+        "Locus @Model class with properties: id (UUID), latitude (Double), longitude (Double), locationName (String?), audioFileURL (String), transcription (String), categoryRawValue (String), isShared (Bool), createdByName (String?), householdId (UUID?), createdAt (Date), updatedAt (Date), isArchived (Bool), syncStatusRawValue (String)",
+        "Computed property for category (LocusCategory from rawValue)",
+        "Computed property for coordinate (CLLocationCoordinate2D)",
+        "SyncStatus enum: pending, synced, modified, conflicted",
+        "Default values: isShared=false, isArchived=false, syncStatus=.pending, createdAt=Date(), updatedAt=Date()",
+        "Typecheck passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Define Household and HouseholdMember SwiftData models",
+      "description": "As a developer, I need household models so that family sharing can be implemented.",
+      "acceptanceCriteria": [
+        "Household @Model: id (UUID), name (String), ownerId (UUID), inviteCode (String), inviteExpiresAt (Date)",
+        "HouseholdMember @Model: id (UUID), householdId (UUID), userId (UUID), displayName (String), roleRawValue (String)",
+        "MemberRole enum: owner, member (Codable)",
+        "Household has computed property isInviteExpired (Bool)",
+        "Typecheck passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Define UserProfile model and app constants",
+      "description": "As a developer, I need a user profile model and centralized constants for tier limits and defaults.",
+      "acceptanceCriteria": [
+        "UserProfile @Model: id (UUID), authId (UUID?), displayName (String), subscriptionTierRawValue (String), apnsToken (String?)",
+        "SubscriptionTier enum: free, premium, family (Codable) with limits property",
+        "AppConstants struct with: maxFreeLocis=10, geofenceRadius=100.0, maxGeofences=20, maxHouseholdMembers=6, inviteCodeLength=6, inviteExpiryHours=48, audioFormat settings (AAC, 64kbps, mono, 44100Hz)",
+        "Typecheck passes"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-006",
+      "title": "Create theme system with colors, fonts, and semantic tokens",
+      "description": "As a developer, I need a consistent design system so that the app has a polished, cohesive look.",
+      "acceptanceCriteria": [
+        "Theme struct with static color properties: primary, secondary, background, surface, textPrimary, textSecondary, error, success, warning",
+        "Colors adapt to light/dark mode using Color asset catalog or adaptive colors",
+        "Font scale: largeTitle, title, headline, body, caption with consistent sizing",
+        "Spacing constants: xs=4, sm=8, md=16, lg=24, xl=32",
+        "Corner radius constants: small=8, medium=12, large=16",
+        "Typecheck passes"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-007",
+      "title": "Create Haversine distance utility and extensions",
+      "description": "As a developer, I need distance calculations so that the geofence manager can find nearest loci.",
+      "acceptanceCriteria": [
+        "HaversineDistance utility function: (lat1, lon1, lat2, lon2) -> meters (Double)",
+        "CLLocationCoordinate2D extension: distance(to: CLLocationCoordinate2D) -> CLLocationDistance",
+        "Array<Locus> extension: sortedByDistance(from: CLLocationCoordinate2D) -> [Locus]",
+        "Array<Locus> extension: nearest(_ count: Int, to: CLLocationCoordinate2D) -> [Locus]",
+        "Unit tests for Haversine with known coordinate pairs",
+        "Typecheck passes"
+      ],
+      "priority": 7,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-008",
+      "title": "Create ModelContainer configuration and preview helpers",
+      "description": "As a developer, I need SwiftData container setup and preview mocks for efficient development.",
+      "acceptanceCriteria": [
+        "ModelContainer factory with schema for Locus, Household, HouseholdMember, UserProfile",
+        "Separate in-memory container for SwiftUI previews",
+        "PreviewData struct with sample loci (various categories, locations), sample household, sample members",
+        "LociApp.swift updated to use the production ModelContainer",
+        "Typecheck passes"
+      ],
+      "priority": 8,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-009",
+      "title": "Create LocationService with permission management",
+      "description": "As a user, I need the app to request and manage location permissions so that GPS features work.",
+      "acceptanceCriteria": [
+        "LocationService class conforming to @Observable and CLLocationManagerDelegate",
+        "Properties: currentLocation (CLLocation?), authorizationStatus (CLAuthorizationStatus), isAuthorizedAlways (Bool)",
+        "requestWhenInUsePermission() and requestAlwaysPermission() methods",
+        "Delegate methods update published properties on authorization changes",
+        "Error handling for denied/restricted states",
+        "Typecheck passes"
+      ],
+      "priority": 9,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-010",
+      "title": "Add current location tracking and significant location changes",
+      "description": "As the geofence system, I need continuous location updates so that the nearest-20 rotation works.",
+      "acceptanceCriteria": [
+        "LocationService starts significant location change monitoring on init",
+        "startMonitoringSignificantLocationChanges() called when authorized",
+        "locationManager(_:didUpdateLocations:) updates currentLocation property",
+        "Posts Notification 'LocationDidUpdate' on significant changes for GeofenceManager",
+        "Handles background location update delivery",
+        "Typecheck passes"
+      ],
+      "priority": 10,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-011",
+      "title": "Create reverse geocoding service",
+      "description": "As a user, I want to see place names instead of raw coordinates for my loci.",
+      "acceptanceCriteria": [
+        "ReverseGeocodingService with async method: reverseGeocode(CLLocationCoordinate2D) async throws -> String?",
+        "Returns formatted place name (e.g., 'Hy-Vee, 1st Ave' or '1234 Main St')",
+        "Prioritizes: name > thoroughfare + subThoroughfare > locality",
+        "Caches results by rounded coordinate (3 decimal places) to reduce API calls",
+        "Handles CLGeocoder rate limiting gracefully",
+        "Typecheck passes"
+      ],
+      "priority": 11,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-012",
+      "title": "Create AudioService with AVAudioRecorder configuration",
+      "description": "As a developer, I need audio recording setup so that voice notes can be captured.",
+      "acceptanceCriteria": [
+        "AudioService @Observable class with AVAudioSession and AVAudioRecorder management",
+        "Recording settings: M4A format, AAC codec, 64kbps bitrate, mono channel, 44100Hz sample rate",
+        "configureAudioSession() sets category to .playAndRecord with .defaultToSpeaker option",
+        "requestMicrophonePermission() async -> Bool",
+        "File naming: locus_{UUID}_{timestamp}.m4a stored in app documents directory",
+        "Typecheck passes"
+      ],
+      "priority": 12,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-013",
+      "title": "Add recording start, stop, and save methods to AudioService",
+      "description": "As a user, I want to record voice notes with a simple tap interaction.",
+      "acceptanceCriteria": [
+        "startRecording() -> URL method creates recorder and begins recording, returns file URL",
+        "stopRecording() method stops recorder and finalizes file",
+        "isRecording published property reflects current state",
+        "currentAmplitude published property updated via timer for waveform visualization (recorder.averagePower)",
+        "deleteRecording(at: URL) removes audio file from disk",
+        "Haptic feedback on start (UIImpactFeedbackGenerator .medium) and stop (.light)",
+        "Typecheck passes"
+      ],
+      "priority": 13,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-014",
+      "title": "Create AudioPlayerService for playback controls",
+      "description": "As a user, I want to play back my recorded voice notes with standard controls.",
+      "acceptanceCriteria": [
+        "AudioPlayerService @Observable class wrapping AVAudioPlayer",
+        "play(url: URL), pause(), stop() methods",
+        "Published properties: isPlaying (Bool), currentTime (TimeInterval), duration (TimeInterval), progress (Double 0-1)",
+        "Timer-based progress updates at 60Hz for smooth UI",
+        "seek(to: TimeInterval) method for scrubbing",
+        "AVAudioPlayerDelegate for playback completion handling",
+        "Typecheck passes"
+      ],
+      "priority": 14,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-015",
+      "title": "Create TranscriptionService with on-device speech recognition",
+      "description": "As a user, I want my voice notes automatically transcribed so I can read them later.",
+      "acceptanceCriteria": [
+        "TranscriptionService @Observable class using SFSpeechRecognizer",
+        "requestTranscriptionPermission() async -> Bool",
+        "isAvailable published property checks SFSpeechRecognizer availability",
+        "On-device recognition enforced: recognitionRequest.requiresOnDeviceRecognition = true",
+        "Fallback to server recognition if on-device unavailable",
+        "Typecheck passes"
+      ],
+      "priority": 15,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-016",
+      "title": "Add real-time streaming transcription to TranscriptionService",
+      "description": "As a user, I want to see my words appear in real-time as I speak.",
+      "acceptanceCriteria": [
+        "startLiveTranscription(audioEngine: AVAudioEngine) method with SFSpeechAudioBufferRecognitionRequest",
+        "transcription published property updated in real-time from recognition results",
+        "isFinal flag tracked to know when recognition segment is complete",
+        "stopLiveTranscription() cleans up recognition task and audio engine tap",
+        "transcribeFile(url: URL) async throws -> String for post-recording transcription",
+        "Error handling for recognition failures with user-friendly messages",
+        "Typecheck passes"
+      ],
+      "priority": 16,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-017",
+      "title": "Create GeofenceManager with CLMonitor region registration",
+      "description": "As the system, I need to register geofence regions so that proximity triggers work.",
+      "acceptanceCriteria": [
+        "GeofenceManager singleton @Observable class",
+        "Uses CLMonitor (iOS 17+) for geofence monitoring",
+        "registerRegion(for locus: Locus) adds CLCircularRegion with 100m radius",
+        "removeRegion(for locus: Locus) removes monitored region",
+        "removeAllRegions() clears all monitored regions",
+        "monitoredRegionIds published property tracks active geofences",
+        "Typecheck passes"
+      ],
+      "priority": 17,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-018",
+      "title": "Implement 20-region rotation with nearest-loci calculation",
+      "description": "As the system, I need to dynamically rotate the 20 geofence slots to cover the most relevant loci.",
+      "acceptanceCriteria": [
+        "refreshGeofences(from location: CLLocationCoordinate2D, loci: [Locus]) method",
+        "Calculates Haversine distance from current location to all non-archived loci (personal + shared)",
+        "Sorts by distance and registers nearest 20 (or fewer if <20 loci exist)",
+        "Removes previously registered regions that are no longer in nearest 20",
+        "Listens for LocationDidUpdate notification to trigger refresh",
+        "Also triggers on app foreground and new locus creation",
+        "Typecheck passes"
+      ],
+      "priority": 18,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-019",
+      "title": "Create NotificationService with permission management",
+      "description": "As a user, I need push notification permissions so that loci can alert me when I arrive at locations.",
+      "acceptanceCriteria": [
+        "NotificationService @Observable class wrapping UNUserNotificationCenter",
+        "requestPermission() async -> Bool requesting .alert, .sound, .badge",
+        "isAuthorized published property reflecting current authorization status",
+        "checkAuthorizationStatus() async updates isAuthorized",
+        "Configure notification categories with actions: 'VIEW_LOCUS', 'ADD_NOTE', 'ARCHIVE'",
+        "Typecheck passes"
+      ],
+      "priority": 19,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-020",
+      "title": "Implement geofence entry notification with locus preview",
+      "description": "As a user, I want to receive a notification showing my note when I arrive at a saved location.",
+      "acceptanceCriteria": [
+        "scheduleGeofenceNotification(for locus: Locus) creates UNNotificationContent",
+        "Title: locationName or 'You left a note here'",
+        "Body: first 100 chars of transcription",
+        "Subtitle: category name and relative time ('3 weeks ago')",
+        "Sound: UNNotificationSound.default",
+        "UserInfo includes locusId for deep-linking",
+        "Handles CLMonitor events to trigger notification delivery",
+        "Typecheck passes"
+      ],
+      "priority": 20,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-021",
+      "title": "Implement notification tap deep-link to locus detail",
+      "description": "As a user, I want tapping a notification to open the relevant locus detail view.",
+      "acceptanceCriteria": [
+        "UNUserNotificationCenterDelegate implemented in LociApp or AppDelegate",
+        "userNotificationCenter(_:didReceive:) extracts locusId from userInfo",
+        "NavigationRouter @Observable class with selectedLocusId property for deep-linking",
+        "App's NavigationStack responds to selectedLocusId changes",
+        "Works from terminated state (app relaunched by iOS on geofence entry)",
+        "Typecheck passes"
+      ],
+      "priority": 21,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-022",
+      "title": "Create RecordViewModel orchestrating audio, transcription, and GPS",
+      "description": "As a developer, I need a view model that coordinates the recording flow across multiple services.",
+      "acceptanceCriteria": [
+        "RecordViewModel @Observable class injecting LocationService, AudioService, TranscriptionService",
+        "State: isRecording, isPreparing, transcription, currentLocation, recordingDuration, amplitude",
+        "startRecording() async: validates permissions, starts audio + transcription + GPS capture simultaneously",
+        "stopRecording() async -> (URL, String, CLLocationCoordinate2D): stops all services, returns results",
+        "Timer-based duration tracking updated at 1Hz",
+        "Error state with user-friendly messages for permission failures",
+        "Typecheck passes"
+      ],
+      "priority": 22,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-023",
+      "title": "Create RecordButton component with animation and haptics",
+      "description": "As a user, I want a large, obvious record button that feels satisfying to use.",
+      "acceptanceCriteria": [
+        "RecordButton SwiftUI view: large circle (80pt), prominent color from Theme",
+        "Idle state: microphone SF Symbol, subtle pulse animation",
+        "Recording state: stop icon, red color, animated ring showing amplitude",
+        "Press triggers UIImpactFeedbackGenerator (.medium)",
+        "scaleEffect animation on press/release",
+        "Accessible: VoiceOver label 'Record voice note' / 'Stop recording'",
+        "Typecheck passes"
+      ],
+      "priority": 23,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-024",
+      "title": "Create RecordingView with real-time transcription display",
+      "description": "As a user, I want to see my words appear as I speak and know the recording is working.",
+      "acceptanceCriteria": [
+        "RecordingView shows RecordButton centered, transcription text above, duration timer below",
+        "Real-time transcription text scrolls as new words appear",
+        "Location name displayed at top (from reverse geocoding)",
+        "Recording duration formatted as mm:ss",
+        "Instruction text when idle: 'Tap to record a voice note'",
+        "Background subtle gradient related to current detected category",
+        "Typecheck passes"
+      ],
+      "priority": 24,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-025",
+      "title": "Create AudioWaveformView for real-time amplitude visualization",
+      "description": "As a user, I want visual feedback showing my voice being captured during recording.",
+      "acceptanceCriteria": [
+        "AudioWaveformView takes amplitude binding (0.0-1.0) as input",
+        "Renders animated bars or wave that responds to current amplitude",
+        "Smooth interpolation between amplitude values using withAnimation",
+        "Configurable bar count, color, and height",
+        "Respects Reduce Motion: falls back to simple opacity pulse",
+        "Works in both recording (live) and playback (progress) contexts",
+        "Typecheck passes"
+      ],
+      "priority": 25,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-026",
+      "title": "Create AI auto-categorization service",
+      "description": "As a user, I want my loci automatically categorized so I don't have to manually tag each one.",
+      "acceptanceCriteria": [
+        "AICategoryService with method: categorize(transcription: String) -> LocusCategory",
+        "Keyword-based matching for MVP: food keywords (grocery, restaurant, eat, cook), shopping (buy, price, sale, store), parking (park, lot, garage, meter), health (doctor, pharmacy, dentist, hospital), travel (hotel, airport, flight, trip), tip (try, recommend, good, best), warning (avoid, careful, don't, bad), home (plumber, contractor, repair, fix), outdoor (trail, hike, camp, fish)",
+        "Returns .general if no strong match",
+        "Case-insensitive matching on transcription text",
+        "Confidence threshold: requires 2+ keyword matches for non-general category",
+        "Typecheck passes"
+      ],
+      "priority": 26,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-027",
+      "title": "Create PostRecordingSheet with category and sharing options",
+      "description": "As a user, I want to confirm the category and optionally share with family before saving.",
+      "acceptanceCriteria": [
+        "PostRecordingSheet presented as .sheet after recording stops",
+        "Shows: transcription preview, detected category (editable via picker), location name",
+        "Category picker: horizontal scroll of category pills with icons/colors",
+        "Share with Family toggle (only visible if user has a household)",
+        "Save and Discard buttons",
+        "Audio playback preview button to re-listen before saving",
+        "Typecheck passes"
+      ],
+      "priority": 27,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-028",
+      "title": "Implement locus save flow with geofence update",
+      "description": "As a user, I want my recording saved and the geofence system updated immediately.",
+      "acceptanceCriteria": [
+        "saveLocus() method in RecordViewModel: creates Locus model, inserts into SwiftData context",
+        "Reverse geocodes location and sets locationName",
+        "Auto-categorizes transcription and sets category",
+        "Triggers GeofenceManager.refreshGeofences() after save",
+        "Success haptic (UINotificationFeedbackGenerator .success)",
+        "Navigates back to map view on successful save",
+        "Typecheck passes"
+      ],
+      "priority": 28,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-029",
+      "title": "Create HomeMapViewModel with filtered annotations",
+      "description": "As a developer, I need a view model managing map state, filtering, and annotation data.",
+      "acceptanceCriteria": [
+        "HomeMapViewModel @Observable class with @Query integration for loci",
+        "mapRegion: MKCoordinateRegion tracking visible area",
+        "selectedCategories: Set<LocusCategory> for filtering",
+        "filteredLoci computed property applying category and archive filters",
+        "visibleLoci computed property filtering by map viewport bounds",
+        "centerOnUserLocation() method",
+        "Typecheck passes"
+      ],
+      "priority": 29,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-030",
+      "title": "Create CategoryPinView custom map annotation",
+      "description": "As a user, I want to see color-coded pins on the map so I can identify loci types at a glance.",
+      "acceptanceCriteria": [
+        "CategoryPinView: circular pin with category SF Symbol icon, colored by category",
+        "Size: 36pt diameter with 2pt white border for contrast",
+        "Shared loci show small person.2 badge overlay in corner",
+        "Selected state: slightly larger with shadow elevation",
+        "Supports callout tap to navigate to detail",
+        "Typecheck passes"
+      ],
+      "priority": 30,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-031",
+      "title": "Create HomeMapView with MapKit and locus annotations",
+      "description": "As a user, I want to see all my loci plotted on a map centered on my location.",
+      "acceptanceCriteria": [
+        "HomeMapView using MapKit Map with UserAnnotation and custom Annotation views",
+        "Each non-archived locus rendered as CategoryPinView annotation",
+        "Map centers on user location on first load",
+        "Tap annotation to select → shows brief callout with transcription preview",
+        "Tap callout navigates to LocusDetailView via NavigationRouter",
+        "Record button floating at bottom center overlaying map",
+        "Typecheck passes"
+      ],
+      "priority": 31,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-032",
+      "title": "Create map annotation clustering for dense areas",
+      "description": "As a user, I want clustered pins when zoomed out so the map stays readable.",
+      "acceptanceCriteria": [
+        "ClusterAnnotationView shows count badge when multiple loci overlap",
+        "Cluster color: blended from dominant category in cluster",
+        "Tap cluster zooms map to fit all loci in that cluster",
+        "Clustering threshold: pins within 60pt screen distance",
+        "Clusters break apart smoothly when zooming in",
+        "Typecheck passes"
+      ],
+      "priority": 32,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-033",
+      "title": "Create CategoryFilterBar component",
+      "description": "As a user, I want to filter the map by category to find specific types of loci.",
+      "acceptanceCriteria": [
+        "CategoryFilterBar: horizontal ScrollView of filter chips",
+        "Each chip shows category icon + name, toggles on/off with color change",
+        "'All' chip at start to reset filters",
+        "Selected chips use category color background, unselected use surface color",
+        "Count badge on each chip showing number of loci in that category",
+        "Typecheck passes"
+      ],
+      "priority": 33,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-034",
+      "title": "Create LocusListView as alternative to map view",
+      "description": "As a user, I want a list view of my loci sorted by proximity or date.",
+      "acceptanceCriteria": [
+        "LocusListView with List showing LocusRowView for each locus",
+        "LocusRowView: category icon, transcription preview (2 lines), location name, relative time",
+        "Sort options: nearest first, newest first, oldest first (Picker in toolbar)",
+        "Section headers when sorted by date (Today, This Week, Earlier)",
+        "Pull-to-refresh gesture (refreshes location and re-sorts)",
+        "Typecheck passes"
+      ],
+      "priority": 34,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-035",
+      "title": "Create tab-based navigation with map, list, and settings",
+      "description": "As a user, I need clear navigation between the main sections of the app.",
+      "acceptanceCriteria": [
+        "ContentView with TabView: Map (map.fill), List (list.bullet), Settings (gearshape.fill)",
+        "Map tab shows HomeMapView with CategoryFilterBar overlay at top",
+        "List tab shows LocusListView",
+        "Settings tab shows SettingsView",
+        "NavigationStack in each tab for push navigation",
+        "Tab badges: number of unread triggered loci (from notifications)",
+        "Typecheck passes"
+      ],
+      "priority": 35,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-036",
+      "title": "Create EmptyStateView reusable component",
+      "description": "As a user, I want helpful guidance when I have no loci yet instead of a blank screen.",
+      "acceptanceCriteria": [
+        "EmptyStateView with SF Symbol image, title, subtitle, optional CTA button",
+        "Map empty state: 'Drop your first locus' with record CTA",
+        "List empty state: 'No loci yet' with prompt to record",
+        "Search empty state: 'No results found' with suggestion to broaden search",
+        "Centered layout with muted colors, accessible text sizing",
+        "Typecheck passes"
+      ],
+      "priority": 36,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-037",
+      "title": "Create LocusDetailViewModel",
+      "description": "As a developer, I need a view model for the locus detail screen managing playback and edit state.",
+      "acceptanceCriteria": [
+        "LocusDetailViewModel @Observable with locus: Locus property",
+        "Integrates AudioPlayerService for playback",
+        "archiveLocus() marks locus as archived, updates geofences",
+        "unarchiveLocus() reverses archive",
+        "deleteLocus() removes from SwiftData and deletes audio file",
+        "updateCategory(_ category: LocusCategory) changes category",
+        "updateTranscription(_ text: String) edits transcription text",
+        "Typecheck passes"
+      ],
+      "priority": 37,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-038",
+      "title": "Create LocusDetailView with transcription and metadata",
+      "description": "As a user, I want to see full details of a locus including its transcription and location.",
+      "acceptanceCriteria": [
+        "LocusDetailView with ScrollView layout: category badge, location name, address, date",
+        "Full transcription text displayed prominently",
+        "Map snippet showing pin location (small non-interactive MapKit view)",
+        "Created by name shown for shared loci",
+        "Shared indicator badge if locus is shared with family",
+        "Toolbar buttons for edit, archive, share, delete",
+        "Typecheck passes"
+      ],
+      "priority": 38,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-039",
+      "title": "Create AudioPlaybackBar with progress and controls",
+      "description": "As a user, I want to play back my voice note with a visual progress indicator.",
+      "acceptanceCriteria": [
+        "AudioPlaybackBar component: play/pause button, progress slider, duration labels",
+        "Current time and total duration displayed as mm:ss",
+        "Slider is draggable for seeking",
+        "AudioWaveformView integrated showing playback progress",
+        "Auto-stops at end of recording",
+        "Displayed in LocusDetailView below transcription",
+        "Typecheck passes"
+      ],
+      "priority": 39,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-040",
+      "title": "Create EditLocusSheet for modifying existing loci",
+      "description": "As a user, I want to edit my locus's transcription, category, or re-record audio.",
+      "acceptanceCriteria": [
+        "EditLocusSheet presented as .sheet from LocusDetailView",
+        "Editable transcription in TextEditor",
+        "Category picker (same horizontal pills as PostRecordingSheet)",
+        "Re-record button that replaces audio file and re-transcribes",
+        "Save and Cancel buttons, save updates updatedAt timestamp",
+        "Typecheck passes"
+      ],
+      "priority": 40,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-041",
+      "title": "Create archive and delete actions with undo support",
+      "description": "As a user, I want to archive or delete loci with the ability to undo mistakes.",
+      "acceptanceCriteria": [
+        "Archive action: sets isArchived=true, removes from geofence rotation",
+        "Undo snackbar appears at bottom for 5 seconds after archive",
+        "Undo reverses the archive action",
+        "Delete action: shows confirmation alert before permanent deletion",
+        "Delete removes audio file from disk and locus from SwiftData",
+        "Haptic feedback on archive (UINotificationFeedbackGenerator .warning) and delete (.error)",
+        "Typecheck passes"
+      ],
+      "priority": 41,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-042",
+      "title": "Create swipe actions on locus list items",
+      "description": "As a user, I want quick swipe gestures to manage loci from the list view.",
+      "acceptanceCriteria": [
+        "Leading swipe: Share with Family toggle (green person.2 icon)",
+        "Trailing swipe: Archive (yellow archivebox icon), Delete (red trash icon)",
+        "Swipe actions use .swipeActions modifier on list rows",
+        "Archive swipe shows undo snackbar",
+        "Delete swipe shows confirmation alert",
+        "Share swipe only available for users with a household",
+        "Typecheck passes"
+      ],
+      "priority": 42,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-043",
+      "title": "Create contextual menus on locus items (long-press)",
+      "description": "As a user, I want long-press menus for quick actions on both map pins and list items.",
+      "acceptanceCriteria": [
+        ".contextMenu modifier on LocusRowView and CategoryPinView callout",
+        "Menu items: View Details, Edit, Copy Transcription, Share with Family, Archive, Delete",
+        "Copy Transcription copies text to UIPasteboard",
+        "Menu items show appropriate SF Symbol icons",
+        "Destructive actions (Archive, Delete) styled with .destructive role",
+        "Typecheck passes"
+      ],
+      "priority": 43,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-044",
+      "title": "Create SearchService for keyword, category, and nearby queries",
+      "description": "As a user, I want to find specific loci by searching text, filtering by category, or browsing nearby.",
+      "acceptanceCriteria": [
+        "SearchService with methods: searchByKeyword(_ query: String, in context: ModelContext) -> [Locus]",
+        "searchByCategory(_ category: LocusCategory, in context: ModelContext) -> [Locus]",
+        "searchNearby(location: CLLocationCoordinate2D, radius: Double, in context: ModelContext) -> [Locus]",
+        "Keyword search matches against transcription and locationName (case-insensitive contains)",
+        "All searches exclude archived loci by default",
+        "Results sorted by relevance (keyword match count) then recency",
+        "Typecheck passes"
+      ],
+      "priority": 44,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-045",
+      "title": "Create SearchView with search bar and filter chips",
+      "description": "As a user, I want an intuitive search interface with recent searches and category filters.",
+      "acceptanceCriteria": [
+        "SearchView with .searchable modifier or custom search bar at top",
+        "Category filter chips below search bar (reuses CategoryFilterBar)",
+        "Recent searches list (stored in UserDefaults, max 10)",
+        "Tap recent search re-executes that query",
+        "Clear button to remove all recent searches",
+        "Debounced search (300ms) to avoid excessive queries while typing",
+        "Typecheck passes"
+      ],
+      "priority": 45,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-046",
+      "title": "Create SearchResultsView with highlighted matches",
+      "description": "As a user, I want search results that highlight where my query matched.",
+      "acceptanceCriteria": [
+        "SearchResultsView List with LocusRowView items",
+        "Matching text highlighted with bold or tinted color in transcription preview",
+        "Results count displayed at top: 'N results for query'",
+        "Empty results shows EmptyStateView with search-specific message",
+        "Tap result navigates to LocusDetailView",
+        "Typecheck passes"
+      ],
+      "priority": 46,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-047",
+      "title": "Create OnboardingViewModel with step management",
+      "description": "As a developer, I need onboarding flow state management tracking completion of each step.",
+      "acceptanceCriteria": [
+        "OnboardingViewModel @Observable with currentStep: OnboardingStep enum",
+        "Steps: welcome, locationPermission, notificationPermission, microphonePermission, firstLocus, complete",
+        "hasCompletedOnboarding stored in UserDefaults/AppStorage",
+        "advance() moves to next step, skip() skips current permission step",
+        "completeOnboarding() sets flag and transitions to main app",
+        "Typecheck passes"
+      ],
+      "priority": 47,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-048",
+      "title": "Create welcome onboarding screens with value propositions",
+      "description": "As a new user, I want to understand what Loci does and why it's valuable in 3-4 screens.",
+      "acceptanceCriteria": [
+        "OnboardingPageView reusable component: large SF Symbol, headline, body text, CTA button",
+        "Page 1: 'Your Spatial Memory' - explain voice notes pinned to places",
+        "Page 2: 'Notes Find You' - explain proximity-triggered notifications",
+        "Page 3: 'Share with Family' - explain household sharing",
+        "TabView with PageTabViewStyle for swipeable pages",
+        "Skip button in top-right, primary CTA advances to permissions",
+        "Typecheck passes"
+      ],
+      "priority": 48,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-049",
+      "title": "Create location permission request screen",
+      "description": "As a new user, I need to understand why Always Allow location is important before granting it.",
+      "acceptanceCriteria": [
+        "LocationPermissionView: illustration showing geofence concept",
+        "Clear explanation: 'Loci needs Always Allow to notify you when you return to a saved location'",
+        "Bullet points: works in background, low battery impact (<2%), private/on-device",
+        "Primary CTA: 'Enable Location' triggers requestAlwaysPermission()",
+        "Secondary: 'Maybe Later' skips (app works with When In Use, no background triggers)",
+        "Handles authorization callback to advance onboarding",
+        "Typecheck passes"
+      ],
+      "priority": 49,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-050",
+      "title": "Create notification and microphone permission screens",
+      "description": "As a new user, I need to grant notification and microphone access with clear explanations.",
+      "acceptanceCriteria": [
+        "NotificationPermissionView: explains triggered retrieval notifications",
+        "CTA triggers NotificationService.requestPermission()",
+        "MicrophonePermissionView: explains voice recording is core feature",
+        "CTA triggers AudioService.requestMicrophonePermission()",
+        "Both screens have 'Maybe Later' skip options",
+        "After all permissions: prompt to 'Drop your first locus right now'",
+        "Typecheck passes"
+      ],
+      "priority": 50,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-051",
+      "title": "Create first locus prompt in onboarding",
+      "description": "As a new user, I want to be guided to create my first locus immediately to experience the value.",
+      "acceptanceCriteria": [
+        "FirstLocusView shows simplified recording UI inline in onboarding",
+        "Prompt text: 'Look around. What's worth remembering about this spot?'",
+        "Suggestions: 'A parking tip? A restaurant rec? Something you want to remember next time?'",
+        "Record button starts recording flow, saves first locus",
+        "Skip option: 'I'll do this later' completes onboarding",
+        "Success state: 'Your first locus! You'll be notified when you return here.'",
+        "Typecheck passes"
+      ],
+      "priority": 51,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-052",
+      "title": "Create SettingsViewModel with user preferences",
+      "description": "As a developer, I need settings state management for preferences, account, and data options.",
+      "acceptanceCriteria": [
+        "SettingsViewModel @Observable class",
+        "AppStorage properties: notificationsEnabled, quietHoursStart, quietHoursEnd, defaultRadius, mapType",
+        "Account state: isSignedIn, currentUser, subscriptionTier",
+        "Computed: storageUsed (bytes of audio files on disk)",
+        "clearCache() removes orphaned audio files",
+        "signOut() clears auth state",
+        "Typecheck passes"
+      ],
+      "priority": 52,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-053",
+      "title": "Create SettingsView with organized sections",
+      "description": "As a user, I want a clean settings screen to manage my preferences and account.",
+      "acceptanceCriteria": [
+        "SettingsView with Form/List and sections: Account, Notifications, Data, Family, About",
+        "Account section: sign in/out, subscription status with 'Manage' link",
+        "Notifications section: toggle enabled, quiet hours picker",
+        "Data section: storage usage display, clear cache button, export option",
+        "Family section: household name, members count, manage link (or Create Family)",
+        "About section: version, privacy policy, terms, support/feedback links",
+        "Typecheck passes"
+      ],
+      "priority": 53,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-054",
+      "title": "Create notification preferences with quiet hours",
+      "description": "As a user, I want to set quiet hours so I'm not notified at night.",
+      "acceptanceCriteria": [
+        "NotificationPreferencesView within Settings",
+        "Toggle: Enable proximity notifications (master switch)",
+        "Quiet hours: start time picker, end time picker (e.g., 10PM - 7AM)",
+        "During quiet hours, geofence notifications are suppressed (not delivered)",
+        "NotificationService checks quiet hours before scheduling notifications",
+        "Preview showing sample notification appearance",
+        "Typecheck passes"
+      ],
+      "priority": 54,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-055",
+      "title": "Create data management view with storage info",
+      "description": "As a user, I want to see how much storage my loci use and manage my data.",
+      "acceptanceCriteria": [
+        "DataManagementView shows: total loci count, audio file count, total storage used (formatted MB/GB)",
+        "Clear Cache button: removes orphaned audio files with confirmation",
+        "Archive section: count of archived loci, 'Permanently Delete All Archived' option",
+        "Storage breakdown: audio files size, database size estimate",
+        "Export Data button (placeholder for V2 CSV/JSON export)",
+        "Typecheck passes"
+      ],
+      "priority": 55,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-056",
+      "title": "Create About view with legal links and app info",
+      "description": "As a user, I want to access legal documents and app information from settings.",
+      "acceptanceCriteria": [
+        "AboutView section in Settings with: App version and build number",
+        "Link rows: Privacy Policy (opens Safari/SFSafariViewController to useloci.com/privacy)",
+        "Terms of Service (opens useloci.com/terms)",
+        "Support/Feedback (opens mailto:hello@useloci.com or useloci.com/support)",
+        "Rate on App Store link (SKStoreReviewController or direct link)",
+        "Credits: 'Made by Pearson Media LLC'",
+        "Typecheck passes"
+      ],
+      "priority": 56,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-057",
+      "title": "Create PostgreSQL schema migration for users table",
+      "description": "As a developer, I need the users table in Supabase so that user profiles can be stored server-side.",
+      "acceptanceCriteria": [
+        "SQL migration file: 001_create_users.sql",
+        "Table: users with columns: id UUID PK DEFAULT gen_random_uuid(), auth_id UUID UNIQUE NOT NULL REFERENCES auth.users(id), display_name TEXT, subscription_tier TEXT DEFAULT 'free', apns_token TEXT, created_at TIMESTAMPTZ DEFAULT now(), updated_at TIMESTAMPTZ DEFAULT now()",
+        "Index on auth_id",
+        "RLS enabled with policy: users can read/update own row (auth_id = auth.uid())",
+        "Trigger to auto-create user row on auth.users insert",
+        "Typecheck passes"
+      ],
+      "priority": 57,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-058",
+      "title": "Create PostgreSQL schema migration for loci table with PostGIS",
+      "description": "As a developer, I need the loci table with spatial indexing for geo-queries.",
+      "acceptanceCriteria": [
+        "SQL migration file: 002_create_loci.sql",
+        "Enable PostGIS extension: CREATE EXTENSION IF NOT EXISTS postgis",
+        "Table: loci with columns: id UUID PK DEFAULT gen_random_uuid(), user_id UUID NOT NULL REFERENCES users(id), household_id UUID (nullable), location GEOGRAPHY(POINT, 4326) NOT NULL, location_name TEXT, audio_url TEXT, transcription TEXT NOT NULL, category TEXT DEFAULT 'general', is_shared BOOLEAN DEFAULT false, created_by_name TEXT, is_archived BOOLEAN DEFAULT false, created_at TIMESTAMPTZ DEFAULT now(), updated_at TIMESTAMPTZ DEFAULT now()",
+        "GIST index on location column",
+        "Composite indexes: (user_id, is_archived), (household_id, is_shared)",
+        "Typecheck passes"
+      ],
+      "priority": 58,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-059",
+      "title": "Create PostgreSQL schema migration for households tables",
+      "description": "As a developer, I need household tables for family sharing functionality.",
+      "acceptanceCriteria": [
+        "SQL migration file: 003_create_households.sql",
+        "Table: households with columns: id UUID PK DEFAULT gen_random_uuid(), name TEXT NOT NULL, owner_id UUID NOT NULL REFERENCES users(id), invite_code TEXT UNIQUE, invite_expires_at TIMESTAMPTZ, created_at TIMESTAMPTZ DEFAULT now()",
+        "Table: household_members with columns: id UUID PK DEFAULT gen_random_uuid(), household_id UUID NOT NULL REFERENCES households(id) ON DELETE CASCADE, user_id UUID NOT NULL REFERENCES users(id), display_name TEXT NOT NULL, role TEXT NOT NULL DEFAULT 'member', joined_at TIMESTAMPTZ DEFAULT now(), UNIQUE(household_id, user_id)",
+        "Index on household_members(user_id)",
+        "Typecheck passes"
+      ],
+      "priority": 59,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-060",
+      "title": "Create Row Level Security policies for all tables",
+      "description": "As a developer, I need RLS policies so users can only access their own data and shared household data.",
+      "acceptanceCriteria": [
+        "SQL migration file: 004_rls_policies.sql",
+        "RLS enabled on users, loci, households, household_members tables",
+        "users: SELECT/UPDATE WHERE auth_id = auth.uid()",
+        "loci personal: SELECT/INSERT/UPDATE/DELETE WHERE user_id = (SELECT id FROM users WHERE auth_id = auth.uid())",
+        "loci shared: SELECT WHERE is_shared = true AND household_id IN (SELECT household_id FROM household_members WHERE user_id = (SELECT id FROM users WHERE auth_id = auth.uid()))",
+        "households: SELECT/UPDATE WHERE id IN user's household_members",
+        "household_members: SELECT WHERE household_id IN user's households",
+        "Typecheck passes"
+      ],
+      "priority": 60,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-061",
+      "title": "Create Supabase Storage bucket for audio files",
+      "description": "As a developer, I need cloud storage for syncing audio files between devices.",
+      "acceptanceCriteria": [
+        "SQL migration file: 005_storage_bucket.sql",
+        "Create storage bucket 'loci-audio' with 10MB file size limit",
+        "Allowed MIME types: audio/mp4, audio/x-m4a, audio/aac",
+        "Storage RLS: users can upload to their own folder (user_id/filename)",
+        "Storage RLS: users can read their own files and shared household files",
+        "Storage RLS: users can delete their own files only",
+        "Typecheck passes"
+      ],
+      "priority": 61,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-062",
+      "title": "Create database seed script with test data",
+      "description": "As a developer, I need test data for development and testing.",
+      "acceptanceCriteria": [
+        "SQL seed file: seed.sql",
+        "Creates 2 test users with different subscription tiers",
+        "Creates 1 household with both users as members",
+        "Creates 10 diverse loci (various categories, some shared, some archived)",
+        "Loci spread across realistic coordinates (mix of nearby and distant)",
+        "Seed is idempotent (uses INSERT ON CONFLICT DO NOTHING)",
+        "Typecheck passes"
+      ],
+      "priority": 62,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-063",
+      "title": "Create edge function project with Docker and Hono scaffold",
+      "description": "As a developer, I need the edge function sidecar project structure for backend logic.",
+      "acceptanceCriteria": [
+        "Directory: edge-functions/ with package.json (Node.js 20 LTS)",
+        "Dependencies: hono, @supabase/supabase-js, node-cron",
+        "Dockerfile: Node 20 alpine image, copies source, exposes port 3000",
+        "docker-compose.yml for local development alongside Supabase",
+        "Main entry point (index.ts) with Hono app, health check route at GET /health",
+        "Environment variables: SUPABASE_URL, SUPABASE_SERVICE_KEY, ANTHROPIC_API_KEY",
+        "Typecheck passes"
+      ],
+      "priority": 63,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-064",
+      "title": "Create household-invite edge function",
+      "description": "As a user, I need invite code generation and validation for family group joining.",
+      "acceptanceCriteria": [
+        "POST /api/household/invite/generate: creates 6-char alphanumeric code, stores in households table, 48hr expiry",
+        "POST /api/household/invite/validate: checks code exists, not expired, household not full (6 max)",
+        "POST /api/household/invite/accept: adds user to household_members, returns household info",
+        "POST /api/household/invite/regenerate: owner can regenerate code, invalidates old one",
+        "All endpoints require Supabase auth JWT validation",
+        "Error responses with appropriate HTTP status codes and messages",
+        "Typecheck passes"
+      ],
+      "priority": 64,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-065",
+      "title": "Create contextual-select edge function",
+      "description": "As the system, I need smart locus selection when multiple loci exist at a location.",
+      "acceptanceCriteria": [
+        "POST /api/loci/contextual-select: accepts lat, lon, userId",
+        "Queries loci within 100m using PostGIS ST_DWithin",
+        "Ranking algorithm: weights recency (40%), time-of-day relevance (30%), visit frequency (30%)",
+        "Time-of-day: food loci prioritized at meal times, parking during business hours",
+        "Returns top locus with explanation field for notification",
+        "Falls back to most recent if algorithm produces no clear winner",
+        "Typecheck passes"
+      ],
+      "priority": 65,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-066",
+      "title": "Create analyze-loci edge function for AI summaries",
+      "description": "As a premium user, I want AI-generated summaries when I have multiple loci at a location.",
+      "acceptanceCriteria": [
+        "Cron job registered for nightly execution (2 AM user timezone)",
+        "Queries locations with 3+ loci using PostGIS clustering",
+        "Calls Anthropic API (Claude Haiku) to generate concise summary of related loci",
+        "Stores summary as special 'summary' category locus at cluster centroid",
+        "Only processes loci for users with premium/family tier",
+        "Handles API rate limits and failures gracefully with retry",
+        "Typecheck passes"
+      ],
+      "priority": 66,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-067",
+      "title": "Create sync-subscription edge function for RevenueCat webhook",
+      "description": "As the system, I need to sync subscription status from RevenueCat to the database.",
+      "acceptanceCriteria": [
+        "POST /api/webhook/revenuecat: receives RevenueCat webhook payload",
+        "Validates webhook signature using shared secret",
+        "Handles events: INITIAL_PURCHASE, RENEWAL, CANCELLATION, EXPIRATION",
+        "Updates users.subscription_tier based on active entitlements",
+        "Maps RevenueCat entitlements: 'premium' -> 'premium', 'family' -> 'family', none -> 'free'",
+        "Returns 200 on success, 400 on validation failure",
+        "Typecheck passes"
+      ],
+      "priority": 67,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-068",
+      "title": "Create push-digest edge function for weekly summaries",
+      "description": "As a user, I want a weekly summary of my loci activity to stay engaged.",
+      "acceptanceCriteria": [
+        "Cron job registered for weekly execution (Sunday 10 AM)",
+        "Queries each user's activity: loci created this week, most visited location, total loci count",
+        "Generates summary text: 'You created N loci this week. Most visited: [location].'",
+        "Sends push notification via APNs using stored apns_token",
+        "Only sends to users who have been active in the last 30 days",
+        "Typecheck passes"
+      ],
+      "priority": 68,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-069",
+      "title": "Create SupabaseClient configuration with supabase-swift",
+      "description": "As a developer, I need the Supabase SDK configured to connect iOS to the backend.",
+      "acceptanceCriteria": [
+        "SupabaseClient singleton initialized with project URL and anon key",
+        "Configuration in environment-based config (debug vs release URLs)",
+        "Client accessible via shared instance pattern",
+        "Auth session persistence configured for Keychain storage",
+        "Logging enabled in debug builds only",
+        "Typecheck passes"
+      ],
+      "priority": 69,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-070",
+      "title": "Create AuthService with Apple Sign In",
+      "description": "As a user, I want to sign in with my Apple ID for a seamless, privacy-friendly experience.",
+      "acceptanceCriteria": [
+        "AuthService @Observable class wrapping Supabase Auth",
+        "signInWithApple() method using ASAuthorizationAppleIDProvider flow",
+        "Passes Apple ID credential to Supabase Auth signInWithApple()",
+        "Creates/updates UserProfile in SwiftData after successful auth",
+        "Published properties: isAuthenticated, currentUser (UserProfile?)",
+        "Handles ASAuthorizationError cases with user-friendly messages",
+        "Typecheck passes"
+      ],
+      "priority": 70,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-071",
+      "title": "Create AuthService email/password flow",
+      "description": "As a user, I want an email sign-in option as an alternative to Apple Sign In.",
+      "acceptanceCriteria": [
+        "signUp(email:password:displayName:) async throws method",
+        "signIn(email:password:) async throws method",
+        "resetPassword(email:) async throws method for password recovery",
+        "Email validation before submission",
+        "Password requirements: minimum 8 characters",
+        "Error handling for: invalid credentials, email taken, network failure",
+        "Typecheck passes"
+      ],
+      "priority": 71,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-072",
+      "title": "Create auth state management with session persistence",
+      "description": "As a user, I want to stay signed in between app launches.",
+      "acceptanceCriteria": [
+        "AuthService restores session on app launch from Supabase Auth stored session",
+        "signOut() clears session, resets auth state, clears Keychain tokens",
+        "deleteAccount() calls Supabase RPC to delete user data, then signs out",
+        "Session refresh handled automatically by supabase-swift SDK",
+        "Auth state changes trigger re-evaluation of sync and household features",
+        "Typecheck passes"
+      ],
+      "priority": 72,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-073",
+      "title": "Create auth UI screens (sign in, sign up)",
+      "description": "As a user, I need clean sign-in and sign-up screens.",
+      "acceptanceCriteria": [
+        "SignInView: Apple Sign In button (ASAuthorizationAppleIDButton), email/password form, sign-up link",
+        "SignUpView: email, password, display name fields, create account button, sign-in link",
+        "Loading states during auth operations",
+        "Error alert display for auth failures",
+        "Dismiss keyboard on submit",
+        "Can be accessed from Settings or prompted during sync/sharing features",
+        "Typecheck passes"
+      ],
+      "priority": 73,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-074",
+      "title": "Create SyncService for uploading loci to Supabase",
+      "description": "As a user, I want my loci backed up to the cloud so I don't lose them.",
+      "acceptanceCriteria": [
+        "SyncService @Observable class with sync state tracking",
+        "uploadPendingLoci() queries SwiftData for loci with syncStatus .pending or .modified",
+        "Converts Locus to Supabase insert/upsert payload with PostGIS point: ST_MakePoint(lon, lat)",
+        "Updates syncStatus to .synced on successful upload",
+        "Handles network failures gracefully, leaves status as .pending for retry",
+        "Published properties: isSyncing, lastSyncDate, pendingCount",
+        "Typecheck passes"
+      ],
+      "priority": 74,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-075",
+      "title": "Create SyncService for downloading and merging remote loci",
+      "description": "As a user, I want to download loci from the cloud including shared household loci.",
+      "acceptanceCriteria": [
+        "downloadRemoteLoci() fetches from Supabase where updated_at > lastSyncDate",
+        "Includes shared loci from user's households",
+        "Merge strategy: last-write-wins based on updated_at timestamp",
+        "Creates new SwiftData Locus entries for remote-only loci",
+        "Updates existing entries when remote updated_at is newer",
+        "Triggers GeofenceManager refresh after download completes",
+        "Typecheck passes"
+      ],
+      "priority": 75,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-076",
+      "title": "Create audio file sync to Supabase Storage",
+      "description": "As a user, I want my voice recordings synced to the cloud for backup and cross-device access.",
+      "acceptanceCriteria": [
+        "AudioSyncService handles upload of M4A files to Supabase Storage bucket 'loci-audio'",
+        "Upload path: {user_id}/{locus_id}.m4a",
+        "Upload triggered after locus sync, only for loci with local-only audio",
+        "Download method for fetching audio files that exist remotely but not locally",
+        "Updates locus.audioFileURL with local path after download",
+        "Handles upload failures with retry queue",
+        "Typecheck passes"
+      ],
+      "priority": 76,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-077",
+      "title": "Create background sync manager",
+      "description": "As a user, I want my data synced automatically without manual intervention.",
+      "acceptanceCriteria": [
+        "BackgroundSyncManager registers BGAppRefreshTask for periodic sync",
+        "Sync triggers: app foreground (via scenePhase .active), new locus creation, background fetch",
+        "Minimum sync interval: 15 minutes to avoid excessive network usage",
+        "Coordinates SyncService upload then download sequence",
+        "Coordinates AudioSyncService after loci sync",
+        "Only syncs when user is authenticated",
+        "Typecheck passes"
+      ],
+      "priority": 77,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-078",
+      "title": "Create HouseholdViewModel for family management",
+      "description": "As a developer, I need household state management for the family sharing feature.",
+      "acceptanceCriteria": [
+        "HouseholdViewModel @Observable class",
+        "Properties: currentHousehold (Household?), members ([HouseholdMember]), inviteCode (String?)",
+        "createHousehold(name:) async throws: calls edge function, saves to SwiftData",
+        "joinHousehold(code:) async throws: validates and joins via edge function",
+        "leaveHousehold() async throws: removes self from members",
+        "deleteHousehold() async throws: owner-only, removes household and all members",
+        "refreshMembers() async: fetches current member list from Supabase",
+        "Typecheck passes"
+      ],
+      "priority": 78,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-079",
+      "title": "Create household creation UI",
+      "description": "As a user, I want to create a family group and get an invite code to share.",
+      "acceptanceCriteria": [
+        "CreateHouseholdView: text field for family name, Create button",
+        "After creation: displays 6-char invite code prominently",
+        "Share button copies invite code to clipboard or opens share sheet",
+        "Expiry notice: 'Code expires in 48 hours'",
+        "Regenerate code button for owner",
+        "Navigation from Settings > Family section",
+        "Typecheck passes"
+      ],
+      "priority": 79,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-080",
+      "title": "Create join household UI",
+      "description": "As a user, I want to join my family's group by entering an invite code.",
+      "acceptanceCriteria": [
+        "JoinHouseholdView: 6-character code input field (auto-uppercase, alphanumeric only)",
+        "Join button validates code against edge function",
+        "Error states: expired code, invalid code, household full (6 max), already a member",
+        "Success state: shows household name and member count, transitions to household view",
+        "Loading state during validation",
+        "Typecheck passes"
+      ],
+      "priority": 80,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-081",
+      "title": "Create household member management UI",
+      "description": "As a household owner, I want to view and manage family members.",
+      "acceptanceCriteria": [
+        "HouseholdMembersView: List of members with display name, role badge, joined date",
+        "Owner can remove members (swipe to delete with confirmation)",
+        "Owner indicated with crown icon, members with person icon",
+        "Member count: 'N of 6 members'",
+        "Invite code section at bottom with share/regenerate for owner",
+        "Non-owners see read-only member list with Leave button",
+        "Typecheck passes"
+      ],
+      "priority": 81,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-082",
+      "title": "Create share-with-family toggle on locus creation",
+      "description": "As a user, I want to easily share specific loci with my family group.",
+      "acceptanceCriteria": [
+        "ShareWithFamilyToggle component: Toggle with person.2 icon and household name",
+        "Only visible when user belongs to a household",
+        "Integrated into PostRecordingSheet and EditLocusSheet",
+        "When enabled: sets locus.isShared=true and locus.householdId to user's household",
+        "When enabled: sets locus.createdByName to user's display name",
+        "Toggle defaults to off for new loci",
+        "Typecheck passes"
+      ],
+      "priority": 82,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-083",
+      "title": "Create shared loci display with creator attribution",
+      "description": "As a user, I want to see who in my family created shared loci.",
+      "acceptanceCriteria": [
+        "CategoryPinView shows small person.2 badge for shared loci",
+        "LocusRowView shows 'Shared by [name]' subtitle for family loci",
+        "LocusDetailView shows creator name with person icon for shared loci",
+        "Notifications for shared loci include creator name: '[Name] left a note here:'",
+        "Map filter option to show/hide family loci",
+        "Typecheck passes"
+      ],
+      "priority": 83,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-084",
+      "title": "Include shared loci in geofence rotation",
+      "description": "As a user, I want to be notified about family members' shared loci when I'm nearby.",
+      "acceptanceCriteria": [
+        "GeofenceManager.refreshGeofences includes shared household loci in nearest-20 calculation",
+        "Shared loci from user's household fetched via SwiftData query (householdId match, isShared=true)",
+        "Notification text distinguishes personal vs shared: 'You left a note' vs '[Name] left a note'",
+        "If user has no household, only personal loci are considered",
+        "Shared loci do not count against free tier loci limit",
+        "Typecheck passes"
+      ],
+      "priority": 84,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-085",
+      "title": "Create RevenueCat SDK configuration",
+      "description": "As a developer, I need RevenueCat configured to manage in-app subscriptions.",
+      "acceptanceCriteria": [
+        "RevenueCat SDK (Purchases) added as dependency",
+        "Purchases.configure(withAPIKey:) called in LociApp.init or AppDelegate",
+        "Offering IDs defined: 'premium_monthly', 'premium_yearly', 'family_monthly', 'family_yearly', 'lifetime_individual', 'lifetime_family'",
+        "Debug logging enabled in debug builds",
+        "Purchases.shared.delegate set for transaction updates",
+        "Typecheck passes"
+      ],
+      "priority": 85,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-086",
+      "title": "Create SubscriptionService for purchase and tier management",
+      "description": "As a developer, I need a service layer managing subscription state and purchases.",
+      "acceptanceCriteria": [
+        "SubscriptionService @Observable class wrapping RevenueCat",
+        "currentTier published property: .free, .premium, or .family",
+        "fetchOfferings() async throws -> [Package] loads available products",
+        "purchase(_ package: Package) async throws -> Bool completes purchase flow",
+        "restorePurchases() async throws restores previous transactions",
+        "checkEntitlements() updates currentTier from Purchases.shared.customerInfo",
+        "isPremiumFeature(_ feature: String) -> Bool checks if feature requires upgrade",
+        "Typecheck passes"
+      ],
+      "priority": 86,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-087",
+      "title": "Create PaywallView with tier comparison",
+      "description": "As a user, I want to see pricing options and understand what I get with each plan.",
+      "acceptanceCriteria": [
+        "PaywallView presented as .fullScreenCover or .sheet",
+        "Three tiers displayed: Free (current), Premium ($3.99/mo), Family ($5.99/mo)",
+        "Feature comparison grid: loci limit, AI categorization, cloud sync, widget, search, family sharing",
+        "Toggle between monthly/yearly pricing (yearly shows savings percentage)",
+        "Lifetime option shown below subscriptions with launch promo pricing",
+        "7-day free trial badge on Premium and Family tiers",
+        "Restore Purchases button at bottom",
+        "Terms/Privacy links at bottom",
+        "Typecheck passes"
+      ],
+      "priority": 87,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-088",
+      "title": "Create tier enforcement for free plan limits",
+      "description": "As the system, I need to enforce free tier limits so that monetization works.",
+      "acceptanceCriteria": [
+        "TierEnforcement utility checks before feature access: canCreateLocus (free max 10), canUseAI (premium+), canSync (premium+), canUseWidget (premium+), canSearch (premium+), canShareWithFamily (family only)",
+        "RecordViewModel checks canCreateLocus before starting recording",
+        "AICategoryService checks canUseAI, returns .general for free users",
+        "Free loci count tracked in SwiftData (non-archived personal loci)",
+        "Each enforcement point stores the blocked feature name for upgrade prompt",
+        "Typecheck passes"
+      ],
+      "priority": 88,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-089",
+      "title": "Create contextual upgrade prompts",
+      "description": "As the system, I want to show upgrade prompts when users hit free tier limits.",
+      "acceptanceCriteria": [
+        "UpgradePromptView: context-aware prompt explaining the specific blocked feature",
+        "Shown inline when user tries: 11th locus, search, AI features, widget config, family share",
+        "Each prompt message is specific: 'Upgrade to Premium for unlimited loci' vs 'Family plan required for sharing'",
+        "CTA button opens PaywallView",
+        "Dismiss button to close prompt",
+        "Does not re-show for same feature within 24 hours (UserDefaults cooldown)",
+        "Typecheck passes"
+      ],
+      "priority": 89,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-090",
+      "title": "Create WidgetKit timeline provider for nearby loci",
+      "description": "As a premium user, I want a widget showing my nearest loci on my home screen.",
+      "acceptanceCriteria": [
+        "NearbyLociTimelineProvider conforming to TimelineProvider",
+        "getTimeline: reads loci from shared App Group SwiftData container",
+        "Sorts by distance from last known location (stored in UserDefaults App Group)",
+        "Returns top 3 nearest loci as timeline entries",
+        "Refresh policy: .after(Date().addingTimeInterval(900)) for 15-minute updates",
+        "Placeholder and snapshot entries with sample data",
+        "Typecheck passes"
+      ],
+      "priority": 90,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-091",
+      "title": "Create NearbyLociWidget small and medium layouts",
+      "description": "As a user, I want an attractive widget showing my nearest voice notes.",
+      "acceptanceCriteria": [
+        "Small widget: single nearest locus with category icon, truncated transcription, location name",
+        "Medium widget: list of 3 nearest loci with category icons and transcription previews",
+        "Widget background uses subtle gradient matching primary category color",
+        "Tap widget deep-links to locus detail in app",
+        "Widget configuration: allow user to filter by category (AppIntent)",
+        "Locked state: shows 'Upgrade to Premium' for free users",
+        "Typecheck passes"
+      ],
+      "priority": 91,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-092",
+      "title": "Create widget deep-link with AppIntent",
+      "description": "As a user, I want tapping a widget locus to open its detail in the app.",
+      "acceptanceCriteria": [
+        "AppIntent defined for opening a specific locus by ID",
+        "Widget uses widgetURL or Link with loci://detail/{locusId} URL scheme",
+        "LociApp handles URL scheme in .onOpenURL modifier",
+        "NavigationRouter processes deep-link URL and sets selectedLocusId",
+        "Works when app is running, backgrounded, or terminated",
+        "Typecheck passes"
+      ],
+      "priority": 92,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-093",
+      "title": "Create KeychainService for secure credential storage",
+      "description": "As a security requirement, auth tokens must be stored in the Keychain, not UserDefaults.",
+      "acceptanceCriteria": [
+        "KeychainService wrapper using Security framework (SecItemAdd, SecItemCopyMatching, etc.)",
+        "save(key: String, data: Data) throws method",
+        "load(key: String) throws -> Data? method",
+        "delete(key: String) throws method",
+        "Keys defined as constants: authToken, refreshToken, userId",
+        "kSecAttrAccessible set to kSecAttrAccessibleAfterFirstUnlock for background access",
+        "Typecheck passes"
+      ],
+      "priority": 93,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-094",
+      "title": "Create biometric lock for app access",
+      "description": "As a user, I want to optionally require Face ID/Touch ID to open Loci for privacy.",
+      "acceptanceCriteria": [
+        "BiometricLockService using LocalAuthentication framework (LAContext)",
+        "canUseBiometrics() -> Bool checks device capability",
+        "authenticate() async throws -> Bool triggers biometric prompt",
+        "isBiometricLockEnabled stored in AppStorage (default: false)",
+        "Toggle in Settings > Privacy section",
+        "Lock screen shown on app foreground if enabled (after 5-minute grace period)",
+        "Fallback to device passcode if biometric fails",
+        "Typecheck passes"
+      ],
+      "priority": 94,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-095",
+      "title": "Create SSL certificate pinning for API calls",
+      "description": "As a security requirement, API calls to Supabase should use certificate pinning to prevent MITM.",
+      "acceptanceCriteria": [
+        "CertificatePinningDelegate implementing URLSessionDelegate",
+        "urlSession(_:didReceive:) validates server certificate against pinned public key hash",
+        "Pinned certificate hash stored as constant (SHA-256 of Supabase server cert public key)",
+        "Fallback: if pin validation fails, connection is rejected",
+        "Applied to Supabase client URL session configuration",
+        "Logging of pin failures for debugging (debug builds only)",
+        "Typecheck passes"
+      ],
+      "priority": 95,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-096",
+      "title": "Create audio file encryption at rest",
+      "description": "As a security feature, audio files should be encrypted on disk to protect user privacy.",
+      "acceptanceCriteria": [
+        "AudioEncryptionService using CryptoKit (AES-GCM)",
+        "Encryption key derived from device-specific identifier stored in Keychain",
+        "encrypt(data: Data) throws -> Data method",
+        "decrypt(data: Data) throws -> Data method",
+        "AudioService saves encrypted audio files, AudioPlayerService decrypts on playback",
+        "Migration path for existing unencrypted files (encrypt on next app launch)",
+        "Typecheck passes"
+      ],
+      "priority": 96,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-097",
+      "title": "Create input sanitization service",
+      "description": "As a security requirement, all user-generated text must be sanitized before storage and display.",
+      "acceptanceCriteria": [
+        "InputSanitizer utility with sanitize(_ text: String) -> String method",
+        "Strips HTML tags and script injection attempts",
+        "Limits text length (transcription: 5000 chars, display name: 50 chars, household name: 30 chars)",
+        "Applied to: transcription text before save, display names, household names, search queries",
+        "Preserves legitimate Unicode characters (accented letters, emoji)",
+        "Typecheck passes"
+      ],
+      "priority": 97,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-098",
+      "title": "Create rate limiting middleware for edge functions",
+      "description": "As a security requirement, API endpoints need rate limiting to prevent abuse.",
+      "acceptanceCriteria": [
+        "Rate limiting middleware for Hono using in-memory store (or Redis if available)",
+        "Default: 60 requests per minute per user",
+        "Invite validation endpoint: 5 attempts per minute per IP (brute force prevention)",
+        "Webhook endpoint: 100 requests per minute (RevenueCat volume)",
+        "Returns 429 Too Many Requests with Retry-After header when exceeded",
+        "Middleware applied globally with per-route overrides",
+        "Typecheck passes"
+      ],
+      "priority": 98,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-099",
+      "title": "Create efficient SwiftData pagination",
+      "description": "As a performance optimization, list views need pagination to handle thousands of loci.",
+      "acceptanceCriteria": [
+        "PaginatedLocusQuery utility wrapping SwiftData FetchDescriptor with fetchLimit and fetchOffset",
+        "Page size: 20 loci per page",
+        "loadMore() method appends next page to existing results",
+        "hasMore property based on returned count vs page size",
+        "Integrated into LocusListView with 'load more' trigger at scroll bottom",
+        "Reset pagination when sort order or filter changes",
+        "Typecheck passes"
+      ],
+      "priority": 99,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-100",
+      "title": "Create audio file cache management",
+      "description": "As a performance optimization, audio files need cache management to prevent disk bloat.",
+      "acceptanceCriteria": [
+        "AudioCacheManager with maxCacheSize property (default: 500MB)",
+        "currentCacheSize() -> Int64 calculates total audio files size on disk",
+        "cleanupIfNeeded() removes oldest archived loci audio files when over limit",
+        "isFileCached(_ url: String) -> Bool checks if audio exists locally",
+        "Runs on app launch and after each sync",
+        "Excludes non-synced audio files from cleanup",
+        "Typecheck passes"
+      ],
+      "priority": 100,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-101",
+      "title": "Create map viewport optimization for annotation loading",
+      "description": "As a performance optimization, the map should only render annotations visible in the current viewport.",
+      "acceptanceCriteria": [
+        "HomeMapViewModel.visibleLoci filters loci by current map region bounds",
+        "Adds padding margin (10%) around visible region for smooth scrolling",
+        "Recalculates on mapRegionDidChange events (debounced 200ms)",
+        "Maximum 100 annotations rendered at once (cluster beyond that)",
+        "Profile with Instruments: annotation rendering under 16ms frame budget",
+        "Typecheck passes"
+      ],
+      "priority": 101,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-102",
+      "title": "Create VoiceOver accessibility labels throughout app",
+      "description": "As a user with visual impairment, I need proper VoiceOver support to use Loci.",
+      "acceptanceCriteria": [
+        "All interactive elements have .accessibilityLabel and .accessibilityHint",
+        "RecordButton: 'Record voice note' / 'Double tap to start recording'",
+        "CategoryPinView: '[Category] note at [location]' / 'Double tap for details'",
+        "AudioPlaybackBar: 'Play recording, [duration]' / 'Double tap to play'",
+        "Map view: .accessibilityElement(children: .contain) with annotation rotor",
+        "Tab bar items have labels matching their purpose",
+        "Typecheck passes"
+      ],
+      "priority": 102,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-103",
+      "title": "Create Dynamic Type support across all views",
+      "description": "As a user, I want text to respect my system font size preferences.",
+      "acceptanceCriteria": [
+        "All Text views use .font(.headline), .font(.body), etc. (not fixed sizes)",
+        "Layout adapts to larger text: ScrollView wrapping where needed, flexible frames",
+        "RecordButton size remains tappable at all text sizes (minimum 44x44pt)",
+        "Category pills wrap to multiple lines at larger sizes",
+        "Tested at: Default, Large, Extra Large, AX3 accessibility sizes",
+        "Typecheck passes"
+      ],
+      "priority": 103,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-104",
+      "title": "Create Reduce Motion alternatives",
+      "description": "As a user with motion sensitivity, I want reduced animation when I have Reduce Motion enabled.",
+      "acceptanceCriteria": [
+        "@Environment(\\.accessibilityReduceMotion) checked before animations",
+        "RecordButton: pulse animation replaced with opacity fade",
+        "AudioWaveformView: animated bars replaced with simple level indicator",
+        "View transitions: slide/scale replaced with opacity crossfade",
+        "Map annotation appearance: no bounce, simple fade in",
+        "All uses of withAnimation check reduceMotion preference",
+        "Typecheck passes"
+      ],
+      "priority": 104,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-105",
+      "title": "Create haptic feedback manager",
+      "description": "As a user, I want consistent haptic feedback that makes the app feel responsive and polished.",
+      "acceptanceCriteria": [
+        "HapticManager with static methods for named feedback patterns",
+        "recordStart(): UIImpactFeedbackGenerator(.medium)",
+        "recordStop(): UIImpactFeedbackGenerator(.light)",
+        "saveSuccess(): UINotificationFeedbackGenerator(.success)",
+        "archive(): UINotificationFeedbackGenerator(.warning)",
+        "delete(): UINotificationFeedbackGenerator(.error)",
+        "tabSelection(): UISelectionFeedbackGenerator()",
+        "Typecheck passes"
+      ],
+      "priority": 105,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-106",
+      "title": "Create smooth view transition animations",
+      "description": "As a user, I want polished transitions between screens and states.",
+      "acceptanceCriteria": [
+        "Navigation transitions use .navigationTransition(.slide) where appropriate",
+        "Sheet presentations use .presentationDetents for half/full sheets",
+        "PostRecordingSheet slides up as medium detent, expandable to large",
+        "Recording state transition: smooth scale + opacity change on record button",
+        "Category filter selection: animated color fill transition",
+        "List item appearance: staggered fade-in on initial load",
+        "Typecheck passes"
+      ],
+      "priority": 106,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-107",
+      "title": "Create skeleton loading states for async content",
+      "description": "As a user, I want placeholder loading states instead of blank screens while data loads.",
+      "acceptanceCriteria": [
+        "SkeletonView: shimmer animation on rounded rectangle placeholders",
+        "LocusRowSkeleton: matches LocusRowView layout with placeholder shapes",
+        "MapSkeleton: placeholder map with shimmer overlay",
+        "DetailSkeleton: placeholder transcription block, metadata fields, playback bar",
+        "Applied to views during initial data fetch and sync operations",
+        "Shimmer animation uses LinearGradient with offset animation",
+        "Typecheck passes"
+      ],
+      "priority": 107,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-108",
+      "title": "Create comprehensive error handling UI",
+      "description": "As a user, I want clear error messages and recovery options when things go wrong.",
+      "acceptanceCriteria": [
+        "ErrorBannerView: dismissible banner at top of screen for non-blocking errors",
+        "Network error: 'No internet connection. Your loci are saved locally.' with retry button",
+        "Permission denied: specific guidance for each permission (location, mic, notifications) with 'Open Settings' button",
+        "Storage full: 'Device storage full. Archive old loci to free space.' with manage link",
+        "Sync failure: 'Sync failed. Will retry automatically.' with manual retry",
+        "Recording failure: 'Could not start recording. Check microphone access.' with Settings link",
+        "Typecheck passes"
+      ],
+      "priority": 108,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-109",
+      "title": "Create TelemetryDeck analytics integration",
+      "description": "As a developer, I need privacy-focused analytics to understand usage patterns.",
+      "acceptanceCriteria": [
+        "TelemetryDeck SDK added as dependency, configured in LociApp with app ID",
+        "Events tracked: locus_created (with category), locus_triggered (geofence entry), recording_started, recording_completed, search_performed, household_created, household_joined, paywall_shown, subscription_purchased",
+        "No PII sent: only anonymous event counts and category breakdowns",
+        "Analytics disabled when user opts out in Settings",
+        "Debug builds log events to console instead of sending",
+        "Typecheck passes"
+      ],
+      "priority": 109,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-110",
+      "title": "Create dark mode support with proper color adaptation",
+      "description": "As a user, I want Loci to look great in both light and dark mode.",
+      "acceptanceCriteria": [
+        "All Theme colors defined with light/dark variants using Color asset catalog",
+        "Map style adapts: standard for light, mutedStandard for dark",
+        "Category pin colors maintain readability in both modes",
+        "Widget adapts to system appearance",
+        "Recording view gradient adapts to mode",
+        "All SF Symbols use .symbolRenderingMode(.hierarchical) for proper dark mode appearance",
+        "Typecheck passes"
+      ],
+      "priority": 110,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-111",
+      "title": "Create Astro project for useloci.com marketing site",
+      "description": "As a developer, I need the marketing website project scaffolded for Cloudflare Pages.",
+      "acceptanceCriteria": [
+        "Directory: web/ with Astro project initialized",
+        "Configured for Cloudflare Pages adapter (static output)",
+        "Tailwind CSS integrated for styling",
+        "Base layout with header (logo, nav) and footer (links, copyright)",
+        "astro.config.mjs configured with site: 'https://useloci.com'",
+        "Favicon and Open Graph meta tags configured",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 111,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-112",
+      "title": "Create landing page with hero, features, and download CTA",
+      "description": "As a potential user, I want to understand Loci's value and download the app from the website.",
+      "acceptanceCriteria": [
+        "Hero section: tagline 'Your Spatial Memory', subtitle 'Voice notes pinned to places that find you when you return', App Store badge CTA",
+        "How It Works section: 3-step visual (Record, Walk Away, Get Notified)",
+        "Features grid: Voice Recording, Proximity Triggers, Family Sharing, AI Categories, Map View, Privacy-First",
+        "Pricing section: Free, Premium, Family tiers with feature comparison",
+        "Social proof section: placeholder for testimonials",
+        "Responsive: mobile-first, works on all screen sizes",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 112,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-113",
+      "title": "Create privacy policy page",
+      "description": "As a legal requirement, the app needs a privacy policy page.",
+      "acceptanceCriteria": [
+        "Privacy policy page at /privacy",
+        "Covers: data collected (location, audio, transcriptions), how data is stored (encrypted, on-device first), sharing (only within household), third parties (Supabase, RevenueCat, TelemetryDeck), data deletion rights, contact info",
+        "Emphasizes: on-device transcription, no public data, user controls",
+        "Effective date and last updated date",
+        "Clean, readable typography",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 113,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-114",
+      "title": "Create terms of service page",
+      "description": "As a legal requirement, the app needs terms of service.",
+      "acceptanceCriteria": [
+        "Terms of service page at /terms",
+        "Covers: acceptable use, subscription terms, refund policy (Apple handles), content ownership (user owns their data), service availability, limitation of liability, governing law",
+        "References App Store EULA where appropriate",
+        "Effective date and last updated date",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 114,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-115",
+      "title": "Create support and contact page",
+      "description": "As a user, I need a way to get help and contact the developer.",
+      "acceptanceCriteria": [
+        "Support page at /support",
+        "FAQ section: common questions (battery life, Always Allow, how triggers work, family sharing, subscription management)",
+        "Contact section: email hello@useloci.com, contact form (Cloudflare Email Routing)",
+        "Troubleshooting section: permissions, notifications not working, sync issues",
+        "App Store review link",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 115,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-116",
+      "title": "Create GitHub Actions CI workflow for build and lint",
+      "description": "As a developer, I need automated builds and linting on every push.",
+      "acceptanceCriteria": [
+        ".github/workflows/ci.yml workflow file",
+        "Triggers on push to develop and feature/* branches, and PRs to main",
+        "Steps: checkout, setup Xcode (latest stable), SwiftLint, xcodebuild build (Debug, iPhone 15 simulator)",
+        "SwiftLint configuration (.swiftlint.yml) with reasonable defaults",
+        "Build step uses xcodebuild -scheme Loci -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 15'",
+        "Caches Swift Package Manager dependencies",
+        "Typecheck passes"
+      ],
+      "priority": 116,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-117",
+      "title": "Create GitHub Actions workflow for TestFlight deployment",
+      "description": "As a developer, I need automated TestFlight deployments from the main branch.",
+      "acceptanceCriteria": [
+        ".github/workflows/deploy.yml workflow file",
+        "Triggers on push to main branch only",
+        "Steps: checkout, setup Xcode, install Fastlane, match certificates, archive, upload to TestFlight",
+        "Uses repository secrets for Apple credentials and match passphrase",
+        "Fastlane Matchfile and Fastfile configured for App Store signing",
+        "Sends Slack/email notification on successful upload (optional)",
+        "Typecheck passes"
+      ],
+      "priority": 117,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-118",
+      "title": "Create app icon set and launch screen",
+      "description": "As a user, I want a distinctive app icon and polished launch screen.",
+      "acceptanceCriteria": [
+        "App icon: pin/location marker with audio wave motif, using primary brand color",
+        "Icon set in Assets.xcassets/AppIcon.appiconset with all required sizes (1024x1024 source)",
+        "Launch screen: centered Loci logo with tagline on brand color background",
+        "LaunchScreen.storyboard or launch screen info.plist configuration",
+        "Icon follows Apple Human Interface Guidelines (no transparency, no text-heavy)",
+        "Typecheck passes"
+      ],
+      "priority": 118,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-119",
+      "title": "Create App Store metadata and screenshot configuration",
+      "description": "As a developer, I need App Store listing content ready for submission.",
+      "acceptanceCriteria": [
+        "Fastlane metadata directory: fastlane/metadata/en-US/",
+        "name.txt: 'Loci'",
+        "subtitle.txt: 'Voice Notes Pinned to Places'",
+        "description.txt: compelling App Store description highlighting voice notes, proximity triggers, family sharing, privacy",
+        "keywords.txt: 'location,notes,voice,memo,place,reminder,gps,pin,map,spot,geo,spatial,memory,family,share'",
+        "promotional_text.txt: launch promotion copy",
+        "Category: Utilities, Secondary: Travel",
+        "Typecheck passes"
+      ],
+      "priority": 119,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-120",
+      "title": "Create Coolify deployment configuration for Supabase and edge functions",
+      "description": "As a developer, I need deployment configs for the self-hosted backend.",
+      "acceptanceCriteria": [
+        "docker-compose.yml in backend/ for Supabase services (postgres, postgrest, auth, storage, realtime)",
+        "PostGIS extension enabled in postgres configuration",
+        "Edge functions service definition alongside Supabase on same Docker network",
+        "Environment variables documented in .env.example (no real secrets)",
+        "Health check endpoints for monitoring",
+        "Volume mounts for persistent postgres data",
+        "Typecheck passes"
+      ],
+      "priority": 120,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

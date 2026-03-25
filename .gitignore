@@ -1,0 +1,57 @@
+# Ralph logs
+.ralph-logs/
+
+# macOS
+.DS_Store
+*.swp
+*~
+
+# Xcode
+Loci/build/
+Loci/*.xcworkspace/xcuserdata/
+Loci/*.xcodeproj/xcuserdata/
+Loci/*.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
+DerivedData/
+*.moved-aside
+*.xcuserstate
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Swift Package Manager
+.build/
+Packages/
+Package.resolved
+
+# CocoaPods (if used)
+Pods/
+
+# Fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/
+fastlane/test_output/
+
+# Node.js (edge functions + web)
+node_modules/
+dist/
+.astro/
+.wrangler/
+
+# Environment & secrets
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+Thumbs.db
+Desktop.ini
+
+# Claude Code local state
+.claude/.ralph-loop.local.md
