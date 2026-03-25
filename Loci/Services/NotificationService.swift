@@ -90,9 +90,42 @@ final class NotificationService: NSObject, UNUserNotificationCenterDelegate {
 
     // MARK: - Geofence Notifications
 
+    /// Returns `true` if the current time falls within the user's configured quiet hours.
+    func isInQuietHours() -> Bool {
+        guard UserDefaults.standard.bool(forKey: "loci_notifications_enabled") else {
+            return true // Notifications disabled entirely
+        }
+
+        guard let startDate = UserDefaults.standard.object(forKey: "loci_quiet_hours_start") as? Date,
+              let endDate = UserDefaults.standard.object(forKey: "loci_quiet_hours_end") as? Date else {
+            return false
+        }
+
+        let calendar = Calendar.current
+        let now = Date()
+        let startComponents = calendar.dateComponents([.hour, .minute], from: startDate)
+        let endComponents = calendar.dateComponents([.hour, .minute], from: endDate)
+        let nowComponents = calendar.dateComponents([.hour, .minute], from: now)
+
+        guard let startMinutes = startComponents.hour.map({ $0 * 60 + (startComponents.minute ?? 0) }),
+              let endMinutes = endComponents.hour.map({ $0 * 60 + (endComponents.minute ?? 0) }),
+              let nowMinutes = nowComponents.hour.map({ $0 * 60 + (nowComponents.minute ?? 0) }) else {
+            return false
+        }
+
+        if startMinutes <= endMinutes {
+            return nowMinutes >= startMinutes && nowMinutes < endMinutes
+        } else {
+            // Crosses midnight (e.g., 22:00 - 07:00)
+            return nowMinutes >= startMinutes || nowMinutes < endMinutes
+        }
+    }
+
     /// Schedules a local notification for a geofence entry event.
     /// Shows the locus location name, transcription preview, category, and relative time.
+    /// Notifications are suppressed during quiet hours.
     func scheduleGeofenceNotification(for locus: Locus) {
+        guard !isInQuietHours() else { return }
         let content = UNMutableNotificationContent()
 
         // Title: location name or fallback
