@@ -4,7 +4,7 @@
 ## Started: 2026-03-25
 ## Status: IN PROGRESS
 ## Total Stories: 120
-## Completed: 1/120
+## Completed: 2/120
 
 ---
 
@@ -43,7 +43,7 @@ Loci is a voice-first iOS app (SwiftUI, iOS 17+) that pins voice notes to GPS co
 
 ## Phase 1: Project Foundation (US-001 → US-008)
 - [x] US-001: Create Xcode project structure with folder organization
-- [ ] US-002: Define LocusCategory enum with colors and icons
+- [x] US-002: Define LocusCategory enum with colors and icons
 - [ ] US-003: Define Locus SwiftData model
 - [ ] US-004: Define Household and HouseholdMember SwiftData models
 - [ ] US-005: Define UserProfile model and app constants
