@@ -4,7 +4,7 @@
 ## Started: 2026-03-25
 ## Status: IN PROGRESS
 ## Total Stories: 120
-## Completed: 35/120
+## Completed: 36/120
 
 ---
 
@@ -85,7 +85,7 @@ Loci is a voice-first iOS app (SwiftUI, iOS 17+) that pins voice notes to GPS co
 - [x] US-033: Create CategoryFilterBar component
 - [x] US-034: Create LocusListView as alternative to map view
 - [x] US-035: Create tab-based navigation with map, list, and settings
-- [ ] US-036: Create EmptyStateView reusable component
+- [x] US-036: Create EmptyStateView reusable component
 
 ## Phase 6: Locus Detail (US-037 → US-043)
 - [ ] US-037: Create LocusDetailViewModel

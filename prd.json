@@ -588,8 +588,8 @@
         "Typecheck passes"
       ],
       "priority": 36,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Reusable EmptyStateView with SF Symbol, title, subtitle, optional CTA. Static factories for map, list, and search presets."
     },
     {
       "id": "US-037",
