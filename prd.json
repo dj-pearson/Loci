@@ -339,8 +339,8 @@
         "Typecheck passes"
       ],
       "priority": 21,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented NavigationRouter @Observable class in ViewModels/NavigationRouter.swift with selectedLocusId property for deep-linking and pendingLocusId for cold-launch support. Observes .notificationTappedViewLocus and .notificationTappedAddNote notifications posted by NotificationService delegate. LociApp.swift updated to create and inject NavigationRouter and NotificationService into environment. ContentView uses NavigationStack with .navigationDestination(item:) binding to selectedLocusId. LocusDeepLinkView provides temporary detail view (to be replaced by full LocusDetailView in US-038). consumePendingDeepLink() called on .onAppear handles terminated-state launches. Build verification deferred to macOS CI."
     },
     {
       "id": "US-022",
