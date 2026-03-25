@@ -555,8 +555,8 @@
         "Typecheck passes"
       ],
       "priority": 34,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "LocusListView with LocusRowView, sort picker (nearest/newest/oldest), date sections, pull-to-refresh, empty state. Uses HaversineDistance for proximity."
     },
     {
       "id": "US-035",
