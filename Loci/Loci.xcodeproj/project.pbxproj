@@ -20,6 +20,7 @@
 		8F2A5C5D1B2E4F7A90D3E6C4 /* ModelContainerConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A5C5D1B2E4F7A90D3E6C4 /* ModelContainerConfiguration.swift */; };
 		8F2A5C5D1B2E4F7A90D3E6C5 /* PreviewData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A5C5D1B2E4F7A90D3E6C5 /* PreviewData.swift */; };
 		8F2A6C5D1B2E4F7A90D3E6C1 /* LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A6C5D1B2E4F7A90D3E6C1 /* LocationService.swift */; };
+		8F2A6C5D1B2E4F7A90D3E6C2 /* ReverseGeocodingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A6C5D1B2E4F7A90D3E6C2 /* ReverseGeocodingService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -39,6 +40,7 @@
 		8F1A5C5D1B2E4F7A90D3E6C4 /* ModelContainerConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelContainerConfiguration.swift; sourceTree = "<group>"; };
 		8F1A5C5D1B2E4F7A90D3E6C5 /* PreviewData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewData.swift; sourceTree = "<group>"; };
 		8F1A6C5D1B2E4F7A90D3E6C1 /* LocationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationService.swift; sourceTree = "<group>"; };
+		8F1A6C5D1B2E4F7A90D3E6C2 /* ReverseGeocodingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReverseGeocodingService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -113,6 +115,7 @@
 			isa = PBXGroup;
 			children = (
 				8F1A6C5D1B2E4F7A90D3E6C1 /* LocationService.swift */,
+				8F1A6C5D1B2E4F7A90D3E6C2 /* ReverseGeocodingService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -259,6 +262,7 @@
 				8F2A5C5D1B2E4F7A90D3E6C4 /* ModelContainerConfiguration.swift in Sources */,
 				8F2A5C5D1B2E4F7A90D3E6C5 /* PreviewData.swift in Sources */,
 				8F2A6C5D1B2E4F7A90D3E6C1 /* LocationService.swift in Sources */,
+				8F2A6C5D1B2E4F7A90D3E6C2 /* ReverseGeocodingService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -172,8 +172,8 @@
         "Typecheck passes"
       ],
       "priority": 11,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented ReverseGeocodingService @Observable class in Services/ReverseGeocodingService.swift. Async reverseGeocode() method with CLGeocoder. Place name formatting prioritizes: POI name + thoroughfare > subThoroughfare + thoroughfare > locality > administrativeArea. Cache keyed by coordinates rounded to 3 decimal places. Retry logic handles CLError.network with exponential backoff (up to 3 attempts). Deduplicates concurrent requests for the same coordinate. Added to project.pbxproj. Build verification deferred to macOS CI."
     },
     {
       "id": "US-012",
