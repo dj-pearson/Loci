@@ -789,8 +789,8 @@
         "Typecheck passes"
       ],
       "priority": 48,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "OnboardingPageView reusable component + WelcomeOnboardingView with 3 swipeable pages, Skip button, Get Started CTA."
     },
     {
       "id": "US-049",
