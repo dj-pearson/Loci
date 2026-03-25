@@ -656,8 +656,8 @@
         "Typecheck passes"
       ],
       "priority": 40,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "EditLocusSheet with TextEditor for transcription, horizontal category pills, re-record button with confirmation dialog, save/cancel toolbar. Wired into LocusDetailView."
     },
     {
       "id": "US-041",

@@ -67,8 +67,7 @@ struct LocusDetailView: View {
             }
         }
         .sheet(isPresented: $showEditSheet) {
-            // EditLocusSheet placeholder — will be implemented in US-040
-            Text(String(localized: "Edit Locus"))
+            EditLocusSheet(viewModel: viewModel)
         }
         .confirmationDialog(
             String(localized: "Delete Voice Note"),
