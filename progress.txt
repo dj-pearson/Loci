@@ -4,7 +4,7 @@
 ## Started: 2026-03-25
 ## Status: IN PROGRESS
 ## Total Stories: 120
-## Completed: 49/120
+## Completed: 50/120
 
 ---
 
@@ -105,7 +105,7 @@ Loci is a voice-first iOS app (SwiftUI, iOS 17+) that pins voice notes to GPS co
 - [x] US-047: Create OnboardingViewModel with step management
 - [x] US-048: Create welcome onboarding screens with value propositions
 - [x] US-049: Create location permission request screen
-- [ ] US-050: Create notification and microphone permission screens
+- [x] US-050: Create notification and microphone permission screens
 - [ ] US-051: Create first locus prompt in onboarding
 
 ## Phase 9: Settings (US-052 → US-056)

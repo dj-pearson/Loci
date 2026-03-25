@@ -823,8 +823,8 @@
         "Typecheck passes"
       ],
       "priority": 50,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "NotificationPermissionView and MicrophonePermissionView with explanations, CTA buttons calling respective service methods, and Maybe Later skip options."
     },
     {
       "id": "US-051",
