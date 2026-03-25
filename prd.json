@@ -857,8 +857,8 @@
         "Typecheck passes"
       ],
       "priority": 52,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "SettingsViewModel with UserDefaults-backed preferences, account state, storageUsed computed property, clearCache and signOut methods."
     },
     {
       "id": "US-053",
