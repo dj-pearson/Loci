@@ -109,8 +109,8 @@
         "Typecheck passes"
       ],
       "priority": 7,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented HaversineDistance enum in Utilities/HaversineDistance.swift with distance(lat1:lon1:lat2:lon2:) function, CLLocationCoordinate2D.distance(to:) extension, and Array<Locus> sortedByDistance/nearest extensions. Unit tests in LociTests/HaversineDistanceTests.swift using Swift Testing framework with known coordinate pairs (NYC-LA, London-Tokyo, same point, short distance, antipodal). Test target needs macOS CI to execute."
     },
     {
       "id": "US-008",

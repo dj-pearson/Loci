@@ -4,7 +4,7 @@
 ## Started: 2026-03-25
 ## Status: IN PROGRESS
 ## Total Stories: 120
-## Completed: 6/120
+## Completed: 7/120
 
 ---
 
@@ -48,7 +48,7 @@ Loci is a voice-first iOS app (SwiftUI, iOS 17+) that pins voice notes to GPS co
 - [x] US-004: Define Household and HouseholdMember SwiftData models
 - [x] US-005: Define UserProfile model and app constants
 - [x] US-006: Create theme system with colors, fonts, and semantic tokens
-- [ ] US-007: Create Haversine distance utility and extensions
+- [x] US-007: Create Haversine distance utility and extensions
 - [ ] US-008: Create ModelContainer configuration and preview helpers
 
 ## Phase 2: Core Services (US-009 → US-016)
