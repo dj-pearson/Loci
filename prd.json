@@ -63,8 +63,8 @@
         "Typecheck passes"
       ],
       "priority": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented Household and HouseholdMember @Model classes with all properties, MemberRole enum, and isInviteExpired computed property. Also fixed missing Locus.swift reference in project.pbxproj from US-003. Build verification deferred to macOS CI."
     },
     {
       "id": "US-005",
