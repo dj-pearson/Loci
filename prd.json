@@ -907,8 +907,8 @@
         "Typecheck passes"
       ],
       "priority": 55,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "DataManagementView with storage breakdown, clear cache, delete all archived, export placeholder."
     },
     {
       "id": "US-056",
