@@ -4,7 +4,7 @@
 ## Started: 2026-03-25
 ## Status: IN PROGRESS
 ## Total Stories: 120
-## Completed: 29/120
+## Completed: 30/120
 
 ---
 
@@ -79,7 +79,7 @@ Loci is a voice-first iOS app (SwiftUI, iOS 17+) that pins voice notes to GPS co
 
 ## Phase 5: Map & Browse (US-029 → US-036)
 - [x] US-029: Create HomeMapViewModel with filtered annotations
-- [ ] US-030: Create CategoryPinView custom map annotation
+- [x] US-030: Create CategoryPinView custom map annotation
 - [ ] US-031: Create HomeMapView with MapKit and locus annotations
 - [ ] US-032: Create map annotation clustering for dense areas
 - [ ] US-033: Create CategoryFilterBar component

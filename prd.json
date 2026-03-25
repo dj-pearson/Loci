@@ -490,8 +490,8 @@
         "Typecheck passes"
       ],
       "priority": 30,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented CategoryPinView with category-colored circle, SF Symbol icon, white border, shared badge, selected state animation, and tap handler."
     },
     {
       "id": "US-031",
