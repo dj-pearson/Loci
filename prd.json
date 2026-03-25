@@ -740,8 +740,8 @@
         "Typecheck passes"
       ],
       "priority": 45,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "SearchView uses .searchable modifier, CategoryFilterBar, UserDefaults-backed recent searches (max 10), 300ms debounce via Task.sleep."
     },
     {
       "id": "US-046",
@@ -756,8 +756,8 @@
         "Typecheck passes"
       ],
       "priority": 46,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "SearchResultsView with highlighted matches via Text concatenation, result count header, EmptyStateView.search() for empty results, tap navigates via NavigationRouter."
     },
     {
       "id": "US-047",
