@@ -19,7 +19,13 @@ struct HomeMapView: View {
             Map(position: $mapCameraPosition, selection: $selectedLocus) {
                 UserAnnotation()
 
-                ForEach(viewModel.filteredLoci(from: allLoci)) { locus in
+                let clustered = LocusClusterEngine.cluster(
+                    loci: viewModel.filteredLoci(from: allLoci),
+                    region: viewModel.mapRegion,
+                    screenWidth: UIScreen.main.bounds.width
+                )
+
+                ForEach(clustered.singles) { locus in
                     Annotation(
                         locus.locationName ?? "",
                         coordinate: locus.coordinate
@@ -33,6 +39,23 @@ struct HomeMapView: View {
                         }
                     }
                     .tag(locus)
+                    .annotationTitles(.hidden)
+                }
+
+                ForEach(clustered.clusters) { cluster in
+                    Annotation(
+                        "",
+                        coordinate: cluster.coordinate
+                    ) {
+                        ClusterAnnotationView(
+                            count: cluster.loci.count,
+                            dominantCategory: cluster.dominantCategory
+                        ) {
+                            withAnimation {
+                                mapCameraPosition = .region(cluster.boundingRegion)
+                            }
+                        }
+                    }
                     .annotationTitles(.hidden)
                 }
             }
