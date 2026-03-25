@@ -4,9 +4,14 @@ import SwiftUI
 struct RecordingView: View {
     @Bindable var viewModel: RecordViewModel
     let geocodingService: ReverseGeocodingService
+    var hasHousehold: Bool = false
+    var onSave: ((URL, String, CLLocationCoordinate2D, LocusCategory, Bool) -> Void)?
+    var onDiscard: (() -> Void)?
 
     @State private var locationName: String?
     @State private var detectedCategory: LocusCategory = .general
+    @State private var showPostRecordingSheet = false
+    @State private var recordingResult: (url: URL, transcription: String, coordinate: CLLocationCoordinate2D)?
 
     var body: some View {
         ZStack {
@@ -32,7 +37,11 @@ struct RecordingView: View {
                 ) {
                     Task {
                         if viewModel.isRecording {
-                            _ = await viewModel.stopRecording()
+                            if let result = await viewModel.stopRecording() {
+                                recordingResult = result
+                                detectedCategory = AICategoryService.categorize(transcription: result.transcription)
+                                showPostRecordingSheet = true
+                            }
                         } else {
                             await viewModel.startRecording()
                         }
@@ -68,6 +77,27 @@ struct RecordingView: View {
         } message: {
             if let message = viewModel.errorMessage {
                 Text(message)
+            }
+        }
+        .sheet(isPresented: $showPostRecordingSheet) {
+            if let result = recordingResult {
+                PostRecordingSheet(
+                    audioURL: result.url,
+                    transcription: result.transcription,
+                    coordinate: result.coordinate,
+                    locationName: locationName,
+                    detectedCategory: detectedCategory,
+                    hasHousehold: hasHousehold,
+                    onSave: { category, shared in
+                        showPostRecordingSheet = false
+                        onSave?(result.url, result.transcription, result.coordinate, category, shared)
+                    },
+                    onDiscard: {
+                        showPostRecordingSheet = false
+                        onDiscard?()
+                    }
+                )
+                .interactiveDismissDisabled()
             }
         }
     }
