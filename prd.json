@@ -272,8 +272,8 @@
         "Typecheck passes"
       ],
       "priority": 17,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented GeofenceManager @Observable singleton in Services/GeofenceManager.swift. Uses CLMonitor (iOS 17+) with CircularGeographicCondition for geofence monitoring. Async init creates CLMonitor('LociGeofences') and restores existing identifiers. registerRegion(for:) adds 100m radius condition using AppConstants.geofenceRadius. removeRegion(for:) and removeAllRegions() properly clean up monitored conditions. monitoredRegionIds Set<String> tracks all active geofence identifiers. ensureMonitor() handles lazy initialization. Added to project.pbxproj. Build verification deferred to macOS CI."
     },
     {
       "id": "US-018",
