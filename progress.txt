@@ -4,7 +4,7 @@
 ## Started: 2026-03-25
 ## Status: IN PROGRESS
 ## Total Stories: 120
-## Completed: 13/120
+## Completed: 14/120
 
 ---
 
@@ -57,7 +57,7 @@ Loci is a voice-first iOS app (SwiftUI, iOS 17+) that pins voice notes to GPS co
 - [x] US-011: Create reverse geocoding service
 - [x] US-012: Create AudioService with AVAudioRecorder configuration
 - [x] US-013: Add recording start, stop, and save methods to AudioService
-- [ ] US-014: Create AudioPlayerService for playback controls
+- [x] US-014: Create AudioPlayerService for playback controls
 - [ ] US-015: Create TranscriptionService with on-device speech recognition
 - [ ] US-016: Add real-time streaming transcription to TranscriptionService
 

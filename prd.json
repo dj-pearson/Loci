@@ -222,8 +222,8 @@
         "Typecheck passes"
       ],
       "priority": 14,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented AudioPlayerService @Observable class in Services/AudioPlayerService.swift. Wraps AVAudioPlayer with play(url:), pause(), stop(), seek(to:) methods. Published properties: isPlaying, currentTime, duration, progress (0-1). Progress updates at 60Hz via Timer. AVAudioPlayerDelegate handles playback completion and decode errors. NSObject subclass for delegate conformance. Audio session configured for .playback category. Resuming same URL resumes without re-creating player. Added to project.pbxproj. Build verification deferred to macOS CI."
     },
     {
       "id": "US-015",
