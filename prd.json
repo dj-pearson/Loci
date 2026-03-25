@@ -457,8 +457,8 @@
         "Typecheck passes"
       ],
       "priority": 28,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "saveLocus() added to RecordViewModel with SwiftData insert, reverse geocoding, auto-categorization, geofence notification, success haptic, and navigation via didSaveLocus. RecordingView updated to use VM save flow."
     },
     {
       "id": "US-029",

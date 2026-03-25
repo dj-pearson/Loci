@@ -1,6 +1,8 @@
 import AVFoundation
 import CoreLocation
 import Foundation
+import SwiftData
+import UIKit
 
 @Observable
 final class RecordViewModel {
@@ -8,8 +10,10 @@ final class RecordViewModel {
 
     private(set) var isRecording = false
     private(set) var isPreparing = false
+    private(set) var isSaving = false
     private(set) var recordingDuration: TimeInterval = 0
     private(set) var errorMessage: String?
+    private(set) var didSaveLocus = false
 
     var transcription: String {
         transcriptionService.transcription
@@ -28,6 +32,12 @@ final class RecordViewModel {
     private let locationService: LocationService
     private let audioService: AudioService
     private let transcriptionService: TranscriptionService
+    private let geocodingService: ReverseGeocodingService
+    private let geofenceManager: GeofenceManager
+
+    // MARK: - SwiftData
+
+    var modelContext: ModelContext?
 
     // MARK: - Private State
 
@@ -40,11 +50,15 @@ final class RecordViewModel {
     init(
         locationService: LocationService,
         audioService: AudioService,
-        transcriptionService: TranscriptionService
+        transcriptionService: TranscriptionService,
+        geocodingService: ReverseGeocodingService = ReverseGeocodingService(),
+        geofenceManager: GeofenceManager = .shared
     ) {
         self.locationService = locationService
         self.audioService = audioService
         self.transcriptionService = transcriptionService
+        self.geocodingService = geocodingService
+        self.geofenceManager = geofenceManager
     }
 
     // MARK: - Recording Flow
@@ -160,6 +174,67 @@ final class RecordViewModel {
 
     func clearError() {
         errorMessage = nil
+    }
+
+    // MARK: - Save Flow
+
+    /// Saves a recorded locus to SwiftData, reverse geocodes its location, auto-categorizes
+    /// the transcription, refreshes geofences, and fires a success haptic.
+    func saveLocus(
+        audioURL: URL,
+        transcription: String,
+        coordinate: CLLocationCoordinate2D,
+        category: LocusCategory,
+        isShared: Bool
+    ) async {
+        guard let modelContext else {
+            errorMessage = String(localized: "Unable to save. Please try again.")
+            return
+        }
+
+        isSaving = true
+
+        // Reverse geocode location name (best-effort, non-blocking on failure)
+        let locationName = try? await geocodingService.reverseGeocode(coordinate)
+
+        // Auto-categorize if the user kept the default general category
+        let finalCategory: LocusCategory
+        if category == .general {
+            finalCategory = AICategoryService.categorize(transcription: transcription)
+        } else {
+            finalCategory = category
+        }
+
+        // Create and insert Locus into SwiftData
+        let locus = Locus(
+            latitude: coordinate.latitude,
+            longitude: coordinate.longitude,
+            locationName: locationName,
+            audioFileURL: audioURL.lastPathComponent,
+            transcription: transcription,
+            category: finalCategory,
+            isShared: isShared
+        )
+
+        modelContext.insert(locus)
+
+        do {
+            try modelContext.save()
+        } catch {
+            isSaving = false
+            errorMessage = String(localized: "Failed to save voice note. Please try again.")
+            return
+        }
+
+        // Notify the geofence system about the new locus
+        NotificationCenter.default.post(name: .locusDidCreate, object: nil)
+
+        // Success haptic
+        let generator = UINotificationFeedbackGenerator()
+        generator.notificationOccurred(.success)
+
+        isSaving = false
+        didSaveLocus = true
     }
 
     // MARK: - Duration Timer

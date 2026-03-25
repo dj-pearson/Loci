@@ -2,11 +2,11 @@ import CoreLocation
 import SwiftUI
 
 struct RecordingView: View {
+    @Environment(\.modelContext) private var modelContext
     @Bindable var viewModel: RecordViewModel
     let geocodingService: ReverseGeocodingService
     var hasHousehold: Bool = false
-    var onSave: ((URL, String, CLLocationCoordinate2D, LocusCategory, Bool) -> Void)?
-    var onDiscard: (() -> Void)?
+    var onDismiss: (() -> Void)?
 
     @State private var locationName: String?
     @State private var detectedCategory: LocusCategory = .general
@@ -90,14 +90,28 @@ struct RecordingView: View {
                     hasHousehold: hasHousehold,
                     onSave: { category, shared in
                         showPostRecordingSheet = false
-                        onSave?(result.url, result.transcription, result.coordinate, category, shared)
+                        viewModel.modelContext = modelContext
+                        Task {
+                            await viewModel.saveLocus(
+                                audioURL: result.url,
+                                transcription: result.transcription,
+                                coordinate: result.coordinate,
+                                category: category,
+                                isShared: shared
+                            )
+                        }
                     },
                     onDiscard: {
                         showPostRecordingSheet = false
-                        onDiscard?()
+                        onDismiss?()
                     }
                 )
                 .interactiveDismissDisabled()
+            }
+        }
+        .onChange(of: viewModel.didSaveLocus) { _, saved in
+            if saved {
+                onDismiss?()
             }
         }
     }
