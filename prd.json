@@ -606,8 +606,8 @@
         "Typecheck passes"
       ],
       "priority": 37,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "LocusDetailViewModel with AudioPlayerService integration, archive/unarchive, delete with audio file cleanup, category/transcription editing, and geofence refresh notifications."
     },
     {
       "id": "US-038",
