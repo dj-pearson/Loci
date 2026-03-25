@@ -1,4 +1,5 @@
 import Foundation
+import SwiftData
 import UserNotifications
 
 @Observable
@@ -85,6 +86,47 @@ final class NotificationService: NSObject, UNUserNotificationCenterDelegate {
         )
 
         notificationCenter.setNotificationCategories([locusCategory])
+    }
+
+    // MARK: - Geofence Notifications
+
+    /// Schedules a local notification for a geofence entry event.
+    /// Shows the locus location name, transcription preview, category, and relative time.
+    func scheduleGeofenceNotification(for locus: Locus) {
+        let content = UNMutableNotificationContent()
+
+        // Title: location name or fallback
+        content.title = locus.locationName ?? String(localized: "You left a note here")
+
+        // Body: first 100 characters of transcription
+        if locus.transcription.count > 100 {
+            content.body = String(locus.transcription.prefix(100)) + "…"
+        } else {
+            content.body = locus.transcription
+        }
+
+        // Subtitle: category name and relative time
+        let relativeTime = Self.relativeTimeString(from: locus.createdAt)
+        content.subtitle = "\(locus.category.displayName) · \(relativeTime)"
+
+        content.sound = .default
+        content.categoryIdentifier = Self.locusCategoryIdentifier
+        content.userInfo = ["locusId": locus.id.uuidString]
+
+        let request = UNNotificationRequest(
+            identifier: "geofence-\(locus.id.uuidString)",
+            content: content,
+            trigger: nil // Deliver immediately
+        )
+
+        notificationCenter.add(request)
+    }
+
+    /// Returns a human-readable relative time string (e.g., "3 weeks ago", "just now").
+    private static func relativeTimeString(from date: Date) -> String {
+        let formatter = RelativeDateTimeFormatter()
+        formatter.unitsStyle = .full
+        return formatter.localizedString(for: date, relativeTo: Date())
     }
 
     // MARK: - UNUserNotificationCenterDelegate

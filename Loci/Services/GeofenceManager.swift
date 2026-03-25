@@ -28,6 +28,12 @@ final class GeofenceManager {
     /// This avoids GeofenceManager needing direct SwiftData access.
     var lociProvider: (() -> [Locus])?
 
+    /// Called when a geofence entry event is detected for a locus.
+    /// Set by the app to trigger notification delivery via NotificationService.
+    var onGeofenceEntry: ((Locus) -> Void)?
+
+    private var eventTask: Task<Void, Never>?
+
     // MARK: - Initialization
 
     private init() {
@@ -40,6 +46,7 @@ final class GeofenceManager {
     deinit {
         initTask?.cancel()
         refreshTask?.cancel()
+        eventTask?.cancel()
         for observer in notificationObservers {
             NotificationCenter.default.removeObserver(observer)
         }
@@ -54,6 +61,30 @@ final class GeofenceManager {
         // Restore tracked identifiers from existing monitor state
         for identifier in monitor.identifiers {
             monitoredRegionIds.insert(identifier)
+        }
+
+        // Start listening for geofence events
+        startEventMonitoring(monitor)
+    }
+
+    /// Observes the CLMonitor event stream for geofence entry (`.satisfied`) events.
+    /// When entry is detected, looks up the locus by ID and calls `onGeofenceEntry`.
+    private func startEventMonitoring(_ monitor: CLMonitor) {
+        eventTask?.cancel()
+        eventTask = Task {
+            for try await event in monitor.events {
+                guard !Task.isCancelled else { break }
+
+                // Only act on entry events (state becomes satisfied)
+                guard case .satisfied = event.state else { continue }
+
+                let identifier = event.identifier
+                guard let loci = lociProvider?(),
+                      let locus = loci.first(where: { $0.id.uuidString == identifier })
+                else { continue }
+
+                onGeofenceEntry?(locus)
+            }
         }
     }
 

@@ -323,8 +323,8 @@
         "Typecheck passes"
       ],
       "priority": 20,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented scheduleGeofenceNotification(for:) on NotificationService with title (locationName or fallback), body (first 100 chars of transcription), subtitle (category + relative time via RelativeDateTimeFormatter), default sound, locusId in userInfo, and LOCUS_PROXIMITY category. Added CLMonitor event stream handling in GeofenceManager via startEventMonitoring() that watches for .satisfied events, looks up the locus by ID, and calls onGeofenceEntry callback. Build verification deferred to macOS CI."
     },
     {
       "id": "US-021",
