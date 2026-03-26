@@ -1901,8 +1901,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 114,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Terms of service page at /terms covering: acceptable use, content ownership (user owns data), subscription terms with pricing, Apple App Store EULA reference, free trial, refund policy (via Apple), service availability (offline-first emphasis), limitation of liability, indemnification, termination, governing law, contact info. Clean typography matching privacy page."
     },
     {
       "id": "US-115",
