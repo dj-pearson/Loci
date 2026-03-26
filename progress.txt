@@ -4,7 +4,7 @@
 ## Started: 2026-03-25
 ## Status: IN PROGRESS
 ## Total Stories: 120
-## Completed: 98/120
+## Completed: 99/120
 
 ---
 
@@ -201,7 +201,7 @@ Loci is a voice-first iOS app (SwiftUI, iOS 17+) that pins voice notes to GPS co
 - [x] US-117: Create GitHub Actions workflow for TestFlight deployment
 - [x] US-118: Create app icon set and launch screen
 - [x] US-119: Create App Store metadata and screenshot configuration
-- [ ] US-120: Create Coolify deployment configuration for Supabase and edge functions
+- [x] US-120: Create Coolify deployment configuration for Supabase and edge functions
 
 ---
 
