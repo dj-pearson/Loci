@@ -1613,8 +1613,8 @@
         "Typecheck passes"
       ],
       "priority": 97,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "InputSanitizer enum with sanitize(_:maxLength:), sanitizeTranscription(), sanitizeDisplayName(), sanitizeHouseholdName(), sanitizeSearchQuery(). Strips HTML/script/style tags, removes null bytes, collapses whitespace, truncates to limit. Preserves Unicode/emoji."
     },
     {
       "id": "US-098",
