@@ -1512,8 +1512,8 @@
         "Typecheck passes"
       ],
       "priority": 91,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "NearbyLociWidget with small (single locus: icon, distance, location, transcription) and medium (3 loci list) layouts. Locked state shows 'Upgrade to Premium' for free users, links to paywall. Deep-links to locus detail via loci:// URL scheme. SubscriptionService writes premium status to App Group and reloads widget timelines."
     },
     {
       "id": "US-092",

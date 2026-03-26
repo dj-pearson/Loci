@@ -5,6 +5,13 @@ import WidgetKit
 struct NearbyLociEntry: TimelineEntry {
     let date: Date
     let loci: [NearbyLocusData]
+    let isLocked: Bool
+
+    init(date: Date, loci: [NearbyLocusData], isLocked: Bool = false) {
+        self.date = date
+        self.loci = loci
+        self.isLocked = isLocked
+    }
 }
 
 struct NearbyLocusData: Identifiable {
@@ -31,6 +38,7 @@ struct NearbyLociTimelineProvider: TimelineProvider {
     private static let appGroupID = "group.com.pearsonmedia.loci"
     private static let lastLatKey = "widget_last_latitude"
     private static let lastLonKey = "widget_last_longitude"
+    static let isPremiumKey = "widget_is_premium"
 
     func placeholder(in context: Context) -> NearbyLociEntry {
         NearbyLociEntry(date: .now, loci: Self.sampleData)
@@ -46,8 +54,9 @@ struct NearbyLociTimelineProvider: TimelineProvider {
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<NearbyLociEntry>) -> Void) {
-        let loci = fetchNearbyLoci()
-        let entry = NearbyLociEntry(date: .now, loci: loci)
+        let isLocked = !isPremiumUser()
+        let loci = isLocked ? [] : fetchNearbyLoci()
+        let entry = NearbyLociEntry(date: .now, loci: loci, isLocked: isLocked)
         let refreshDate = Date().addingTimeInterval(900) // 15 minutes
         let timeline = Timeline(entries: [entry], policy: .after(refreshDate))
         completion(timeline)
@@ -85,6 +94,11 @@ struct NearbyLociTimelineProvider: TimelineProvider {
                 distanceMeters: locus.coordinate.distance(to: coordinate)
             )
         }
+    }
+
+    private func isPremiumUser() -> Bool {
+        let defaults = UserDefaults(suiteName: Self.appGroupID)
+        return defaults?.bool(forKey: Self.isPremiumKey) ?? false
     }
 
     private func lastKnownLocation() -> CLLocationCoordinate2D? {
