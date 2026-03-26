@@ -4,7 +4,7 @@
 ## Started: 2026-03-25
 ## Status: IN PROGRESS
 ## Total Stories: 120
-## Completed: 93/120
+## Completed: 94/120
 
 ---
 
@@ -194,7 +194,7 @@ Loci is a voice-first iOS app (SwiftUI, iOS 17+) that pins voice notes to GPS co
 - [x] US-112: Create landing page with hero, features, and download CTA
 - [x] US-113: Create privacy policy page
 - [x] US-114: Create terms of service page
-- [ ] US-115: Create support and contact page
+- [x] US-115: Create support and contact page
 
 ## Phase 21: CI/CD & Deployment (US-116 → US-120)
 - [ ] US-116: Create GitHub Actions CI workflow for build and lint

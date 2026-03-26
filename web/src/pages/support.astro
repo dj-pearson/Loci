@@ -1,0 +1,211 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const faqs = [
+  {
+    question: "Does Loci drain my battery?",
+    answer: "Loci uses iOS's built-in geofence monitoring, which is extremely power-efficient. It does not continuously track your GPS. Apple's system wakes the app only when you enter or exit a monitored area. Most users see no noticeable impact on battery life."
+  },
+  {
+    question: "Why does Loci need 'Always Allow' location access?",
+    answer: "Proximity notifications only work when Loci can monitor your location in the background. 'Always Allow' lets iOS notify you when you return to a place with a saved locus — even when the app isn't open. Without it, you'll only get notifications while actively using the app."
+  },
+  {
+    question: "How do proximity triggers work?",
+    answer: "When you save a locus, Loci registers a geofence around that location with iOS. When your device detects you've entered that area, it wakes Loci, which sends you a notification with your saved note. This all happens on-device — no server tracking involved."
+  },
+  {
+    question: "How does family sharing work?",
+    answer: "With a Family plan, you can create a household and invite up to 5 other members (6 total). When creating or editing a locus, toggle 'Share with Family' to make it visible to your household. Shared loci also trigger proximity notifications for household members."
+  },
+  {
+    question: "How do I manage my subscription?",
+    answer: "Subscriptions are managed through the Apple App Store. Go to Settings → Apple ID → Subscriptions on your iPhone to change plans, cancel, or manage billing. You can also upgrade or view your plan from Loci's Settings screen."
+  },
+  {
+    question: "Is my data private?",
+    answer: "Yes. All transcription happens on-device using Apple's Speech framework — your audio never leaves your phone for processing. Data is stored locally by default. Cloud sync is optional (Premium/Family) and uses encrypted connections. We never sell your data."
+  },
+  {
+    question: "Can I use Loci without an account?",
+    answer: "Yes. Loci's core features — recording, playback, transcription, and proximity notifications — work entirely offline without an account. An account is only needed for cloud sync and family sharing (Premium/Family plans)."
+  },
+  {
+    question: "What's the limit on free accounts?",
+    answer: "Free accounts can save up to 10 loci. Premium and Family plans offer unlimited loci, plus cloud sync, AI categorization, widgets, and search."
+  }
+];
+
+const troubleshooting = [
+  {
+    title: "Notifications not working",
+    steps: [
+      "Open Settings → Loci and confirm Notifications are enabled",
+      "Check that Location is set to 'Always' (Settings → Loci → Location)",
+      "Make sure you have loci saved near places you visit — notifications trigger within ~100 meters",
+      "Restart your iPhone if permissions were recently changed",
+      "Ensure Low Power Mode is off, as it can delay background monitoring"
+    ]
+  },
+  {
+    title: "Location permissions issue",
+    steps: [
+      "Go to Settings → Privacy & Security → Location Services",
+      "Find Loci and select 'Always'",
+      "If 'Always' is not available, select 'While Using the App' first, use the app, then change to 'Always'",
+      "Make sure Location Services is turned on globally at the top of the screen"
+    ]
+  },
+  {
+    title: "Microphone not working",
+    steps: [
+      "Go to Settings → Loci and confirm Microphone access is enabled",
+      "Try closing and reopening the app",
+      "Check if another app is using the microphone (active orange dot in status bar)",
+      "Restart your iPhone if the issue persists"
+    ]
+  },
+  {
+    title: "Cloud sync not working",
+    steps: [
+      "Confirm you have an active Premium or Family subscription",
+      "Check your internet connection",
+      "Go to Loci Settings → Data Management and try a manual sync",
+      "Sign out and sign back in to refresh your session",
+      "If issues persist, contact us at hello@useloci.com"
+    ]
+  }
+];
+---
+
+<BaseLayout title="Support — Loci" description="Get help with Loci. Browse FAQs, troubleshooting guides, or contact our team.">
+  <!-- Hero -->
+  <section class="py-16 sm:py-20 bg-gradient-to-b from-brand-50 to-white">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">How can we help?</h1>
+      <p class="text-lg text-gray-600">Find answers to common questions, troubleshoot issues, or get in touch with our team.</p>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="py-16 sm:py-20">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-8">Frequently Asked Questions</h2>
+      <div class="space-y-4">
+        {faqs.map((faq) => (
+          <details class="group border border-gray-200 rounded-xl">
+            <summary class="flex items-center justify-between cursor-pointer px-6 py-4 text-left font-medium text-gray-900 hover:bg-gray-50 rounded-xl transition-colors">
+              <span>{faq.question}</span>
+              <svg class="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform flex-shrink-0 ml-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </summary>
+            <div class="px-6 pb-4 text-gray-600 leading-relaxed">
+              {faq.answer}
+            </div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Troubleshooting Section -->
+  <section class="py-16 sm:py-20 bg-gray-50">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-8">Troubleshooting</h2>
+      <div class="space-y-6">
+        {troubleshooting.map((issue) => (
+          <div class="bg-white rounded-xl border border-gray-200 p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-3">{issue.title}</h3>
+            <ol class="list-decimal pl-5 space-y-2 text-gray-600">
+              {issue.steps.map((step) => (
+                <li>{step}</li>
+              ))}
+            </ol>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section class="py-16 sm:py-20">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-8">Contact Us</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+        <!-- Email Contact -->
+        <div class="bg-brand-50 rounded-xl p-6">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-10 h-10 rounded-full bg-brand-100 flex items-center justify-center">
+              <svg class="w-5 h-5 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-900">Email</h3>
+          </div>
+          <p class="text-gray-600 mb-3">Send us a message and we'll get back to you within 24 hours.</p>
+          <a href="mailto:hello@useloci.com" class="inline-flex items-center text-brand-600 font-medium hover:text-brand-700 transition-colors">
+            hello@useloci.com
+            <svg class="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </a>
+        </div>
+
+        <!-- Contact Form -->
+        <div class="bg-gray-50 rounded-xl p-6">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
+              <svg class="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-900">Contact Form</h3>
+          </div>
+          <form action="https://useloci.com/api/contact" method="POST" class="space-y-3">
+            <input
+              type="email"
+              name="email"
+              placeholder="Your email"
+              required
+              class="w-full px-4 py-2 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
+            />
+            <textarea
+              name="message"
+              placeholder="How can we help?"
+              rows="3"
+              required
+              class="w-full px-4 py-2 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 resize-none"
+            ></textarea>
+            <button
+              type="submit"
+              class="w-full px-4 py-2 bg-brand-600 text-white text-sm font-medium rounded-lg hover:bg-brand-700 transition-colors"
+            >
+              Send Message
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- App Store Review -->
+  <section class="py-16 sm:py-20 bg-gradient-to-b from-white to-brand-50">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="text-2xl font-bold text-gray-900 mb-3">Enjoying Loci?</h2>
+      <p class="text-gray-600 mb-6">We'd love to hear from you. A review helps others discover Loci and helps us improve.</p>
+      <a
+        href="https://apps.apple.com/app/loci-your-spatial-memory/id0000000000?action=write-review"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 text-white font-medium rounded-xl hover:bg-gray-800 transition-colors"
+      >
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+        </svg>
+        Rate on the App Store
+      </a>
+    </div>
+  </section>
+</BaseLayout>

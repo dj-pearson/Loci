@@ -1918,8 +1918,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 115,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Support page at /support with: FAQ section (8 questions covering battery life, Always Allow, proximity triggers, family sharing, subscription management, privacy, offline use, free limits), troubleshooting section (notifications, location permissions, microphone, cloud sync), contact section with email and contact form (Cloudflare Email Routing), App Store review CTA link."
     },
     {
       "id": "US-116",
