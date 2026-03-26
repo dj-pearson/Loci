@@ -1426,8 +1426,8 @@
         "Typecheck passes"
       ],
       "priority": 86,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "SubscriptionService @Observable with PurchasesDelegate. currentTier published, fetchOfferings returns [Package], purchase/restorePurchases async. checkEntitlements maps RevenueCat entitlements to SubscriptionTier. isPremiumFeature checks tier limits. PremiumFeature enum for all gated features."
     },
     {
       "id": "US-087",
@@ -1445,8 +1445,8 @@
         "Typecheck passes"
       ],
       "priority": 87,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "PaywallView with three tiers (Free/Premium/Family), monthly/yearly toggle with savings badge, feature comparison grid, lifetime options with launch promo pricing, 7-day free trial badges, Restore Purchases button, Terms/Privacy links. Uses RevenueCat packages for purchase flow."
     },
     {
       "id": "US-088",
