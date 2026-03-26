@@ -37,6 +37,7 @@
 		8F2ABC5D1B2E4F7A90D3E6C1 /* JoinHouseholdView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1ABC5D1B2E4F7A90D3E6C1 /* JoinHouseholdView.swift */; };
 		8F2ACC5D1B2E4F7A90D3E6C1 /* HouseholdMembersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1ACC5D1B2E4F7A90D3E6C1 /* HouseholdMembersView.swift */; };
 		8F2A6C5D1B2E4F7A90D3E6C9 /* CertificatePinningDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A6C5D1B2E4F7A90D3E6C9 /* CertificatePinningDelegate.swift */; };
+		8F2A6C5D1B2E4F7A90D3E6CA /* AudioEncryptionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A6C5D1B2E4F7A90D3E6CA /* AudioEncryptionService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -69,6 +70,7 @@
 		8F1A9C5D1B2E4F7A90D3E6C1 /* AudioWaveformView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioWaveformView.swift; sourceTree = "<group>"; };
 		8F1A6C5D1B2E4F7A90D3E6C8 /* AICategoryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AICategoryService.swift; sourceTree = "<group>"; };
 		8F1A6C5D1B2E4F7A90D3E6C9 /* CertificatePinningDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CertificatePinningDelegate.swift; sourceTree = "<group>"; };
+		8F1A6C5D1B2E4F7A90D3E6CA /* AudioEncryptionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioEncryptionService.swift; sourceTree = "<group>"; };
 		8F1A7C5D1B2E4F7A90D3E6C3 /* HouseholdViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HouseholdViewModel.swift; sourceTree = "<group>"; };
 		8F1AAC5D1B2E4F7A90D3E6C1 /* CreateHouseholdView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateHouseholdView.swift; sourceTree = "<group>"; };
 		8F1ABC5D1B2E4F7A90D3E6C1 /* JoinHouseholdView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinHouseholdView.swift; sourceTree = "<group>"; };
@@ -150,6 +152,7 @@
 			isa = PBXGroup;
 			children = (
 				8F1A6C5D1B2E4F7A90D3E6C8 /* AICategoryService.swift */,
+				8F1A6C5D1B2E4F7A90D3E6CA /* AudioEncryptionService.swift */,
 				8F1A6C5D1B2E4F7A90D3E6C4 /* AudioPlayerService.swift */,
 				8F1A6C5D1B2E4F7A90D3E6C9 /* CertificatePinningDelegate.swift */,
 				8F1A6C5D1B2E4F7A90D3E6C3 /* AudioService.swift */,
@@ -327,6 +330,7 @@
 				8F2ABC5D1B2E4F7A90D3E6C1 /* JoinHouseholdView.swift in Sources */,
 				8F2ACC5D1B2E4F7A90D3E6C1 /* HouseholdMembersView.swift in Sources */,
 				8F2A6C5D1B2E4F7A90D3E6C9 /* CertificatePinningDelegate.swift in Sources */,
+				8F2A6C5D1B2E4F7A90D3E6CA /* AudioEncryptionService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

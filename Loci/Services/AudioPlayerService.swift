@@ -12,6 +12,7 @@ final class AudioPlayerService: NSObject, AVAudioPlayerDelegate {
 
     private var audioPlayer: AVAudioPlayer?
     private var progressTimer: Timer?
+    private var decryptedTempURL: URL?
 
     // MARK: - Playback Controls
 
@@ -30,7 +31,17 @@ final class AudioPlayerService: NSObject, AVAudioPlayerDelegate {
             try session.setCategory(.playback, mode: .default)
             try session.setActive(true)
 
-            let player = try AVAudioPlayer(contentsOf: url)
+            // Decrypt encrypted audio to a temp file for playback
+            let playbackURL: URL
+            if AudioEncryptionService.isFileEncrypted(at: url) {
+                let tempURL = try AudioEncryptionService.decryptFileForPlayback(at: url)
+                decryptedTempURL = tempURL
+                playbackURL = tempURL
+            } else {
+                playbackURL = url
+            }
+
+            let player = try AVAudioPlayer(contentsOf: playbackURL)
             player.delegate = self
             player.prepareToPlay()
             audioPlayer = player
@@ -110,6 +121,14 @@ final class AudioPlayerService: NSObject, AVAudioPlayerDelegate {
         currentTime = 0
         duration = 0
         progress = 0
+        cleanupDecryptedFile()
+    }
+
+    private func cleanupDecryptedFile() {
+        if let tempURL = decryptedTempURL {
+            try? FileManager.default.removeItem(at: tempURL)
+            decryptedTempURL = nil
+        }
     }
 
     deinit {

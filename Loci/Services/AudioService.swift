@@ -144,6 +144,11 @@ final class AudioService {
         isRecording = false
         currentAmplitude = 0.0
 
+        // Encrypt the recorded audio file at rest
+        if let url = currentRecordingURL {
+            try? AudioEncryptionService.encryptFile(at: url)
+        }
+
         let generator = UIImpactFeedbackGenerator(style: .light)
         generator.impactOccurred()
     }
