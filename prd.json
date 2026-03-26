@@ -1935,8 +1935,8 @@
         "Typecheck passes"
       ],
       "priority": 116,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "CI workflow at .github/workflows/ci.yml with: SwiftLint job (brew install, --strict), iOS build job (Xcode 15.4, iPhone 15 simulator, SPM caching, CODE_SIGNING_ALLOWED=NO), web build job (Node 20, npm ci, Astro build). Triggers on push to develop/feature/*, PRs to main. SwiftLint config at Loci/.swiftlint.yml with reasonable defaults."
     },
     {
       "id": "US-117",
