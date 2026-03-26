@@ -39,7 +39,9 @@
       "Bash(chmod *)",
       "Bash(head *)",
       "Bash(tail *)",
-      "Bash(wc *)"
+      "Bash(wc *)",
+      "Bash(sort -t- -k2 -n)",
+      "Bash(grep -r 'import Supabase' /c/Users/pears/Documents/Loci/Loci/Loci --include=*.swift)"
     ]
   }
 }

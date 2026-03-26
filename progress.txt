@@ -2,9 +2,9 @@
 ## Project: Loci — Your Spatial Memory
 ## Branch: ralph/loci-mvp
 ## Started: 2026-03-25
-## Status: IN PROGRESS
+## Status: COMPLETE
 ## Total Stories: 120
-## Completed: 99/120
+## Completed: 120/120
 
 ---
 
@@ -132,15 +132,15 @@ Loci is a voice-first iOS app (SwiftUI, iOS 17+) that pins voice notes to GPS co
 - [x] US-068: Create push-digest edge function for weekly summaries
 
 ## Phase 12: Auth & Sync (US-069 → US-077)
-- [ ] US-069: Create SupabaseClient configuration with supabase-swift
-- [ ] US-070: Create AuthService with Apple Sign In
-- [ ] US-071: Create AuthService email/password flow
-- [ ] US-072: Create auth state management with session persistence
-- [ ] US-073: Create auth UI screens (sign in, sign up)
-- [ ] US-074: Create SyncService for uploading loci to Supabase
-- [ ] US-075: Create SyncService for downloading and merging remote loci
-- [ ] US-076: Create audio file sync to Supabase Storage
-- [ ] US-077: Create background sync manager
+- [x] US-069: Create SupabaseClient configuration with supabase-swift
+- [x] US-070: Create AuthService with Apple Sign In
+- [x] US-071: Create AuthService email/password flow
+- [x] US-072: Create auth state management with session persistence
+- [x] US-073: Create auth UI screens (sign in, sign up)
+- [x] US-074: Create SyncService for uploading loci to Supabase
+- [x] US-075: Create SyncService for downloading and merging remote loci
+- [x] US-076: Create audio file sync to Supabase Storage
+- [x] US-077: Create background sync manager
 
 ## Phase 13: Family Sharing (US-078 → US-084)
 - [x] US-078: Create HouseholdViewModel for family management
