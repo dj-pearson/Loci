@@ -38,15 +38,24 @@ struct LocusListView: View {
     @State private var archivedLocus: Locus?
     @State private var showUndoSnackbar = false
     @State private var locusToEdit: Locus?
+    @State private var paginatedQuery = PaginatedLocusQuery()
 
     private var hasHousehold: Bool {
         !householdMembers.isEmpty
     }
 
-    private var sortedLoci: [Locus] {
-        let filtered = viewModel.filteredLoci(from: allLoci)
-        switch sortOrder {
-        case .nearest:
+    /// Whether we use paginated data (time-based sorts) or all data (nearest sort).
+    private var usesPagination: Bool {
+        sortOrder != .nearest
+    }
+
+    /// The loci to display, filtered by category and family settings.
+    /// For time-based sorts, uses paginated data. For nearest, uses all data sorted by distance.
+    private var displayLoci: [Locus] {
+        if usesPagination {
+            return viewModel.filteredLoci(from: paginatedQuery.loci)
+        } else {
+            let filtered = viewModel.filteredLoci(from: allLoci)
             guard let location = locationService.currentLocation else {
                 return filtered
             }
@@ -54,16 +63,12 @@ struct LocusListView: View {
                 $0.coordinate.distance(to: location.coordinate) <
                     $1.coordinate.distance(to: location.coordinate)
             }
-        case .newest:
-            return filtered.sorted { $0.createdAt > $1.createdAt }
-        case .oldest:
-            return filtered.sorted { $0.createdAt < $1.createdAt }
         }
     }
 
     private var sections: [(title: String, loci: [Locus])] {
         guard sortOrder != .nearest else {
-            return [(title: "", loci: sortedLoci)]
+            return [(title: "", loci: displayLoci)]
         }
 
         let calendar = Calendar.current
@@ -75,7 +80,7 @@ struct LocusListView: View {
         var thisWeek: [Locus] = []
         var earlier: [Locus] = []
 
-        for locus in sortedLoci {
+        for locus in displayLoci {
             if locus.createdAt >= startOfToday {
                 today.append(locus)
             } else if locus.createdAt >= startOfWeek {
@@ -160,8 +165,37 @@ struct LocusListView: View {
                     }
                 }
             }
+
+            // Load more trigger at scroll bottom (paginated sorts only)
+            if usesPagination && paginatedQuery.hasMore {
+                Section {
+                    HStack {
+                        Spacer()
+                        if paginatedQuery.isLoading {
+                            ProgressView()
+                        } else {
+                            Text(String(localized: "Loading more..."))
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                        Spacer()
+                    }
+                    .onAppear {
+                        paginatedQuery.loadMore(modelContext: modelContext)
+                    }
+                }
+            }
         }
         .listStyle(.insetGrouped)
+        .onAppear {
+            resetPagination()
+        }
+        .onChange(of: sortOrder) {
+            resetPagination()
+        }
+        .onChange(of: viewModel.selectedCategories) {
+            resetPagination()
+        }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Picker(String(localized: "Sort"), selection: $sortOrder) {
@@ -173,11 +207,13 @@ struct LocusListView: View {
             }
         }
         .refreshable {
-            // Trigger a location update to re-sort by proximity
             locationService.startMonitoringSignificantLocationChanges()
+            if usesPagination {
+                resetPagination()
+            }
         }
         .overlay {
-            if sortedLoci.isEmpty {
+            if displayLoci.isEmpty && !paginatedQuery.isLoading {
                 ContentUnavailableView(
                     String(localized: "No Loci"),
                     systemImage: "mappin.slash",
@@ -222,6 +258,16 @@ struct LocusListView: View {
                     editViewModel.modelContext = modelContext
                 }
         }
+    }
+
+    // MARK: - Pagination
+
+    private func resetPagination() {
+        guard usesPagination else { return }
+        paginatedQuery.reset(
+            sortOrder: sortOrder == .oldest ? .forward : .reverse,
+            modelContext: modelContext
+        )
     }
 
     // MARK: - Actions

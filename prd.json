@@ -1647,8 +1647,8 @@
         "Typecheck passes"
       ],
       "priority": 99,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "PaginatedLocusQuery @Observable class with FetchDescriptor pagination (20 per page, fetchLimit/fetchOffset). Integrated into LocusListView: time-based sorts (newest/oldest) use paginated data with onAppear load-more trigger at scroll bottom; nearest sort falls back to full dataset for client-side distance sorting. Resets on sort order or category filter changes."
     },
     {
       "id": "US-100",
