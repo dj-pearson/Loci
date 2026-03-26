@@ -7,6 +7,7 @@ struct SettingsView: View {
 
     @Bindable var viewModel: SettingsViewModel
     var householdViewModel: HouseholdViewModel
+    var biometricService: BiometricLockService?
 
     @State private var showSignOutConfirmation = false
     @State private var showCreateHousehold = false
@@ -15,12 +16,56 @@ struct SettingsView: View {
     var body: some View {
         Form {
             accountSection
+            privacySection
             notificationsSection
             dataSection
             familySection
             aboutSection
         }
         .navigationTitle(String(localized: "Settings"))
+    }
+
+    // MARK: - Privacy Section
+
+    private var privacySection: some View {
+        Section(String(localized: "Privacy")) {
+            if let biometricService, biometricService.canUseBiometrics() {
+                Toggle(isOn: Binding(
+                    get: { biometricService.isBiometricLockEnabled },
+                    set: { newValue in
+                        if newValue {
+                            Task {
+                                do {
+                                    let authenticated = try await biometricService.authenticate()
+                                    if authenticated {
+                                        biometricService.isBiometricLockEnabled = true
+                                    }
+                                } catch {
+                                    // Authentication failed — don't enable
+                                }
+                            }
+                        } else {
+                            biometricService.isBiometricLockEnabled = false
+                        }
+                    }
+                )) {
+                    Label(
+                        String(localized: "Require \(biometricService.biometricType.displayName)"),
+                        systemImage: biometricService.biometricType.systemImageName
+                    )
+                }
+            } else {
+                Label(
+                    String(localized: "Biometric Lock"),
+                    systemImage: "lock"
+                )
+                .foregroundStyle(.secondary)
+
+                Text(String(localized: "Biometric authentication is not available on this device."))
+                    .font(.caption)
+                    .foregroundStyle(.tertiary)
+            }
+        }
     }
 
     // MARK: - Account Section

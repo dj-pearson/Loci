@@ -9,6 +9,9 @@ struct LociApp: App {
     @State private var navigationRouter = NavigationRouter()
     @State private var notificationService = NotificationService()
     @State private var locationService = LocationService()
+    @State private var biometricService = BiometricLockService()
+
+    @Environment(\.scenePhase) private var scenePhase
 
     init() {
         do {
@@ -22,13 +25,32 @@ struct LociApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .environment(navigationRouter)
-                .environment(notificationService)
-                .environment(locationService)
-                .onOpenURL { url in
-                    navigationRouter.handleURL(url)
+            ZStack {
+                ContentView()
+                    .environment(navigationRouter)
+                    .environment(notificationService)
+                    .environment(locationService)
+                    .environment(biometricService)
+                    .onOpenURL { url in
+                        navigationRouter.handleURL(url)
+                    }
+
+                if biometricService.isLocked {
+                    BiometricLockView(biometricService: biometricService)
+                        .transition(.opacity)
                 }
+            }
+            .animation(.easeInOut(duration: 0.3), value: biometricService.isLocked)
+            .onChange(of: scenePhase) { _, newPhase in
+                switch newPhase {
+                case .active:
+                    biometricService.lockIfNeeded()
+                case .background:
+                    biometricService.recordBackgroundTransition()
+                default:
+                    break
+                }
+            }
         }
         .modelContainer(modelContainer)
     }
@@ -38,6 +60,7 @@ struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(NavigationRouter.self) private var navigationRouter
     @Environment(LocationService.self) private var locationService
+    @Environment(BiometricLockService.self) private var biometricService
     @Query(filter: #Predicate<Locus> { !$0.isArchived }) private var loci: [Locus]
     @Query private var householdMembers: [HouseholdMember]
 
@@ -101,7 +124,8 @@ struct ContentView: View {
             NavigationStack {
                 SettingsView(
                     viewModel: settingsViewModel,
-                    householdViewModel: householdViewModel
+                    householdViewModel: householdViewModel,
+                    biometricService: biometricService
                 )
             }
             .tabItem {

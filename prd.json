@@ -1545,8 +1545,8 @@
         "Typecheck passes"
       ],
       "priority": 93,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "KeychainService enum using Security framework. save/load/delete methods with kSecAttrAccessibleAfterFirstUnlock. Key constants for authToken, refreshToken, userId. KeychainError enum with OSStatus details. Convenience saveString/loadString methods."
     },
     {
       "id": "US-094",
@@ -1563,8 +1563,8 @@
         "Typecheck passes"
       ],
       "priority": 94,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BiometricLockService @Observable class using LocalAuthentication (LAContext). canUseBiometrics() checks capability, authenticate() triggers biometric prompt with device passcode fallback. isBiometricLockEnabled in UserDefaults (default false). BiometricLockView shown as overlay in LociApp when locked. 5-minute grace period on app foreground. Toggle in Settings > Privacy section requires auth to enable. BiometricType enum for Face ID/Touch ID/Optic ID display names and SF Symbols."
     },
     {
       "id": "US-095",
