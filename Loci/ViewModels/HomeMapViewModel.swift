@@ -5,11 +5,24 @@ import SwiftData
 
 @Observable
 final class HomeMapViewModel {
+    // MARK: - Constants
+
+    /// Padding factor around visible region for smooth scrolling pre-fetch.
+    private static let viewportPaddingFactor: Double = 0.10
+    /// Maximum annotations rendered before forcing additional clustering.
+    private static let maxAnnotations: Int = 100
+    /// Debounce interval for map region changes in seconds.
+    private static let regionDebounceInterval: TimeInterval = 0.2
+
     // MARK: - State
 
     var mapRegion: MKCoordinateRegion
     var selectedCategories: Set<LocusCategory> = Set(LocusCategory.allCases)
     var showFamilyLoci: Bool = true
+
+    /// The debounced map region used for computing visible loci.
+    /// Updated 200ms after the last `mapRegion` change via `scheduleRegionUpdate()`.
+    var debouncedMapRegion: MKCoordinateRegion
 
     // MARK: - Dependencies
 
@@ -19,6 +32,10 @@ final class HomeMapViewModel {
 
     var modelContext: ModelContext?
 
+    // MARK: - Debounce
+
+    private var regionDebounceTask: Task<Void, Never>?
+
     // MARK: - Initialization
 
     init(locationService: LocationService) {
@@ -26,15 +43,32 @@ final class HomeMapViewModel {
 
         // Default to a wide view; will re-center when location arrives
         if let location = locationService.currentLocation {
-            mapRegion = MKCoordinateRegion(
+            let region = MKCoordinateRegion(
                 center: location.coordinate,
                 span: MKCoordinateSpan(latitudeDelta: 0.02, longitudeDelta: 0.02)
             )
+            mapRegion = region
+            debouncedMapRegion = region
         } else {
-            mapRegion = MKCoordinateRegion(
+            let region = MKCoordinateRegion(
                 center: CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194),
                 span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
             )
+            mapRegion = region
+            debouncedMapRegion = region
+        }
+    }
+
+    // MARK: - Region Debouncing
+
+    /// Call this whenever the map camera changes. Debounces updates to `debouncedMapRegion`
+    /// so that expensive visible-loci calculations only run after 200ms of inactivity.
+    func scheduleRegionUpdate() {
+        regionDebounceTask?.cancel()
+        regionDebounceTask = Task { @MainActor [weak self] in
+            try? await Task.sleep(for: .milliseconds(200))
+            guard let self, !Task.isCancelled else { return }
+            self.debouncedMapRegion = self.mapRegion
         }
     }
 
@@ -49,21 +83,63 @@ final class HomeMapViewModel {
         }
     }
 
-    /// Returns loci within the current map viewport bounds.
+    /// Returns the padded region used for viewport filtering.
+    /// Adds a 10% margin around the debounced region for smooth scrolling.
+    private func paddedRegion() -> (minLat: Double, maxLat: Double, minLon: Double, maxLon: Double) {
+        let center = debouncedMapRegion.center
+        let span = debouncedMapRegion.span
+        let latPad = span.latitudeDelta * Self.viewportPaddingFactor
+        let lonPad = span.longitudeDelta * Self.viewportPaddingFactor
+
+        return (
+            minLat: center.latitude - span.latitudeDelta / 2 - latPad,
+            maxLat: center.latitude + span.latitudeDelta / 2 + latPad,
+            minLon: center.longitude - span.longitudeDelta / 2 - lonPad,
+            maxLon: center.longitude + span.longitudeDelta / 2 + lonPad
+        )
+    }
+
+    /// Returns loci within the current map viewport bounds with a 10% padding margin.
     func visibleLoci(from allLoci: [Locus]) -> [Locus] {
         let filtered = filteredLoci(from: allLoci)
-        let center = mapRegion.center
-        let span = mapRegion.span
-
-        let minLat = center.latitude - span.latitudeDelta / 2
-        let maxLat = center.latitude + span.latitudeDelta / 2
-        let minLon = center.longitude - span.longitudeDelta / 2
-        let maxLon = center.longitude + span.longitudeDelta / 2
+        let bounds = paddedRegion()
 
         return filtered.filter { locus in
-            locus.latitude >= minLat && locus.latitude <= maxLat
-                && locus.longitude >= minLon && locus.longitude <= maxLon
+            locus.latitude >= bounds.minLat && locus.latitude <= bounds.maxLat
+                && locus.longitude >= bounds.minLon && locus.longitude <= bounds.maxLon
         }
+    }
+
+    /// Clusters visible loci for the current viewport, enforcing the max annotation limit.
+    /// When visible annotations exceed `maxAnnotations`, clustering threshold is increased
+    /// until the total count (singles + clusters) fits within the budget.
+    func viewportAnnotations(
+        from allLoci: [Locus],
+        screenWidth: CGFloat
+    ) -> (singles: [Locus], clusters: [LocusCluster]) {
+        let visible = visibleLoci(from: allLoci)
+        var threshold: CGFloat = 60
+        var result = LocusClusterEngine.cluster(
+            loci: visible,
+            region: debouncedMapRegion,
+            screenWidth: screenWidth,
+            thresholdPoints: threshold
+        )
+
+        // Progressively tighten clustering until within annotation budget
+        var totalAnnotations = result.singles.count + result.clusters.count
+        while totalAnnotations > Self.maxAnnotations && threshold < 300 {
+            threshold += 30
+            result = LocusClusterEngine.cluster(
+                loci: visible,
+                region: debouncedMapRegion,
+                screenWidth: screenWidth,
+                thresholdPoints: threshold
+            )
+            totalAnnotations = result.singles.count + result.clusters.count
+        }
+
+        return result
     }
 
     // MARK: - Category Filtering
@@ -88,9 +164,11 @@ final class HomeMapViewModel {
 
     func centerOnUserLocation() {
         guard let location = locationService.currentLocation else { return }
-        mapRegion = MKCoordinateRegion(
+        let region = MKCoordinateRegion(
             center: location.coordinate,
             span: MKCoordinateSpan(latitudeDelta: 0.02, longitudeDelta: 0.02)
         )
+        mapRegion = region
+        debouncedMapRegion = region
     }
 }

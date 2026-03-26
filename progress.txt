@@ -174,7 +174,7 @@ Loci is a voice-first iOS app (SwiftUI, iOS 17+) that pins voice notes to GPS co
 ## Phase 17: Performance Optimization (US-099 → US-101)
 - [x] US-099: Create efficient SwiftData pagination
 - [x] US-100: Create audio file cache management
-- [ ] US-101: Create map viewport optimization for annotation loading
+- [x] US-101: Create map viewport optimization for annotation loading
 
 ## Phase 18: Accessibility & Polish (US-102 → US-108)
 - [ ] US-102: Create VoiceOver accessibility labels throughout app

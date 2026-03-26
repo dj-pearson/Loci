@@ -33,9 +33,8 @@ struct HomeMapView: View {
             Map(position: $mapCameraPosition, selection: $selectedLocus) {
                 UserAnnotation()
 
-                let clustered = LocusClusterEngine.cluster(
-                    loci: viewModel.filteredLoci(from: allLoci),
-                    region: viewModel.mapRegion,
+                let clustered = viewModel.viewportAnnotations(
+                    from: allLoci,
                     screenWidth: UIScreen.main.bounds.width
                 )
 
@@ -79,6 +78,7 @@ struct HomeMapView: View {
             }
             .onMapCameraChange { context in
                 viewModel.mapRegion = context.region
+                viewModel.scheduleRegionUpdate()
             }
 
             // Selected locus callout

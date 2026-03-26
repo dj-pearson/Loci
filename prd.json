@@ -1680,8 +1680,8 @@
         "Typecheck passes"
       ],
       "priority": 101,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented viewport optimization in HomeMapViewModel: (1) visibleLoci now uses debouncedMapRegion with 10% padding margin for smooth scrolling pre-fetch. (2) scheduleRegionUpdate() debounces map camera changes by 200ms before recalculating visible loci. (3) viewportAnnotations() enforces max 100 annotations by progressively increasing clustering threshold. (4) HomeMapView updated to call viewportAnnotations instead of direct LocusClusterEngine.cluster, and triggers debounce on onMapCameraChange."
     },
     {
       "id": "US-102",
