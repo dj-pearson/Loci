@@ -6,8 +6,10 @@ struct SettingsView: View {
     @Query private var householdMembers: [HouseholdMember]
 
     @Bindable var viewModel: SettingsViewModel
+    var householdViewModel: HouseholdViewModel
 
     @State private var showSignOutConfirmation = false
+    @State private var showCreateHousehold = false
 
     var body: some View {
         Form {
@@ -130,10 +132,13 @@ struct SettingsView: View {
     private var familySection: some View {
         Section(String(localized: "Family")) {
             if householdMembers.isEmpty {
-                NavigationLink {
-                    Text(String(localized: "Create Family"))
+                Button {
+                    showCreateHousehold = true
                 } label: {
                     Label(String(localized: "Create Family"), systemImage: "person.2.badge.plus")
+                }
+                .sheet(isPresented: $showCreateHousehold) {
+                    CreateHouseholdView(viewModel: householdViewModel)
                 }
             } else {
                 HStack {

@@ -509,6 +509,11 @@ final class HouseholdViewModel {
     private func setError(_ message: String) {
         errorMessage = message
     }
+
+    @MainActor
+    func clearError() {
+        errorMessage = nil
+    }
 }
 
 // MARK: - Household Errors

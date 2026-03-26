@@ -1310,8 +1310,8 @@
         "Typecheck passes"
       ],
       "priority": 79,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "CreateHouseholdView with family name form, prominent monospaced invite code display, ShareLink for sharing, 48-hour expiry notice, regenerate code button. Integrated into SettingsView family section via sheet. HouseholdViewModel gets clearError() for alert dismiss binding. Added to pbxproj."
     },
     {
       "id": "US-080",

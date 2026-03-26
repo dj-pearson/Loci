@@ -36,6 +36,8 @@ struct ContentView: View {
 
     @State private var selectedTab: AppTab = .map
     @State private var mapViewModel: HomeMapViewModel?
+    @State private var settingsViewModel = SettingsViewModel()
+    @State private var householdViewModel = HouseholdViewModel()
 
     var body: some View {
         @Bindable var router = navigationRouter
@@ -89,9 +91,10 @@ struct ContentView: View {
 
             // Settings Tab
             NavigationStack {
-                Text(String(localized: "Settings"))
-                    .font(.title)
-                    .foregroundStyle(.secondary)
+                SettingsView(
+                    viewModel: settingsViewModel,
+                    householdViewModel: householdViewModel
+                )
             }
             .tabItem {
                 Label(String(localized: "Settings"), systemImage: "gearshape.fill")
