@@ -1528,8 +1528,8 @@
         "Typecheck passes"
       ],
       "priority": 92,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "NavigationRouter.handleURL() processes loci://detail/{id} and loci://paywall URL schemes. LociApp .onOpenURL modifier routes URLs to NavigationRouter. OpenLocusIntent AppIntent for widget integration. Widget already uses widgetURL/Link with loci:// scheme. Works for cold launch (pendingLocusId), background, and foreground."
     },
     {
       "id": "US-093",

@@ -4,7 +4,7 @@
 ## Started: 2026-03-25
 ## Status: IN PROGRESS
 ## Total Stories: 120
-## Completed: 81/120
+## Completed: 82/120
 
 ---
 
@@ -161,7 +161,7 @@ Loci is a voice-first iOS app (SwiftUI, iOS 17+) that pins voice notes to GPS co
 ## Phase 15: Widget (US-090 → US-092)
 - [x] US-090: Create WidgetKit timeline provider for nearby loci
 - [x] US-091: Create NearbyLociWidget small and medium layouts
-- [ ] US-092: Create widget deep-link with AppIntent
+- [x] US-092: Create widget deep-link with AppIntent
 
 ## Phase 16: Security Hardening (US-093 → US-098)
 - [ ] US-093: Create KeychainService for secure credential storage

@@ -26,6 +26,9 @@ struct LociApp: App {
                 .environment(navigationRouter)
                 .environment(notificationService)
                 .environment(locationService)
+                .onOpenURL { url in
+                    navigationRouter.handleURL(url)
+                }
         }
         .modelContainer(modelContainer)
     }

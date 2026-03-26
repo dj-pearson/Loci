@@ -89,4 +89,27 @@ final class NavigationRouter {
         selectedLocusId = uuid
         pendingLocusId = uuid
     }
+
+    // MARK: - URL Scheme Handling
+
+    /// Set to `true` when a paywall deep-link is received (e.g., from widget locked state).
+    var showPaywall = false
+
+    /// Processes a `loci://` URL scheme for deep-linking from widgets and notifications.
+    /// Supported paths:
+    /// - `loci://detail/{locusId}` — navigates to locus detail
+    /// - `loci://paywall` — opens the paywall
+    func handleURL(_ url: URL) {
+        guard url.scheme == "loci" else { return }
+
+        switch url.host {
+        case "detail":
+            let idString = url.lastPathComponent
+            handleDeepLink(locusIdString: idString)
+        case "paywall":
+            showPaywall = true
+        default:
+            break
+        }
+    }
 }
