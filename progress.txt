@@ -4,7 +4,7 @@
 ## Started: 2026-03-25
 ## Status: IN PROGRESS
 ## Total Stories: 120
-## Completed: 87/120
+## Completed: 88/120
 
 ---
 
@@ -169,7 +169,7 @@ Loci is a voice-first iOS app (SwiftUI, iOS 17+) that pins voice notes to GPS co
 - [x] US-095: Create SSL certificate pinning for API calls
 - [x] US-096: Create audio file encryption at rest
 - [x] US-097: Create input sanitization service
-- [ ] US-098: Create rate limiting middleware for edge functions
+- [x] US-098: Create rate limiting middleware for edge functions
 
 ## Phase 17: Performance Optimization (US-099 → US-101)
 - [ ] US-099: Create efficient SwiftData pagination

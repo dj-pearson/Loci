@@ -1630,8 +1630,8 @@
         "Typecheck passes"
       ],
       "priority": 98,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Rate limiting middleware using in-memory store with periodic cleanup. Default 60 req/min per user, invite 5 req/min per IP, webhook 100 req/min per IP. Returns 429 with Retry-After header. X-RateLimit-* response headers. Applied globally with per-route overrides in index.ts."
     },
     {
       "id": "US-099",
