@@ -187,7 +187,7 @@ Loci is a voice-first iOS app (SwiftUI, iOS 17+) that pins voice notes to GPS co
 
 ## Phase 19: Analytics & Theming (US-109 → US-110)
 - [x] US-109: Create TelemetryDeck analytics integration
-- [ ] US-110: Create dark mode support with proper color adaptation
+- [x] US-110: Create dark mode support with proper color adaptation
 
 ## Phase 20: Marketing Website (US-111 → US-115)
 - [ ] US-111: Create Astro project for useloci.com marketing site

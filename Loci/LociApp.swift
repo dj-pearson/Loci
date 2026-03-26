@@ -140,6 +140,7 @@ struct ContentView: View {
             .accessibilityLabel(String(localized: "Settings"))
             .accessibilityHint(String(localized: "App preferences and account"))
         }
+        .symbolRenderingMode(.hierarchical)
         .onAppear {
             if mapViewModel == nil {
                 mapViewModel = HomeMapViewModel(locationService: locationService)

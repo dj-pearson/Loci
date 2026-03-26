@@ -1832,8 +1832,8 @@
         "Typecheck passes"
       ],
       "priority": 110,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Theme already uses system dynamic colors. Added dark-adaptive mapStyle, symbolRenderingMode(.hierarchical) on TabView."
     },
     {
       "id": "US-111",

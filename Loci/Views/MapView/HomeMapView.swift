@@ -15,6 +15,8 @@ struct HomeMapView: View {
     @Bindable var viewModel: HomeMapViewModel
     let navigationRouter: NavigationRouter
 
+    @Environment(\.colorScheme) private var colorScheme
+
     @State private var selectedLocus: Locus?
     @State private var showRecordingView = false
     @State private var mapCameraPosition: MapCameraPosition = .automatic
@@ -83,6 +85,7 @@ struct HomeMapView: View {
                     .annotationTitles(.hidden)
                 }
             }
+            .mapStyle(colorScheme == .dark ? .standard(elevation: .flat, emphasis: .muted) : .standard)
             .mapControls {
                 MapCompass()
                 MapScaleView()
