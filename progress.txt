@@ -180,7 +180,7 @@ Loci is a voice-first iOS app (SwiftUI, iOS 17+) that pins voice notes to GPS co
 - [x] US-102: Create VoiceOver accessibility labels throughout app
 - [x] US-103: Create Dynamic Type support across all views
 - [x] US-104: Create Reduce Motion alternatives
-- [ ] US-105: Create haptic feedback manager
+- [x] US-105: Create haptic feedback manager
 - [ ] US-106: Create smooth view transition animations
 - [ ] US-107: Create skeleton loading states for async content
 - [ ] US-108: Create comprehensive error handling UI
