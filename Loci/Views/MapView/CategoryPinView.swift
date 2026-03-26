@@ -6,6 +6,8 @@ struct CategoryPinView: View {
     var isSelected: Bool = false
     var onTap: (() -> Void)?
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     private let baseSize: CGFloat = 36
     private let borderWidth: CGFloat = 2
 
@@ -41,7 +43,7 @@ struct CategoryPinView: View {
                     .offset(x: pinSize / 2 - 4, y: -pinSize / 2 + 4)
             }
         }
-        .animation(.easeInOut(duration: 0.2), value: isSelected)
+        .animation(reduceMotion ? nil : .easeInOut(duration: 0.2), value: isSelected)
         .onTapGesture {
             onTap?()
         }

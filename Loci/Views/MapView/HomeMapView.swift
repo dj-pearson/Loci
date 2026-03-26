@@ -24,6 +24,8 @@ struct HomeMapView: View {
     @State private var showUndoSnackbar = false
     @State private var locusToEdit: Locus?
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     private var hasHousehold: Bool {
         !householdMembers.isEmpty
     }
@@ -65,8 +67,12 @@ struct HomeMapView: View {
                             count: cluster.loci.count,
                             dominantCategory: cluster.dominantCategory
                         ) {
-                            withAnimation {
+                            if reduceMotion {
                                 mapCameraPosition = .region(cluster.boundingRegion)
+                            } else {
+                                withAnimation {
+                                    mapCameraPosition = .region(cluster.boundingRegion)
+                                }
                             }
                         }
                         .accessibilityElement(children: .ignore)
@@ -122,7 +128,7 @@ struct HomeMapView: View {
                         selectedLocus = nil
                     }
                 )
-                .transition(.move(edge: .bottom).combined(with: .opacity))
+                .transition(reduceMotion ? .opacity : .move(edge: .bottom).combined(with: .opacity))
                 .padding(.bottom, 80)
                 .padding(.horizontal, 16)
             }
@@ -140,7 +146,7 @@ struct HomeMapView: View {
             .accessibilityHint(String(localized: "Double tap to start recording"))
             .padding(.bottom, 24)
         }
-        .animation(.easeInOut(duration: 0.25), value: selectedLocus?.id)
+        .animation(reduceMotion ? nil : .easeInOut(duration: 0.25), value: selectedLocus?.id)
         .onAppear {
             navigationRouter.consumePendingDeepLink()
             centerOnUserIfNeeded()

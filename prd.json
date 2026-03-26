@@ -1730,8 +1730,8 @@
         "Typecheck passes"
       ],
       "priority": 104,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Added @Environment(.accessibilityReduceMotion) checks throughout: RecordButton (pulse replaced with static glow, amplitude ring uses opacity fade, press spring disabled), CategoryPinView (selection animation disabled), HomeMapView (callout transition uses opacity-only, cluster zoom-in is instant, selection animation disabled), RecordingView (scroll animation disabled, background gradient transition disabled). AudioWaveformView already had reduce motion support."
     },
     {
       "id": "US-105",

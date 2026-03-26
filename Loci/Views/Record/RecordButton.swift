@@ -9,6 +9,8 @@ struct RecordButton: View {
     @State private var isPulsing = false
     @State private var isPressed = false
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     private let buttonSize: CGFloat = 80
     private let feedbackGenerator = UIImpactFeedbackGenerator(style: .medium)
 
@@ -20,14 +22,21 @@ struct RecordButton: View {
             ZStack {
                 // Amplitude ring (recording state only)
                 if isRecording {
-                    Circle()
-                        .stroke(Theme.error.opacity(0.3), lineWidth: 4)
-                        .frame(width: amplitudeRingSize, height: amplitudeRingSize)
-                        .animation(.easeOut(duration: 0.1), value: amplitude)
+                    if reduceMotion {
+                        // Static ring with opacity mapped to amplitude
+                        Circle()
+                            .stroke(Theme.error.opacity(Double(min(max(amplitude, 0.2), 1))), lineWidth: 4)
+                            .frame(width: buttonSize + 20, height: buttonSize + 20)
+                    } else {
+                        Circle()
+                            .stroke(Theme.error.opacity(0.3), lineWidth: 4)
+                            .frame(width: amplitudeRingSize, height: amplitudeRingSize)
+                            .animation(.easeOut(duration: 0.1), value: amplitude)
+                    }
                 }
 
-                // Pulse ring (idle state only)
-                if !isRecording {
+                // Pulse ring (idle state only) — replaced with static glow for reduce motion
+                if !isRecording && !reduceMotion {
                     Circle()
                         .fill(Theme.primary.opacity(0.15))
                         .frame(width: buttonSize + 20, height: buttonSize + 20)
@@ -37,6 +46,11 @@ struct RecordButton: View {
                             .easeInOut(duration: 1.5).repeatForever(autoreverses: false),
                             value: isPulsing
                         )
+                } else if !isRecording {
+                    // Static subtle glow ring for reduce motion
+                    Circle()
+                        .fill(Theme.primary.opacity(0.12))
+                        .frame(width: buttonSize + 20, height: buttonSize + 20)
                 }
 
                 // Main circle
@@ -59,7 +73,7 @@ struct RecordButton: View {
         }
         .buttonStyle(.plain)
         .scaleEffect(isPressed ? 0.9 : 1.0)
-        .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isPressed)
+        .animation(reduceMotion ? nil : .spring(response: 0.3, dampingFraction: 0.6), value: isPressed)
         .simultaneousGesture(
             DragGesture(minimumDistance: 0)
                 .onChanged { _ in

@@ -15,6 +15,8 @@ struct RecordingView: View {
     @State private var showPostRecordingSheet = false
     @State private var recordingResult: (url: URL, transcription: String, coordinate: CLLocationCoordinate2D)?
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     var body: some View {
         ZStack {
             // Background gradient based on detected category
@@ -161,8 +163,12 @@ struct RecordingView: View {
                     }
                     .frame(maxHeight: 200)
                     .onChange(of: viewModel.transcription) {
-                        withAnimation(.easeOut(duration: 0.2)) {
+                        if reduceMotion {
                             proxy.scrollTo("transcriptionEnd", anchor: .bottom)
+                        } else {
+                            withAnimation(.easeOut(duration: 0.2)) {
+                                proxy.scrollTo("transcriptionEnd", anchor: .bottom)
+                            }
                         }
                     }
                 }
@@ -216,7 +222,7 @@ struct RecordingView: View {
             startPoint: .top,
             endPoint: .bottom
         )
-        .animation(.easeInOut(duration: 0.5), value: detectedCategory)
+        .animation(reduceMotion ? nil : .easeInOut(duration: 0.5), value: detectedCategory)
     }
 
     // MARK: - Preparing Overlay
