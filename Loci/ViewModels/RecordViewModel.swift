@@ -27,6 +27,9 @@ final class RecordViewModel {
         locationService.currentLocation
     }
 
+    /// Set when a premium feature is blocked; drives the upgrade prompt.
+    private(set) var blockedFeature: BlockedFeature?
+
     // MARK: - Dependencies
 
     private let locationService: LocationService
@@ -34,6 +37,7 @@ final class RecordViewModel {
     private let transcriptionService: TranscriptionService
     private let geocodingService: ReverseGeocodingService
     private let geofenceManager: GeofenceManager
+    private let subscriptionService: SubscriptionService
 
     // MARK: - SwiftData
 
@@ -52,19 +56,28 @@ final class RecordViewModel {
         audioService: AudioService,
         transcriptionService: TranscriptionService,
         geocodingService: ReverseGeocodingService = ReverseGeocodingService(),
-        geofenceManager: GeofenceManager = .shared
+        geofenceManager: GeofenceManager = .shared,
+        subscriptionService: SubscriptionService = SubscriptionService()
     ) {
         self.locationService = locationService
         self.audioService = audioService
         self.transcriptionService = transcriptionService
         self.geocodingService = geocodingService
         self.geofenceManager = geofenceManager
+        self.subscriptionService = subscriptionService
     }
 
     // MARK: - Recording Flow
 
     func startRecording() async {
         guard !isRecording else { return }
+
+        // Check free tier loci limit
+        if let modelContext,
+           !TierEnforcement.canCreateLocus(tier: subscriptionService.currentTier, modelContext: modelContext) {
+            blockedFeature = .lociLimit
+            return
+        }
 
         isPreparing = true
         errorMessage = nil
@@ -174,6 +187,10 @@ final class RecordViewModel {
 
     func clearError() {
         errorMessage = nil
+    }
+
+    func clearBlockedFeature() {
+        blockedFeature = nil
     }
 
     // MARK: - Save Flow

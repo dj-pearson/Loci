@@ -14,7 +14,13 @@ enum AICategoryService {
         .outdoor: ["trail", "hike", "camp", "fish", "kayak", "climb", "nature", "mountain", "lake", "river"],
     ]
 
-    static func categorize(transcription: String) -> LocusCategory {
+    /// Categorizes a transcription using keyword matching.
+    /// Returns `.general` for free-tier users (AI categorization is a premium feature).
+    static func categorize(transcription: String, tier: SubscriptionTier = .premium) -> LocusCategory {
+        guard TierEnforcement.canUseAI(tier: tier) else {
+            return .general
+        }
+
         let lowercased = transcription.lowercased()
         let words = tokenize(lowercased)
 

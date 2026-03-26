@@ -1461,8 +1461,8 @@
         "Typecheck passes"
       ],
       "priority": 88,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "TierEnforcement utility with canCreateLocus (SwiftData count of non-archived personal loci), canUseAI, canSync, canUseWidget, canSearch, canShareWithFamily. BlockedFeature enum stores title/message/requiredTier for upgrade prompts. RecordViewModel checks canCreateLocus before recording. AICategoryService returns .general for free users."
     },
     {
       "id": "US-089",
