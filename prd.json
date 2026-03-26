@@ -1392,8 +1392,8 @@
         "Typecheck passes"
       ],
       "priority": 84,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "GeofenceManager.refreshGeofences already includes all non-archived loci (personal + shared) in nearest-20 via lociProvider closure. Shared loci stored in same SwiftData store with householdId/isShared fields. Notification distinction (personal vs shared) implemented in US-083. No-household users only have personal loci in store. Free tier enforcement (US-088) should exclude shared loci (createdByName != nil) from count."
     },
     {
       "id": "US-085",

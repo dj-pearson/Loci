@@ -4,7 +4,7 @@
 ## Started: 2026-03-25
 ## Status: IN PROGRESS
 ## Total Stories: 120
-## Completed: 73/120
+## Completed: 74/120
 
 ---
 
@@ -149,7 +149,7 @@ Loci is a voice-first iOS app (SwiftUI, iOS 17+) that pins voice notes to GPS co
 - [x] US-081: Create household member management UI
 - [x] US-082: Create share-with-family toggle on locus creation
 - [x] US-083: Create shared loci display with creator attribution
-- [ ] US-084: Include shared loci in geofence rotation
+- [x] US-084: Include shared loci in geofence rotation
 
 ## Phase 14: Monetization (US-085 → US-089)
 - [ ] US-085: Create RevenueCat SDK configuration
