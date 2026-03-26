@@ -1478,8 +1478,8 @@
         "Typecheck passes"
       ],
       "priority": 89,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "UpgradePromptView with context-aware icon, title, message from BlockedFeature. CTA opens PaywallView, dismiss button with 24-hour UserDefaults cooldown per feature. Shown inline when tier enforcement blocks a feature."
     },
     {
       "id": "US-090",
