@@ -940,8 +940,8 @@
         "Typecheck passes"
       ],
       "priority": 57,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Migration file already existed in backend/migrations/001_create_users.sql with all required columns (id, auth_id, display_name, subscription_tier, apns_token, created_at, updated_at), auth_id index, RLS policies for select/update own row, and auto-create trigger on auth.users insert."
     },
     {
       "id": "US-058",
@@ -956,8 +956,8 @@
         "Typecheck passes"
       ],
       "priority": 58,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Migration file already existed in backend/migrations/002_create_loci.sql with PostGIS extension, all required columns, GIST index on location, and composite indexes on (user_id, is_archived) and (household_id, is_shared). RLS enabled."
     },
     {
       "id": "US-059",
@@ -971,8 +971,8 @@
         "Typecheck passes"
       ],
       "priority": 59,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Created 003_create_households.sql with households table (id, name, owner_id, invite_code, invite_expires_at, created_at), household_members table (id, household_id, user_id, display_name, role, joined_at, UNIQUE constraint), index on household_members(user_id), FK from loci.household_id, and RLS enabled on both tables."
     },
     {
       "id": "US-060",
@@ -989,8 +989,8 @@
         "Typecheck passes"
       ],
       "priority": 60,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Created 004_rls_policies.sql with current_user_id() helper function, loci CRUD policies (own + shared read), households policies (member select, owner update/insert/delete), and household_members policies (member select, owner insert/delete, self-remove)."
     },
     {
       "id": "US-061",
@@ -1006,8 +1006,8 @@
         "Typecheck passes"
       ],
       "priority": 61,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Created 005_storage_bucket.sql with loci-audio bucket (10MB limit, audio/mp4, audio/x-m4a, audio/aac MIME types), storage RLS policies for upload to own folder, read own files, read shared household files, delete own files only."
     },
     {
       "id": "US-062",
@@ -1023,8 +1023,8 @@
         "Typecheck passes"
       ],
       "priority": 62,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Created seed.sql with 2 test users (Alice=premium, Bob=family), 1 household with both as members, 10 diverse loci across all categories (food, outdoor, parking, health, travel, shopping, warning, home, general, tip), mix of shared/personal/archived, spread across SF, NYC, and Portland. Idempotent with ON CONFLICT DO NOTHING."
     },
     {
       "id": "US-063",
@@ -1040,8 +1040,8 @@
         "Typecheck passes"
       ],
       "priority": 63,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Created edge-functions/ with package.json (hono, @hono/node-server, @supabase/supabase-js, node-cron), tsconfig.json (strict, ESM), Dockerfile (Node 20 alpine multi-stage), docker-compose.yml (supabase network), src/index.ts with Hono health check at GET /health, and .env.example with required env vars."
     },
     {
       "id": "US-064",
@@ -1057,8 +1057,8 @@
         "Typecheck passes"
       ],
       "priority": 64,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Created household-invite routes with auth middleware. Endpoints: POST generate (owner creates 6-char code, 48hr expiry), POST validate (checks code validity, expiry, member count), POST accept (joins user to household), POST regenerate (owner invalidates old code). All require JWT auth. Auth middleware resolves auth_id to internal user ID."
     },
     {
       "id": "US-065",
@@ -1074,8 +1074,8 @@
         "Typecheck passes"
       ],
       "priority": 65,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Created contextual-select route at POST /api/loci/contextual-select. Uses PostGIS ST_DWithin for 100m radius query via nearby_loci RPC (006_nearby_loci_rpc.sql). Scoring: recency 40% (exponential decay), time-of-day category relevance 30% (food at mealtimes, parking during business hours, etc.), proximity 30%. Falls back to most recent if no clear winner."
     },
     {
       "id": "US-066",
@@ -1091,8 +1091,8 @@
         "Typecheck passes"
       ],
       "priority": 66,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Created analyze-loci route with nightly cron (2 AM). Uses loci_clusters RPC (007_loci_clusters_rpc.sql) with ST_ClusterDBSCAN to find 3+ loci within 50m. Calls Claude Haiku API for summaries. Only processes premium/family users. Retry backoff on API failures. Manual trigger at POST /api/loci/analyze/run."
     },
     {
       "id": "US-067",
@@ -1108,8 +1108,8 @@
         "Typecheck passes"
       ],
       "priority": 67,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Created sync-subscription route at POST /api/webhook/revenuecat. Validates HMAC-SHA256 webhook signature. Handles INITIAL_PURCHASE, RENEWAL, CANCELLATION, EXPIRATION, NON_RENEWING_PURCHASE events. Maps entitlements to tiers (family > premium > free). Updates users.subscription_tier via auth_id lookup."
     },
     {
       "id": "US-068",
@@ -1124,8 +1124,8 @@
         "Typecheck passes"
       ],
       "priority": 68,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Created push-digest route with weekly cron (Sunday 10 AM). Queries each user's weekly loci count, total count, and most visited location. Generates summary text and sends APNs push. Only sends to users active in last 30 days with APNs tokens. Manual trigger at POST /api/digest/run."
     },
     {
       "id": "US-069",

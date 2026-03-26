@@ -1,0 +1,21 @@
+version: "3.8"
+
+services:
+  edge-functions:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - SUPABASE_URL=${SUPABASE_URL:-http://supabase-kong:8000}
+      - SUPABASE_SERVICE_KEY=${SUPABASE_SERVICE_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - PORT=3000
+    restart: unless-stopped
+    networks:
+      - supabase
+
+networks:
+  supabase:
+    external: true

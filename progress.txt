@@ -4,7 +4,7 @@
 ## Started: 2026-03-25
 ## Status: IN PROGRESS
 ## Total Stories: 120
-## Completed: 56/120
+## Completed: 68/120
 
 ---
 
@@ -116,20 +116,20 @@ Loci is a voice-first iOS app (SwiftUI, iOS 17+) that pins voice notes to GPS co
 - [x] US-056: Create About view with legal links and app info
 
 ## Phase 10: Backend — Schema & RLS (US-057 → US-062)
-- [ ] US-057: Create PostgreSQL schema migration for users table
-- [ ] US-058: Create PostgreSQL schema migration for loci table with PostGIS
-- [ ] US-059: Create PostgreSQL schema migration for households tables
-- [ ] US-060: Create Row Level Security policies for all tables
-- [ ] US-061: Create Supabase Storage bucket for audio files
-- [ ] US-062: Create database seed script with test data
+- [x] US-057: Create PostgreSQL schema migration for users table
+- [x] US-058: Create PostgreSQL schema migration for loci table with PostGIS
+- [x] US-059: Create PostgreSQL schema migration for households tables
+- [x] US-060: Create Row Level Security policies for all tables
+- [x] US-061: Create Supabase Storage bucket for audio files
+- [x] US-062: Create database seed script with test data
 
 ## Phase 11: Backend — Edge Functions (US-063 → US-068)
-- [ ] US-063: Create edge function project with Docker and Hono scaffold
-- [ ] US-064: Create household-invite edge function
-- [ ] US-065: Create contextual-select edge function
-- [ ] US-066: Create analyze-loci edge function for AI summaries
-- [ ] US-067: Create sync-subscription edge function for RevenueCat webhook
-- [ ] US-068: Create push-digest edge function for weekly summaries
+- [x] US-063: Create edge function project with Docker and Hono scaffold
+- [x] US-064: Create household-invite edge function
+- [x] US-065: Create contextual-select edge function
+- [x] US-066: Create analyze-loci edge function for AI summaries
+- [x] US-067: Create sync-subscription edge function for RevenueCat webhook
+- [x] US-068: Create push-digest edge function for weekly summaries
 
 ## Phase 12: Auth & Sync (US-069 → US-077)
 - [ ] US-069: Create SupabaseClient configuration with supabase-swift
