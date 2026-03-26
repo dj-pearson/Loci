@@ -1,0 +1,21 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background - solid brand blue with rounded corners -->
+  <rect width="1024" height="1024" rx="224" fill="#2563EB"/>
+
+  <!-- Location pin shape - white -->
+  <path d="M512 180C408 180 324 264 324 368C324 520 512 780 512 780C512 780 700 520 700 368C700 264 616 180 512 180Z" fill="white" opacity="0.95"/>
+
+  <!-- Inner circle of pin -->
+  <circle cx="512" cy="368" r="88" fill="#2563EB"/>
+
+  <!-- Audio wave arcs around the pin circle -->
+  <!-- Left wave 1 -->
+  <path d="M380 320C362 345 352 356 352 368C352 380 362 391 380 416" stroke="white" stroke-width="18" stroke-linecap="round" fill="none" opacity="0.7"/>
+  <!-- Left wave 2 -->
+  <path d="M340 290C310 325 296 348 296 368C296 388 310 411 340 446" stroke="white" stroke-width="18" stroke-linecap="round" fill="none" opacity="0.45"/>
+
+  <!-- Right wave 1 -->
+  <path d="M644 320C662 345 672 356 672 368C672 380 662 391 644 416" stroke="white" stroke-width="18" stroke-linecap="round" fill="none" opacity="0.7"/>
+  <!-- Right wave 2 -->
+  <path d="M684 290C714 325 728 348 728 368C728 388 714 411 684 446" stroke="white" stroke-width="18" stroke-linecap="round" fill="none" opacity="0.45"/>
+</svg>
