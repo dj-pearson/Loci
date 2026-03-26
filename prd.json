@@ -1885,8 +1885,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 113,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Privacy policy page at /privacy covering: data collected (location, audio, transcriptions, account info, analytics), on-device storage default with optional cloud sync, household sharing (Family plan only), third-party services table (Supabase, RevenueCat, TelemetryDeck, Apple), user rights (access, export, delete, account deletion), on-device processing emphasis, data retention, children's privacy, contact info. Clean typography with prose styling."
     },
     {
       "id": "US-114",
