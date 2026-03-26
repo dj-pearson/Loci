@@ -3,6 +3,7 @@ import SwiftUI
 struct CategoryFilterBar: View {
     @Binding var selectedCategories: Set<LocusCategory>
     var lociCounts: [LocusCategory: Int] = [:]
+    var showFamilyLoci: Binding<Bool>?
 
     private var allSelected: Bool {
         selectedCategories.count == LocusCategory.allCases.count
@@ -23,6 +24,19 @@ struct CategoryFilterBar: View {
                         selectedCategories.removeAll()
                     } else {
                         selectedCategories = Set(LocusCategory.allCases)
+                    }
+                }
+
+                // Family filter chip (only shown when binding is provided)
+                if let showFamily = showFamilyLoci {
+                    FilterChip(
+                        label: String(localized: "Family"),
+                        systemImage: "person.2.fill",
+                        count: nil,
+                        isSelected: showFamily.wrappedValue,
+                        selectedColor: Theme.secondary
+                    ) {
+                        showFamily.wrappedValue.toggle()
                     }
                 }
 

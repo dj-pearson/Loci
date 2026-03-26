@@ -9,6 +9,7 @@ final class HomeMapViewModel {
 
     var mapRegion: MKCoordinateRegion
     var selectedCategories: Set<LocusCategory> = Set(LocusCategory.allCases)
+    var showFamilyLoci: Bool = true
 
     // MARK: - Dependencies
 
@@ -39,10 +40,12 @@ final class HomeMapViewModel {
 
     // MARK: - Filtered Loci
 
-    /// Returns all non-archived loci matching the selected category filters.
+    /// Returns all non-archived loci matching the selected category and family filters.
     func filteredLoci(from allLoci: [Locus]) -> [Locus] {
         allLoci.filter { locus in
-            !locus.isArchived && selectedCategories.contains(locus.category)
+            !locus.isArchived
+                && selectedCategories.contains(locus.category)
+                && (showFamilyLoci || !locus.isShared || locus.createdByName == nil)
         }
     }
 

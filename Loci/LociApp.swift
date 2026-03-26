@@ -33,6 +33,7 @@ struct ContentView: View {
     @Environment(NavigationRouter.self) private var navigationRouter
     @Environment(LocationService.self) private var locationService
     @Query(filter: #Predicate<Locus> { !$0.isArchived }) private var loci: [Locus]
+    @Query private var householdMembers: [HouseholdMember]
 
     @State private var selectedTab: AppTab = .map
     @State private var mapViewModel: HomeMapViewModel?
@@ -56,7 +57,8 @@ struct ContentView: View {
                     if let vm = mapViewModel {
                         CategoryFilterBar(
                             selectedCategories: Bindable(vm).selectedCategories,
-                            lociCounts: lociCountsByCategory
+                            lociCounts: lociCountsByCategory,
+                            showFamilyLoci: hasHousehold ? Bindable(vm).showFamilyLoci : nil
                         )
                         .background(.ultraThinMaterial)
                     }
@@ -107,6 +109,10 @@ struct ContentView: View {
             }
             navigationRouter.consumePendingDeepLink()
         }
+    }
+
+    private var hasHousehold: Bool {
+        !householdMembers.isEmpty
     }
 
     private var lociCountsByCategory: [LocusCategory: Int] {

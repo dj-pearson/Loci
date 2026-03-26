@@ -1376,8 +1376,8 @@
         "Typecheck passes"
       ],
       "priority": 83,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "CategoryPinView already had person.2 badge. Added 'Shared by [name]' subtitle to LocusRowView. LocusDetailView already had sharedSection. Updated NotificationService to show '[Name] left a note here:' for shared loci. Added Family filter chip to CategoryFilterBar with showFamilyLoci toggle on HomeMapViewModel."
     },
     {
       "id": "US-084",

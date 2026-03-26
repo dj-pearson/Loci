@@ -128,14 +128,23 @@ final class NotificationService: NSObject, UNUserNotificationCenterDelegate {
         guard !isInQuietHours() else { return }
         let content = UNMutableNotificationContent()
 
-        // Title: location name or fallback
-        content.title = locus.locationName ?? String(localized: "You left a note here")
+        // Title: distinguish personal vs shared loci
+        if locus.isShared, let creatorName = locus.createdByName {
+            content.title = String(localized: "\(creatorName) left a note here:")
+        } else {
+            content.title = locus.locationName ?? String(localized: "You left a note here")
+        }
 
         // Body: first 100 characters of transcription
         if locus.transcription.count > 100 {
             content.body = String(locus.transcription.prefix(100)) + "…"
         } else {
             content.body = locus.transcription
+        }
+
+        // Subtitle for shared loci: include location name
+        if locus.isShared, locus.createdByName != nil, let locationName = locus.locationName {
+            content.subtitle = "\(locationName) · \(locus.category.displayName)"
         }
 
         // Subtitle: category name and relative time

@@ -284,6 +284,16 @@ struct LocusRowView: View {
                     .font(.subheadline)
                     .lineLimit(2)
 
+                if locus.isShared, let creatorName = locus.createdByName {
+                    HStack(spacing: 4) {
+                        Image(systemName: "person.2.fill")
+                            .font(.system(size: 9))
+                        Text(String(localized: "Shared by \(creatorName)"))
+                    }
+                    .font(.caption)
+                    .foregroundStyle(Theme.primary)
+                }
+
                 HStack(spacing: 6) {
                     if let name = locus.locationName {
                         Text(name)
