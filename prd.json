@@ -1580,8 +1580,8 @@
         "Typecheck passes"
       ],
       "priority": 95,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "CertificatePinningDelegate implementing URLSessionDelegate with SPKI SHA-256 public key hash validation. Validates against pinned hashes in CertificatePinningConfig. Rejects connections on pin failure. Debug-only logging of failures with full certificate chain details. Applied to SupabaseClient via custom URLSession with pinning delegate."
     },
     {
       "id": "US-096",

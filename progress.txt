@@ -4,7 +4,7 @@
 ## Started: 2026-03-25
 ## Status: IN PROGRESS
 ## Total Stories: 120
-## Completed: 84/120
+## Completed: 85/120
 
 ---
 
@@ -166,7 +166,7 @@ Loci is a voice-first iOS app (SwiftUI, iOS 17+) that pins voice notes to GPS co
 ## Phase 16: Security Hardening (US-093 → US-098)
 - [x] US-093: Create KeychainService for secure credential storage
 - [x] US-094: Create biometric lock for app access
-- [ ] US-095: Create SSL certificate pinning for API calls
+- [x] US-095: Create SSL certificate pinning for API calls
 - [ ] US-096: Create audio file encryption at rest
 - [ ] US-097: Create input sanitization service
 - [ ] US-098: Create rate limiting middleware for edge functions
