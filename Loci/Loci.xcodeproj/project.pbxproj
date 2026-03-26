@@ -35,6 +35,7 @@
 		8F2A7C5D1B2E4F7A90D3E6C3 /* HouseholdViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A7C5D1B2E4F7A90D3E6C3 /* HouseholdViewModel.swift */; };
 		8F2AAC5D1B2E4F7A90D3E6C1 /* CreateHouseholdView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1AAC5D1B2E4F7A90D3E6C1 /* CreateHouseholdView.swift */; };
 		8F2ABC5D1B2E4F7A90D3E6C1 /* JoinHouseholdView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1ABC5D1B2E4F7A90D3E6C1 /* JoinHouseholdView.swift */; };
+		8F2ACC5D1B2E4F7A90D3E6C1 /* HouseholdMembersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1ACC5D1B2E4F7A90D3E6C1 /* HouseholdMembersView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -69,6 +70,7 @@
 		8F1A7C5D1B2E4F7A90D3E6C3 /* HouseholdViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HouseholdViewModel.swift; sourceTree = "<group>"; };
 		8F1AAC5D1B2E4F7A90D3E6C1 /* CreateHouseholdView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateHouseholdView.swift; sourceTree = "<group>"; };
 		8F1ABC5D1B2E4F7A90D3E6C1 /* JoinHouseholdView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinHouseholdView.swift; sourceTree = "<group>"; };
+		8F1ACC5D1B2E4F7A90D3E6C1 /* HouseholdMembersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HouseholdMembersView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -211,6 +213,7 @@
 			children = (
 				8F1AAC5D1B2E4F7A90D3E6C1 /* CreateHouseholdView.swift */,
 				8F1ABC5D1B2E4F7A90D3E6C1 /* JoinHouseholdView.swift */,
+				8F1ACC5D1B2E4F7A90D3E6C1 /* HouseholdMembersView.swift */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -319,6 +322,7 @@
 				8F2A6C5D1B2E4F7A90D3E6C8 /* AICategoryService.swift in Sources */,
 				8F2AAC5D1B2E4F7A90D3E6C1 /* CreateHouseholdView.swift in Sources */,
 				8F2ABC5D1B2E4F7A90D3E6C1 /* JoinHouseholdView.swift in Sources */,
+				8F2ACC5D1B2E4F7A90D3E6C1 /* HouseholdMembersView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

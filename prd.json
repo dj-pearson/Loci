@@ -1343,8 +1343,8 @@
         "Typecheck passes"
       ],
       "priority": 81,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "HouseholdMembersView with sorted member list (owner first), role badges (crown/person icons), swipe-to-delete with confirmation for owner, 'N of 6 members' count, invite code section with share/regenerate for owner, Leave button for non-owners, Delete button for owner. Added removeMember() to HouseholdViewModel. Linked from SettingsView. Added to pbxproj."
     },
     {
       "id": "US-082",

@@ -414,6 +414,41 @@ final class HouseholdViewModel {
         }
     }
 
+    // MARK: - Remove Member
+
+    /// Removes a member from the household. Owner only.
+    func removeMember(_ member: HouseholdMember, modelContext: ModelContext) async throws {
+        guard let household = currentHousehold else {
+            throw HouseholdError.noHousehold
+        }
+
+        guard member.role != .owner else {
+            throw HouseholdError.ownerCannotLeave
+        }
+
+        await setLoading(true)
+        defer { Task { await self.setLoading(false) } }
+
+        do {
+            try await supabase
+                .from("household_members")
+                .delete()
+                .eq("id", value: member.id.uuidString)
+                .eq("household_id", value: household.id.uuidString)
+                .execute()
+
+            await MainActor.run {
+                modelContext.delete(member)
+                try? modelContext.save()
+                self.members.removeAll { $0.id == member.id }
+                self.errorMessage = nil
+            }
+        } catch {
+            await setError(String(localized: "Failed to remove member. Please try again."))
+            throw HouseholdError.removeFailed
+        }
+    }
+
     // MARK: - Generate Invite Code
 
     /// Generates a new invite code for the household (owner only).
@@ -533,6 +568,7 @@ enum HouseholdError: LocalizedError {
     case leaveFailed
     case deleteFailed
     case generateCodeFailed
+    case removeFailed
 
     var errorDescription: String? {
         switch self {
@@ -564,6 +600,8 @@ enum HouseholdError: LocalizedError {
             String(localized: "Failed to delete household. Please try again.")
         case .generateCodeFailed:
             String(localized: "Failed to generate invite code. Please try again.")
+        case .removeFailed:
+            String(localized: "Failed to remove member. Please try again.")
         }
     }
 }

@@ -159,7 +159,7 @@ struct SettingsView: View {
                 }
 
                 NavigationLink {
-                    Text(String(localized: "Manage Family"))
+                    HouseholdMembersView(viewModel: householdViewModel)
                 } label: {
                     Label(String(localized: "Manage Members"), systemImage: "person.2")
                 }
