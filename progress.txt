@@ -4,7 +4,7 @@
 ## Started: 2026-03-25
 ## Status: IN PROGRESS
 ## Total Stories: 120
-## Completed: 89/120
+## Completed: 90/120
 
 ---
 
@@ -173,7 +173,7 @@ Loci is a voice-first iOS app (SwiftUI, iOS 17+) that pins voice notes to GPS co
 
 ## Phase 17: Performance Optimization (US-099 → US-101)
 - [x] US-099: Create efficient SwiftData pagination
-- [ ] US-100: Create audio file cache management
+- [x] US-100: Create audio file cache management
 - [ ] US-101: Create map viewport optimization for annotation loading
 
 ## Phase 18: Accessibility & Polish (US-102 → US-108)

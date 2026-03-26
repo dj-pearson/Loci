@@ -1664,8 +1664,8 @@
         "Typecheck passes"
       ],
       "priority": 100,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "AudioCacheManager @Observable with maxCacheSize (500MB default), currentCacheSize() scanning documents/audio/ and root .m4a files, cleanupIfNeeded() removing oldest archived+synced loci audio (LRU), isFileCached() check. Integrated into BackgroundSyncManager (runs after each sync) and ContentView.onAppear (runs on app launch). Non-synced files excluded from cleanup."
     },
     {
       "id": "US-101",

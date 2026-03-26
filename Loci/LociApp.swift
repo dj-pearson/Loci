@@ -68,6 +68,7 @@ struct ContentView: View {
     @State private var mapViewModel: HomeMapViewModel?
     @State private var settingsViewModel = SettingsViewModel()
     @State private var householdViewModel = HouseholdViewModel()
+    @State private var audioCacheManager = AudioCacheManager()
 
     var body: some View {
         @Bindable var router = navigationRouter
@@ -138,6 +139,7 @@ struct ContentView: View {
                 mapViewModel = HomeMapViewModel(locationService: locationService)
             }
             navigationRouter.consumePendingDeepLink()
+            audioCacheManager.cleanupIfNeeded(modelContext: modelContext)
         }
     }
 

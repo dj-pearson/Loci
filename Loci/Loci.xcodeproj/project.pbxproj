@@ -39,6 +39,7 @@
 		8F2A6C5D1B2E4F7A90D3E6C9 /* CertificatePinningDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A6C5D1B2E4F7A90D3E6C9 /* CertificatePinningDelegate.swift */; };
 		8F2A6C5D1B2E4F7A90D3E6CA /* AudioEncryptionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A6C5D1B2E4F7A90D3E6CA /* AudioEncryptionService.swift */; };
 		8F2A5C5D1B2E4F7A90D3E6C6 /* InputSanitizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A5C5D1B2E4F7A90D3E6C6 /* InputSanitizer.swift */; };
+		8F2A6C5D1B2E4F7A90D3E6CB /* AudioCacheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A6C5D1B2E4F7A90D3E6CB /* AudioCacheManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -73,6 +74,7 @@
 		8F1A6C5D1B2E4F7A90D3E6C9 /* CertificatePinningDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CertificatePinningDelegate.swift; sourceTree = "<group>"; };
 		8F1A6C5D1B2E4F7A90D3E6CA /* AudioEncryptionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioEncryptionService.swift; sourceTree = "<group>"; };
 		8F1A5C5D1B2E4F7A90D3E6C6 /* InputSanitizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputSanitizer.swift; sourceTree = "<group>"; };
+		8F1A6C5D1B2E4F7A90D3E6CB /* AudioCacheManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioCacheManager.swift; sourceTree = "<group>"; };
 		8F1A7C5D1B2E4F7A90D3E6C3 /* HouseholdViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HouseholdViewModel.swift; sourceTree = "<group>"; };
 		8F1AAC5D1B2E4F7A90D3E6C1 /* CreateHouseholdView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateHouseholdView.swift; sourceTree = "<group>"; };
 		8F1ABC5D1B2E4F7A90D3E6C1 /* JoinHouseholdView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinHouseholdView.swift; sourceTree = "<group>"; };
@@ -163,6 +165,7 @@
 				8F1A6C5D1B2E4F7A90D3E6C5 /* TranscriptionService.swift */,
 				8F1A6C5D1B2E4F7A90D3E6C6 /* GeofenceManager.swift */,
 				8F1A6C5D1B2E4F7A90D3E6C7 /* NotificationService.swift */,
+				8F1A6C5D1B2E4F7A90D3E6CB /* AudioCacheManager.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -335,6 +338,7 @@
 				8F2A6C5D1B2E4F7A90D3E6C9 /* CertificatePinningDelegate.swift in Sources */,
 				8F2A6C5D1B2E4F7A90D3E6CA /* AudioEncryptionService.swift in Sources */,
 				8F2A5C5D1B2E4F7A90D3E6C6 /* InputSanitizer.swift in Sources */,
+				8F2A6C5D1B2E4F7A90D3E6CB /* AudioCacheManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
