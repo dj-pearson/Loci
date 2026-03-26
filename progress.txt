@@ -4,7 +4,7 @@
 ## Started: 2026-03-25
 ## Status: IN PROGRESS
 ## Total Stories: 120
-## Completed: 69/120
+## Completed: 70/120
 
 ---
 
@@ -145,7 +145,7 @@ Loci is a voice-first iOS app (SwiftUI, iOS 17+) that pins voice notes to GPS co
 ## Phase 13: Family Sharing (US-078 → US-084)
 - [x] US-078: Create HouseholdViewModel for family management
 - [x] US-079: Create household creation UI
-- [ ] US-080: Create join household UI
+- [x] US-080: Create join household UI
 - [ ] US-081: Create household member management UI
 - [ ] US-082: Create share-with-family toggle on locus creation
 - [ ] US-083: Create shared loci display with creator attribution

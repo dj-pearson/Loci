@@ -1326,8 +1326,8 @@
         "Typecheck passes"
       ],
       "priority": 80,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "JoinHouseholdView with 6-char auto-uppercase alphanumeric code input, join button with loading state, error handling for expired/invalid/full/already-member via HouseholdViewModel, success view showing household name and member count. Integrated into SettingsView family section via sheet. Added to pbxproj."
     },
     {
       "id": "US-081",

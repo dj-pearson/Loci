@@ -10,6 +10,7 @@ struct SettingsView: View {
 
     @State private var showSignOutConfirmation = false
     @State private var showCreateHousehold = false
+    @State private var showJoinHousehold = false
 
     var body: some View {
         Form {
@@ -139,6 +140,15 @@ struct SettingsView: View {
                 }
                 .sheet(isPresented: $showCreateHousehold) {
                     CreateHouseholdView(viewModel: householdViewModel)
+                }
+
+                Button {
+                    showJoinHousehold = true
+                } label: {
+                    Label(String(localized: "Join Family"), systemImage: "person.badge.key")
+                }
+                .sheet(isPresented: $showJoinHousehold) {
+                    JoinHouseholdView(viewModel: householdViewModel)
                 }
             } else {
                 HStack {
