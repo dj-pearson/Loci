@@ -1952,8 +1952,8 @@
         "Typecheck passes"
       ],
       "priority": 117,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Deploy workflow at .github/workflows/deploy.yml triggers on push to main. Steps: checkout, Xcode 15.4, SPM cache, install Fastlane, match certificates (appstore readonly), increment build number (run_number), archive and upload via Fastlane release lane, Slack notifications on success/failure (optional). Fastfile and Matchfile in Loci/fastlane/ with App Store Connect API key auth."
     },
     {
       "id": "US-118",

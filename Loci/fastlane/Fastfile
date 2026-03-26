@@ -1,0 +1,34 @@
+default_platform(:ios)
+
+platform :ios do
+  desc "Sync certificates and profiles via match"
+  lane :certificates do
+    match(type: "appstore", readonly: true)
+  end
+
+  desc "Build and upload to TestFlight"
+  lane :release do
+    app_store_connect_api_key(
+      key_id: ENV["APP_STORE_CONNECT_API_KEY_KEY_ID"],
+      issuer_id: ENV["APP_STORE_CONNECT_API_KEY_ISSUER_ID"],
+      key_content: ENV["APP_STORE_CONNECT_API_KEY_KEY"],
+      is_key_content_base64: true
+    )
+
+    match(type: "appstore", readonly: true)
+
+    build_app(
+      project: "Loci.xcodeproj",
+      scheme: "Loci",
+      export_method: "app-store",
+      clean: true,
+      output_directory: "./build",
+      output_name: "Loci.ipa"
+    )
+
+    upload_to_testflight(
+      skip_waiting_for_build_processing: true,
+      distribute_external: false
+    )
+  end
+end
