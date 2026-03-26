@@ -1140,8 +1140,8 @@
         "Typecheck passes"
       ],
       "priority": 69,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Created SupabaseClientProvider singleton with environment-based config (DEBUG/RELEASE URLs), KeychainAuthStorage for session persistence, PKCE flow."
     },
     {
       "id": "US-070",
@@ -1157,8 +1157,8 @@
         "Typecheck passes"
       ],
       "priority": 70,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "AuthService @Observable class with signInWithApple() using ASAuthorizationAppleIDProvider, passes ID token to Supabase Auth, creates/updates local UserProfile. Published isAuthenticated, currentUser, isLoading, errorMessage."
     },
     {
       "id": "US-071",
@@ -1174,8 +1174,8 @@
         "Typecheck passes"
       ],
       "priority": 71,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "AuthService includes signUp(email:password:displayName:), signIn(email:password:), resetPassword(email:) with email validation (regex) and min 8-char password. Error handling maps to user-friendly messages."
     },
     {
       "id": "US-072",
@@ -1190,8 +1190,8 @@
         "Typecheck passes"
       ],
       "priority": 72,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "AuthService restores session on init via authStateChanges listener. signOut() clears state. deleteAccount() calls server-side RPC then signs out. Session refresh handled by supabase-swift SDK."
     },
     {
       "id": "US-073",
@@ -1207,8 +1207,8 @@
         "Typecheck passes"
       ],
       "priority": 73,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Created SignInView (Apple Sign In button, email/password form, sign-up link, forgot password) and SignUpView (display name, email, password fields). Loading states, error alerts, keyboard dismiss, auto-dismiss on auth."
     },
     {
       "id": "US-074",
@@ -1224,8 +1224,8 @@
         "Typecheck passes"
       ],
       "priority": 74,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "SyncService @Observable with uploadPendingLoci() querying .pending/.modified loci, upserts to Supabase with PostGIS EWKT point, updates syncStatus to .synced. Published isSyncing, lastSyncDate, pendingCount."
     },
     {
       "id": "US-075",
@@ -1241,8 +1241,8 @@
         "Typecheck passes"
       ],
       "priority": 75,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "SyncService downloadRemoteLoci() fetches where updated_at > lastSyncDate, includes shared household loci. Last-write-wins merge. Creates new or updates existing SwiftData entries. Posts locusDidCreate notification to trigger geofence refresh."
     },
     {
       "id": "US-076",
@@ -1258,8 +1258,8 @@
         "Typecheck passes"
       ],
       "priority": 76,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "AudioSyncService uploads M4A to loci-audio bucket at {user_id}/{locus_id}.m4a. Downloads missing remote audio to local documents/audio/. Retry on failure. Delete method for cleanup."
     },
     {
       "id": "US-077",
@@ -1275,8 +1275,8 @@
         "Typecheck passes"
       ],
       "priority": 77,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BackgroundSyncManager with BGAppRefreshTask registration, 15-min minimum interval. Triggers on: foreground, new locus creation, background fetch. Coordinates upload then download for loci and audio. Only syncs when authenticated."
     },
     {
       "id": "US-078",
@@ -1293,8 +1293,8 @@
         "Typecheck passes"
       ],
       "priority": 78,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "HouseholdViewModel @Observable with currentHousehold, members, inviteCode. createHousehold() inserts to Supabase + SwiftData with owner as first member. joinHousehold() validates/accepts via edge functions. leaveHousehold() removes member (owner must delete). deleteHousehold() owner-only cascade delete. refreshMembers() fetches from Supabase. loadLocalHousehold() restores from SwiftData. generateInviteCode() via edge function. HouseholdError enum with localized messages."
     },
     {
       "id": "US-079",

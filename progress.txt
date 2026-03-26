@@ -143,7 +143,7 @@ Loci is a voice-first iOS app (SwiftUI, iOS 17+) that pins voice notes to GPS co
 - [ ] US-077: Create background sync manager
 
 ## Phase 13: Family Sharing (US-078 → US-084)
-- [ ] US-078: Create HouseholdViewModel for family management
+- [x] US-078: Create HouseholdViewModel for family management
 - [ ] US-079: Create household creation UI
 - [ ] US-080: Create join household UI
 - [ ] US-081: Create household member management UI
