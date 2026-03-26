@@ -1,0 +1,1 @@
+location,notes,voice,memo,place,reminder,gps,pin,map,spot,geo,spatial,memory,family,share

@@ -1986,8 +1986,8 @@
         "Typecheck passes"
       ],
       "priority": 119,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Fastlane metadata at Loci/fastlane/metadata/en-US/ with: name.txt, subtitle.txt, description.txt (compelling copy with feature highlights), keywords.txt (15 keywords), promotional_text.txt (launch promo), primary_category.txt (Utilities), secondary_category.txt (Travel)."
     },
     {
       "id": "US-120",
