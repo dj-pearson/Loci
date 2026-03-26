@@ -1360,8 +1360,8 @@
         "Typecheck passes"
       ],
       "priority": 82,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "ShareWithFamilyToggle component with person.2 icon, integrated in PostRecordingSheet and EditLocusSheet. Conditionally visible when householdName is non-nil. Defaults to off. Save flow sets isShared, householdId, createdByName. EditLocusSheet updateSharing passes householdId and createdByName."
     },
     {
       "id": "US-083",

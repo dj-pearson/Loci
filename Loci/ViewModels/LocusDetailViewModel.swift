@@ -86,6 +86,19 @@ final class LocusDetailViewModel {
         saveContext()
     }
 
+    func updateSharing(isShared: Bool, householdId: UUID? = nil, createdByName: String? = nil) {
+        locus.isShared = isShared
+        if isShared {
+            locus.householdId = householdId
+            locus.createdByName = createdByName
+        } else {
+            locus.householdId = nil
+            locus.createdByName = nil
+        }
+        locus.updatedAt = Date()
+        saveContext()
+    }
+
     // MARK: - Playback
 
     func togglePlayback() {

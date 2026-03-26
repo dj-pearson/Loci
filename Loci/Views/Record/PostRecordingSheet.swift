@@ -7,7 +7,7 @@ struct PostRecordingSheet: View {
     let coordinate: CLLocationCoordinate2D
     let locationName: String?
     let detectedCategory: LocusCategory
-    let hasHousehold: Bool
+    let householdName: String?
     let onSave: (LocusCategory, Bool) -> Void
     let onDiscard: () -> Void
 
@@ -22,7 +22,7 @@ struct PostRecordingSheet: View {
         coordinate: CLLocationCoordinate2D,
         locationName: String?,
         detectedCategory: LocusCategory,
-        hasHousehold: Bool,
+        householdName: String?,
         onSave: @escaping (LocusCategory, Bool) -> Void,
         onDiscard: @escaping () -> Void
     ) {
@@ -31,7 +31,7 @@ struct PostRecordingSheet: View {
         self.coordinate = coordinate
         self.locationName = locationName
         self.detectedCategory = detectedCategory
-        self.hasHousehold = hasHousehold
+        self.householdName = householdName
         self.onSave = onSave
         self.onDiscard = onDiscard
         _selectedCategory = State(initialValue: detectedCategory)
@@ -54,8 +54,11 @@ struct PostRecordingSheet: View {
                     categorySection
 
                     // Share with family toggle
-                    if hasHousehold {
-                        familyToggle
+                    if let householdName {
+                        ShareWithFamilyToggle(
+                            isShared: $shareWithFamily,
+                            householdName: householdName
+                        )
                     }
                 }
                 .padding(Theme.Spacing.md)
@@ -192,22 +195,6 @@ struct PostRecordingSheet: View {
         }
     }
 
-    // MARK: - Family Toggle
-
-    private var familyToggle: some View {
-        Toggle(isOn: $shareWithFamily) {
-            HStack(spacing: Theme.Spacing.sm) {
-                Image(systemName: "person.2.fill")
-                    .foregroundStyle(Theme.secondary)
-                Text(String(localized: "Share with Family"))
-                    .font(Theme.Typography.body)
-            }
-        }
-        .padding(Theme.Spacing.md)
-        .background(Theme.surface, in: RoundedRectangle(cornerRadius: Theme.CornerRadius.medium))
-        .accessibilityLabel(String(localized: "Share this voice note with your family"))
-    }
-
     // MARK: - Helpers
 
     private func formattedTime(_ time: TimeInterval) -> String {
@@ -259,7 +246,7 @@ private struct CategoryPill: View {
         coordinate: CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194),
         locationName: "123 Main St, San Francisco",
         detectedCategory: .food,
-        hasHousehold: true,
+        householdName: "The Smiths",
         onSave: { _, _ in },
         onDiscard: {}
     )

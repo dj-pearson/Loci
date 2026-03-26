@@ -5,7 +5,9 @@ struct RecordingView: View {
     @Environment(\.modelContext) private var modelContext
     @Bindable var viewModel: RecordViewModel
     let geocodingService: ReverseGeocodingService
-    var hasHousehold: Bool = false
+    var householdName: String?
+    var householdId: UUID?
+    var createdByName: String?
     var onDismiss: (() -> Void)?
 
     @State private var locationName: String?
@@ -87,7 +89,7 @@ struct RecordingView: View {
                     coordinate: result.coordinate,
                     locationName: locationName,
                     detectedCategory: detectedCategory,
-                    hasHousehold: hasHousehold,
+                    householdName: householdName,
                     onSave: { category, shared in
                         showPostRecordingSheet = false
                         viewModel.modelContext = modelContext
@@ -97,7 +99,9 @@ struct RecordingView: View {
                                 transcription: result.transcription,
                                 coordinate: result.coordinate,
                                 category: category,
-                                isShared: shared
+                                isShared: shared,
+                                householdId: shared ? householdId : nil,
+                                createdByName: shared ? createdByName : nil
                             )
                         }
                     },

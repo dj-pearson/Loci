@@ -185,7 +185,9 @@ final class RecordViewModel {
         transcription: String,
         coordinate: CLLocationCoordinate2D,
         category: LocusCategory,
-        isShared: Bool
+        isShared: Bool,
+        householdId: UUID? = nil,
+        createdByName: String? = nil
     ) async {
         guard let modelContext else {
             errorMessage = String(localized: "Unable to save. Please try again.")
@@ -213,7 +215,9 @@ final class RecordViewModel {
             audioFileURL: audioURL.lastPathComponent,
             transcription: transcription,
             category: finalCategory,
-            isShared: isShared
+            isShared: isShared,
+            createdByName: isShared ? createdByName : nil,
+            householdId: isShared ? householdId : nil
         )
 
         modelContext.insert(locus)

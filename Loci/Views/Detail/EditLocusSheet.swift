@@ -2,16 +2,24 @@ import SwiftUI
 
 struct EditLocusSheet: View {
     @Bindable var viewModel: LocusDetailViewModel
+    let householdName: String?
+    let householdId: UUID?
+    let createdByName: String?
     @Environment(\.dismiss) private var dismiss
 
     @State private var editedTranscription: String
     @State private var selectedCategory: LocusCategory
+    @State private var isShared: Bool
     @State private var showReRecordConfirmation = false
 
-    init(viewModel: LocusDetailViewModel) {
+    init(viewModel: LocusDetailViewModel, householdName: String? = nil, householdId: UUID? = nil, createdByName: String? = nil) {
         self.viewModel = viewModel
+        self.householdName = householdName
+        self.householdId = householdId
+        self.createdByName = createdByName
         _editedTranscription = State(initialValue: viewModel.locus.transcription)
         _selectedCategory = State(initialValue: viewModel.locus.category)
+        _isShared = State(initialValue: viewModel.locus.isShared)
     }
 
     var body: some View {
@@ -23,6 +31,14 @@ struct EditLocusSheet: View {
 
                     // Transcription editor
                     transcriptionSection
+
+                    // Share with family toggle
+                    if let householdName {
+                        ShareWithFamilyToggle(
+                            isShared: $isShared,
+                            householdName: householdName
+                        )
+                    }
 
                     // Re-record option
                     reRecordSection
@@ -143,6 +159,7 @@ struct EditLocusSheet: View {
     private var hasChanges: Bool {
         editedTranscription != viewModel.locus.transcription
             || selectedCategory != viewModel.locus.category
+            || isShared != viewModel.locus.isShared
     }
 
     private func save() {
@@ -151,6 +168,9 @@ struct EditLocusSheet: View {
         }
         if editedTranscription != viewModel.locus.transcription {
             viewModel.updateTranscription(editedTranscription)
+        }
+        if isShared != viewModel.locus.isShared {
+            viewModel.updateSharing(isShared: isShared, householdId: householdId, createdByName: createdByName)
         }
         dismiss()
     }
