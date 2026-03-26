@@ -29,8 +29,11 @@ struct AudioPlaybackBar: View {
                         .foregroundStyle(waveformColor)
                 }
                 .accessibilityLabel(playerService.isPlaying
-                                    ? String(localized: "Pause")
-                                    : String(localized: "Play"))
+                                    ? String(localized: "Pause recording")
+                                    : String(localized: "Play recording, \(formatTime(playerService.duration))"))
+                .accessibilityHint(playerService.isPlaying
+                                   ? String(localized: "Double tap to pause")
+                                   : String(localized: "Double tap to play"))
 
                 VStack(spacing: 2) {
                     // Progress slider
@@ -51,6 +54,8 @@ struct AudioPlaybackBar: View {
                         }
                     }
                     .tint(waveformColor)
+                    .accessibilityLabel(String(localized: "Playback position"))
+                    .accessibilityValue(String(localized: "\(formatTime(playerService.currentTime)) of \(formatTime(playerService.duration))"))
 
                     // Time labels
                     HStack {

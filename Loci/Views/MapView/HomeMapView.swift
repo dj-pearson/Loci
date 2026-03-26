@@ -50,6 +50,7 @@ struct HomeMapView: View {
                         ) {
                             selectedLocus = locus
                         }
+                        .accessibilityConfigured(locationName: locus.locationName)
                     }
                     .tag(locus)
                     .annotationTitles(.hidden)
@@ -68,6 +69,10 @@ struct HomeMapView: View {
                                 mapCameraPosition = .region(cluster.boundingRegion)
                             }
                         }
+                        .accessibilityElement(children: .ignore)
+                        .accessibilityLabel(String(localized: "\(cluster.loci.count) notes clustered"))
+                        .accessibilityHint(String(localized: "Double tap to zoom in"))
+                        .accessibilityAddTraits(.isButton)
                     }
                     .annotationTitles(.hidden)
                 }
@@ -76,6 +81,8 @@ struct HomeMapView: View {
                 MapCompass()
                 MapScaleView()
             }
+            .accessibilityElement(children: .contain)
+            .accessibilityLabel(String(localized: "Voice notes map"))
             .onMapCameraChange { context in
                 viewModel.mapRegion = context.region
                 viewModel.scheduleRegionUpdate()
@@ -129,6 +136,8 @@ struct HomeMapView: View {
                     .foregroundStyle(.white, Color.accentColor)
                     .shadow(color: .black.opacity(0.2), radius: 8, y: 4)
             }
+            .accessibilityLabel(String(localized: "Record voice note"))
+            .accessibilityHint(String(localized: "Double tap to start recording"))
             .padding(.bottom, 24)
         }
         .animation(.easeInOut(duration: 0.25), value: selectedLocus?.id)

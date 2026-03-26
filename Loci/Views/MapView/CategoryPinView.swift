@@ -45,6 +45,15 @@ struct CategoryPinView: View {
         .onTapGesture {
             onTap?()
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityAddTraits(.isButton)
+    }
+
+    func accessibilityConfigured(locationName: String?) -> some View {
+        let location = locationName ?? String(localized: "Unknown location")
+        return self
+            .accessibilityLabel(String(localized: "\(category.displayName) note at \(location)"))
+            .accessibilityHint(String(localized: "Double tap for details"))
     }
 }
 

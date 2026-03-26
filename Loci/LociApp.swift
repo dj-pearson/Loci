@@ -101,6 +101,8 @@ struct ContentView: View {
                 Label(String(localized: "Map"), systemImage: "map.fill")
             }
             .tag(AppTab.map)
+            .accessibilityLabel(String(localized: "Map"))
+            .accessibilityHint(String(localized: "View voice notes on a map"))
 
             // List Tab
             NavigationStack {
@@ -120,6 +122,8 @@ struct ContentView: View {
                 Label(String(localized: "List"), systemImage: "list.bullet")
             }
             .tag(AppTab.list)
+            .accessibilityLabel(String(localized: "List"))
+            .accessibilityHint(String(localized: "Browse voice notes in a list"))
 
             // Settings Tab
             NavigationStack {
@@ -133,6 +137,8 @@ struct ContentView: View {
                 Label(String(localized: "Settings"), systemImage: "gearshape.fill")
             }
             .tag(AppTab.settings)
+            .accessibilityLabel(String(localized: "Settings"))
+            .accessibilityHint(String(localized: "App preferences and account"))
         }
         .onAppear {
             if mapViewModel == nil {

@@ -72,6 +72,9 @@ struct RecordButton: View {
         .accessibilityLabel(isRecording
             ? String(localized: "Stop recording")
             : String(localized: "Record voice note"))
+        .accessibilityHint(isRecording
+            ? String(localized: "Double tap to stop recording")
+            : String(localized: "Double tap to start recording"))
         .accessibilityAddTraits(.isButton)
         .onAppear {
             feedbackGenerator.prepare()
