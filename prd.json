@@ -1713,8 +1713,8 @@
         "Typecheck passes"
       ],
       "priority": 103,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Converted fixed-size icon fonts to Dynamic Type equivalents (.caption, .caption2, .subheadline) across LocusDetailView, LocusListView, SearchResultsView, EditLocusSheet, CategoryFilterBar, and HomeMapView callout. Added FlowLayout wrapping layout to CategoryFilterBar for accessibility text sizes. FilterChip icons now use .imageScale(.small) with dynamic font. CategoryFilterBar switches from horizontal scroll to vertical wrapping flow at accessibility sizes."
     },
     {
       "id": "US-104",

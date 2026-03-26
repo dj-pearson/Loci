@@ -82,7 +82,8 @@ struct EditLocusSheet: View {
                         } label: {
                             HStack(spacing: 4) {
                                 Image(systemName: category.systemImageName)
-                                    .font(.system(size: 12, weight: .semibold))
+                                    .font(.caption2.weight(.semibold))
+                                    .imageScale(.small)
                                 Text(category.displayName)
                                     .font(.caption.weight(.medium))
                             }

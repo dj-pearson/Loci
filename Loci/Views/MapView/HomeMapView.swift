@@ -217,7 +217,7 @@ private struct LocusCalloutView: View {
                 .frame(width: 40, height: 40)
                 .overlay(
                     Image(systemName: locus.category.systemImageName)
-                        .font(.system(size: 16, weight: .semibold))
+                        .font(.subheadline.weight(.semibold))
                         .foregroundStyle(.white)
                 )
 

@@ -5,63 +5,143 @@ struct CategoryFilterBar: View {
     var lociCounts: [LocusCategory: Int] = [:]
     var showFamilyLoci: Binding<Bool>?
 
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
     private var allSelected: Bool {
         selectedCategories.count == LocusCategory.allCases.count
     }
 
+    /// At accessibility sizes, category pills need more room — use wrapping layout.
+    private var usesWrappingLayout: Bool {
+        dynamicTypeSize.isAccessibilitySize
+    }
+
     var body: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
-                // "All" chip
-                FilterChip(
-                    label: String(localized: "All"),
-                    systemImage: "line.3.horizontal.decrease.circle",
-                    count: nil,
-                    isSelected: allSelected,
-                    selectedColor: Theme.primary
-                ) {
-                    if allSelected {
-                        selectedCategories.removeAll()
-                    } else {
-                        selectedCategories = Set(LocusCategory.allCases)
-                    }
-                }
+        if usesWrappingLayout {
+            ScrollView(.vertical, showsIndicators: false) {
+                wrappingContent
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+            }
+            .frame(maxHeight: 200)
+        } else {
+            ScrollView(.horizontal, showsIndicators: false) {
+                horizontalContent
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+            }
+        }
+    }
 
-                // Family filter chip (only shown when binding is provided)
-                if let showFamily = showFamilyLoci {
-                    FilterChip(
-                        label: String(localized: "Family"),
-                        systemImage: "person.2.fill",
-                        count: nil,
-                        isSelected: showFamily.wrappedValue,
-                        selectedColor: Theme.secondary
-                    ) {
-                        showFamily.wrappedValue.toggle()
-                    }
-                }
+    private var horizontalContent: some View {
+        HStack(spacing: 8) {
+            chipContents
+        }
+    }
 
-                ForEach(LocusCategory.allCases) { category in
-                    let isSelected = selectedCategories.contains(category)
-                    let count = lociCounts[category] ?? 0
+    private var wrappingContent: some View {
+        FlowLayout(spacing: 8) {
+            chipContents
+        }
+    }
 
-                    FilterChip(
-                        label: category.displayName,
-                        systemImage: category.systemImageName,
-                        count: count > 0 ? count : nil,
-                        isSelected: isSelected,
-                        selectedColor: category.color
-                    ) {
-                        if isSelected {
-                            selectedCategories.remove(category)
-                        } else {
-                            selectedCategories.insert(category)
-                        }
-                    }
+    @ViewBuilder
+    private var chipContents: some View {
+        // "All" chip
+        FilterChip(
+            label: String(localized: "All"),
+            systemImage: "line.3.horizontal.decrease.circle",
+            count: nil,
+            isSelected: allSelected,
+            selectedColor: Theme.primary
+        ) {
+            if allSelected {
+                selectedCategories.removeAll()
+            } else {
+                selectedCategories = Set(LocusCategory.allCases)
+            }
+        }
+
+        // Family filter chip (only shown when binding is provided)
+        if let showFamily = showFamilyLoci {
+            FilterChip(
+                label: String(localized: "Family"),
+                systemImage: "person.2.fill",
+                count: nil,
+                isSelected: showFamily.wrappedValue,
+                selectedColor: Theme.secondary
+            ) {
+                showFamily.wrappedValue.toggle()
+            }
+        }
+
+        ForEach(LocusCategory.allCases) { category in
+            let isSelected = selectedCategories.contains(category)
+            let count = lociCounts[category] ?? 0
+
+            FilterChip(
+                label: category.displayName,
+                systemImage: category.systemImageName,
+                count: count > 0 ? count : nil,
+                isSelected: isSelected,
+                selectedColor: category.color
+            ) {
+                if isSelected {
+                    selectedCategories.remove(category)
+                } else {
+                    selectedCategories.insert(category)
                 }
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 8)
         }
+    }
+}
+
+// MARK: - Flow Layout
+
+/// A wrapping layout that arranges children horizontally, flowing to the next line when needed.
+private struct FlowLayout: Layout {
+    var spacing: CGFloat = 8
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let result = computeLayout(proposal: proposal, subviews: subviews)
+        return result.size
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        let result = computeLayout(proposal: proposal, subviews: subviews)
+        for (index, position) in result.positions.enumerated() {
+            subviews[index].place(
+                at: CGPoint(x: bounds.minX + position.x, y: bounds.minY + position.y),
+                proposal: .unspecified
+            )
+        }
+    }
+
+    private func computeLayout(proposal: ProposedViewSize, subviews: Subviews) -> (size: CGSize, positions: [CGPoint]) {
+        let maxWidth = proposal.width ?? .infinity
+        var positions: [CGPoint] = []
+        var currentX: CGFloat = 0
+        var currentY: CGFloat = 0
+        var lineHeight: CGFloat = 0
+        var totalWidth: CGFloat = 0
+
+        for subview in subviews {
+            let size = subview.sizeThatFits(.unspecified)
+            if currentX + size.width > maxWidth && currentX > 0 {
+                currentX = 0
+                currentY += lineHeight + spacing
+                lineHeight = 0
+            }
+            positions.append(CGPoint(x: currentX, y: currentY))
+            lineHeight = max(lineHeight, size.height)
+            currentX += size.width + spacing
+            totalWidth = max(totalWidth, currentX - spacing)
+        }
+
+        return (
+            size: CGSize(width: totalWidth, height: currentY + lineHeight),
+            positions: positions
+        )
     }
 }
 
@@ -79,7 +159,8 @@ private struct FilterChip: View {
         Button(action: action) {
             HStack(spacing: 4) {
                 Image(systemName: systemImage)
-                    .font(.system(size: 12, weight: .semibold))
+                    .font(.caption2.weight(.semibold))
+                    .imageScale(.small)
 
                 Text(label)
                     .font(.caption.weight(.medium))

@@ -102,9 +102,9 @@ struct LocusDetailView: View {
         HStack {
             HStack(spacing: 8) {
                 Image(systemName: locus.category.systemImageName)
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(.caption.weight(.semibold))
                     .foregroundStyle(.white)
-                    .frame(width: 28, height: 28)
+                    .frame(minWidth: 28, minHeight: 28)
                     .background(locus.category.color, in: Circle())
 
                 Text(locus.category.displayName)

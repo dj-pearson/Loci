@@ -57,7 +57,7 @@ private struct SearchResultRow: View {
                 .frame(width: 36, height: 36)
                 .overlay(
                     Image(systemName: locus.category.systemImageName)
-                        .font(.system(size: 14, weight: .semibold))
+                        .font(.caption.weight(.semibold))
                         .foregroundStyle(.white)
                 )
 
