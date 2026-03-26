@@ -1,3 +1,4 @@
+import RevenueCat
 import SwiftData
 import SwiftUI
 
@@ -15,6 +16,8 @@ struct LociApp: App {
         } catch {
             fatalError("Failed to initialize ModelContainer: \(error.localizedDescription)")
         }
+
+        RevenueCatConfiguration.configure()
     }
 
     var body: some Scene {
