@@ -1495,8 +1495,8 @@
         "Typecheck passes"
       ],
       "priority": 90,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "NearbyLociTimelineProvider reads from shared App Group SwiftData container and UserDefaults location. Returns top 3 nearest loci sorted by Haversine distance. 15-minute refresh policy. LocationService writes coordinates to App Group UserDefaults on each update."
     },
     {
       "id": "US-091",
