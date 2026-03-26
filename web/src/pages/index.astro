@@ -3,10 +3,338 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout title="Loci — Your Spatial Memory">
-  <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center">
-    <h1 class="text-5xl font-bold tracking-tight text-gray-900">Your Spatial Memory</h1>
-    <p class="mt-6 text-xl text-gray-600 max-w-2xl mx-auto">
-      Pin voice notes to places. Rediscover them when you return.
-    </p>
+  <!-- Hero -->
+  <section class="relative overflow-hidden bg-gradient-to-b from-brand-50 to-white">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32 text-center">
+      <h1 class="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-gray-900">
+        Your Spatial Memory
+      </h1>
+      <p class="mt-6 text-xl sm:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+        Voice notes pinned to places that find you when you return.
+      </p>
+      <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a
+          href="https://apps.apple.com/app/loci"
+          class="inline-flex items-center gap-3 bg-gray-900 text-white px-6 py-3 rounded-xl hover:bg-gray-800 transition-colors"
+          aria-label="Download on the App Store"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 22 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.09 22C7.79 22.05 6.8 20.68 5.96 19.47C4.25 16.56 2.93 11.3 4.69 7.95C5.56 6.29 7.29 5.22 9.17 5.2C10.45 5.18 11.67 6.08 12.45 6.08C13.23 6.08 14.72 4.99 16.26 5.15C16.88 5.18 18.75 5.42 19.95 7.17C19.86 7.23 17.58 8.57 17.6 11.3C17.63 14.56 20.47 15.63 20.5 15.64C20.47 15.71 20.03 17.24 18.71 19.5ZM13 3.5C13.73 2.67 14.94 2.04 15.94 2C16.07 3.17 15.6 4.35 14.9 5.19C14.21 6.04 13.07 6.7 11.95 6.61C11.8 5.46 12.36 4.26 13 3.5Z" />
+          </svg>
+          <div class="text-left">
+            <div class="text-[10px] leading-none opacity-80">Download on the</div>
+            <div class="text-lg font-semibold leading-tight">App Store</div>
+          </div>
+        </a>
+        <a href="#how-it-works" class="text-brand-600 font-semibold hover:text-brand-700 transition-colors">
+          See how it works &darr;
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section id="how-it-works" class="py-20 sm:py-28 bg-white">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl sm:text-4xl font-bold text-center text-gray-900">How It Works</h2>
+      <p class="mt-4 text-lg text-gray-500 text-center max-w-2xl mx-auto">Three steps to never forget what matters where.</p>
+      <div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
+        <!-- Step 1: Record -->
+        <div class="flex flex-col items-center">
+          <div class="w-16 h-16 rounded-2xl bg-brand-100 text-brand-600 flex items-center justify-center text-2xl font-bold">1</div>
+          <h3 class="mt-6 text-xl font-semibold text-gray-900">Record</h3>
+          <p class="mt-3 text-gray-500 leading-relaxed">
+            Tap and speak. Loci captures your voice note and pins it to your exact GPS location.
+          </p>
+        </div>
+        <!-- Step 2: Walk Away -->
+        <div class="flex flex-col items-center">
+          <div class="w-16 h-16 rounded-2xl bg-brand-100 text-brand-600 flex items-center justify-center text-2xl font-bold">2</div>
+          <h3 class="mt-6 text-xl font-semibold text-gray-900">Walk Away</h3>
+          <p class="mt-3 text-gray-500 leading-relaxed">
+            Go about your life. Your notes live on the map, organized by place and category.
+          </p>
+        </div>
+        <!-- Step 3: Get Notified -->
+        <div class="flex flex-col items-center">
+          <div class="w-16 h-16 rounded-2xl bg-brand-100 text-brand-600 flex items-center justify-center text-2xl font-bold">3</div>
+          <h3 class="mt-6 text-xl font-semibold text-gray-900">Get Notified</h3>
+          <p class="mt-3 text-gray-500 leading-relaxed">
+            Return to that spot and Loci nudges you with your note. The right memory, at the right place.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section id="features" class="py-20 sm:py-28 bg-gray-50">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl sm:text-4xl font-bold text-center text-gray-900">Everything You Need</h2>
+      <p class="mt-4 text-lg text-gray-500 text-center max-w-2xl mx-auto">Powerful features that keep your memories where they belong.</p>
+      <div class="mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Voice Recording -->
+        <div class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+          <div class="w-12 h-12 rounded-xl bg-red-100 text-red-600 flex items-center justify-center">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" />
+            </svg>
+          </div>
+          <h3 class="mt-5 text-lg font-semibold text-gray-900">Voice Recording</h3>
+          <p class="mt-2 text-gray-500 leading-relaxed">Tap once to record. Your voice is automatically transcribed on-device for instant search.</p>
+        </div>
+        <!-- Proximity Triggers -->
+        <div class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+          <div class="w-12 h-12 rounded-xl bg-brand-100 text-brand-600 flex items-center justify-center">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+            </svg>
+          </div>
+          <h3 class="mt-5 text-lg font-semibold text-gray-900">Proximity Triggers</h3>
+          <p class="mt-2 text-gray-500 leading-relaxed">Notes find you. Get a gentle notification when you return to a place where you left a memory.</p>
+        </div>
+        <!-- Family Sharing -->
+        <div class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+          <div class="w-12 h-12 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+            </svg>
+          </div>
+          <h3 class="mt-5 text-lg font-semibold text-gray-900">Family Sharing</h3>
+          <p class="mt-2 text-gray-500 leading-relaxed">Share notes with your household. Leave a voice note at the grocery store for your partner.</p>
+        </div>
+        <!-- AI Categories -->
+        <div class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+          <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
+            </svg>
+          </div>
+          <h3 class="mt-5 text-lg font-semibold text-gray-900">AI Categories</h3>
+          <p class="mt-2 text-gray-500 leading-relaxed">Notes are auto-categorized by AI so you can filter by errands, ideas, reminders, and more.</p>
+        </div>
+        <!-- Map View -->
+        <div class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+          <div class="w-12 h-12 rounded-xl bg-green-100 text-green-600 flex items-center justify-center">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z" />
+            </svg>
+          </div>
+          <h3 class="mt-5 text-lg font-semibold text-gray-900">Map View</h3>
+          <p class="mt-2 text-gray-500 leading-relaxed">See all your notes on a beautiful map. Explore your memories by location, not by date.</p>
+        </div>
+        <!-- Privacy-First -->
+        <div class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+          <div class="w-12 h-12 rounded-xl bg-teal-100 text-teal-600 flex items-center justify-center">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+            </svg>
+          </div>
+          <h3 class="mt-5 text-lg font-semibold text-gray-900">Privacy-First</h3>
+          <p class="mt-2 text-gray-500 leading-relaxed">Transcription happens on your device. Your data is encrypted and never shared publicly.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section id="pricing" class="py-20 sm:py-28 bg-white">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl sm:text-4xl font-bold text-center text-gray-900">Simple Pricing</h2>
+      <p class="mt-4 text-lg text-gray-500 text-center max-w-2xl mx-auto">Start free. Upgrade when you need more.</p>
+      <div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+        <!-- Free -->
+        <div class="rounded-2xl border border-gray-200 p-8">
+          <h3 class="text-lg font-semibold text-gray-900">Free</h3>
+          <div class="mt-4">
+            <span class="text-4xl font-bold text-gray-900">$0</span>
+            <span class="text-gray-500">/month</span>
+          </div>
+          <p class="mt-4 text-sm text-gray-500">Get started with the basics.</p>
+          <ul class="mt-8 space-y-3 text-sm text-gray-600">
+            <li class="flex items-start gap-3">
+              <svg class="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+              Up to 10 loci
+            </li>
+            <li class="flex items-start gap-3">
+              <svg class="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+              Voice recording &amp; transcription
+            </li>
+            <li class="flex items-start gap-3">
+              <svg class="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+              Proximity notifications
+            </li>
+            <li class="flex items-start gap-3">
+              <svg class="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+              Map view
+            </li>
+            <li class="flex items-start gap-3">
+              <svg class="w-5 h-5 text-gray-300 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+              <span class="text-gray-400">Cloud sync</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <svg class="w-5 h-5 text-gray-300 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+              <span class="text-gray-400">Family sharing</span>
+            </li>
+          </ul>
+          <a href="https://apps.apple.com/app/loci" class="mt-8 block w-full text-center py-3 rounded-xl border border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 transition-colors">
+            Get Started
+          </a>
+        </div>
+        <!-- Premium -->
+        <div class="rounded-2xl border-2 border-brand-600 p-8 relative shadow-lg">
+          <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand-600 text-white text-xs font-bold px-3 py-1 rounded-full">Most Popular</div>
+          <h3 class="text-lg font-semibold text-gray-900">Premium</h3>
+          <div class="mt-4">
+            <span class="text-4xl font-bold text-gray-900">$3.99</span>
+            <span class="text-gray-500">/month</span>
+          </div>
+          <p class="mt-4 text-sm text-gray-500">Unlimited loci with smart features.</p>
+          <ul class="mt-8 space-y-3 text-sm text-gray-600">
+            <li class="flex items-start gap-3">
+              <svg class="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+              <strong>Unlimited</strong> loci
+            </li>
+            <li class="flex items-start gap-3">
+              <svg class="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+              AI auto-categorization
+            </li>
+            <li class="flex items-start gap-3">
+              <svg class="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+              Cloud sync across devices
+            </li>
+            <li class="flex items-start gap-3">
+              <svg class="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+              Home screen widget
+            </li>
+            <li class="flex items-start gap-3">
+              <svg class="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+              Full-text search
+            </li>
+            <li class="flex items-start gap-3">
+              <svg class="w-5 h-5 text-gray-300 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+              <span class="text-gray-400">Family sharing</span>
+            </li>
+          </ul>
+          <a href="https://apps.apple.com/app/loci" class="mt-8 block w-full text-center py-3 rounded-xl bg-brand-600 text-white font-semibold hover:bg-brand-700 transition-colors">
+            Start 7-Day Free Trial
+          </a>
+        </div>
+        <!-- Family -->
+        <div class="rounded-2xl border border-gray-200 p-8">
+          <h3 class="text-lg font-semibold text-gray-900">Family</h3>
+          <div class="mt-4">
+            <span class="text-4xl font-bold text-gray-900">$5.99</span>
+            <span class="text-gray-500">/month</span>
+          </div>
+          <p class="mt-4 text-sm text-gray-500">Share with up to 6 family members.</p>
+          <ul class="mt-8 space-y-3 text-sm text-gray-600">
+            <li class="flex items-start gap-3">
+              <svg class="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+              Everything in Premium
+            </li>
+            <li class="flex items-start gap-3">
+              <svg class="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+              Household sharing (up to 6)
+            </li>
+            <li class="flex items-start gap-3">
+              <svg class="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+              Shared family loci
+            </li>
+            <li class="flex items-start gap-3">
+              <svg class="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+              Creator attribution on notes
+            </li>
+            <li class="flex items-start gap-3">
+              <svg class="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+              Invite-only household groups
+            </li>
+          </ul>
+          <a href="https://apps.apple.com/app/loci" class="mt-8 block w-full text-center py-3 rounded-xl border border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 transition-colors">
+            Start Family Trial
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Social Proof / Testimonials -->
+  <section class="py-20 sm:py-28 bg-gray-50">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl sm:text-4xl font-bold text-center text-gray-900">What People Are Saying</h2>
+      <p class="mt-4 text-lg text-gray-500 text-center max-w-2xl mx-auto">Early users love the magic of location-triggered memories.</p>
+      <div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+          <div class="flex items-center gap-1 text-amber-400">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+          </div>
+          <p class="mt-4 text-gray-600 leading-relaxed">"I leave voice notes at the grocery store and they pop up next time I'm there. It's like having a second brain for errands."</p>
+          <div class="mt-6 flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center font-semibold text-sm">SR</div>
+            <div>
+              <div class="text-sm font-semibold text-gray-900">Sarah R.</div>
+              <div class="text-xs text-gray-400">Beta tester</div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+          <div class="flex items-center gap-1 text-amber-400">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+          </div>
+          <p class="mt-4 text-gray-600 leading-relaxed">"The family sharing is a game-changer. My wife leaves notes at places and I get them when I arrive. No more forgotten pickups!"</p>
+          <div class="mt-6 flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center font-semibold text-sm">MK</div>
+            <div>
+              <div class="text-sm font-semibold text-gray-900">Marcus K.</div>
+              <div class="text-xs text-gray-400">Beta tester</div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+          <div class="flex items-center gap-1 text-amber-400">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+          </div>
+          <p class="mt-4 text-gray-600 leading-relaxed">"I use it for work ideas. Walking through the office, I record thoughts and they come back when I'm in the same meeting room."</p>
+          <div class="mt-6 flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-green-100 text-green-600 flex items-center justify-center font-semibold text-sm">JL</div>
+            <div>
+              <div class="text-sm font-semibold text-gray-900">Jamie L.</div>
+              <div class="text-xs text-gray-400">Beta tester</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Final CTA -->
+  <section class="py-20 sm:py-28 bg-brand-600">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="text-3xl sm:text-4xl font-bold text-white">Ready to Remember Better?</h2>
+      <p class="mt-4 text-lg text-brand-100 max-w-2xl mx-auto">Download Loci and start pinning voice notes to the places that matter.</p>
+      <a
+        href="https://apps.apple.com/app/loci"
+        class="mt-8 inline-flex items-center gap-3 bg-white text-brand-600 px-6 py-3 rounded-xl font-semibold hover:bg-brand-50 transition-colors"
+        aria-label="Download on the App Store"
+      >
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 22 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.09 22C7.79 22.05 6.8 20.68 5.96 19.47C4.25 16.56 2.93 11.3 4.69 7.95C5.56 6.29 7.29 5.22 9.17 5.2C10.45 5.18 11.67 6.08 12.45 6.08C13.23 6.08 14.72 4.99 16.26 5.15C16.88 5.18 18.75 5.42 19.95 7.17C19.86 7.23 17.58 8.57 17.6 11.3C17.63 14.56 20.47 15.63 20.5 15.64C20.47 15.71 20.03 17.24 18.71 19.5ZM13 3.5C13.73 2.67 14.94 2.04 15.94 2C16.07 3.17 15.6 4.35 14.9 5.19C14.21 6.04 13.07 6.7 11.95 6.61C11.8 5.46 12.36 4.26 13 3.5Z" />
+        </svg>
+        Download on the App Store
+      </a>
+    </div>
   </section>
 </BaseLayout>
