@@ -183,6 +183,7 @@ private struct FilterChip: View {
                     .fill(isSelected ? selectedColor : Theme.surface)
             )
             .foregroundStyle(isSelected ? .white : Theme.textPrimary)
+            .animation(.easeInOut(duration: 0.2), value: isSelected)
         }
         .buttonStyle(.plain)
         .accessibilityLabel("\(label) filter")

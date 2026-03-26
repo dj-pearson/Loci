@@ -58,17 +58,23 @@ struct RecordButton: View {
                     .fill(isRecording ? Theme.error : Theme.primary)
                     .frame(width: buttonSize, height: buttonSize)
                     .shadow(color: (isRecording ? Theme.error : Theme.primary).opacity(0.4), radius: 8, y: 4)
+                    .animation(reduceMotion ? nil : .easeInOut(duration: 0.25), value: isRecording)
 
-                // Icon
-                if isRecording {
-                    RoundedRectangle(cornerRadius: 4)
-                        .fill(.white)
-                        .frame(width: 24, height: 24)
-                } else {
+                // Icon with smooth state transition
+                ZStack {
                     Image(systemName: "mic.fill")
                         .font(.system(size: 30, weight: .medium))
                         .foregroundStyle(.white)
+                        .opacity(isRecording ? 0 : 1)
+                        .scaleEffect(isRecording ? 0.5 : 1)
+
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(.white)
+                        .frame(width: 24, height: 24)
+                        .opacity(isRecording ? 1 : 0)
+                        .scaleEffect(isRecording ? 1 : 0.5)
                 }
+                .animation(reduceMotion ? nil : .spring(response: 0.35, dampingFraction: 0.7), value: isRecording)
             }
         }
         .buttonStyle(.plain)

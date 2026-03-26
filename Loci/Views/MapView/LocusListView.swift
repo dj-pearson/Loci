@@ -39,6 +39,9 @@ struct LocusListView: View {
     @State private var showUndoSnackbar = false
     @State private var locusToEdit: Locus?
     @State private var paginatedQuery = PaginatedLocusQuery()
+    @State private var appearedItems: Set<UUID> = []
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private var hasHousehold: Bool {
         !householdMembers.isEmpty
@@ -101,7 +104,7 @@ struct LocusListView: View {
         List {
             ForEach(sections, id: \.title) { section in
                 Section {
-                    ForEach(section.loci) { locus in
+                    ForEach(Array(section.loci.enumerated()), id: \.element.id) { index, locus in
                         Button {
                             navigationRouter.selectedLocusId = locus.id
                         } label: {
@@ -111,6 +114,14 @@ struct LocusListView: View {
                             )
                         }
                         .buttonStyle(.plain)
+                        .opacity(appearedItems.contains(locus.id) || reduceMotion ? 1 : 0)
+                        .offset(y: appearedItems.contains(locus.id) || reduceMotion ? 0 : 10)
+                        .onAppear {
+                            guard !reduceMotion, !appearedItems.contains(locus.id) else { return }
+                            withAnimation(.easeOut(duration: 0.3).delay(Double(index) * 0.05)) {
+                                appearedItems.insert(locus.id)
+                            }
+                        }
                         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                             Button(role: .destructive) {
                                 locusToDelete = locus

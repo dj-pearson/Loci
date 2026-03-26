@@ -113,6 +113,7 @@ struct RecordingView: View {
                     }
                 )
                 .interactiveDismissDisabled()
+                .presentationDetents([.medium, .large])
             }
         }
         .onChange(of: viewModel.didSaveLocus) { _, saved in

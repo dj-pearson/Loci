@@ -1765,8 +1765,8 @@
         "Typecheck passes"
       ],
       "priority": 106,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Added presentationDetents to PostRecordingSheet, smooth scale+opacity on RecordButton icons, animated FilterChip color fills, staggered fade-in on list items."
     },
     {
       "id": "US-107",
