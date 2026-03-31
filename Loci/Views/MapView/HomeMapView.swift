@@ -9,8 +9,10 @@ struct HomeMapView: View {
     private var allLoci: [Locus]
 
     @Query private var householdMembers: [HouseholdMember]
+    @Query private var households: [Household]
 
     @Environment(\.modelContext) private var modelContext
+    @Environment(LocationService.self) private var locationService
 
     @Bindable var viewModel: HomeMapViewModel
     let navigationRouter: NavigationRouter
@@ -25,11 +27,16 @@ struct HomeMapView: View {
     @State private var archivedLocus: Locus?
     @State private var showUndoSnackbar = false
     @State private var locusToEdit: Locus?
+    @State private var recordViewModel: RecordViewModel?
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private var hasHousehold: Bool {
         !householdMembers.isEmpty
+    }
+
+    private var currentHousehold: Household? {
+        households.first
     }
 
     var body: some View {
@@ -154,9 +161,32 @@ struct HomeMapView: View {
             navigationRouter.consumePendingDeepLink()
             centerOnUserIfNeeded()
         }
-        .sheet(isPresented: $showRecordingView) {
-            // Placeholder — RecordingView will be wired here
-            Text(String(localized: "Recording View"))
+        .sheet(isPresented: $showRecordingView, onDismiss: {
+            recordViewModel = nil
+        }) {
+            if let vm = recordViewModel {
+                RecordingView(
+                    viewModel: vm,
+                    geocodingService: ReverseGeocodingService(),
+                    householdName: currentHousehold?.name,
+                    householdId: currentHousehold?.id,
+                    onDismiss: {
+                        showRecordingView = false
+                    }
+                )
+                .onAppear {
+                    vm.modelContext = modelContext
+                }
+            }
+        }
+        .onChange(of: showRecordingView) { _, show in
+            if show {
+                recordViewModel = RecordViewModel(
+                    locationService: locationService,
+                    audioService: AudioService(),
+                    transcriptionService: TranscriptionService()
+                )
+            }
         }
         .sheet(item: $locusToEdit) { locus in
             let editViewModel = LocusDetailViewModel(locus: locus)

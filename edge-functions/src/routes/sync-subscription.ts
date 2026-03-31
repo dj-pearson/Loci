@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import { getSupabaseAdmin } from '../middleware/auth.js';
-import { createHmac } from 'node:crypto';
+import { createHmac, timingSafeEqual } from 'node:crypto';
 
 const syncSubscription = new Hono();
 
@@ -27,13 +27,16 @@ const HANDLED_EVENTS = [
 function verifySignature(body: string, signature: string | undefined): boolean {
   const secret = process.env.REVENUECAT_WEBHOOK_SECRET;
   if (!secret) {
-    console.warn('[webhook] REVENUECAT_WEBHOOK_SECRET not set, skipping signature validation');
-    return true;
+    console.error('[webhook] REVENUECAT_WEBHOOK_SECRET not set, rejecting webhook');
+    return false;
   }
   if (!signature) return false;
 
   const expected = createHmac('sha256', secret).update(body).digest('hex');
-  return signature === expected;
+
+  // Use timing-safe comparison to prevent timing attacks
+  if (expected.length !== signature.length) return false;
+  return timingSafeEqual(Buffer.from(expected, 'hex'), Buffer.from(signature, 'hex'));
 }
 
 function mapEntitlementsToTier(entitlementIds: string[] | undefined): string {

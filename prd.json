@@ -2005,6 +2005,351 @@
       "priority": 120,
       "passes": true,
       "notes": "Full docker-compose.yml in backend/ with: postgres (PostGIS 15), auth (GoTrue), rest (PostgREST), storage, realtime, kong (API gateway), edge-functions (Node.js/Hono from ../edge-functions). All services on 'supabase' Docker network. Persistent volumes for postgres and storage. Health checks on all services. Kong declarative config (kong.yml) for routing. Comprehensive .env.example documenting all variables."
+    },
+    {
+      "id": "US-121",
+      "title": "Configure production API credentials and certificate pinning",
+      "description": "As a developer, I need all placeholder API keys and credentials replaced with production values so the app can connect to real services.",
+      "acceptanceCriteria": [
+        "RevenueCatConfiguration.swift uses actual RevenueCat API keys (debug and production) instead of placeholder strings",
+        "SupabaseClient.swift production URL points to actual Contabo-hosted Supabase instance",
+        "SupabaseClient.swift production anon key is the real Supabase anon key",
+        "CertificatePinningDelegate.swift primary pin hash is extracted from actual production server certificate using openssl command documented in comments",
+        "Backup pin hash (Let's Encrypt ISRG Root X1) remains as secondary",
+        "All keys are verified by successful API call in both debug and release builds",
+        "No placeholder strings remain in production code paths",
+        "Typecheck passes"
+      ],
+      "priority": 121,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-122",
+      "title": "Restrict CORS origins in Kong API gateway",
+      "description": "As a security engineer, I need CORS restricted to known client origins so that unauthorized websites cannot make API requests to our backend.",
+      "acceptanceCriteria": [
+        "Kong CORS plugin in kong.yml has explicit origins whitelist",
+        "Allowed origins include only the marketing site domain and any web admin domains",
+        "CORS preflight requests return correct Access-Control-Allow-Origin for whitelisted origins",
+        "Requests from non-whitelisted origins are rejected or return no CORS headers",
+        "iOS app requests are unaffected (native apps don't send Origin headers)",
+        "Docker compose services restart cleanly with updated kong.yml",
+        "Typecheck passes"
+      ],
+      "priority": 122,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-123",
+      "title": "Add webhook replay protection with timestamp validation",
+      "description": "As a security engineer, I need webhook endpoints to reject replayed requests so attackers cannot re-send captured webhook payloads.",
+      "acceptanceCriteria": [
+        "RevenueCat webhook handler validates event timestamp is within 5-minute tolerance window",
+        "Requests with timestamps older than 5 minutes are rejected with 400 status",
+        "Requests with missing timestamps still process if signature is valid (backwards compat during rollout)",
+        "Rejected replay attempts are logged with event type and age for monitoring",
+        "Unit tests cover: valid timestamp, expired timestamp, missing timestamp, future timestamp",
+        "Typecheck passes"
+      ],
+      "priority": 123,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-124",
+      "title": "Replace in-memory rate limiting with Redis-backed store",
+      "description": "As a developer, I need rate limiting to persist across edge function restarts and work in multi-instance deployments.",
+      "acceptanceCriteria": [
+        "Redis service added to docker-compose.yml on supabase network",
+        "Rate limit middleware uses Redis instead of in-memory Map for counter storage",
+        "Redis key format: ratelimit:{endpoint}:{userKey} with TTL matching window duration",
+        "Fallback to in-memory store if Redis connection fails (graceful degradation)",
+        "Existing rate limit tiers preserved: 60/min default, 5/min invite, 100/min webhook",
+        "Redis health check in docker-compose.yml",
+        "Edge function .env.example includes REDIS_URL variable",
+        "Typecheck passes"
+      ],
+      "priority": 124,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-125",
+      "title": "Wire LocusDetailView into deep-link navigation replacing placeholder",
+      "description": "As a user, I need deep-link navigation (from notifications and URL schemes) to open the full LocusDetailView with audio playback instead of the placeholder LocusDeepLinkView.",
+      "acceptanceCriteria": [
+        "LocusDeepLinkView in LociApp.swift is replaced with the real LocusDetailView",
+        "LocusDetailViewModel is properly instantiated with the resolved Locus",
+        "Audio playback works from deep-linked detail view",
+        "Edit, archive, and delete actions work from deep-linked detail view",
+        "Back navigation returns to the originating tab (map or list)",
+        "ContentUnavailableView still shown if locus ID not found",
+        "Notification tap → detail view flow works end-to-end",
+        "Typecheck passes"
+      ],
+      "priority": 125,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-126",
+      "title": "Add network reachability monitoring and offline sync queue",
+      "description": "As a user, I need the app to queue sync operations when offline and automatically process them when connectivity returns.",
+      "acceptanceCriteria": [
+        "NWPathMonitor-based reachability service tracks current network status",
+        "Loci created offline are queued for sync with SyncStatus.pending",
+        "When connectivity returns, pending loci are automatically uploaded to Supabase",
+        "Audio files are uploaded to Supabase Storage during sync",
+        "Sync conflicts are detected and flagged (SyncStatus.conflicted) for user resolution",
+        "UI shows subtle network status indicator when offline",
+        "Sync progress is observable for UI feedback",
+        "Typecheck passes"
+      ],
+      "priority": 126,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-127",
+      "title": "Implement TelemetryDeck analytics integration",
+      "description": "As a product owner, I need privacy-focused analytics to understand usage patterns without compromising user privacy.",
+      "acceptanceCriteria": [
+        "TelemetryDeck SDK configured in LociApp.init with app ID from environment",
+        "Key events tracked: app_launch, recording_started, recording_completed, locus_viewed, geofence_triggered, subscription_started, subscription_cancelled",
+        "User ID is hashed (not raw) before sending to TelemetryDeck",
+        "Analytics respects iOS App Tracking Transparency (disabled if user opts out)",
+        "No PII (location, audio, transcription) is sent to analytics",
+        "Debug builds log analytics events to console instead of sending",
+        "Typecheck passes"
+      ],
+      "priority": 127,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-128",
+      "title": "Add comprehensive input sanitization for all user-facing text fields",
+      "description": "As a security engineer, I need all user input sanitized before storage and display to prevent injection attacks and data corruption.",
+      "acceptanceCriteria": [
+        "InputSanitizer validates and sanitizes: household names, display names, transcription edits",
+        "Maximum length enforced: household name 50 chars, display name 50 chars, transcription 5000 chars",
+        "Control characters and zero-width characters stripped from all text inputs",
+        "HTML/script tags stripped to prevent XSS if content is ever rendered in web views",
+        "Sanitization applied at the ViewModel layer before save, not just in UI",
+        "Edge functions validate input length and content at API boundary",
+        "Typecheck passes"
+      ],
+      "priority": 128,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-129",
+      "title": "Add Fastlane match signing and GitHub Actions CI/CD pipeline",
+      "description": "As a developer, I need automated build, test, and TestFlight deployment so releases are consistent and reproducible.",
+      "acceptanceCriteria": [
+        "Fastlane Matchfile configured for App Store and development certificates",
+        "Fastlane Fastfile with lanes: test (build + unit tests), beta (TestFlight upload), release (App Store submission)",
+        "GitHub Actions workflow: on push to main, run SwiftLint, build, test",
+        "GitHub Actions workflow: on tag push (v*), run Fastlane beta lane for TestFlight",
+        "Secrets configured in GitHub: MATCH_PASSWORD, APP_STORE_CONNECT_API_KEY, FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD",
+        "Code signing uses match (readonly in CI)",
+        "Build number auto-incremented from GitHub run number",
+        "Typecheck passes"
+      ],
+      "priority": 129,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-130",
+      "title": "Add comprehensive error recovery and retry logic for Supabase operations",
+      "description": "As a user, I need failed network operations to retry gracefully and show clear error messages instead of silently failing.",
+      "acceptanceCriteria": [
+        "Supabase operations (CRUD, auth, storage) have exponential backoff retry (max 3 attempts)",
+        "Network errors show user-friendly toast/banner with retry action",
+        "Auth token refresh failures trigger re-authentication flow instead of silent failure",
+        "Storage upload failures for audio files queue for background retry",
+        "Household operations show specific error messages (expired invite, household full, etc.)",
+        "All retry logic respects cancellation (task cancellation propagates)",
+        "Typecheck passes"
+      ],
+      "priority": 130,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-131",
+      "title": "Add data export and account deletion compliance (GDPR/App Store requirement)",
+      "description": "As a user, I need to export my data and delete my account to comply with privacy regulations and App Store requirements.",
+      "acceptanceCriteria": [
+        "Settings > Privacy section includes 'Export My Data' button",
+        "Data export generates a ZIP containing: all loci as JSON, all audio files as M4A, user profile",
+        "Export shared via iOS share sheet (AirDrop, Files, etc.)",
+        "Settings > Privacy section includes 'Delete Account' with confirmation dialog",
+        "Account deletion removes: Supabase auth user, all loci (server + local), all audio files (server + local), user profile, household memberships",
+        "Account deletion is irreversible with clear warning",
+        "Edge function endpoint for server-side data deletion cascade",
+        "Typecheck passes"
+      ],
+      "priority": 131,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-132",
+      "title": "Add notification permission re-prompt and settings deep link",
+      "description": "As a user who denied notification permissions, I need a way to understand why notifications matter and easily enable them from Settings.",
+      "acceptanceCriteria": [
+        "If notifications are denied, Settings shows 'Notifications Disabled' banner with explanation",
+        "Banner includes 'Open Settings' button that deep links to app's iOS notification settings",
+        "Geofence entry screen shows subtle prompt explaining notifications enable proximity alerts",
+        "Permission state is checked on each app foreground (in case user changed in Settings)",
+        "No aggressive re-prompting — just informational banners in relevant contexts",
+        "Typecheck passes"
+      ],
+      "priority": 132,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-133",
+      "title": "Add quiet hours edge cases and notification scheduling",
+      "description": "As a user, I need quiet hours to properly suppress geofence notifications during configured times, including edge cases.",
+      "acceptanceCriteria": [
+        "Quiet hours settings in NotificationService respect timezone changes",
+        "Notifications suppressed during quiet hours are queued and delivered when quiet hours end (not lost)",
+        "If user enters a geofenced area during quiet hours and leaves before quiet hours end, no notification fires",
+        "Quiet hours toggle in Settings shows current active/inactive status",
+        "Quiet hours support Do Not Disturb integration (respect system DND separately from app quiet hours)",
+        "Typecheck passes"
+      ],
+      "priority": 133,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-134",
+      "title": "Add search functionality to list view with debounced filtering",
+      "description": "As a user, I need to search through my voice notes by transcription text, location name, or category to quickly find specific notes.",
+      "acceptanceCriteria": [
+        "Search bar at top of LocusListView with debounced input (300ms)",
+        "Searches transcription, locationName, and category display name",
+        "Search is local/offline-first using SwiftData predicates",
+        "Premium users get enhanced search through SearchService (already built)",
+        "Empty search results show helpful empty state ('No notes match your search')",
+        "Search preserves current sort order and category filters",
+        "Free users see upgrade prompt when trying to use search",
+        "Typecheck passes"
+      ],
+      "priority": 134,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-135",
+      "title": "Add pull-to-refresh and background sync trigger",
+      "description": "As a premium user, I need to manually trigger sync and see sync status to ensure my data is up to date across devices.",
+      "acceptanceCriteria": [
+        "Pull-to-refresh on list view triggers SyncService for premium users",
+        "Pull-to-refresh on map view re-centers and refreshes annotations",
+        "Sync status indicator in navigation bar (spinning icon during sync, checkmark on success, warning on failure)",
+        "Last sync timestamp shown in Settings",
+        "Background app refresh triggers sync periodically (BGAppRefreshTask)",
+        "Free users see pull-to-refresh for local data refresh only (no sync badge)",
+        "Typecheck passes"
+      ],
+      "priority": 135,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-136",
+      "title": "Add map style selection and user location centering controls",
+      "description": "As a user, I need map customization options and easy re-centering to improve map navigation experience.",
+      "acceptanceCriteria": [
+        "Map style picker: Standard, Satellite, Hybrid (persisted in UserDefaults via SettingsViewModel)",
+        "Re-center button on map view that animates camera to current user location",
+        "Map remembers last viewed region between app launches (persisted in UserDefaults)",
+        "Long-press on map shows coordinate and offers to create a locus at that location",
+        "Map controls (compass, scale) properly positioned to not overlap record button",
+        "Typecheck passes"
+      ],
+      "priority": 136,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-137",
+      "title": "Add onboarding completion tracking and skip-to-app flow",
+      "description": "As a user, I need to complete onboarding only once, and be able to skip non-essential steps to get to the app quickly.",
+      "acceptanceCriteria": [
+        "Onboarding completion state persisted in UserDefaults",
+        "App shows onboarding only on first launch (not after updates)",
+        "Each permission step has a 'Skip' option that doesn't block progress",
+        "Skipped permissions show subtle in-context prompts later (e.g., 'Enable location for proximity alerts')",
+        "Onboarding can be re-accessed from Settings for users who want to grant previously skipped permissions",
+        "Progress dots or step indicator shows current position in onboarding flow",
+        "Typecheck passes"
+      ],
+      "priority": 137,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-138",
+      "title": "Add audio recording size limit and storage management alerts",
+      "description": "As a user, I need to know when my device storage is getting full and have controls to manage audio file storage.",
+      "acceptanceCriteria": [
+        "Maximum single recording duration: 5 minutes (configurable in AppConstants)",
+        "Recording auto-stops at max duration with save prompt",
+        "Settings shows total audio storage used (already partially implemented in SettingsViewModel)",
+        "Warning alert when device free space drops below 100MB",
+        "Bulk delete option for archived loci audio files in Settings",
+        "Audio file cleanup removes orphaned files not referenced by any Locus (already implemented in AudioCacheManager - verify it runs)",
+        "Typecheck passes"
+      ],
+      "priority": 138,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-139",
+      "title": "Add VoiceOver and accessibility audit pass",
+      "description": "As a user with accessibility needs, I need the entire app to work correctly with VoiceOver, Dynamic Type, and other assistive technologies.",
+      "acceptanceCriteria": [
+        "Every interactive element has accessibilityLabel and accessibilityHint",
+        "Custom views (CategoryPinView, AudioWaveformView, RecordButton) have semantic accessibility traits",
+        "Recording state changes announced via UIAccessibility.post(notification:)",
+        "Map annotations announce category, location name, and distance when focused",
+        "All images have accessibilityLabel (decorative images hidden from VoiceOver)",
+        "Tab bar items have proper accessibility labels (partially done, verify complete)",
+        "Dynamic Type supported up to AX5 without layout breakage",
+        "Typecheck passes"
+      ],
+      "priority": 139,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-140",
+      "title": "Add Supabase Edge Function health check and monitoring endpoint",
+      "description": "As a developer, I need health check endpoints to monitor backend service status and detect issues proactively.",
+      "acceptanceCriteria": [
+        "GET /api/health returns 200 with JSON: { status, version, uptime, services: { database, storage, auth } }",
+        "Database health checked via simple SELECT 1 query",
+        "Storage health checked via bucket existence verification",
+        "Auth health checked via Supabase auth admin endpoint",
+        "Health endpoint does NOT require authentication",
+        "Health endpoint is rate-limited to 10 req/min per IP",
+        "Response includes edge function version and Node.js version for debugging",
+        "Typecheck passes"
+      ],
+      "priority": 140,
+      "passes": false,
+      "notes": ""
     }
   ]
 }
