@@ -2367,8 +2367,8 @@
         "Typecheck passes"
       ],
       "priority": 141,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "PaywallView now uses Package.localizedPriceString for all pricing (monthly, yearly, lifetime). Yearly savings percentage calculated dynamically from package prices. Monthly equivalent from yearly computed with locale-aware NumberFormatter. Trial badge text sourced from introductoryDiscount metadata. Hardcoded prices retained as fallback when packages unavailable (offline graceful degradation)."
     },
     {
       "id": "US-142",
