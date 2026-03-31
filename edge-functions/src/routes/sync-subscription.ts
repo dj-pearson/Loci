@@ -4,11 +4,15 @@ import { createHmac, timingSafeEqual } from 'node:crypto';
 
 const syncSubscription = new Hono();
 
+/** Maximum age (in ms) for webhook events — reject replays older than this. */
+const WEBHOOK_MAX_AGE_MS = 5 * 60 * 1000; // 5 minutes
+
 interface RevenueCatEvent {
   type: string;
   app_user_id: string;
   entitlement_ids?: string[];
   expiration_at_ms?: number;
+  event_timestamp_ms?: number;
 }
 
 interface RevenueCatWebhook {
@@ -63,6 +67,23 @@ syncSubscription.post('/', async (c) => {
   }
 
   const { event } = payload;
+
+  // Replay protection: reject events with timestamps older than 5 minutes
+  if (event.event_timestamp_ms != null) {
+    const eventAge = Date.now() - event.event_timestamp_ms;
+    if (eventAge > WEBHOOK_MAX_AGE_MS) {
+      console.warn(
+        `[webhook] Rejecting stale event: type=${event.type} age=${Math.round(eventAge / 1000)}s`,
+      );
+      return c.json({ error: 'Webhook event too old (possible replay)' }, 400);
+    }
+    if (eventAge < -WEBHOOK_MAX_AGE_MS) {
+      console.warn(
+        `[webhook] Rejecting future-dated event: type=${event.type} drift=${Math.round(-eventAge / 1000)}s`,
+      );
+      return c.json({ error: 'Webhook event timestamp in the future' }, 400);
+    }
+  }
 
   if (!HANDLED_EVENTS.includes(event.type)) {
     // Acknowledge but don't process unhandled event types
