@@ -2283,9 +2283,10 @@
     },
     {
       "id": "US-137",
-      "title": "Add onboarding completion tracking and skip-to-app flow",
-      "description": "As a user, I need to complete onboarding only once, and be able to skip non-essential steps to get to the app quickly.",
+      "title": "Wire onboarding gate into ContentView and add completion tracking",
+      "description": "As a user, I need to complete onboarding only once on first launch, and be able to skip non-essential steps to get to the app quickly.",
       "acceptanceCriteria": [
+        "ContentView checks OnboardingViewModel.hasCompletedOnboarding and shows onboarding flow instead of TabView when false",
         "Onboarding completion state persisted in UserDefaults",
         "App shows onboarding only on first launch (not after updates)",
         "Each permission step has a 'Skip' option that doesn't block progress",
@@ -2348,6 +2349,42 @@
         "Typecheck passes"
       ],
       "priority": 140,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-141",
+      "title": "Fetch paywall prices from RevenueCat instead of hardcoded values",
+      "description": "As a user, I need to see actual subscription prices from the App Store so pricing is accurate and region-appropriate.",
+      "acceptanceCriteria": [
+        "PaywallView fetches current offerings from RevenueCat SDK on appear",
+        "Monthly, yearly, and lifetime prices displayed from RevenueCat packages (not hardcoded)",
+        "Prices shown in user's local currency with proper formatting",
+        "Loading state shown while fetching offerings",
+        "Fallback to hardcoded prices if RevenueCat fetch fails (graceful degradation)",
+        "Yearly savings percentage calculated dynamically from actual prices",
+        "Trial period badge text sourced from RevenueCat package metadata",
+        "Typecheck passes"
+      ],
+      "priority": 141,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-142",
+      "title": "Wire re-record functionality in EditLocusSheet",
+      "description": "As a user, I need to re-record audio for an existing locus so I can update a voice note without creating a new one.",
+      "acceptanceCriteria": [
+        "EditLocusSheet 're-record' button opens RecordingView in replace mode",
+        "New recording replaces old audio file (old file deleted after save)",
+        "Transcription is updated with new recording's transcription",
+        "Original location, category, and sharing settings preserved",
+        "User can cancel re-record to keep original audio",
+        "Audio encryption applied to new recording before save",
+        "GeofenceManager notified if location changes",
+        "Typecheck passes"
+      ],
+      "priority": 142,
       "passes": false,
       "notes": ""
     }
