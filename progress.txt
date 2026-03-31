@@ -4,7 +4,7 @@
 ## Started: 2026-03-25
 ## Status: IN PROGRESS
 ## Total Stories: 142
-## Completed: 123/142
+## Completed: 124/142
 
 ---
 
@@ -220,7 +220,7 @@ Loci is a voice-first iOS app (SwiftUI, iOS 17+) that pins voice notes to GPS co
 - [ ] US-134: Add search functionality to list view with debounced filtering
 - [ ] US-135: Add pull-to-refresh and background sync trigger
 - [ ] US-136: Add map style selection and user location centering controls
-- [ ] US-137: Wire onboarding gate into ContentView and add completion tracking
+- [x] US-137: Wire onboarding gate into ContentView and add completion tracking
 - [ ] US-138: Add audio recording size limit and storage management alerts
 - [ ] US-139: Add VoiceOver and accessibility audit pass
 - [ ] US-140: Add Supabase Edge Function health check and monitoring endpoint

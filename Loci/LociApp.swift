@@ -60,6 +60,7 @@ struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(NavigationRouter.self) private var navigationRouter
     @Environment(LocationService.self) private var locationService
+    @Environment(NotificationService.self) private var notificationService
     @Environment(BiometricLockService.self) private var biometricService
     @Query(filter: #Predicate<Locus> { !$0.isArchived }) private var loci: [Locus]
     @Query private var householdMembers: [HouseholdMember]
@@ -69,11 +70,24 @@ struct ContentView: View {
     @State private var settingsViewModel = SettingsViewModel()
     @State private var householdViewModel = HouseholdViewModel()
     @State private var audioCacheManager = AudioCacheManager()
+    @State private var onboardingViewModel = OnboardingViewModel()
 
     var body: some View {
+        if !onboardingViewModel.hasCompletedOnboarding {
+            OnboardingFlowView(
+                viewModel: onboardingViewModel,
+                locationService: locationService,
+                notificationService: notificationService
+            )
+        } else {
+            mainAppView
+        }
+    }
+
+    private var mainAppView: some View {
         @Bindable var router = navigationRouter
 
-        TabView(selection: $selectedTab) {
+        return TabView(selection: $selectedTab) {
             // Map Tab
             NavigationStack {
                 ZStack(alignment: .top) {

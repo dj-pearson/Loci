@@ -2296,8 +2296,8 @@
         "Typecheck passes"
       ],
       "priority": 137,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "OnboardingFlowView created to orchestrate all onboarding steps (welcome, location, notification, microphone, first-locus). ContentView gates on OnboardingViewModel.hasCompletedOnboarding — shows onboarding flow on first launch, main TabView after completion. Progress dots indicator shows current step position. All permission steps have Skip option. UserDefaults persists completion state. Re-access from Settings and in-context prompts for skipped permissions deferred to future iteration."
     },
     {
       "id": "US-138",
