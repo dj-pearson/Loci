@@ -26,6 +26,27 @@ services:
           - /rest/v1/
     plugins:
       - name: cors
+        config:
+          origins:
+            - https://useloci.com
+            - https://www.useloci.com
+          methods:
+            - GET
+            - POST
+            - PUT
+            - PATCH
+            - DELETE
+            - OPTIONS
+          headers:
+            - Authorization
+            - Content-Type
+            - apikey
+            - X-Client-Info
+          exposed_headers:
+            - X-Total-Count
+            - Content-Range
+          credentials: true
+          max_age: 3600
       - name: key-auth
         config:
           hide_credentials: true
@@ -46,6 +67,24 @@ services:
           - /auth/v1/
     plugins:
       - name: cors
+        config:
+          origins:
+            - https://useloci.com
+            - https://www.useloci.com
+          methods:
+            - GET
+            - POST
+            - PUT
+            - PATCH
+            - DELETE
+            - OPTIONS
+          headers:
+            - Authorization
+            - Content-Type
+            - apikey
+            - X-Client-Info
+          credentials: true
+          max_age: 3600
 
   # Storage
   - name: storage-v1
@@ -57,6 +96,27 @@ services:
           - /storage/v1/
     plugins:
       - name: cors
+        config:
+          origins:
+            - https://useloci.com
+            - https://www.useloci.com
+          methods:
+            - GET
+            - POST
+            - PUT
+            - DELETE
+            - OPTIONS
+          headers:
+            - Authorization
+            - Content-Type
+            - apikey
+            - X-Client-Info
+            - Range
+          exposed_headers:
+            - Content-Range
+            - Content-Length
+          credentials: true
+          max_age: 3600
 
   # Realtime
   - name: realtime-v1
@@ -68,6 +128,20 @@ services:
           - /realtime/v1/
     plugins:
       - name: cors
+        config:
+          origins:
+            - https://useloci.com
+            - https://www.useloci.com
+          methods:
+            - GET
+            - OPTIONS
+          headers:
+            - Authorization
+            - Content-Type
+            - apikey
+            - X-Client-Info
+          credentials: true
+          max_age: 3600
 
   # Edge Functions
   - name: edge-functions
@@ -79,6 +153,24 @@ services:
           - /functions/v1/
     plugins:
       - name: cors
+        config:
+          origins:
+            - https://useloci.com
+            - https://www.useloci.com
+          methods:
+            - GET
+            - POST
+            - PUT
+            - PATCH
+            - DELETE
+            - OPTIONS
+          headers:
+            - Authorization
+            - Content-Type
+            - apikey
+            - X-Client-Info
+          credentials: true
+          max_age: 3600
       - name: key-auth
         config:
           hide_credentials: true

@@ -2038,8 +2038,8 @@
         "Typecheck passes"
       ],
       "priority": 122,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "All 5 Kong CORS plugins configured with explicit origins whitelist (useloci.com, www.useloci.com). Each service has appropriate methods, headers, exposed_headers, credentials, and max_age. iOS native app unaffected (no Origin header). Storage includes Range header for audio streaming."
     },
     {
       "id": "US-123",
