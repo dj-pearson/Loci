@@ -169,8 +169,7 @@ enum AppTab: Hashable {
     case settings
 }
 
-/// Temporary detail view for deep-linked locus navigation.
-/// Will be replaced by the full LocusDetailView in US-038.
+/// Resolves a locus ID from deep-link/notification into the full LocusDetailView.
 struct LocusDeepLinkView: View {
     let locusId: UUID
 
@@ -183,30 +182,14 @@ struct LocusDeepLinkView: View {
 
     var body: some View {
         if let locus {
-            VStack(spacing: Theme.Spacing.md) {
-                Image(systemName: locus.category.systemImageName)
-                    .font(.system(size: 48))
-                    .foregroundStyle(locus.category.color)
-
-                Text(locus.locationName ?? String(localized: "Unknown Location"))
-                    .font(Theme.Typography.title)
-
-                Text(locus.transcription)
-                    .font(Theme.Typography.body)
-                    .foregroundStyle(Theme.textSecondary)
-                    .padding(.horizontal)
-
-                Text(locus.createdAt, style: .relative)
-                    .font(Theme.Typography.caption)
-                    .foregroundStyle(Theme.textSecondary)
-            }
-            .navigationTitle(locus.category.displayName)
-            .navigationBarTitleDisplayMode(.inline)
+            LocusDetailView(
+                viewModel: LocusDetailViewModel(locus: locus)
+            )
         } else {
             ContentUnavailableView(
                 String(localized: "Locus Not Found"),
                 systemImage: "mappin.slash",
-                description: Text("This note may have been deleted.")
+                description: Text(String(localized: "This note may have been deleted."))
             )
         }
     }

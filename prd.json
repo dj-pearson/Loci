@@ -2090,8 +2090,8 @@
         "Typecheck passes"
       ],
       "priority": 125,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "LocusDeepLinkView now resolves locus ID and shows full LocusDetailView with LocusDetailViewModel. Audio playback, edit/archive/delete toolbar actions, and back navigation all work through the existing LocusDetailView. ContentUnavailableView preserved for missing loci."
     },
     {
       "id": "US-126",
