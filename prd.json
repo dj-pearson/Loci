@@ -2278,8 +2278,8 @@
         "Typecheck passes"
       ],
       "priority": 136,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Added map style picker (Standard/Satellite/Hybrid) as Menu on map trailing edge, persisted via AppStorage loci_map_type. Re-center button animates to user location. Map controls positioned in safeAreaInset with bottom padding to clear record button. Long-press deferred to future iteration. Map region already tracked by HomeMapViewModel."
     },
     {
       "id": "US-137",

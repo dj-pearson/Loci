@@ -28,6 +28,9 @@ struct HomeMapView: View {
     @State private var showUndoSnackbar = false
     @State private var locusToEdit: Locus?
     @State private var recordViewModel: RecordViewModel?
+    @State private var showMapStylePicker = false
+
+    @AppStorage("loci_map_type") private var mapTypeRaw: Int = 0
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -92,10 +95,15 @@ struct HomeMapView: View {
                     .annotationTitles(.hidden)
                 }
             }
-            .mapStyle(colorScheme == .dark ? .standard(elevation: .flat, emphasis: .muted) : .standard)
+            .mapStyle(currentMapStyle)
             .mapControls {
                 MapCompass()
                 MapScaleView()
+            }
+            .safeAreaInset(edge: .trailing) {
+                mapControlButtons
+                    .padding(.trailing, 8)
+                    .padding(.bottom, 100) // Clear record button
             }
             .accessibilityElement(children: .contain)
             .accessibilityLabel(String(localized: "Voice notes map"))
@@ -233,6 +241,80 @@ struct HomeMapView: View {
             }
         } message: { _ in
             Text(String(localized: "This will permanently delete the voice note and its audio recording."))
+        }
+    }
+
+    // MARK: - Map Style
+
+    private var currentMapStyle: MapStyle {
+        switch MKMapType(rawValue: UInt(mapTypeRaw)) ?? .standard {
+        case .satellite, .satelliteFlyover:
+            return .imagery
+        case .hybrid, .hybridFlyover:
+            return .hybrid
+        default:
+            return colorScheme == .dark ? .standard(elevation: .flat, emphasis: .muted) : .standard
+        }
+    }
+
+    private var mapStyleIcon: String {
+        switch MKMapType(rawValue: UInt(mapTypeRaw)) ?? .standard {
+        case .satellite, .satelliteFlyover:
+            return "globe.americas.fill"
+        case .hybrid, .hybridFlyover:
+            return "square.stack.3d.up.fill"
+        default:
+            return "map"
+        }
+    }
+
+    // MARK: - Map Control Buttons
+
+    private var mapControlButtons: some View {
+        VStack(spacing: 8) {
+            // Re-center on user location
+            Button {
+                if reduceMotion {
+                    centerOnUserIfNeeded()
+                } else {
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        centerOnUserIfNeeded()
+                    }
+                }
+            } label: {
+                Image(systemName: "location.fill")
+                    .font(.body)
+                    .frame(width: 36, height: 36)
+                    .background(.ultraThinMaterial, in: Circle())
+            }
+            .accessibilityLabel(String(localized: "Center on current location"))
+
+            // Map style toggle
+            Menu {
+                Button {
+                    mapTypeRaw = Int(MKMapType.standard.rawValue)
+                } label: {
+                    Label(String(localized: "Standard"), systemImage: "map")
+                }
+
+                Button {
+                    mapTypeRaw = Int(MKMapType.satellite.rawValue)
+                } label: {
+                    Label(String(localized: "Satellite"), systemImage: "globe.americas.fill")
+                }
+
+                Button {
+                    mapTypeRaw = Int(MKMapType.hybrid.rawValue)
+                } label: {
+                    Label(String(localized: "Hybrid"), systemImage: "square.stack.3d.up.fill")
+                }
+            } label: {
+                Image(systemName: mapStyleIcon)
+                    .font(.body)
+                    .frame(width: 36, height: 36)
+                    .background(.ultraThinMaterial, in: Circle())
+            }
+            .accessibilityLabel(String(localized: "Map style"))
         }
     }
 
