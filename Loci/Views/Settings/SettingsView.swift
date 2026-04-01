@@ -152,6 +152,17 @@ struct SettingsView: View {
                     ),
                     displayedComponents: .hourAndMinute
                 )
+
+                HStack(spacing: Theme.Spacing.sm) {
+                    Image(systemName: notificationService.isQuietHoursActive ? "moon.fill" : "moon")
+                        .foregroundStyle(notificationService.isQuietHoursActive ? Theme.warning : Theme.textSecondary)
+                        .font(.caption)
+                    Text(notificationService.isQuietHoursActive
+                         ? String(localized: "Quiet hours are active")
+                         : String(localized: "Quiet hours are inactive"))
+                        .font(.caption)
+                        .foregroundStyle(Theme.textSecondary)
+                }
             }
         }
     }

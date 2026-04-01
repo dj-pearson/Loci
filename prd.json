@@ -2227,8 +2227,8 @@
         "Typecheck passes"
       ],
       "priority": 133,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "NotificationService now queues suppressed notifications keyed by locus ID. Queued notifications delivered on foreground via deliverQueuedNotifications(). Queueing by ID means if user enters and leaves during quiet hours, the notification stays queued but won't double-fire. Settings shows active/inactive quiet hours status. Calendar.current already respects timezone. System DND handled natively by iOS notification center."
     },
     {
       "id": "US-134",

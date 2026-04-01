@@ -46,6 +46,7 @@ struct LociApp: App {
                 case .active:
                     biometricService.lockIfNeeded()
                     Task { await notificationService.checkAuthorizationStatus() }
+                    notificationService.deliverQueuedNotifications()
                 case .background:
                     biometricService.recordBackgroundTransition()
                 default:
