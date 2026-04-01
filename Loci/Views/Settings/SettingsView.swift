@@ -1,5 +1,6 @@
 import SwiftData
 import SwiftUI
+import UIKit
 
 struct SettingsView: View {
     @Environment(\.modelContext) private var modelContext
@@ -117,16 +118,23 @@ struct SettingsView: View {
 
     // MARK: - Notifications Section
 
+    @Environment(NotificationService.self) private var notificationService
+
     private var notificationsSection: some View {
         Section(String(localized: "Notifications")) {
+            if notificationService.authorizationStatus == .denied {
+                notificationDeniedBanner
+            }
+
             Toggle(isOn: Binding(
                 get: { viewModel.notificationsEnabled },
                 set: { viewModel.notificationsEnabled = $0 }
             )) {
                 Label(String(localized: "Proximity Alerts"), systemImage: "bell")
             }
+            .disabled(notificationService.authorizationStatus == .denied)
 
-            if viewModel.notificationsEnabled {
+            if viewModel.notificationsEnabled && notificationService.authorizationStatus != .denied {
                 DatePicker(
                     String(localized: "Quiet Hours Start"),
                     selection: Binding(
@@ -146,6 +154,32 @@ struct SettingsView: View {
                 )
             }
         }
+    }
+
+    private var notificationDeniedBanner: some View {
+        VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
+            Label {
+                Text(String(localized: "Notifications Disabled"))
+                    .font(.subheadline.weight(.semibold))
+            } icon: {
+                Image(systemName: "bell.slash.fill")
+                    .foregroundStyle(Theme.warning)
+            }
+
+            Text(String(localized: "Loci uses notifications to alert you when you return to a saved location. Enable notifications to receive proximity alerts."))
+                .font(.caption)
+                .foregroundStyle(Theme.textSecondary)
+
+            Button {
+                if let url = URL(string: UIApplication.openSettingsURLString) {
+                    UIApplication.shared.open(url)
+                }
+            } label: {
+                Text(String(localized: "Open Settings"))
+                    .font(.caption.weight(.medium))
+            }
+        }
+        .padding(.vertical, Theme.Spacing.xs)
     }
 
     // MARK: - Data Section

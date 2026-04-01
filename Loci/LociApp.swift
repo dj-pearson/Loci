@@ -45,6 +45,7 @@ struct LociApp: App {
                 switch newPhase {
                 case .active:
                     biometricService.lockIfNeeded()
+                    Task { await notificationService.checkAuthorizationStatus() }
                 case .background:
                     biometricService.recordBackgroundTransition()
                 default:

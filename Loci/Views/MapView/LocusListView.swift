@@ -42,6 +42,7 @@ struct LocusListView: View {
     @State private var appearedItems: Set<UUID> = []
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(NotificationService.self) private var notificationService
 
     private var hasHousehold: Bool {
         !householdMembers.isEmpty
@@ -100,8 +101,40 @@ struct LocusListView: View {
         return result
     }
 
+    @State private var showNotificationBanner = true
+
     var body: some View {
         List {
+            if notificationService.authorizationStatus == .denied && showNotificationBanner {
+                Section {
+                    HStack(spacing: Theme.Spacing.sm) {
+                        Image(systemName: "bell.slash")
+                            .foregroundStyle(Theme.warning)
+                            .font(.body)
+
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(String(localized: "Proximity alerts are off"))
+                                .font(.subheadline.weight(.medium))
+                            Text(String(localized: "Enable notifications to be reminded when you return to a saved location."))
+                                .font(.caption)
+                                .foregroundStyle(Theme.textSecondary)
+                        }
+
+                        Spacer(minLength: 0)
+
+                        Button {
+                            showNotificationBanner = false
+                        } label: {
+                            Image(systemName: "xmark")
+                                .font(.caption2)
+                                .foregroundStyle(Theme.textSecondary)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    .padding(.vertical, Theme.Spacing.xs)
+                }
+            }
+
             ForEach(sections, id: \.title) { section in
                 Section {
                     ForEach(Array(section.loci.enumerated()), id: \.element.id) { index, locus in

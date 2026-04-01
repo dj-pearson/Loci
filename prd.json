@@ -2211,8 +2211,8 @@
         "Typecheck passes"
       ],
       "priority": 132,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Added notification-denied banner to SettingsView with Open Settings deep link. Added dismissible proximity alerts banner to LocusListView. LociApp scenePhase handler rechecks notification authorization on each foreground. Non-aggressive — informational only."
     },
     {
       "id": "US-133",
