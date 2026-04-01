@@ -2245,8 +2245,8 @@
         "Typecheck passes"
       ],
       "priority": 134,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Added .searchable modifier to LocusListView with 300ms debounce. Searches transcription, locationName, and category displayName. Preserves current sort order and category filters. Empty state uses ContentUnavailableView. Search input sanitized via InputSanitizer. SearchService available for premium enhanced search via dedicated SearchView. Free tier gating deferred to premium tier check."
     },
     {
       "id": "US-135",
