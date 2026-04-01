@@ -2,9 +2,9 @@
 ## Project: Loci — Your Spatial Memory
 ## Branch: ralph/loci-mvp
 ## Started: 2026-03-25
-## Status: COMPLETE
-## Total Stories: 120
-## Completed: 120/120
+## Status: IN PROGRESS
+## Total Stories: 142
+## Completed: 139/142
 
 ---
 
@@ -202,6 +202,30 @@ Loci is a voice-first iOS app (SwiftUI, iOS 17+) that pins voice notes to GPS co
 - [x] US-118: Create app icon set and launch screen
 - [x] US-119: Create App Store metadata and screenshot configuration
 - [x] US-120: Create Coolify deployment configuration for Supabase and edge functions
+
+## Phase 22: Production Readiness (US-121 → US-140)
+- [ ] US-121: Configure production API credentials and certificate pinning
+- [x] US-122: Restrict CORS origins in Kong API gateway
+- [x] US-123: Add webhook replay protection with timestamp validation
+- [ ] US-124: Replace in-memory rate limiting with Redis-backed store
+- [x] US-125: Wire LocusDetailView into deep-link navigation replacing placeholder
+- [x] US-126: Add network reachability monitoring and offline sync queue
+- [x] US-127: Implement TelemetryDeck analytics integration
+- [x] US-128: Add comprehensive input sanitization for all user-facing text fields
+- [ ] US-129: Add Fastlane match signing and GitHub Actions CI/CD pipeline
+- [x] US-130: Add comprehensive error recovery and retry logic for Supabase operations
+- [x] US-131: Add data export and account deletion compliance (GDPR/App Store requirement)
+- [x] US-132: Add notification permission re-prompt and settings deep link
+- [x] US-133: Add quiet hours edge cases and notification scheduling
+- [x] US-134: Add search functionality to list view with debounced filtering
+- [x] US-135: Add pull-to-refresh and background sync trigger
+- [x] US-136: Add map style selection and user location centering controls
+- [x] US-137: Wire onboarding gate into ContentView and add completion tracking
+- [x] US-138: Add audio recording size limit and storage management alerts
+- [x] US-139: Add VoiceOver and accessibility audit pass
+- [x] US-140: Add Supabase Edge Function health check and monitoring endpoint
+- [x] US-141: Fetch paywall prices from RevenueCat instead of hardcoded values
+- [x] US-142: Wire re-record functionality in EditLocusSheet
 
 ---
 

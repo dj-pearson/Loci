@@ -10,6 +10,7 @@ struct LociApp: App {
     @State private var notificationService = NotificationService()
     @State private var locationService = LocationService()
     @State private var biometricService = BiometricLockService()
+    @State private var networkMonitor = NetworkMonitor()
 
     @Environment(\.scenePhase) private var scenePhase
 
@@ -21,6 +22,8 @@ struct LociApp: App {
         }
 
         RevenueCatConfiguration.configure()
+        AnalyticsService.shared.configure()
+        AnalyticsService.shared.trackAppLaunch()
     }
 
     var body: some Scene {
@@ -31,6 +34,7 @@ struct LociApp: App {
                     .environment(notificationService)
                     .environment(locationService)
                     .environment(biometricService)
+                    .environment(networkMonitor)
                     .onOpenURL { url in
                         navigationRouter.handleURL(url)
                     }
@@ -45,6 +49,8 @@ struct LociApp: App {
                 switch newPhase {
                 case .active:
                     biometricService.lockIfNeeded()
+                    Task { await notificationService.checkAuthorizationStatus() }
+                    notificationService.deliverQueuedNotifications()
                 case .background:
                     biometricService.recordBackgroundTransition()
                 default:
@@ -60,6 +66,7 @@ struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(NavigationRouter.self) private var navigationRouter
     @Environment(LocationService.self) private var locationService
+    @Environment(NotificationService.self) private var notificationService
     @Environment(BiometricLockService.self) private var biometricService
     @Query(filter: #Predicate<Locus> { !$0.isArchived }) private var loci: [Locus]
     @Query private var householdMembers: [HouseholdMember]
@@ -69,11 +76,24 @@ struct ContentView: View {
     @State private var settingsViewModel = SettingsViewModel()
     @State private var householdViewModel = HouseholdViewModel()
     @State private var audioCacheManager = AudioCacheManager()
+    @State private var onboardingViewModel = OnboardingViewModel()
 
     var body: some View {
+        if !onboardingViewModel.hasCompletedOnboarding {
+            OnboardingFlowView(
+                viewModel: onboardingViewModel,
+                locationService: locationService,
+                notificationService: notificationService
+            )
+        } else {
+            mainAppView
+        }
+    }
+
+    private var mainAppView: some View {
         @Bindable var router = navigationRouter
 
-        TabView(selection: $selectedTab) {
+        return TabView(selection: $selectedTab) {
             // Map Tab
             NavigationStack {
                 ZStack(alignment: .top) {
@@ -169,8 +189,7 @@ enum AppTab: Hashable {
     case settings
 }
 
-/// Temporary detail view for deep-linked locus navigation.
-/// Will be replaced by the full LocusDetailView in US-038.
+/// Resolves a locus ID from deep-link/notification into the full LocusDetailView.
 struct LocusDeepLinkView: View {
     let locusId: UUID
 
@@ -183,30 +202,14 @@ struct LocusDeepLinkView: View {
 
     var body: some View {
         if let locus {
-            VStack(spacing: Theme.Spacing.md) {
-                Image(systemName: locus.category.systemImageName)
-                    .font(.system(size: 48))
-                    .foregroundStyle(locus.category.color)
-
-                Text(locus.locationName ?? String(localized: "Unknown Location"))
-                    .font(Theme.Typography.title)
-
-                Text(locus.transcription)
-                    .font(Theme.Typography.body)
-                    .foregroundStyle(Theme.textSecondary)
-                    .padding(.horizontal)
-
-                Text(locus.createdAt, style: .relative)
-                    .font(Theme.Typography.caption)
-                    .foregroundStyle(Theme.textSecondary)
-            }
-            .navigationTitle(locus.category.displayName)
-            .navigationBarTitleDisplayMode(.inline)
+            LocusDetailView(
+                viewModel: LocusDetailViewModel(locus: locus)
+            )
         } else {
             ContentUnavailableView(
                 String(localized: "Locus Not Found"),
                 systemImage: "mappin.slash",
-                description: Text("This note may have been deleted.")
+                description: Text(String(localized: "This note may have been deleted."))
             )
         }
     }

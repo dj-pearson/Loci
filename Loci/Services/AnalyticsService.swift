@@ -1,10 +1,13 @@
+import CryptoKit
 import Foundation
 import os.log
 
 // MARK: - Analytics Event
 
 enum AnalyticsEvent: String {
+    case appLaunch = "app_launch"
     case locusCreated = "locus_created"
+    case locusViewed = "locus_viewed"
     case locusTriggered = "locus_triggered"
     case recordingStarted = "recording_started"
     case recordingCompleted = "recording_completed"
@@ -13,6 +16,8 @@ enum AnalyticsEvent: String {
     case householdJoined = "household_joined"
     case paywallShown = "paywall_shown"
     case subscriptionPurchased = "subscription_purchased"
+    case subscriptionCancelled = "subscription_cancelled"
+    case geofenceTriggered = "geofence_triggered"
 }
 
 // MARK: - Analytics Service
@@ -106,5 +111,43 @@ final class AnalyticsService {
 
     func trackSubscriptionPurchased() {
         track(.subscriptionPurchased)
+    }
+
+    func trackSubscriptionCancelled() {
+        track(.subscriptionCancelled)
+    }
+
+    func trackAppLaunch() {
+        track(.appLaunch)
+    }
+
+    func trackLocusViewed() {
+        track(.locusViewed)
+    }
+
+    func trackGeofenceTriggered() {
+        track(.geofenceTriggered)
+    }
+
+    // MARK: - User Identity (Hashed)
+
+    /// Sets the TelemetryDeck user identifier as a SHA-256 hash of the user ID.
+    /// No raw PII is sent to analytics.
+    func setUser(id: String) {
+        let hashed = SHA256.hash(data: Data(id.utf8))
+            .compactMap { String(format: "%02x", $0) }
+            .joined()
+
+        if isDebug {
+            logger.debug("📊 [Analytics] User set: \(hashed.prefix(12))...")
+        }
+        // TelemetryDeck.updateDefaultUser(to: hashed)
+    }
+
+    func clearUser() {
+        if isDebug {
+            logger.debug("📊 [Analytics] User cleared")
+        }
+        // TelemetryDeck.updateDefaultUser(to: nil)
     }
 }

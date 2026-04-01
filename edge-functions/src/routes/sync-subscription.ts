@@ -1,14 +1,18 @@
 import { Hono } from 'hono';
 import { getSupabaseAdmin } from '../middleware/auth.js';
-import { createHmac } from 'node:crypto';
+import { createHmac, timingSafeEqual } from 'node:crypto';
 
 const syncSubscription = new Hono();
+
+/** Maximum age (in ms) for webhook events — reject replays older than this. */
+const WEBHOOK_MAX_AGE_MS = 5 * 60 * 1000; // 5 minutes
 
 interface RevenueCatEvent {
   type: string;
   app_user_id: string;
   entitlement_ids?: string[];
   expiration_at_ms?: number;
+  event_timestamp_ms?: number;
 }
 
 interface RevenueCatWebhook {
@@ -27,13 +31,16 @@ const HANDLED_EVENTS = [
 function verifySignature(body: string, signature: string | undefined): boolean {
   const secret = process.env.REVENUECAT_WEBHOOK_SECRET;
   if (!secret) {
-    console.warn('[webhook] REVENUECAT_WEBHOOK_SECRET not set, skipping signature validation');
-    return true;
+    console.error('[webhook] REVENUECAT_WEBHOOK_SECRET not set, rejecting webhook');
+    return false;
   }
   if (!signature) return false;
 
   const expected = createHmac('sha256', secret).update(body).digest('hex');
-  return signature === expected;
+
+  // Use timing-safe comparison to prevent timing attacks
+  if (expected.length !== signature.length) return false;
+  return timingSafeEqual(Buffer.from(expected, 'hex'), Buffer.from(signature, 'hex'));
 }
 
 function mapEntitlementsToTier(entitlementIds: string[] | undefined): string {
@@ -60,6 +67,23 @@ syncSubscription.post('/', async (c) => {
   }
 
   const { event } = payload;
+
+  // Replay protection: reject events with timestamps older than 5 minutes
+  if (event.event_timestamp_ms != null) {
+    const eventAge = Date.now() - event.event_timestamp_ms;
+    if (eventAge > WEBHOOK_MAX_AGE_MS) {
+      console.warn(
+        `[webhook] Rejecting stale event: type=${event.type} age=${Math.round(eventAge / 1000)}s`,
+      );
+      return c.json({ error: 'Webhook event too old (possible replay)' }, 400);
+    }
+    if (eventAge < -WEBHOOK_MAX_AGE_MS) {
+      console.warn(
+        `[webhook] Rejecting future-dated event: type=${event.type} drift=${Math.round(-eventAge / 1000)}s`,
+      );
+      return c.json({ error: 'Webhook event timestamp in the future' }, 400);
+    }
+  }
 
   if (!HANDLED_EVENTS.includes(event.type)) {
     // Acknowledge but don't process unhandled event types

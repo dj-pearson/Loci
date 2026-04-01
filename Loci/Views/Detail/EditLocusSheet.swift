@@ -6,11 +6,14 @@ struct EditLocusSheet: View {
     let householdId: UUID?
     let createdByName: String?
     @Environment(\.dismiss) private var dismiss
+    @Environment(LocationService.self) private var locationService
 
     @State private var editedTranscription: String
     @State private var selectedCategory: LocusCategory
     @State private var isShared: Bool
     @State private var showReRecordConfirmation = false
+    @State private var showReRecordSheet = false
+    @State private var reRecordViewModel: RecordViewModel?
 
     init(viewModel: LocusDetailViewModel, householdName: String? = nil, householdId: UUID? = nil, createdByName: String? = nil) {
         self.viewModel = viewModel
@@ -142,11 +145,33 @@ struct EditLocusSheet: View {
                 titleVisibility: .visible
             ) {
                 Button(String(localized: "Replace Recording"), role: .destructive) {
-                    // Re-record will be wired to RecordViewModel when available
-                    dismiss()
+                    reRecordViewModel = RecordViewModel(
+                        locationService: locationService,
+                        audioService: AudioService(),
+                        transcriptionService: TranscriptionService()
+                    )
+                    showReRecordSheet = true
                 }
             } message: {
                 Text(String(localized: "This will replace the current audio recording. This cannot be undone."))
+            }
+            .sheet(isPresented: $showReRecordSheet, onDismiss: {
+                reRecordViewModel = nil
+            }) {
+                if let vm = reRecordViewModel {
+                    ReRecordView(
+                        recordViewModel: vm,
+                        onSave: { audioURL, transcription in
+                            viewModel.replaceAudio(newFileURL: audioURL, newTranscription: transcription)
+                            editedTranscription = transcription
+                            showReRecordSheet = false
+                            dismiss()
+                        },
+                        onCancel: {
+                            showReRecordSheet = false
+                        }
+                    )
+                }
             }
 
             Text(String(localized: "Replaces the existing recording and transcription."))

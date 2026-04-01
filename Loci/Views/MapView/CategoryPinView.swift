@@ -49,6 +49,8 @@ struct CategoryPinView: View {
         }
         .accessibilityElement(children: .ignore)
         .accessibilityAddTraits(.isButton)
+        .accessibilityLabel(String(localized: "\(category.displayName) note\(isShared ? String(localized: ", shared") : "")"))
+        .accessibilityHint(String(localized: "Double tap for details"))
     }
 
     func accessibilityConfigured(locationName: String?) -> some View {

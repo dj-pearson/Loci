@@ -91,7 +91,7 @@ struct PaywallView: View {
                     .foregroundStyle(isYearly ? Theme.textPrimary : Theme.textSecondary)
                     .fontWeight(isYearly ? .semibold : .regular)
 
-                Text(String(localized: "Save 37%"))
+                Text(savingsText)
                     .font(Theme.Typography.caption)
                     .fontWeight(.semibold)
                     .foregroundStyle(.white)
@@ -103,18 +103,35 @@ struct PaywallView: View {
         .padding(.vertical, Theme.Spacing.sm)
     }
 
+    private var savingsText: String {
+        let monthlyPkg = packageForId(RevenueCatConfiguration.OfferingID.premiumMonthly)
+        let yearlyPkg = packageForId(RevenueCatConfiguration.OfferingID.premiumYearly)
+        guard let monthlyPrice = monthlyPkg?.storeProduct.price as? NSDecimalNumber,
+              let yearlyPrice = yearlyPkg?.storeProduct.price as? NSDecimalNumber else {
+            return String(localized: "Save 37%")
+        }
+        let annualMonthly = monthlyPrice.doubleValue * 12
+        let savings = ((annualMonthly - yearlyPrice.doubleValue) / annualMonthly) * 100
+        return String(localized: "Save \(Int(savings.rounded()))%")
+    }
+
     // MARK: - Tier Cards
 
     private var tierCards: some View {
-        VStack(spacing: Theme.Spacing.md) {
+        let premiumMonthlyPkg = packageForId(RevenueCatConfiguration.OfferingID.premiumMonthly)
+        let premiumYearlyPkg = packageForId(RevenueCatConfiguration.OfferingID.premiumYearly)
+        let familyMonthlyPkg = packageForId(RevenueCatConfiguration.OfferingID.familyMonthly)
+        let familyYearlyPkg = packageForId(RevenueCatConfiguration.OfferingID.familyYearly)
+
+        return VStack(spacing: Theme.Spacing.md) {
             // Premium Card
             tierCard(
                 title: String(localized: "Premium"),
                 icon: "star.fill",
                 color: Theme.primary,
-                monthlyPrice: "$3.99",
-                yearlyPrice: "$29.99",
-                yearlyMonthly: "$2.49",
+                monthlyPrice: premiumMonthlyPkg?.localizedPriceString ?? "$3.99",
+                yearlyPrice: premiumYearlyPkg?.localizedPriceString ?? "$29.99",
+                yearlyMonthlyPrice: formattedMonthlyFromYearly(premiumYearlyPkg) ?? "$2.49",
                 features: [
                     String(localized: "Unlimited loci"),
                     String(localized: "AI categorization"),
@@ -122,9 +139,9 @@ struct PaywallView: View {
                     String(localized: "Home screen widget"),
                     String(localized: "Full-text search"),
                 ],
-                trialBadge: true,
-                package: packageFor(monthly: RevenueCatConfiguration.OfferingID.premiumMonthly,
-                                    yearly: RevenueCatConfiguration.OfferingID.premiumYearly)
+                trialBadge: premiumMonthlyPkg?.storeProduct.introductoryDiscount != nil
+                    || premiumYearlyPkg?.storeProduct.introductoryDiscount != nil,
+                package: isYearly ? premiumYearlyPkg : premiumMonthlyPkg
             )
 
             // Family Card
@@ -132,18 +149,18 @@ struct PaywallView: View {
                 title: String(localized: "Family"),
                 icon: "person.3.fill",
                 color: Theme.secondary,
-                monthlyPrice: "$5.99",
-                yearlyPrice: "$44.99",
-                yearlyMonthly: "$3.74",
+                monthlyPrice: familyMonthlyPkg?.localizedPriceString ?? "$5.99",
+                yearlyPrice: familyYearlyPkg?.localizedPriceString ?? "$44.99",
+                yearlyMonthlyPrice: formattedMonthlyFromYearly(familyYearlyPkg) ?? "$3.74",
                 features: [
                     String(localized: "Everything in Premium"),
                     String(localized: "Family sharing (up to 6)"),
                     String(localized: "Shared household loci"),
                     String(localized: "Family member management"),
                 ],
-                trialBadge: true,
-                package: packageFor(monthly: RevenueCatConfiguration.OfferingID.familyMonthly,
-                                    yearly: RevenueCatConfiguration.OfferingID.familyYearly)
+                trialBadge: familyMonthlyPkg?.storeProduct.introductoryDiscount != nil
+                    || familyYearlyPkg?.storeProduct.introductoryDiscount != nil,
+                package: isYearly ? familyYearlyPkg : familyMonthlyPkg
             )
         }
     }
@@ -154,7 +171,7 @@ struct PaywallView: View {
         color: Color,
         monthlyPrice: String,
         yearlyPrice: String,
-        yearlyMonthly: String,
+        yearlyMonthlyPrice: String,
         features: [String],
         trialBadge: Bool,
         package: Package?
@@ -168,7 +185,7 @@ struct PaywallView: View {
                     .fontWeight(.bold)
                 Spacer()
                 if trialBadge {
-                    Text(String(localized: "7-day free trial"))
+                    Text(trialBadgeText(for: package))
                         .font(.caption2)
                         .fontWeight(.semibold)
                         .foregroundStyle(.white)
@@ -181,7 +198,7 @@ struct PaywallView: View {
             // Pricing
             HStack(alignment: .firstTextBaseline, spacing: Theme.Spacing.xs) {
                 if isYearly {
-                    Text(yearlyMonthly)
+                    Text(yearlyMonthlyPrice)
                         .font(.title)
                         .fontWeight(.bold)
                         .foregroundStyle(color)
@@ -222,7 +239,9 @@ struct PaywallView: View {
                         ProgressView()
                             .tint(.white)
                     } else {
-                        Text(String(localized: "Start Free Trial"))
+                        Text(trialBadge
+                             ? String(localized: "Start Free Trial")
+                             : String(localized: "Subscribe"))
                     }
                 }
                 .font(Theme.Typography.headline)
@@ -241,7 +260,10 @@ struct PaywallView: View {
     // MARK: - Lifetime Section
 
     private var lifetimeSection: some View {
-        VStack(spacing: Theme.Spacing.sm) {
+        let lifetimeIndividualPkg = packageForId(RevenueCatConfiguration.OfferingID.lifetimeIndividual)
+        let lifetimeFamilyPkg = packageForId(RevenueCatConfiguration.OfferingID.lifetimeFamily)
+
+        return VStack(spacing: Theme.Spacing.sm) {
             Text(String(localized: "Prefer a one-time purchase?"))
                 .font(Theme.Typography.caption)
                 .foregroundStyle(Theme.textSecondary)
@@ -249,16 +271,14 @@ struct PaywallView: View {
             HStack(spacing: Theme.Spacing.md) {
                 lifetimeButton(
                     title: String(localized: "Lifetime Individual"),
-                    price: "$59.99",
-                    promoPrice: "$39.99",
-                    package: packageForId(RevenueCatConfiguration.OfferingID.lifetimeIndividual)
+                    price: lifetimeIndividualPkg?.localizedPriceString ?? "$39.99",
+                    package: lifetimeIndividualPkg
                 )
 
                 lifetimeButton(
                     title: String(localized: "Lifetime Family"),
-                    price: "$89.99",
-                    promoPrice: "$59.99",
-                    package: packageForId(RevenueCatConfiguration.OfferingID.lifetimeFamily)
+                    price: lifetimeFamilyPkg?.localizedPriceString ?? "$59.99",
+                    package: lifetimeFamilyPkg
                 )
             }
 
@@ -272,7 +292,6 @@ struct PaywallView: View {
     private func lifetimeButton(
         title: String,
         price: String,
-        promoPrice: String,
         package: Package?
     ) -> some View {
         Button {
@@ -283,16 +302,10 @@ struct PaywallView: View {
                     .font(Theme.Typography.caption)
                     .fontWeight(.medium)
 
-                HStack(spacing: 4) {
-                    Text(price)
-                        .font(Theme.Typography.caption)
-                        .strikethrough()
-                        .foregroundStyle(Theme.textSecondary)
-                    Text(promoPrice)
-                        .font(Theme.Typography.headline)
-                        .fontWeight(.bold)
-                        .foregroundStyle(Theme.primary)
-                }
+                Text(price)
+                    .font(Theme.Typography.headline)
+                    .fontWeight(.bold)
+                    .foregroundStyle(Theme.primary)
             }
             .frame(maxWidth: .infinity)
             .padding(Theme.Spacing.sm)
@@ -463,12 +476,38 @@ struct PaywallView: View {
 
     // MARK: - Package Helpers
 
-    private func packageFor(monthly: String, yearly: String) -> Package? {
-        let id = isYearly ? yearly : monthly
-        return packages.first { $0.identifier == id }
-    }
-
     private func packageForId(_ id: String) -> Package? {
         packages.first { $0.identifier == id }
+    }
+
+    /// Calculates monthly equivalent from a yearly package price, formatted in local currency.
+    private func formattedMonthlyFromYearly(_ yearlyPackage: Package?) -> String? {
+        guard let pkg = yearlyPackage else { return nil }
+        let yearlyPrice = (pkg.storeProduct.price as NSDecimalNumber).doubleValue
+        let monthlyEquivalent = yearlyPrice / 12.0
+
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.locale = pkg.storeProduct.priceFormatter?.locale ?? .current
+        return formatter.string(from: NSNumber(value: monthlyEquivalent))
+    }
+
+    /// Returns the trial badge text from RevenueCat introductory offer, or a default.
+    private func trialBadgeText(for package: Package?) -> String {
+        guard let intro = package?.storeProduct.introductoryDiscount else {
+            return String(localized: "7-day free trial")
+        }
+        let days = intro.subscriptionPeriod.value
+        let unit = intro.subscriptionPeriod.unit
+        switch unit {
+        case .day:
+            return String(localized: "\(days)-day free trial")
+        case .week:
+            return String(localized: "\(days)-week free trial")
+        case .month:
+            return String(localized: "\(days)-month free trial")
+        default:
+            return String(localized: "Free trial")
+        }
     }
 }

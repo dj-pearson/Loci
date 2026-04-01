@@ -14,6 +14,7 @@ final class RecordViewModel {
     private(set) var recordingDuration: TimeInterval = 0
     private(set) var errorMessage: String?
     private(set) var didSaveLocus = false
+    private(set) var didReachMaxDuration = false
 
     var transcription: String {
         transcriptionService.transcription
@@ -126,12 +127,16 @@ final class RecordViewModel {
         isRecording = true
         recordingDuration = 0
         startDurationTimer()
+        AnalyticsService.shared.trackRecordingStarted()
+        UIAccessibility.post(notification: .announcement, argument: String(localized: "Recording started"))
     }
 
     /// Stops recording and returns the audio URL, transcription text, and captured coordinate.
     /// Returns `nil` if recording was not active or location is unavailable.
     func stopRecording() async -> (url: URL, transcription: String, coordinate: CLLocationCoordinate2D)? {
         guard isRecording else { return nil }
+
+        UIAccessibility.post(notification: .announcement, argument: String(localized: "Recording stopped"))
 
         // Stop services
         audioService.stopRecording()
@@ -230,10 +235,10 @@ final class RecordViewModel {
             longitude: coordinate.longitude,
             locationName: locationName,
             audioFileURL: audioURL.lastPathComponent,
-            transcription: transcription,
+            transcription: InputSanitizer.sanitizeTranscription(transcription),
             category: finalCategory,
             isShared: isShared,
-            createdByName: isShared ? createdByName : nil,
+            createdByName: isShared ? createdByName.map { InputSanitizer.sanitizeDisplayName($0) } : nil,
             householdId: isShared ? householdId : nil
         )
 
@@ -254,6 +259,9 @@ final class RecordViewModel {
         let generator = UINotificationFeedbackGenerator()
         generator.notificationOccurred(.success)
 
+        AnalyticsService.shared.trackRecordingCompleted()
+        AnalyticsService.shared.trackLocusCreated(category: finalCategory.rawValue)
+
         isSaving = false
         didSaveLocus = true
     }
@@ -264,6 +272,11 @@ final class RecordViewModel {
         durationTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
             guard let self, self.isRecording else { return }
             self.recordingDuration += 1
+
+            // Auto-stop at max duration
+            if self.recordingDuration >= AppConstants.maxRecordingDurationSeconds {
+                self.didReachMaxDuration = true
+            }
         }
     }
 

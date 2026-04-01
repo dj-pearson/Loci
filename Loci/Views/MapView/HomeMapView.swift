@@ -9,8 +9,11 @@ struct HomeMapView: View {
     private var allLoci: [Locus]
 
     @Query private var householdMembers: [HouseholdMember]
+    @Query private var households: [Household]
 
     @Environment(\.modelContext) private var modelContext
+    @Environment(LocationService.self) private var locationService
+    @Environment(NetworkMonitor.self) private var networkMonitor
 
     @Bindable var viewModel: HomeMapViewModel
     let navigationRouter: NavigationRouter
@@ -25,11 +28,19 @@ struct HomeMapView: View {
     @State private var archivedLocus: Locus?
     @State private var showUndoSnackbar = false
     @State private var locusToEdit: Locus?
+    @State private var recordViewModel: RecordViewModel?
+    @State private var showMapStylePicker = false
+
+    @AppStorage("loci_map_type") private var mapTypeRaw: Int = 0
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private var hasHousehold: Bool {
         !householdMembers.isEmpty
+    }
+
+    private var currentHousehold: Household? {
+        households.first
     }
 
     var body: some View {
@@ -85,10 +96,15 @@ struct HomeMapView: View {
                     .annotationTitles(.hidden)
                 }
             }
-            .mapStyle(colorScheme == .dark ? .standard(elevation: .flat, emphasis: .muted) : .standard)
+            .mapStyle(currentMapStyle)
             .mapControls {
                 MapCompass()
                 MapScaleView()
+            }
+            .safeAreaInset(edge: .trailing) {
+                mapControlButtons
+                    .padding(.trailing, 8)
+                    .padding(.bottom, 100) // Clear record button
             }
             .accessibilityElement(children: .contain)
             .accessibilityLabel(String(localized: "Voice notes map"))
@@ -136,6 +152,20 @@ struct HomeMapView: View {
                 .padding(.horizontal, 16)
             }
 
+            // Offline indicator
+            if !networkMonitor.isConnected {
+                HStack(spacing: 6) {
+                    Image(systemName: "wifi.slash")
+                        .font(.caption2)
+                    Text(String(localized: "Offline — notes saved locally"))
+                        .font(.caption2)
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(.ultraThinMaterial, in: Capsule())
+                .padding(.bottom, 96) // Above record button
+            }
+
             // Record button
             Button {
                 showRecordingView = true
@@ -154,9 +184,32 @@ struct HomeMapView: View {
             navigationRouter.consumePendingDeepLink()
             centerOnUserIfNeeded()
         }
-        .sheet(isPresented: $showRecordingView) {
-            // Placeholder — RecordingView will be wired here
-            Text(String(localized: "Recording View"))
+        .sheet(isPresented: $showRecordingView, onDismiss: {
+            recordViewModel = nil
+        }) {
+            if let vm = recordViewModel {
+                RecordingView(
+                    viewModel: vm,
+                    geocodingService: ReverseGeocodingService(),
+                    householdName: currentHousehold?.name,
+                    householdId: currentHousehold?.id,
+                    onDismiss: {
+                        showRecordingView = false
+                    }
+                )
+                .onAppear {
+                    vm.modelContext = modelContext
+                }
+            }
+        }
+        .onChange(of: showRecordingView) { _, show in
+            if show {
+                recordViewModel = RecordViewModel(
+                    locationService: locationService,
+                    audioService: AudioService(),
+                    transcriptionService: TranscriptionService()
+                )
+            }
         }
         .sheet(item: $locusToEdit) { locus in
             let editViewModel = LocusDetailViewModel(locus: locus)
@@ -203,6 +256,80 @@ struct HomeMapView: View {
             }
         } message: { _ in
             Text(String(localized: "This will permanently delete the voice note and its audio recording."))
+        }
+    }
+
+    // MARK: - Map Style
+
+    private var currentMapStyle: MapStyle {
+        switch MKMapType(rawValue: UInt(mapTypeRaw)) ?? .standard {
+        case .satellite, .satelliteFlyover:
+            return .imagery
+        case .hybrid, .hybridFlyover:
+            return .hybrid
+        default:
+            return colorScheme == .dark ? .standard(elevation: .flat, emphasis: .muted) : .standard
+        }
+    }
+
+    private var mapStyleIcon: String {
+        switch MKMapType(rawValue: UInt(mapTypeRaw)) ?? .standard {
+        case .satellite, .satelliteFlyover:
+            return "globe.americas.fill"
+        case .hybrid, .hybridFlyover:
+            return "square.stack.3d.up.fill"
+        default:
+            return "map"
+        }
+    }
+
+    // MARK: - Map Control Buttons
+
+    private var mapControlButtons: some View {
+        VStack(spacing: 8) {
+            // Re-center on user location
+            Button {
+                if reduceMotion {
+                    centerOnUserIfNeeded()
+                } else {
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        centerOnUserIfNeeded()
+                    }
+                }
+            } label: {
+                Image(systemName: "location.fill")
+                    .font(.body)
+                    .frame(width: 36, height: 36)
+                    .background(.ultraThinMaterial, in: Circle())
+            }
+            .accessibilityLabel(String(localized: "Center on current location"))
+
+            // Map style toggle
+            Menu {
+                Button {
+                    mapTypeRaw = Int(MKMapType.standard.rawValue)
+                } label: {
+                    Label(String(localized: "Standard"), systemImage: "map")
+                }
+
+                Button {
+                    mapTypeRaw = Int(MKMapType.satellite.rawValue)
+                } label: {
+                    Label(String(localized: "Satellite"), systemImage: "globe.americas.fill")
+                }
+
+                Button {
+                    mapTypeRaw = Int(MKMapType.hybrid.rawValue)
+                } label: {
+                    Label(String(localized: "Hybrid"), systemImage: "square.stack.3d.up.fill")
+                }
+            } label: {
+                Image(systemName: mapStyleIcon)
+                    .font(.body)
+                    .frame(width: 36, height: 36)
+                    .background(.ultraThinMaterial, in: Circle())
+            }
+            .accessibilityLabel(String(localized: "Map style"))
         }
     }
 

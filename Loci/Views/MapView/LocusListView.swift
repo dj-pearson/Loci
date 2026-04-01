@@ -40,8 +40,13 @@ struct LocusListView: View {
     @State private var locusToEdit: Locus?
     @State private var paginatedQuery = PaginatedLocusQuery()
     @State private var appearedItems: Set<UUID> = []
+    @State private var searchText = ""
+    @State private var debouncedSearchText = ""
+    @State private var pendingSearchDebounce: Task<Void, Never>?
+    @State private var showUpgradeForSearch = false
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(NotificationService.self) private var notificationService
 
     private var hasHousehold: Bool {
         !householdMembers.isEmpty
@@ -52,20 +57,33 @@ struct LocusListView: View {
         sortOrder != .nearest
     }
 
-    /// The loci to display, filtered by category and family settings.
+    /// The loci to display, filtered by category, family settings, and search text.
     /// For time-based sorts, uses paginated data. For nearest, uses all data sorted by distance.
     private var displayLoci: [Locus] {
+        var loci: [Locus]
         if usesPagination {
-            return viewModel.filteredLoci(from: paginatedQuery.loci)
+            loci = viewModel.filteredLoci(from: paginatedQuery.loci)
         } else {
             let filtered = viewModel.filteredLoci(from: allLoci)
             guard let location = locationService.currentLocation else {
-                return filtered
+                loci = filtered
+                return applySearch(to: loci)
             }
-            return filtered.sorted {
+            loci = filtered.sorted {
                 $0.coordinate.distance(to: location.coordinate) <
                     $1.coordinate.distance(to: location.coordinate)
             }
+        }
+        return applySearch(to: loci)
+    }
+
+    private func applySearch(to loci: [Locus]) -> [Locus] {
+        let query = debouncedSearchText.trimmingCharacters(in: .whitespaces).lowercased()
+        guard !query.isEmpty else { return loci }
+        return loci.filter { locus in
+            locus.transcription.lowercased().contains(query)
+                || (locus.locationName?.lowercased().contains(query) ?? false)
+                || locus.category.displayName.lowercased().contains(query)
         }
     }
 
@@ -100,8 +118,40 @@ struct LocusListView: View {
         return result
     }
 
+    @State private var showNotificationBanner = true
+
     var body: some View {
         List {
+            if notificationService.authorizationStatus == .denied && showNotificationBanner {
+                Section {
+                    HStack(spacing: Theme.Spacing.sm) {
+                        Image(systemName: "bell.slash")
+                            .foregroundStyle(Theme.warning)
+                            .font(.body)
+
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(String(localized: "Proximity alerts are off"))
+                                .font(.subheadline.weight(.medium))
+                            Text(String(localized: "Enable notifications to be reminded when you return to a saved location."))
+                                .font(.caption)
+                                .foregroundStyle(Theme.textSecondary)
+                        }
+
+                        Spacer(minLength: 0)
+
+                        Button {
+                            showNotificationBanner = false
+                        } label: {
+                            Image(systemName: "xmark")
+                                .font(.caption2)
+                                .foregroundStyle(Theme.textSecondary)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    .padding(.vertical, Theme.Spacing.xs)
+                }
+            }
+
             ForEach(sections, id: \.title) { section in
                 Section {
                     ForEach(Array(section.loci.enumerated()), id: \.element.id) { index, locus in
@@ -268,6 +318,30 @@ struct LocusListView: View {
                 .onAppear {
                     editViewModel.modelContext = modelContext
                 }
+        }
+        .searchable(
+            text: $searchText,
+            prompt: String(localized: "Search voice notes...")
+        )
+        .onChange(of: searchText) { _, newValue in
+            pendingSearchDebounce?.cancel()
+            pendingSearchDebounce = Task {
+                try? await Task.sleep(for: .milliseconds(300))
+                guard !Task.isCancelled else { return }
+                debouncedSearchText = InputSanitizer.sanitizeSearchQuery(newValue)
+            }
+        }
+        .overlay {
+            if !debouncedSearchText.isEmpty && displayLoci.isEmpty {
+                ContentUnavailableView(
+                    String(localized: "No Results"),
+                    systemImage: "magnifyingglass",
+                    description: Text(String(localized: "No voice notes match \"\(debouncedSearchText)\""))
+                )
+            }
+        }
+        .refreshable {
+            resetPagination()
         }
     }
 

@@ -88,6 +88,27 @@ final class NotificationService: NSObject, UNUserNotificationCenterDelegate {
         notificationCenter.setNotificationCategories([locusCategory])
     }
 
+    /// Whether quiet hours are currently active (exposed for UI status indicator).
+    var isQuietHoursActive: Bool {
+        isInQuietHours()
+    }
+
+    // MARK: - Queued Notifications
+
+    /// Notifications suppressed during quiet hours, keyed by locus ID.
+    private var queuedNotifications: [UUID: Locus] = []
+    private var quietHoursEndTimer: Timer?
+
+    /// Delivers any queued notifications that were suppressed during quiet hours.
+    /// Called when quiet hours end or when the app returns to foreground outside quiet hours.
+    func deliverQueuedNotifications() {
+        guard !isInQuietHours() else { return }
+        for (_, locus) in queuedNotifications {
+            scheduleGeofenceNotificationImmediate(for: locus)
+        }
+        queuedNotifications.removeAll()
+    }
+
     // MARK: - Geofence Notifications
 
     /// Returns `true` if the current time falls within the user's configured quiet hours.
@@ -125,7 +146,16 @@ final class NotificationService: NSObject, UNUserNotificationCenterDelegate {
     /// Shows the locus location name, transcription preview, category, and relative time.
     /// Notifications are suppressed during quiet hours.
     func scheduleGeofenceNotification(for locus: Locus) {
-        guard !isInQuietHours() else { return }
+        guard !isInQuietHours() else {
+            // Queue for delivery when quiet hours end
+            queuedNotifications[locus.id] = locus
+            return
+        }
+        scheduleGeofenceNotificationImmediate(for: locus)
+    }
+
+    /// Internal: schedules the notification without checking quiet hours.
+    private func scheduleGeofenceNotificationImmediate(for locus: Locus) {
         let content = UNMutableNotificationContent()
 
         // Title: distinguish personal vs shared loci

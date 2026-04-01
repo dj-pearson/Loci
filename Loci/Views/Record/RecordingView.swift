@@ -121,6 +121,17 @@ struct RecordingView: View {
                 onDismiss?()
             }
         }
+        .onChange(of: viewModel.didReachMaxDuration) { _, reached in
+            if reached {
+                Task {
+                    if let result = await viewModel.stopRecording() {
+                        recordingResult = result
+                        detectedCategory = AICategoryService.categorize(transcription: result.transcription)
+                        showPostRecordingSheet = true
+                    }
+                }
+            }
+        }
     }
 
     // MARK: - Location Header

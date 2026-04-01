@@ -117,4 +117,11 @@ export const rateLimitWebhook = createRateLimiter({
   keyExtractor: ipKeyExtractor,
 });
 
+/** Health check: 10 requests per minute per IP. */
+export const rateLimitHealth = createRateLimiter({
+  max: 10,
+  windowMs: 60 * 1000,
+  keyExtractor: ipKeyExtractor,
+});
+
 export { createRateLimiter };

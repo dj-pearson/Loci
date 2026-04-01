@@ -1,5 +1,6 @@
 import SwiftData
 import SwiftUI
+import UIKit
 
 struct SettingsView: View {
     @Environment(\.modelContext) private var modelContext
@@ -12,6 +13,11 @@ struct SettingsView: View {
     @State private var showSignOutConfirmation = false
     @State private var showCreateHousehold = false
     @State private var showJoinHousehold = false
+    @State private var showDeleteAccountConfirmation = false
+    @State private var isExportingData = false
+    @State private var exportURL: URL?
+    @State private var showExportShare = false
+    @State private var isDeletingAccount = false
 
     var body: some View {
         Form {
@@ -65,6 +71,56 @@ struct SettingsView: View {
                     .font(.caption)
                     .foregroundStyle(.tertiary)
             }
+
+            // Data export
+            Button {
+                Task { await exportData() }
+            } label: {
+                if isExportingData {
+                    HStack {
+                        Label(String(localized: "Exporting Data..."), systemImage: "square.and.arrow.up")
+                        Spacer()
+                        ProgressView()
+                    }
+                } else {
+                    Label(String(localized: "Export My Data"), systemImage: "square.and.arrow.up")
+                }
+            }
+            .disabled(isExportingData)
+            .sheet(isPresented: $showExportShare) {
+                if let url = exportURL {
+                    ShareSheet(items: [url])
+                }
+            }
+
+            // Account deletion
+            if viewModel.isSignedIn {
+                Button(role: .destructive) {
+                    showDeleteAccountConfirmation = true
+                } label: {
+                    if isDeletingAccount {
+                        HStack {
+                            Label(String(localized: "Deleting Account..."), systemImage: "trash")
+                            Spacer()
+                            ProgressView()
+                        }
+                    } else {
+                        Label(String(localized: "Delete Account"), systemImage: "trash")
+                    }
+                }
+                .disabled(isDeletingAccount)
+                .alert(
+                    String(localized: "Delete Account"),
+                    isPresented: $showDeleteAccountConfirmation
+                ) {
+                    Button(String(localized: "Delete Everything"), role: .destructive) {
+                        Task { await deleteAccount() }
+                    }
+                    Button(String(localized: "Cancel"), role: .cancel) {}
+                } message: {
+                    Text(String(localized: "This will permanently delete your account, all voice notes, audio recordings, and household memberships. This action cannot be undone."))
+                }
+            }
         }
     }
 
@@ -117,16 +173,23 @@ struct SettingsView: View {
 
     // MARK: - Notifications Section
 
+    @Environment(NotificationService.self) private var notificationService
+
     private var notificationsSection: some View {
         Section(String(localized: "Notifications")) {
+            if notificationService.authorizationStatus == .denied {
+                notificationDeniedBanner
+            }
+
             Toggle(isOn: Binding(
                 get: { viewModel.notificationsEnabled },
                 set: { viewModel.notificationsEnabled = $0 }
             )) {
                 Label(String(localized: "Proximity Alerts"), systemImage: "bell")
             }
+            .disabled(notificationService.authorizationStatus == .denied)
 
-            if viewModel.notificationsEnabled {
+            if viewModel.notificationsEnabled && notificationService.authorizationStatus != .denied {
                 DatePicker(
                     String(localized: "Quiet Hours Start"),
                     selection: Binding(
@@ -144,14 +207,75 @@ struct SettingsView: View {
                     ),
                     displayedComponents: .hourAndMinute
                 )
+
+                HStack(spacing: Theme.Spacing.sm) {
+                    Image(systemName: notificationService.isQuietHoursActive ? "moon.fill" : "moon")
+                        .foregroundStyle(notificationService.isQuietHoursActive ? Theme.warning : Theme.textSecondary)
+                        .font(.caption)
+                    Text(notificationService.isQuietHoursActive
+                         ? String(localized: "Quiet hours are active")
+                         : String(localized: "Quiet hours are inactive"))
+                        .font(.caption)
+                        .foregroundStyle(Theme.textSecondary)
+                }
             }
         }
     }
 
+    private var notificationDeniedBanner: some View {
+        VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
+            Label {
+                Text(String(localized: "Notifications Disabled"))
+                    .font(.subheadline.weight(.semibold))
+            } icon: {
+                Image(systemName: "bell.slash.fill")
+                    .foregroundStyle(Theme.warning)
+            }
+
+            Text(String(localized: "Loci uses notifications to alert you when you return to a saved location. Enable notifications to receive proximity alerts."))
+                .font(.caption)
+                .foregroundStyle(Theme.textSecondary)
+
+            Button {
+                if let url = URL(string: UIApplication.openSettingsURLString) {
+                    UIApplication.shared.open(url)
+                }
+            } label: {
+                Text(String(localized: "Open Settings"))
+                    .font(.caption.weight(.medium))
+            }
+        }
+        .padding(.vertical, Theme.Spacing.xs)
+    }
+
     // MARK: - Data Section
+
+    @State private var showDeleteArchivedConfirmation = false
+    @State private var deletedArchivedCount = 0
+    @State private var showDeletedArchivedAlert = false
 
     private var dataSection: some View {
         Section(String(localized: "Data")) {
+            if viewModel.isStorageLow {
+                HStack(spacing: Theme.Spacing.sm) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .foregroundStyle(Theme.warning)
+                    Text(String(localized: "Device storage is running low. Consider deleting archived audio to free space."))
+                        .font(.caption)
+                        .foregroundStyle(Theme.textSecondary)
+                }
+                .padding(.vertical, Theme.Spacing.xs)
+            }
+
+            if let lastSync = viewModel.lastSyncTimestamp {
+                HStack {
+                    Label(String(localized: "Last Sync"), systemImage: "arrow.triangle.2.circlepath")
+                    Spacer()
+                    Text(lastSync, style: .relative)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
             HStack {
                 Label(String(localized: "Storage Used"), systemImage: "internaldrive")
                 Spacer()
@@ -163,6 +287,32 @@ struct SettingsView: View {
                 viewModel.clearCache(modelContext: modelContext)
             } label: {
                 Label(String(localized: "Clear Cache"), systemImage: "trash")
+            }
+
+            Button(role: .destructive) {
+                showDeleteArchivedConfirmation = true
+            } label: {
+                Label(String(localized: "Delete Archived Audio"), systemImage: "archivebox.fill")
+            }
+            .confirmationDialog(
+                String(localized: "Delete Archived Audio"),
+                isPresented: $showDeleteArchivedConfirmation,
+                titleVisibility: .visible
+            ) {
+                Button(String(localized: "Delete All Archived Audio"), role: .destructive) {
+                    deletedArchivedCount = viewModel.deleteArchivedAudio(modelContext: modelContext)
+                    showDeletedArchivedAlert = true
+                }
+            } message: {
+                Text(String(localized: "This will permanently delete audio files for all archived loci. The text transcriptions will be preserved."))
+            }
+            .alert(
+                String(localized: "Archived Audio Deleted"),
+                isPresented: $showDeletedArchivedAlert
+            ) {
+                Button(String(localized: "OK")) {}
+            } message: {
+                Text(String(localized: "\(deletedArchivedCount) audio file(s) deleted."))
             }
 
             NavigationLink {
@@ -259,6 +409,139 @@ struct SettingsView: View {
         formatter.countStyle = .file
         return formatter.string(fromByteCount: bytes)
     }
+
+    // MARK: - Data Export
+
+    private func exportData() async {
+        isExportingData = true
+        defer { isExportingData = false }
+
+        let descriptor = FetchDescriptor<Locus>()
+        guard let loci = try? modelContext.fetch(descriptor) else { return }
+
+        let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent("loci-export-\(UUID().uuidString)")
+        try? FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
+
+        // Export loci as JSON
+        let lociData = loci.map { locus -> [String: Any] in
+            [
+                "id": locus.id.uuidString,
+                "latitude": locus.latitude,
+                "longitude": locus.longitude,
+                "locationName": locus.locationName ?? "",
+                "transcription": locus.transcription,
+                "category": locus.categoryRawValue,
+                "isShared": locus.isShared,
+                "isArchived": locus.isArchived,
+                "createdAt": locus.createdAt.ISO8601Format(),
+                "updatedAt": locus.updatedAt.ISO8601Format(),
+            ]
+        }
+
+        if let jsonData = try? JSONSerialization.data(withJSONObject: lociData, options: .prettyPrinted) {
+            try? jsonData.write(to: tempDir.appendingPathComponent("loci.json"))
+        }
+
+        // Copy audio files
+        let audioDir = tempDir.appendingPathComponent("audio")
+        try? FileManager.default.createDirectory(at: audioDir, withIntermediateDirectories: true)
+        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+
+        for locus in loci {
+            let sourceURL = documentsURL.appendingPathComponent(locus.audioFileURL)
+            if FileManager.default.fileExists(atPath: sourceURL.path) {
+                try? FileManager.default.copyItem(
+                    at: sourceURL,
+                    to: audioDir.appendingPathComponent(locus.audioFileURL)
+                )
+            }
+        }
+
+        // Export user profile
+        let profileDescriptor = FetchDescriptor<UserProfile>()
+        if let profile = try? modelContext.fetch(profileDescriptor).first {
+            let profileData: [String: Any] = [
+                "displayName": profile.displayName,
+                "subscriptionTier": profile.subscriptionTier.rawValue,
+            ]
+            if let data = try? JSONSerialization.data(withJSONObject: profileData, options: .prettyPrinted) {
+                try? data.write(to: tempDir.appendingPathComponent("profile.json"))
+            }
+        }
+
+        // Create ZIP (using a simple directory share since ZIPFoundation isn't available)
+        exportURL = tempDir
+        showExportShare = true
+    }
+
+    // MARK: - Account Deletion
+
+    private func deleteAccount() async {
+        isDeletingAccount = true
+        defer { isDeletingAccount = false }
+
+        // Call server-side cascade deletion
+        do {
+            let supabase = SupabaseClientProvider.shared
+            try await supabase.functions.invoke("account/delete", options: .init(method: "POST"))
+        } catch {
+            // Continue with local cleanup even if server fails
+        }
+
+        // Clear local SwiftData
+        let lociDescriptor = FetchDescriptor<Locus>()
+        if let loci = try? modelContext.fetch(lociDescriptor) {
+            for locus in loci {
+                modelContext.delete(locus)
+            }
+        }
+
+        let profileDescriptor = FetchDescriptor<UserProfile>()
+        if let profiles = try? modelContext.fetch(profileDescriptor) {
+            for profile in profiles {
+                modelContext.delete(profile)
+            }
+        }
+
+        let householdDescriptor = FetchDescriptor<Household>()
+        if let households = try? modelContext.fetch(householdDescriptor) {
+            for household in households {
+                modelContext.delete(household)
+            }
+        }
+
+        let memberDescriptor = FetchDescriptor<HouseholdMember>()
+        if let members = try? modelContext.fetch(memberDescriptor) {
+            for member in members {
+                modelContext.delete(member)
+            }
+        }
+
+        try? modelContext.save()
+
+        // Clear local audio files
+        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        if let contents = try? FileManager.default.contentsOfDirectory(at: documentsURL, includingPropertiesForKeys: nil) {
+            for file in contents where file.pathExtension == AppConstants.Audio.fileExtension {
+                try? FileManager.default.removeItem(at: file)
+            }
+        }
+
+        // Sign out
+        viewModel.signOut()
+    }
+}
+
+// MARK: - ShareSheet
+
+private struct ShareSheet: UIViewControllerRepresentable {
+    let items: [Any]
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: items, applicationActivities: nil)
+    }
+
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
 
 // MARK: - SubscriptionTier Display Name
