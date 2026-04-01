@@ -124,4 +124,11 @@ export const rateLimitHealth = createRateLimiter({
   keyExtractor: ipKeyExtractor,
 });
 
+/** Auth endpoints: 5 attempts per 15 minutes per IP (US-146, in-memory fallback). */
+export const rateLimitAuth = createRateLimiter({
+  max: 5,
+  windowMs: 15 * 60 * 1000,
+  keyExtractor: ipKeyExtractor,
+});
+
 export { createRateLimiter };

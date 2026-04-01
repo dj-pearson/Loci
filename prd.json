@@ -2387,6 +2387,190 @@
       "priority": 142,
       "passes": true,
       "notes": "Created ReRecordView component in Views/Record/ReRecordView.swift. Simplified recording view with record/review states, cancel/save callbacks. EditLocusSheet wired with confirmation dialog, RecordViewModel creation, and replaceAudio integration."
+    },
+    {
+      "id": "US-143",
+      "title": "Client-side login attempt throttling with exponential backoff",
+      "description": "As a user, I need the app to protect my account from brute force attacks by throttling login attempts with escalating delays and lockout after repeated failures.",
+      "acceptanceCriteria": [
+        "LoginAttemptTracker service tracks failed login attempts per email in Keychain-backed storage",
+        "After 3 failed attempts: 30-second cooldown before next attempt allowed",
+        "After 5 failed attempts: 2-minute cooldown with warning message",
+        "After 8 failed attempts: 15-minute lockout with clear countdown timer in UI",
+        "After 10 failed attempts: 1-hour lockout with suggestion to reset password",
+        "Successful login resets attempt counter for that email",
+        "Attempt data persists across app restarts via Keychain",
+        "SignInView shows remaining lockout time and disables sign-in button during cooldown",
+        "Apple Sign In is not affected by email/password throttling",
+        "Typecheck passes"
+      ],
+      "priority": 143,
+      "passes": true,
+      "notes": "Created LoginAttemptTracker @Observable service in Services/LoginAttemptTracker.swift. Implements escalating lockout policy (30s at 3 failures, 2m at 5, 15m at 8, 1h at 10). Keychain-backed persistence with auto-expiry after 24h idle. Integrated into AuthService.signIn() with pre-check and failure/success recording. SignInView updated with lockout countdown banner, failed attempt warning, and password reset suggestion. Network errors excluded from failure tracking. Apple Sign In unaffected."
+    },
+    {
+      "id": "US-144",
+      "title": "Password strength validation with complexity requirements and UI indicator",
+      "description": "As a user, I need clear password strength feedback during sign-up so I create a secure account, and the app must enforce minimum complexity requirements.",
+      "acceptanceCriteria": [
+        "PasswordValidator utility with strength scoring: weak, fair, good, strong",
+        "Minimum requirements: 8+ characters, at least one uppercase, one lowercase, one digit",
+        "Strong requirements: 12+ characters, includes special character, no common patterns",
+        "Common password check against top 100 most common passwords",
+        "PasswordStrengthView shows colored progress bar (red/orange/yellow/green) with label",
+        "Individual requirement checklist with checkmarks as requirements are met",
+        "SignUpView integrates PasswordStrengthView below password field",
+        "Sign-up button disabled until password meets minimum requirements (fair or above)",
+        "Password confirmation field with match indicator",
+        "Typecheck passes"
+      ],
+      "priority": 144,
+      "passes": true,
+      "notes": "Created PasswordValidator enum in Utilities/PasswordValidator.swift with strength scoring (weak/fair/good/strong). Requirements struct tracks 7 individual checks. Common password blocklist with 100 entries. Created PasswordStrengthView component with 4-segment colored progress bar, strength label, and animated requirement checklist. SignUpView updated with PasswordStrengthView integration, confirm password field with match indicator, and canSubmit gating. AuthService.signUp enforces PasswordValidator.meetsMinimum server-side. New AuthError cases: passwordTooWeak, passwordsDoNotMatch."
+    },
+    {
+      "id": "US-145",
+      "title": "Secure session lifecycle with token rotation and forced re-authentication",
+      "description": "As a security-conscious user, I need my sessions to expire after inactivity and require re-authentication for sensitive operations to protect against session hijacking.",
+      "acceptanceCriteria": [
+        "SessionManager service tracks last activity timestamp in Keychain",
+        "Sessions expire after 30 days of inactivity (configurable in AppConstants)",
+        "Expired sessions trigger automatic sign-out with explanatory message",
+        "Sensitive operations (delete account, change password, manage household) require re-authentication",
+        "Re-auth prompt supports biometric or password confirmation",
+        "Session activity updated on meaningful user actions (not passive reads)",
+        "AuthService.signOut clears all session data from Keychain",
+        "Token refresh failures after 3 retries trigger session expiry",
+        "Typecheck passes"
+      ],
+      "priority": 145,
+      "passes": true,
+      "notes": "Created SessionManager @Observable service in Services/SessionManager.swift. Tracks last activity via Keychain with throttled writes (5-min interval). 30-day inactivity timeout with configurable constant in AppConstants. ExpiryReason enum with user-facing messages. Token refresh failure tracking with 3-retry limit. SensitiveOperation enum for re-auth gating. ReAuthView component in Views/Components/ supports biometric (Face ID/Touch ID) with password fallback. AuthService integrated: restoreSession checks validity, signIn records activity, signOut clears session."
+    },
+    {
+      "id": "US-146",
+      "title": "Server-side auth rate limiting and login attempt tracking",
+      "description": "As a security engineer, I need the backend to track and rate-limit authentication attempts to prevent credential stuffing and brute force attacks at the API level.",
+      "acceptanceCriteria": [
+        "New auth-specific rate limiter: 5 login attempts per email per 15-minute window",
+        "Login attempt tracking middleware logs email, IP, timestamp, and success/failure",
+        "After 10 failed attempts for an email: 1-hour server-side lockout returning 429 with Retry-After",
+        "Successful login resets the attempt counter for that email",
+        "Rate limit response includes clear error message: 'Too many login attempts. Try again in X minutes.'",
+        "Auth rate limiter applied to Supabase auth proxy endpoints",
+        "Failed attempt logging uses structured JSON for monitoring/alerting",
+        "IP-based rate limiting: max 20 auth attempts per IP per 15 minutes across all emails",
+        "New database migration (009) creates login_attempts table with indexes",
+        "Edge function route /api/auth/verify-limits checks if email/IP is currently locked out",
+        "Typecheck passes"
+      ],
+      "priority": 146,
+      "passes": true,
+      "notes": "Created migration 009_login_attempts.sql with login_attempts table, indexes on email+time and IP+time, RLS enabled (service-role only). Three PostgreSQL functions: check_auth_lockout (email + IP lockout check with configurable thresholds), record_login_attempt (records attempt and clears failures on success), cleanup_login_attempts (30-day retention). Created auth-rate-limit.ts middleware with DB-backed lockout checks, structured JSON logging with masked emails, and recordLoginAttempt helper. Created auth-verify.ts route with GET /api/auth/verify-limits endpoint for iOS pre-flight lockout check. Wired into index.ts with authRateLimit on /api/auth/* and daily cleanup cron at 3 AM. Added rateLimitAuth (5/15min) as in-memory fallback in rate-limit.ts."
+    },
+    {
+      "id": "US-147",
+      "title": "Auth flow UX improvements with password visibility and keyboard management",
+      "description": "As a user, I want a polished sign-in experience with password visibility toggles, smart keyboard behavior, and haptic feedback on auth actions.",
+      "acceptanceCriteria": [
+        "Password visibility toggle button (eye/eye.slash SF Symbol) on all password fields",
+        "Auto-focus email field on SignInView appear",
+        "Return key advances from email to password field, then submits form",
+        "Keyboard dismissed on successful sign-in before dismiss animation",
+        "Haptic feedback: success notification on sign-in, error notification on failure",
+        "Loading state disables all interactive elements, not just sign-in button",
+        "Error banner with shake animation on failed attempt",
+        "Sign-up form: return key flows through display name → email → password → confirm password → submit",
+        "Typecheck passes"
+      ],
+      "priority": 147,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-148",
+      "title": "Jailbreak and runtime integrity detection",
+      "description": "As a security engineer, I need the app to detect compromised runtime environments and warn users or restrict sensitive operations.",
+      "acceptanceCriteria": [
+        "IntegrityCheckService detects common jailbreak indicators (Cydia, suspicious paths, writable system dirs)",
+        "Checks for debugger attachment and method swizzling indicators",
+        "Checks for sandbox escape (can write outside sandbox)",
+        "On detection: logs event via TelemetryDeck, shows warning banner",
+        "Sensitive operations (auth, sync, payment) show additional confirmation on compromised devices",
+        "Detection runs on app launch and periodically in background",
+        "Does not crash or block app usage — informational only per App Store guidelines",
+        "Typecheck passes"
+      ],
+      "priority": 148,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-149",
+      "title": "Security audit logging for authentication events",
+      "description": "As a developer, I need structured logging of all auth events so suspicious activity can be detected and investigated.",
+      "acceptanceCriteria": [
+        "SecurityAuditLogger service logs auth events to local SwiftData store and TelemetryDeck",
+        "Events logged: sign_in_success, sign_in_failure, sign_up, sign_out, password_reset_request, session_expired, account_deleted, biometric_unlock, biometric_failure",
+        "Each event includes: timestamp, event type, email hash (SHA-256, not plaintext), device info, app version",
+        "Local audit log capped at 1000 entries with FIFO cleanup",
+        "Audit log viewable in Settings > Security for transparency",
+        "Server-side: edge function logs auth events to structured JSON output",
+        "Typecheck passes"
+      ],
+      "priority": 149,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-150",
+      "title": "Email enumeration protection on auth endpoints",
+      "description": "As a security engineer, I need auth responses to not reveal whether an email exists in the system to prevent account enumeration attacks.",
+      "acceptanceCriteria": [
+        "Sign-up error for existing email shows generic message: 'If this email is available, you will receive a confirmation.'",
+        "Password reset always shows success message regardless of email existence",
+        "Sign-in failure uses generic message: 'Invalid email or password' (never 'email not found')",
+        "Response timing is consistent regardless of email existence (prevents timing attacks)",
+        "Edge function auth endpoints follow same pattern",
+        "Typecheck passes"
+      ],
+      "priority": 150,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-151",
+      "title": "Android app architecture planning and Kotlin Multiplatform evaluation",
+      "description": "As a product owner, I need an architectural plan for the Android version of Loci to understand the effort and approach for cross-platform expansion.",
+      "acceptanceCriteria": [
+        "Architecture decision document (android/ARCHITECTURE.md) comparing: native Kotlin/Jetpack Compose vs KMP shared logic",
+        "Mapping of iOS services to Android equivalents (LocationService → FusedLocationProvider, SwiftData → Room, Keychain → EncryptedSharedPreferences, etc.)",
+        "Estimated story count and phase breakdown for Android MVP",
+        "Shared backend — no backend changes needed, same Supabase API",
+        "Android-specific considerations: background location limits, Doze mode, notification channels",
+        "Recommended minimum Android API level and rationale",
+        "File created: android/ARCHITECTURE.md"
+      ],
+      "priority": 151,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-152",
+      "title": "Network security hardening with App Transport Security and request signing",
+      "description": "As a security engineer, I need all network communication hardened against interception and tampering.",
+      "acceptanceCriteria": [
+        "App Transport Security (ATS) fully enforced — no NSAllowsArbitraryLoads exceptions",
+        "All API requests include X-Client-Version header for server-side version gating",
+        "Request signing: HMAC-SHA256 signature header on sensitive mutations (delete, update, payment)",
+        "Server-side signature validation middleware for signed requests",
+        "Certificate transparency logging enabled",
+        "Connection timeout set to 30s, read timeout 60s for all Supabase requests",
+        "Typecheck passes"
+      ],
+      "priority": 152,
+      "passes": false,
+      "notes": ""
     }
   ]
 }

@@ -12,6 +12,12 @@ final class AuthService {
     private(set) var isLoading = false
     private(set) var errorMessage: String?
 
+    /// Tracks failed login attempts for brute force protection (US-143).
+    let loginAttemptTracker = LoginAttemptTracker()
+
+    /// Manages session lifecycle: inactivity timeout, re-auth, token refresh (US-145).
+    let sessionManager = SessionManager()
+
     private let supabase = SupabaseClientProvider.shared
     private var authStateTask: Task<Void, Never>?
 
@@ -52,11 +58,26 @@ final class AuthService {
     func restoreSession() async {
         do {
             let session = try await supabase.auth.session
+
+            // US-145: Check session inactivity timeout
+            guard sessionManager.checkSessionValidity() else {
+                await setError(sessionManager.sessionExpiryReason?.message ?? "")
+                try? await signOut()
+                return
+            }
+
+            sessionManager.recordActivity()
+            sessionManager.resetTokenRefreshFailures()
+
             await MainActor.run {
                 self.isAuthenticated = true
             }
             _ = session // Session exists, user is authenticated
         } catch {
+            // US-145: Track token refresh failures
+            if sessionManager.recordTokenRefreshFailure() {
+                await setError(SessionManager.ExpiryReason.tokenRefreshFailed.message)
+            }
             await MainActor.run {
                 self.isAuthenticated = false
             }
@@ -99,6 +120,10 @@ final class AuthService {
         guard isValidEmail(email) else { throw AuthError.invalidEmail }
         guard password.count >= 8 else { throw AuthError.passwordTooShort }
 
+        // US-144: Enforce password complexity requirements
+        let validation = PasswordValidator.validate(password)
+        guard validation.requirements.meetsMinimum else { throw AuthError.passwordTooWeak }
+
         await setLoading(true)
         defer { Task { await setLoading(false) } }
 
@@ -126,6 +151,12 @@ final class AuthService {
     func signIn(email: String, password: String) async throws {
         guard isValidEmail(email) else { throw AuthError.invalidEmail }
 
+        // US-143: Check brute force lockout before attempting
+        if let lockoutMessage = loginAttemptTracker.checkAllowed(email: email) {
+            await setError(lockoutMessage)
+            throw AuthError.rateLimited
+        }
+
         await setLoading(true)
         defer { Task { await setLoading(false) } }
 
@@ -135,12 +166,24 @@ final class AuthService {
                 password: password
             )
 
+            // US-143: Reset attempt counter on success
+            loginAttemptTracker.recordSuccess(email: email)
+
+            // US-145: Record session activity and reset token failures
+            sessionManager.recordActivity()
+            sessionManager.resetTokenRefreshFailures()
+
             await updateLocalProfile(
                 authId: UUID(uuidString: session.user.id.uuidString) ?? UUID(),
                 displayName: nil,
                 email: email
             )
         } catch {
+            // US-143: Record failed attempt (only for credential errors, not network)
+            let message = error.localizedDescription.lowercased()
+            if !message.contains("network") && !message.contains("connection") {
+                loginAttemptTracker.recordFailure(email: email)
+            }
             await setError(mapAuthError(error))
             throw error
         }
@@ -164,6 +207,8 @@ final class AuthService {
 
     func signOut() async throws {
         try await supabase.auth.signOut()
+        // US-145: Clear all session data on sign out
+        sessionManager.clearSession()
         await MainActor.run {
             self.isAuthenticated = false
             self.currentUser = nil
@@ -181,6 +226,15 @@ final class AuthService {
         if let profile = currentUser {
             modelContext.delete(profile)
             try? modelContext.save()
+        }
+    }
+
+    // MARK: - Session Helpers
+
+    /// The current authenticated user's email (for re-auth flows, US-145).
+    var supabaseEmail: String? {
+        get throws {
+            try supabase.auth.session.user.email
         }
     }
 
@@ -258,6 +312,9 @@ enum AuthError: LocalizedError {
     case invalidCredential
     case invalidEmail
     case passwordTooShort
+    case passwordTooWeak
+    case passwordsDoNotMatch
+    case rateLimited
 
     var errorDescription: String? {
         switch self {
@@ -267,6 +324,12 @@ enum AuthError: LocalizedError {
             String(localized: "Please enter a valid email address.")
         case .passwordTooShort:
             String(localized: "Password must be at least 8 characters.")
+        case .passwordTooWeak:
+            String(localized: "Password does not meet security requirements.")
+        case .passwordsDoNotMatch:
+            String(localized: "Passwords do not match.")
+        case .rateLimited:
+            String(localized: "Too many attempts. Please wait before trying again.")
         }
     }
 }
