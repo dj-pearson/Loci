@@ -127,6 +127,7 @@ final class RecordViewModel {
         isRecording = true
         recordingDuration = 0
         startDurationTimer()
+        AnalyticsService.shared.trackRecordingStarted()
     }
 
     /// Stops recording and returns the audio URL, transcription text, and captured coordinate.
@@ -254,6 +255,9 @@ final class RecordViewModel {
         // Success haptic
         let generator = UINotificationFeedbackGenerator()
         generator.notificationOccurred(.success)
+
+        AnalyticsService.shared.trackRecordingCompleted()
+        AnalyticsService.shared.trackLocusCreated(category: finalCategory.rawValue)
 
         isSaving = false
         didSaveLocus = true

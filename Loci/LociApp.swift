@@ -21,6 +21,8 @@ struct LociApp: App {
         }
 
         RevenueCatConfiguration.configure()
+        AnalyticsService.shared.configure()
+        AnalyticsService.shared.trackAppLaunch()
     }
 
     var body: some Scene {

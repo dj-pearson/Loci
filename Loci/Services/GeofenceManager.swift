@@ -83,6 +83,7 @@ final class GeofenceManager {
                       let locus = loci.first(where: { $0.id.uuidString == identifier })
                 else { continue }
 
+                AnalyticsService.shared.trackGeofenceTriggered()
                 onGeofenceEntry?(locus)
             }
         }

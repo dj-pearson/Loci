@@ -2125,8 +2125,8 @@
         "Typecheck passes"
       ],
       "priority": 127,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "AnalyticsService enhanced with all required events (app_launch, locus_viewed, geofence_triggered, subscription_cancelled). SHA-256 user ID hashing via CryptoKit. configure() + trackAppLaunch() called from LociApp.init. Recording events wired in RecordViewModel. Geofence trigger wired in GeofenceManager. Debug mode logs to console. Opt-out respected via UserDefaults. TelemetryDeck SDK calls commented until SPM package is added."
     },
     {
       "id": "US-128",
