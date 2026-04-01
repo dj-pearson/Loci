@@ -14,6 +14,10 @@ enum AppConstants {
     static let inviteCodeLength = 6
     static let inviteExpiryHours = 48
 
+    // MARK: - Recording Limits
+    static let maxRecordingDurationSeconds: TimeInterval = 300 // 5 minutes
+    static let lowStorageThresholdBytes: Int64 = 100 * 1024 * 1024 // 100 MB
+
     // MARK: - Audio Format
     enum Audio {
         static let formatID = kAudioFormatMPEG4AAC

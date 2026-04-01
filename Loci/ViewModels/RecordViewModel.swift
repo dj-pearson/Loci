@@ -14,6 +14,7 @@ final class RecordViewModel {
     private(set) var recordingDuration: TimeInterval = 0
     private(set) var errorMessage: String?
     private(set) var didSaveLocus = false
+    private(set) var didReachMaxDuration = false
 
     var transcription: String {
         transcriptionService.transcription
@@ -264,6 +265,11 @@ final class RecordViewModel {
         durationTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
             guard let self, self.isRecording else { return }
             self.recordingDuration += 1
+
+            // Auto-stop at max duration
+            if self.recordingDuration >= AppConstants.maxRecordingDurationSeconds {
+                self.didReachMaxDuration = true
+            }
         }
     }
 

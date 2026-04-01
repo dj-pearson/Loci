@@ -2313,8 +2313,8 @@
         "Typecheck passes"
       ],
       "priority": 138,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Added maxRecordingDurationSeconds (300s/5min) and lowStorageThresholdBytes (100MB) to AppConstants. RecordViewModel auto-stops via didReachMaxDuration flag observed by RecordingView and ReRecordView. SettingsViewModel has deviceFreeSpace, isStorageLow, and deleteArchivedAudio. SettingsView shows low storage warning and bulk delete for archived audio. Orphan cleanup already in clearCache."
     },
     {
       "id": "US-139",

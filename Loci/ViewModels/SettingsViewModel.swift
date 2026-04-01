@@ -73,7 +73,43 @@ final class SettingsViewModel {
         return totalSize
     }
 
+    /// Returns the device's available free space in bytes, or nil if unavailable.
+    var deviceFreeSpace: Int64? {
+        let url = URL(fileURLWithPath: NSHomeDirectory())
+        guard let values = try? url.resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey]),
+              let capacity = values.volumeAvailableCapacityForImportantUsage else {
+            return nil
+        }
+        return capacity
+    }
+
+    /// Whether device storage is critically low (< 100 MB).
+    var isStorageLow: Bool {
+        guard let free = deviceFreeSpace else { return false }
+        return free < AppConstants.lowStorageThresholdBytes
+    }
+
     // MARK: - Actions
+
+    /// Deletes audio files for all archived loci.
+    func deleteArchivedAudio(modelContext: ModelContext) -> Int {
+        let archivedPredicate = #Predicate<Locus> { $0.isArchived }
+        let descriptor = FetchDescriptor<Locus>(predicate: archivedPredicate)
+        guard let archivedLoci = try? modelContext.fetch(descriptor) else { return 0 }
+
+        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        var deletedCount = 0
+
+        for locus in archivedLoci {
+            let fileURL = documentsURL.appendingPathComponent(locus.audioFileURL)
+            if FileManager.default.fileExists(atPath: fileURL.path) {
+                try? FileManager.default.removeItem(at: fileURL)
+                deletedCount += 1
+            }
+        }
+
+        return deletedCount
+    }
 
     func clearCache(modelContext: ModelContext) {
         let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!

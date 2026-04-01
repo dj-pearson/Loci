@@ -93,6 +93,15 @@ struct ReRecordView: View {
                 preparingOverlay
             }
         }
+        .onChange(of: recordViewModel.didReachMaxDuration) { _, reached in
+            if reached {
+                Task {
+                    if let result = await recordViewModel.stopRecording() {
+                        recordingResult = (url: result.url, transcription: result.transcription)
+                    }
+                }
+            }
+        }
     }
 
     // MARK: - Review View

@@ -184,8 +184,23 @@ struct SettingsView: View {
 
     // MARK: - Data Section
 
+    @State private var showDeleteArchivedConfirmation = false
+    @State private var deletedArchivedCount = 0
+    @State private var showDeletedArchivedAlert = false
+
     private var dataSection: some View {
         Section(String(localized: "Data")) {
+            if viewModel.isStorageLow {
+                HStack(spacing: Theme.Spacing.sm) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .foregroundStyle(Theme.warning)
+                    Text(String(localized: "Device storage is running low. Consider deleting archived audio to free space."))
+                        .font(.caption)
+                        .foregroundStyle(Theme.textSecondary)
+                }
+                .padding(.vertical, Theme.Spacing.xs)
+            }
+
             HStack {
                 Label(String(localized: "Storage Used"), systemImage: "internaldrive")
                 Spacer()
@@ -197,6 +212,32 @@ struct SettingsView: View {
                 viewModel.clearCache(modelContext: modelContext)
             } label: {
                 Label(String(localized: "Clear Cache"), systemImage: "trash")
+            }
+
+            Button(role: .destructive) {
+                showDeleteArchivedConfirmation = true
+            } label: {
+                Label(String(localized: "Delete Archived Audio"), systemImage: "archivebox.fill")
+            }
+            .confirmationDialog(
+                String(localized: "Delete Archived Audio"),
+                isPresented: $showDeleteArchivedConfirmation,
+                titleVisibility: .visible
+            ) {
+                Button(String(localized: "Delete All Archived Audio"), role: .destructive) {
+                    deletedArchivedCount = viewModel.deleteArchivedAudio(modelContext: modelContext)
+                    showDeletedArchivedAlert = true
+                }
+            } message: {
+                Text(String(localized: "This will permanently delete audio files for all archived loci. The text transcriptions will be preserved."))
+            }
+            .alert(
+                String(localized: "Archived Audio Deleted"),
+                isPresented: $showDeletedArchivedAlert
+            ) {
+                Button(String(localized: "OK")) {}
+            } message: {
+                Text(String(localized: "\(deletedArchivedCount) audio file(s) deleted."))
             }
 
             NavigationLink {
