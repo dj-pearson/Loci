@@ -267,6 +267,15 @@ struct SettingsView: View {
                 .padding(.vertical, Theme.Spacing.xs)
             }
 
+            if let lastSync = viewModel.lastSyncTimestamp {
+                HStack {
+                    Label(String(localized: "Last Sync"), systemImage: "arrow.triangle.2.circlepath")
+                    Spacer()
+                    Text(lastSync, style: .relative)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
             HStack {
                 Label(String(localized: "Storage Used"), systemImage: "internaldrive")
                 Spacer()

@@ -340,6 +340,9 @@ struct LocusListView: View {
                 )
             }
         }
+        .refreshable {
+            resetPagination()
+        }
     }
 
     // MARK: - Pagination

@@ -43,6 +43,11 @@ final class SettingsViewModel {
         set { UserDefaults.standard.set(Int(newValue.rawValue), forKey: "loci_map_type") }
     }
 
+    var lastSyncTimestamp: Date? {
+        get { UserDefaults.standard.object(forKey: "loci_last_sync_timestamp") as? Date }
+        set { UserDefaults.standard.set(newValue, forKey: "loci_last_sync_timestamp") }
+    }
+
     // MARK: - Account State
 
     var isSignedIn = false

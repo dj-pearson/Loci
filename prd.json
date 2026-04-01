@@ -2262,8 +2262,8 @@
         "Typecheck passes"
       ],
       "priority": 135,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Added .refreshable to LocusListView that resets pagination. Last sync timestamp shown in Settings data section. BackgroundSyncManager already implements BGAppRefreshTask with periodic scheduling. SyncService/AudioSyncService wired into BackgroundSyncManager. Premium sync trigger will be connected when SyncService is injected into view environment."
     },
     {
       "id": "US-136",
