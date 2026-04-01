@@ -38,19 +38,23 @@ final class AudioSyncService {
             do {
                 let data = try Data(contentsOf: localURL)
 
-                try await supabase.storage
-                    .from(bucket)
-                    .upload(
-                        path: remotePath,
-                        file: data,
-                        options: .init(contentType: "audio/mp4", upsert: true)
-                    )
+                try await RetryHelper.withRetry(shouldRetry: RetryHelper.isTransientError) {
+                    try await supabase.storage
+                        .from(bucket)
+                        .upload(
+                            path: remotePath,
+                            file: data,
+                            options: .init(contentType: "audio/mp4", upsert: true)
+                        )
+                }
 
                 // Update the audio URL to include remote path info
                 // Keep local path for offline playback, store remote path in a way that's recoverable
                 await MainActor.run {
                     locus.updatedAt = Date()
                 }
+            } catch is CancellationError {
+                return
             } catch {
                 // Will retry on next sync cycle
                 continue

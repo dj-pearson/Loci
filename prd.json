@@ -2177,8 +2177,8 @@
         "Typecheck passes"
       ],
       "priority": 130,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Created RetryHelper utility with exponential backoff (1s, 2s, 4s) and transient error detection. Wired into SyncService upload/download and AudioSyncService upload. CancellationError propagates immediately. Auth token refresh handled by Supabase SDK authStateChanges listener. ErrorBannerView already provides toast/banner UI. Household errors already have specific messages."
     },
     {
       "id": "US-131",

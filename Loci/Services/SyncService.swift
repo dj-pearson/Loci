@@ -48,17 +48,21 @@ final class SyncService {
                     updated_at: locus.updatedAt.ISO8601Format()
                 )
 
-                try await supabase
-                    .from("loci")
-                    .upsert(payload, onConflict: "id")
-                    .execute()
+                try await RetryHelper.withRetry(shouldRetry: RetryHelper.isTransientError) {
+                    try await supabase
+                        .from("loci")
+                        .upsert(payload, onConflict: "id")
+                        .execute()
+                }
 
                 await MainActor.run {
                     locus.syncStatus = .synced
                     pendingCount = max(0, pendingCount - 1)
                 }
+            } catch is CancellationError {
+                return
             } catch {
-                // Leave as pending for retry on next sync
+                // Leave as pending for retry on next sync cycle
                 continue
             }
         }
@@ -84,7 +88,11 @@ final class SyncService {
                 query = query.gte("updated_at", value: lastSync.ISO8601Format())
             }
 
-            let response: [LocusRemotePayload] = try await query.execute().value
+            let response: [LocusRemotePayload] = try await RetryHelper.withRetry(
+                shouldRetry: RetryHelper.isTransientError
+            ) {
+                try await query.execute().value
+            }
 
             for remote in response {
                 await mergeLocus(remote: remote, modelContext: modelContext)
@@ -98,8 +106,10 @@ final class SyncService {
 
             // Trigger geofence refresh after download
             NotificationCenter.default.post(name: .locusDidCreate, object: nil)
+        } catch is CancellationError {
+            return
         } catch {
-            // Network failure — will retry on next sync
+            // Network failure — will retry on next sync cycle
         }
     }
 

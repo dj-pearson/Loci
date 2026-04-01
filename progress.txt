@@ -4,7 +4,7 @@
 ## Started: 2026-03-25
 ## Status: IN PROGRESS
 ## Total Stories: 142
-## Completed: 127/142
+## Completed: 128/142
 
 ---
 
@@ -213,7 +213,7 @@ Loci is a voice-first iOS app (SwiftUI, iOS 17+) that pins voice notes to GPS co
 - [ ] US-127: Implement TelemetryDeck analytics integration
 - [x] US-128: Add comprehensive input sanitization for all user-facing text fields
 - [ ] US-129: Add Fastlane match signing and GitHub Actions CI/CD pipeline
-- [ ] US-130: Add comprehensive error recovery and retry logic for Supabase operations
+- [x] US-130: Add comprehensive error recovery and retry logic for Supabase operations
 - [ ] US-131: Add data export and account deletion compliance (GDPR/App Store requirement)
 - [ ] US-132: Add notification permission re-prompt and settings deep link
 - [ ] US-133: Add quiet hours edge cases and notification scheduling
