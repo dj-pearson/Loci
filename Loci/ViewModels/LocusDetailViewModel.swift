@@ -86,6 +86,20 @@ final class LocusDetailViewModel {
         saveContext()
     }
 
+    /// Replaces the locus audio file and transcription after a re-record.
+    func replaceAudio(newFileURL: URL, newTranscription: String) {
+        // Delete old audio file
+        if let oldURL = audioURL {
+            try? FileManager.default.removeItem(at: oldURL)
+        }
+
+        // Update locus with new audio
+        locus.audioFileURL = newFileURL.lastPathComponent
+        locus.transcription = newTranscription
+        locus.updatedAt = Date()
+        saveContext()
+    }
+
     func updateSharing(isShared: Bool, householdId: UUID? = nil, createdByName: String? = nil) {
         locus.isShared = isShared
         if isShared {
