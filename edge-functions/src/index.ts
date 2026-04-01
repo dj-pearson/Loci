@@ -1,12 +1,13 @@
 import { Hono } from 'hono';
 import { serve } from '@hono/node-server';
 import cron from 'node-cron';
-import { rateLimitDefault, rateLimitInvite, rateLimitWebhook } from './middleware/rate-limit.js';
+import { rateLimitDefault, rateLimitInvite, rateLimitWebhook, rateLimitHealth } from './middleware/rate-limit.js';
 import householdInvite from './routes/household-invite.js';
 import contextualSelect from './routes/contextual-select.js';
 import analyzeLoci, { processUserClusters } from './routes/analyze-loci.js';
 import syncSubscription from './routes/sync-subscription.js';
 import pushDigest, { generateDigests } from './routes/push-digest.js';
+import health from './routes/health.js';
 
 const app = new Hono();
 
@@ -38,14 +39,9 @@ cron.schedule('0 10 * * 0', async () => {
   console.log(`[cron] Digest complete: ${result.sent} sent, ${result.skipped} skipped`);
 });
 
-// Health check
-app.get('/health', (c) => {
-  return c.json({
-    status: 'ok',
-    service: 'loci-edge-functions',
-    timestamp: new Date().toISOString(),
-  });
-});
+// Health check — no auth required, rate-limited to 10 req/min per IP
+app.use('/api/health/*', rateLimitHealth);
+app.route('/api/health', health);
 
 const port = parseInt(process.env.PORT || '3000', 10);
 
