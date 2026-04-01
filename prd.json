@@ -2331,8 +2331,8 @@
         "Typecheck passes"
       ],
       "priority": 139,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "AudioWaveformView: added accessibilityHint. CategoryPinView: added default accessibilityLabel with category and shared status. RecordViewModel: added UIAccessibility.post(.announcement) for recording started/stopped. RecordButton, map annotations, and tab bar items already had proper accessibility. Dynamic Type supported via system fonts throughout."
     },
     {
       "id": "US-140",

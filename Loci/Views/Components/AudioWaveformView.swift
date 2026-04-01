@@ -52,6 +52,7 @@ struct AudioWaveformView: View {
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(String(localized: "Audio waveform"))
         .accessibilityValue(amplitudeAccessibilityValue)
+        .accessibilityHint(String(localized: "Shows volume level during recording"))
     }
 
     // MARK: - Reduced Motion Fallback
@@ -67,6 +68,7 @@ struct AudioWaveformView: View {
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(String(localized: "Audio level indicator"))
             .accessibilityValue(amplitudeAccessibilityValue)
+            .accessibilityHint(String(localized: "Shows volume level during recording"))
     }
 
     // MARK: - Bar Height Computation

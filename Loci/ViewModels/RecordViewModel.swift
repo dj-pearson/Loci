@@ -128,12 +128,15 @@ final class RecordViewModel {
         recordingDuration = 0
         startDurationTimer()
         AnalyticsService.shared.trackRecordingStarted()
+        UIAccessibility.post(notification: .announcement, argument: String(localized: "Recording started"))
     }
 
     /// Stops recording and returns the audio URL, transcription text, and captured coordinate.
     /// Returns `nil` if recording was not active or location is unavailable.
     func stopRecording() async -> (url: URL, transcription: String, coordinate: CLLocationCoordinate2D)? {
         guard isRecording else { return nil }
+
+        UIAccessibility.post(notification: .announcement, argument: String(localized: "Recording stopped"))
 
         // Stop services
         audioService.stopRecording()
