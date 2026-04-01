@@ -13,6 +13,7 @@ struct HomeMapView: View {
 
     @Environment(\.modelContext) private var modelContext
     @Environment(LocationService.self) private var locationService
+    @Environment(NetworkMonitor.self) private var networkMonitor
 
     @Bindable var viewModel: HomeMapViewModel
     let navigationRouter: NavigationRouter
@@ -149,6 +150,20 @@ struct HomeMapView: View {
                 .transition(reduceMotion ? .opacity : .move(edge: .bottom).combined(with: .opacity))
                 .padding(.bottom, 80)
                 .padding(.horizontal, 16)
+            }
+
+            // Offline indicator
+            if !networkMonitor.isConnected {
+                HStack(spacing: 6) {
+                    Image(systemName: "wifi.slash")
+                        .font(.caption2)
+                    Text(String(localized: "Offline — notes saved locally"))
+                        .font(.caption2)
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(.ultraThinMaterial, in: Capsule())
+                .padding(.bottom, 96) // Above record button
             }
 
             // Record button

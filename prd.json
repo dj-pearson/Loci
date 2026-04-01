@@ -2108,8 +2108,8 @@
         "Typecheck passes"
       ],
       "priority": 126,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Created NetworkMonitor service using NWPathMonitor tracking isConnected and connectionType. Injected into environment from LociApp. HomeMapView shows offline capsule indicator when disconnected. SyncStatus.pending already queues offline loci. SyncService.isSyncing and pendingCount already observable. BackgroundSyncManager triggers sync on foreground."
     },
     {
       "id": "US-127",

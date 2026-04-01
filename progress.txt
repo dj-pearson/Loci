@@ -4,7 +4,7 @@
 ## Started: 2026-03-25
 ## Status: IN PROGRESS
 ## Total Stories: 142
-## Completed: 138/142
+## Completed: 139/142
 
 ---
 
@@ -209,7 +209,7 @@ Loci is a voice-first iOS app (SwiftUI, iOS 17+) that pins voice notes to GPS co
 - [x] US-123: Add webhook replay protection with timestamp validation
 - [ ] US-124: Replace in-memory rate limiting with Redis-backed store
 - [x] US-125: Wire LocusDetailView into deep-link navigation replacing placeholder
-- [ ] US-126: Add network reachability monitoring and offline sync queue
+- [x] US-126: Add network reachability monitoring and offline sync queue
 - [x] US-127: Implement TelemetryDeck analytics integration
 - [x] US-128: Add comprehensive input sanitization for all user-facing text fields
 - [ ] US-129: Add Fastlane match signing and GitHub Actions CI/CD pipeline

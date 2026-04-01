@@ -10,6 +10,7 @@ struct LociApp: App {
     @State private var notificationService = NotificationService()
     @State private var locationService = LocationService()
     @State private var biometricService = BiometricLockService()
+    @State private var networkMonitor = NetworkMonitor()
 
     @Environment(\.scenePhase) private var scenePhase
 
@@ -33,6 +34,7 @@ struct LociApp: App {
                     .environment(notificationService)
                     .environment(locationService)
                     .environment(biometricService)
+                    .environment(networkMonitor)
                     .onOpenURL { url in
                         navigationRouter.handleURL(url)
                     }
