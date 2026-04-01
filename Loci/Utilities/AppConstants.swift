@@ -18,6 +18,11 @@ enum AppConstants {
     static let maxRecordingDurationSeconds: TimeInterval = 300 // 5 minutes
     static let lowStorageThresholdBytes: Int64 = 100 * 1024 * 1024 // 100 MB
 
+    // MARK: - Session Security (US-145)
+    static let sessionInactivityTimeoutDays: Int = 30
+    static let tokenRefreshMaxRetries: Int = 3
+    static let sessionActivityUpdateIntervalSeconds: TimeInterval = 300 // 5 minutes
+
     // MARK: - Audio Format
     enum Audio {
         static let formatID = kAudioFormatMPEG4AAC

@@ -56,6 +56,41 @@ struct SignInView: View {
                             .textFieldStyle(.roundedBorder)
                             .textContentType(.password)
 
+                        // US-143: Lockout indicator
+                        if authService.loginAttemptTracker.isLockedOut {
+                            HStack(spacing: Theme.Spacing.sm) {
+                                Image(systemName: "lock.fill")
+                                    .foregroundStyle(Theme.error)
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("Account temporarily locked")
+                                        .font(Theme.Typography.caption)
+                                        .foregroundStyle(Theme.error)
+                                    Text("Try again in \(authService.loginAttemptTracker.formattedTime(authService.loginAttemptTracker.remainingLockoutSeconds))")
+                                        .font(Theme.Typography.caption)
+                                        .foregroundStyle(Theme.textSecondary)
+                                }
+                                Spacer()
+                            }
+                            .padding(Theme.Spacing.sm)
+                            .background(Theme.error.opacity(0.1))
+                            .cornerRadius(Theme.CornerRadius.small)
+                        }
+
+                        // US-143: Failed attempt warning (before lockout)
+                        if authService.loginAttemptTracker.failedAttemptCount > 0 && !authService.loginAttemptTracker.isLockedOut {
+                            HStack(spacing: Theme.Spacing.sm) {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                    .foregroundStyle(Theme.warning)
+                                Text("\(authService.loginAttemptTracker.failedAttemptCount) failed attempt(s)")
+                                    .font(Theme.Typography.caption)
+                                    .foregroundStyle(Theme.warning)
+                                Spacer()
+                            }
+                            .padding(Theme.Spacing.sm)
+                            .background(Theme.warning.opacity(0.1))
+                            .cornerRadius(Theme.CornerRadius.small)
+                        }
+
                         Button {
                             Task { await signInWithEmail() }
                         } label: {
@@ -72,7 +107,7 @@ struct SignInView: View {
                         }
                         .buttonStyle(.borderedProminent)
                         .tint(Theme.primary)
-                        .disabled(email.isEmpty || password.isEmpty || authService.isLoading)
+                        .disabled(email.isEmpty || password.isEmpty || authService.isLoading || authService.loginAttemptTracker.isLockedOut)
                     }
 
                     // Links
@@ -81,6 +116,13 @@ struct SignInView: View {
                             showResetPassword = true
                         }
                         .font(Theme.Typography.caption)
+
+                        // US-143: Password reset suggestion after many failures
+                        if authService.loginAttemptTracker.shouldSuggestPasswordReset {
+                            Text("Having trouble? Try resetting your password.")
+                                .font(Theme.Typography.caption)
+                                .foregroundStyle(Theme.primary)
+                        }
 
                         HStack {
                             Text("Don't have an account?")
@@ -170,8 +212,23 @@ struct SignUpView: View {
 
     @State private var email = ""
     @State private var password = ""
+    @State private var confirmPassword = ""
     @State private var displayName = ""
     @State private var showError = false
+
+    /// US-144: Password meets minimum requirements (fair or above).
+    private var passwordMeetsMinimum: Bool {
+        PasswordValidator.validate(password).requirements.meetsMinimum
+    }
+
+    /// US-144: Passwords match.
+    private var passwordsMatch: Bool {
+        !confirmPassword.isEmpty && password == confirmPassword
+    }
+
+    private var canSubmit: Bool {
+        !email.isEmpty && !displayName.isEmpty && passwordMeetsMinimum && passwordsMatch && !authService.isLoading
+    }
 
     var body: some View {
         NavigationStack {
@@ -199,9 +256,34 @@ struct SignUpView: View {
                             .autocorrectionDisabled()
                             .textInputAutocapitalization(.never)
 
-                        SecureField(String(localized: "Password (8+ characters)"), text: $password)
+                        SecureField(String(localized: "Password"), text: $password)
                             .textFieldStyle(.roundedBorder)
                             .textContentType(.newPassword)
+
+                        // US-144: Password strength indicator
+                        if !password.isEmpty {
+                            PasswordStrengthView(password: password)
+                        }
+
+                        // US-144: Confirm password with match indicator
+                        HStack {
+                            SecureField(String(localized: "Confirm Password"), text: $confirmPassword)
+                                .textFieldStyle(.roundedBorder)
+                                .textContentType(.newPassword)
+
+                            if !confirmPassword.isEmpty {
+                                Image(systemName: passwordsMatch ? "checkmark.circle.fill" : "xmark.circle.fill")
+                                    .foregroundStyle(passwordsMatch ? Theme.success : Theme.error)
+                                    .font(.system(size: 18))
+                            }
+                        }
+
+                        if !confirmPassword.isEmpty && !passwordsMatch {
+                            Text("Passwords do not match")
+                                .font(Theme.Typography.caption)
+                                .foregroundStyle(Theme.error)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
 
                         Button {
                             Task { await signUp() }
@@ -219,7 +301,7 @@ struct SignUpView: View {
                         }
                         .buttonStyle(.borderedProminent)
                         .tint(Theme.primary)
-                        .disabled(email.isEmpty || password.isEmpty || displayName.isEmpty || authService.isLoading)
+                        .disabled(!canSubmit)
                     }
 
                     HStack {
@@ -249,6 +331,17 @@ struct SignUpView: View {
     }
 
     private func signUp() async {
+        // US-144: Validate password strength before submitting
+        guard passwordMeetsMinimum else {
+            authService.errorMessage = AuthError.passwordTooWeak.localizedDescription
+            showError = true
+            return
+        }
+        guard passwordsMatch else {
+            authService.errorMessage = AuthError.passwordsDoNotMatch.localizedDescription
+            showError = true
+            return
+        }
         do {
             try await authService.signUp(email: email, password: password, displayName: displayName)
         } catch {
