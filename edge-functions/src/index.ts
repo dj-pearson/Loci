@@ -8,6 +8,7 @@ import analyzeLoci, { processUserClusters } from './routes/analyze-loci.js';
 import syncSubscription from './routes/sync-subscription.js';
 import pushDigest, { generateDigests } from './routes/push-digest.js';
 import health from './routes/health.js';
+import accountDelete from './routes/account-delete.js';
 
 const app = new Hono();
 
@@ -24,6 +25,7 @@ app.route('/api/loci/contextual-select', contextualSelect);
 app.route('/api/loci/analyze', analyzeLoci);
 app.route('/api/webhook/revenuecat', syncSubscription);
 app.route('/api/digest', pushDigest);
+app.route('/api/account', accountDelete);
 
 // Cron: nightly AI analysis at 2 AM
 cron.schedule('0 2 * * *', async () => {

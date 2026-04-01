@@ -2195,8 +2195,8 @@
         "Typecheck passes"
       ],
       "priority": 131,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Added Export My Data and Delete Account to Privacy section. Export creates JSON + audio files directory shared via UIActivityViewController. Delete Account calls account-delete edge function for server cascade (memberships, households, storage, loci, auth user), then clears local SwiftData and audio files. Confirmation dialog with irreversibility warning."
     },
     {
       "id": "US-132",
