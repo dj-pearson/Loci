@@ -2142,8 +2142,8 @@
         "Typecheck passes"
       ],
       "priority": 128,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Wired InputSanitizer into all ViewModel save points (LocusDetailViewModel, RecordViewModel, HouseholdViewModel, AuthService). Enhanced InputSanitizer with control char and zero-width char stripping. Added validate.ts middleware for edge functions with UUID, invite code, and string validators. Household invite routes now validate input format."
     },
     {
       "id": "US-129",

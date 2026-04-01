@@ -230,10 +230,10 @@ final class RecordViewModel {
             longitude: coordinate.longitude,
             locationName: locationName,
             audioFileURL: audioURL.lastPathComponent,
-            transcription: transcription,
+            transcription: InputSanitizer.sanitizeTranscription(transcription),
             category: finalCategory,
             isShared: isShared,
-            createdByName: isShared ? createdByName : nil,
+            createdByName: isShared ? createdByName.map { InputSanitizer.sanitizeDisplayName($0) } : nil,
             householdId: isShared ? householdId : nil
         )
 

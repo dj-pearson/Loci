@@ -81,7 +81,7 @@ final class LocusDetailViewModel {
     }
 
     func updateTranscription(_ text: String) {
-        locus.transcription = text
+        locus.transcription = InputSanitizer.sanitizeTranscription(text)
         locus.updatedAt = Date()
         saveContext()
     }
@@ -95,7 +95,7 @@ final class LocusDetailViewModel {
 
         // Update locus with new audio
         locus.audioFileURL = newFileURL.lastPathComponent
-        locus.transcription = newTranscription
+        locus.transcription = InputSanitizer.sanitizeTranscription(newTranscription)
         locus.updatedAt = Date()
         saveContext()
     }
@@ -104,7 +104,7 @@ final class LocusDetailViewModel {
         locus.isShared = isShared
         if isShared {
             locus.householdId = householdId
-            locus.createdByName = createdByName
+            locus.createdByName = createdByName.map { InputSanitizer.sanitizeDisplayName($0) }
         } else {
             locus.householdId = nil
             locus.createdByName = nil

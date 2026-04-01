@@ -103,16 +103,17 @@ final class AuthService {
         defer { Task { await setLoading(false) } }
 
         do {
+            let sanitizedName = InputSanitizer.sanitizeDisplayName(displayName)
             let response = try await supabase.auth.signUp(
                 email: email,
                 password: password,
-                data: ["display_name": .string(displayName)]
+                data: ["display_name": .string(sanitizedName)]
             )
 
             if let session = response.session {
                 await updateLocalProfile(
                     authId: UUID(uuidString: session.user.id.uuidString) ?? UUID(),
-                    displayName: displayName,
+                    displayName: sanitizedName,
                     email: email
                 )
             }
@@ -190,10 +191,10 @@ final class AuthService {
             if let existing = currentUser {
                 existing.authId = authId
                 if let name = displayName, !name.isEmpty {
-                    existing.displayName = name
+                    existing.displayName = InputSanitizer.sanitizeDisplayName(name)
                 }
             } else {
-                let name = displayName ?? email ?? String(localized: "User")
+                let name = InputSanitizer.sanitizeDisplayName(displayName ?? email ?? String(localized: "User"))
                 currentUser = UserProfile(authId: authId, displayName: name)
             }
             isAuthenticated = true

@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import { authMiddleware, getSupabaseAdmin, type AuthEnv } from '../middleware/auth.js';
+import { isValidUUID, isValidInviteCode } from '../middleware/validate.js';
 
 const householdInvite = new Hono<AuthEnv>();
 
@@ -23,8 +24,8 @@ householdInvite.post('/generate', async (c) => {
   const userId = c.get('userId');
   const { householdId } = await c.req.json<{ householdId: string }>();
 
-  if (!householdId) {
-    return c.json({ error: 'householdId is required' }, 400);
+  if (!isValidUUID(householdId)) {
+    return c.json({ error: 'householdId must be a valid UUID' }, 400);
   }
 
   const supabase = getSupabaseAdmin();
@@ -63,8 +64,8 @@ householdInvite.post('/generate', async (c) => {
 householdInvite.post('/validate', async (c) => {
   const { code } = await c.req.json<{ code: string }>();
 
-  if (!code) {
-    return c.json({ error: 'code is required' }, 400);
+  if (!isValidInviteCode(code)) {
+    return c.json({ error: 'Invalid invite code format' }, 400);
   }
 
   const supabase = getSupabaseAdmin();
@@ -106,8 +107,8 @@ householdInvite.post('/accept', async (c) => {
   const userId = c.get('userId');
   const { code } = await c.req.json<{ code: string }>();
 
-  if (!code) {
-    return c.json({ error: 'code is required' }, 400);
+  if (!isValidInviteCode(code)) {
+    return c.json({ error: 'Invalid invite code format' }, 400);
   }
 
   const supabase = getSupabaseAdmin();
@@ -182,8 +183,8 @@ householdInvite.post('/regenerate', async (c) => {
   const userId = c.get('userId');
   const { householdId } = await c.req.json<{ householdId: string }>();
 
-  if (!householdId) {
-    return c.json({ error: 'householdId is required' }, 400);
+  if (!isValidUUID(householdId)) {
+    return c.json({ error: 'householdId must be a valid UUID' }, 400);
   }
 
   const supabase = getSupabaseAdmin();

@@ -6,7 +6,7 @@ enum InputSanitizer {
     enum LengthLimit {
         static let transcription = 5000
         static let displayName = 50
-        static let householdName = 30
+        static let householdName = 50
         static let searchQuery = 200
     }
 
@@ -19,8 +19,10 @@ enum InputSanitizer {
         // Strip HTML tags (preserves Unicode content between tags)
         result = stripHTMLTags(result)
 
-        // Remove null bytes
+        // Remove null bytes and control characters (except newline/tab for transcriptions)
         result = result.replacingOccurrences(of: "\0", with: "")
+        result = stripControlCharacters(result)
+        result = stripZeroWidthCharacters(result)
 
         // Trim leading/trailing whitespace and newlines
         result = result.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -104,6 +106,29 @@ enum InputSanitizer {
             .replacingOccurrences(of: "&nbsp;", with: " ")
 
         return result
+    }
+
+    /// Strips control characters except newline (\n) and tab (\t).
+    private static func stripControlCharacters(_ text: String) -> String {
+        text.unicodeScalars.filter { scalar in
+            !scalar.properties.isDefaultIgnorableCodePoint
+                && (scalar.value >= 0x20 || scalar == "\n" || scalar == "\t")
+        }.map { String($0) }.joined()
+    }
+
+    /// Strips zero-width characters (ZWJ, ZWSP, ZWNJ, soft hyphen, BOM, etc.).
+    private static func stripZeroWidthCharacters(_ text: String) -> String {
+        let zeroWidthScalars: Set<Unicode.Scalar> = [
+            "\u{200B}", // Zero Width Space
+            "\u{200C}", // Zero Width Non-Joiner
+            "\u{200D}", // Zero Width Joiner
+            "\u{FEFF}", // BOM / Zero Width No-Break Space
+            "\u{00AD}", // Soft Hyphen
+            "\u{2060}", // Word Joiner
+            "\u{180E}", // Mongolian Vowel Separator
+        ]
+        return text.unicodeScalars.filter { !zeroWidthScalars.contains($0) }
+            .map { String($0) }.joined()
     }
 
     /// Collapses runs of spaces/tabs into a single space, preserving single newlines.

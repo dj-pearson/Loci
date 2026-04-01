@@ -43,9 +43,14 @@ final class HouseholdViewModel {
                 let invite_expires_at: String?
             }
 
+            let sanitizedName = InputSanitizer.sanitizeHouseholdName(name)
+            guard !sanitizedName.isEmpty else {
+                throw HouseholdError.createFailed
+            }
+
             let rows: [HouseholdRow] = try await supabase
                 .from("households")
-                .insert(CreatePayload(name: name.trimmingCharacters(in: .whitespacesAndNewlines), owner_id: userId))
+                .insert(CreatePayload(name: sanitizedName, owner_id: userId))
                 .select()
                 .execute()
                 .value
@@ -62,7 +67,9 @@ final class HouseholdViewModel {
                 let role: String
             }
 
-            let displayName = await currentDisplayName(modelContext: modelContext) ?? String(localized: "Owner")
+            let displayName = InputSanitizer.sanitizeDisplayName(
+                await currentDisplayName(modelContext: modelContext) ?? String(localized: "Owner")
+            )
 
             try await supabase
                 .from("household_members")
@@ -163,7 +170,9 @@ final class HouseholdViewModel {
                 throw HouseholdError.joinFailed
             }
 
-            let displayName = await currentDisplayName(modelContext: modelContext) ?? String(localized: "Member")
+            let displayName = InputSanitizer.sanitizeDisplayName(
+                await currentDisplayName(modelContext: modelContext) ?? String(localized: "Member")
+            )
 
             // Save to SwiftData
             let household = Household(
