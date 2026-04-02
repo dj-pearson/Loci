@@ -45,6 +45,9 @@ dist/
 *.key
 *.pem
 
+# Build-time generated secrets (use BuildSecrets.swift.example as template)
+Loci/Configuration/BuildSecrets.swift
+
 # IDE
 .vscode/
 .idea/

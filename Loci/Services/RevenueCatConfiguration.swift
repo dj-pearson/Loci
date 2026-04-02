@@ -5,11 +5,7 @@ enum RevenueCatConfiguration {
     // MARK: - API Keys
 
     static var apiKey: String {
-        #if DEBUG
-        return "appl_REPLACE_WITH_DEBUG_KEY"
-        #else
-        return "appl_REPLACE_WITH_PRODUCTION_KEY"
-        #endif
+        BuildSecrets.revenueCatAPIKey
     }
 
     // MARK: - Offering IDs

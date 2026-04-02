@@ -19,5 +19,19 @@
 	<string>Loci needs microphone access to record voice notes.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>Loci uses speech recognition to transcribe your voice notes on-device.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+		<string>audio</string>
+		<string>fetch</string>
+		<string>remote-notification</string>
+	</array>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>com.pearsonmedia.loci.sync</string>
+		<string>com.pearsonmedia.loci.geofence-refresh</string>
+	</array>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 </dict>
 </plist>

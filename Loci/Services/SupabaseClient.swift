@@ -2,13 +2,8 @@ import Foundation
 import Supabase
 
 enum SupabaseConfig {
-    #if DEBUG
-    static let url = URL(string: ProcessInfo.processInfo.environment["SUPABASE_URL"] ?? "http://localhost:8000")!
-    static let anonKey = ProcessInfo.processInfo.environment["SUPABASE_ANON_KEY"] ?? "your-anon-key"
-    #else
-    static let url = URL(string: "https://your-project.supabase.co")!
-    static let anonKey = "your-production-anon-key"
-    #endif
+    static let url = URL(string: BuildSecrets.supabaseURL)!
+    static let anonKey = BuildSecrets.supabaseAnonKey
 }
 
 enum SupabaseClientProvider {

@@ -1,6 +1,7 @@
 import CryptoKit
 import Foundation
 import os.log
+// import TelemetryDeck
 
 // MARK: - Analytics Event
 
@@ -26,7 +27,7 @@ enum AnalyticsEvent: String {
 final class AnalyticsService {
     static let shared = AnalyticsService()
 
-    private static let appID = "LOCI_TELEMETRYDECK_APP_ID"
+    private static let appID = BuildSecrets.telemetryDeckAppID
     private static let optOutKey = "loci_analytics_opt_out"
     private let logger = Logger(subsystem: "com.pearsonmedia.loci", category: "Analytics")
 
@@ -53,9 +54,15 @@ final class AnalyticsService {
             return
         }
 
+        guard !Self.appID.isEmpty else {
+            logger.info("TelemetryDeck app ID not configured, skipping")
+            return
+        }
+
         if isDebug {
             logger.info("TelemetryDeck configured in debug mode (console-only)")
         } else {
+            // Uncomment when TelemetryDeck SPM package is added:
             // TelemetryDeck.initialize(config: .init(appID: Self.appID))
             logger.info("TelemetryDeck configured for production")
         }
@@ -72,6 +79,7 @@ final class AnalyticsService {
             return
         }
 
+        // Uncomment when TelemetryDeck SPM package is added:
         // TelemetryDeck.signal(event.rawValue, parameters: parameters)
     }
 

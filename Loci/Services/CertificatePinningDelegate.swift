@@ -6,8 +6,7 @@ import os.log
 
 enum CertificatePinningConfig {
     /// SHA-256 hashes of the public keys for pinned certificates.
-    /// These should be the SPKI (Subject Public Key Info) SHA-256 hashes
-    /// of the Supabase server's certificate chain.
+    /// Generated via BuildSecrets from environment variables.
     ///
     /// To obtain the pin hash for your server, run:
     /// ```
@@ -19,16 +18,19 @@ enum CertificatePinningConfig {
     /// ```
     ///
     /// Include at least two pins: the current leaf certificate and a backup (e.g., intermediate CA).
-    static let pinnedPublicKeyHashes: Set<String> = [
-        // Primary: Supabase server leaf certificate public key hash
-        // Replace with your actual server's public key hash before shipping
-        "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB=",
-        // Backup: Let's Encrypt ISRG Root X1 intermediate CA public key hash
-        "C5+lpZ7tcVwmwQIMcRtPbsQtWLABXhQzejna0wHFr8M=",
-    ]
+    static let pinnedPublicKeyHashes: Set<String> = {
+        var hashes: Set<String> = []
+        let primary = BuildSecrets.certificatePinHash
+        let backup = BuildSecrets.certificateBackupPinHash
+        if !primary.isEmpty { hashes.insert(primary) }
+        if !backup.isEmpty { hashes.insert(backup) }
+        return hashes
+    }()
 
     /// Domains that should have certificate pinning enforced.
+    /// Pinning is skipped if no pin hashes are configured (e.g., local development).
     static let pinnedDomains: Set<String> = {
+        guard !pinnedPublicKeyHashes.isEmpty else { return [] }
         var domains: Set<String> = []
         if let host = SupabaseConfig.url.host {
             domains.insert(host)
