@@ -3,8 +3,8 @@
 ## Branch: ralph/loci-mvp
 ## Started: 2026-03-25
 ## Status: IN PROGRESS
-## Total Stories: 152
-## Completed: 143/152
+## Total Stories: 164
+## Completed: 152/164
 
 ---
 
@@ -239,6 +239,20 @@ Loci is a voice-first iOS app (SwiftUI, iOS 17+) that pins voice notes to GPS co
 - [ ] US-151: Android app architecture planning and Kotlin Multiplatform evaluation
 - [ ] US-152: Network security hardening with App Transport Security and request signing
 
+## Phase 24: Android App (US-153 → US-164)
+- [x] US-153: Android project scaffold with Kotlin, Jetpack Compose, Hilt, and Room
+- [x] US-154: Android core services: location, audio recording, speech recognition, and geofencing
+- [x] US-155: Android UI foundation: Material 3 theme, navigation, and reusable components
+- [x] US-156: Android main screens: Map, List, Recording, Detail, Search, Settings, Auth, Onboarding
+- [x] US-157: Android utility classes: constants, network monitor, secure preferences, input sanitizer, Haversine
+- [x] US-158: Android security hardening: encrypted storage, network config, biometric, data protection
+- [x] US-159: Android performance optimization: lazy loading, caching, background work
+- [x] US-160: Android UX polish: animations, haptics, accessibility, error handling
+- [x] US-161: Android Supabase integration: auth, sync, and storage
+- [ ] US-162: Android CI/CD: GitHub Actions build, lint, and test pipeline
+- [ ] US-163: Android family sharing: household creation, join, member management
+- [ ] US-164: Android monetization: Google Play Billing with tier enforcement
+
 ---
 
 ## Features Added Beyond PRD (for MVP excellence)
@@ -295,3 +309,11 @@ Loci is a voice-first iOS app (SwiftUI, iOS 17+) that pins voice notes to GPS co
 8. **Audio format**: M4A/AAC at 64kbps mono, ~100KB per 30 seconds.
 9. **Geofence limit**: iOS enforces max 20 CLCircularRegions per app.
 10. **The edge functions are Node.js/Hono in Docker, NOT Supabase Edge Functions (Deno).**
+11. **Android Build**: Use `cd android && ./gradlew assembleDebug` for build verification.
+12. **Android minSdk 26**: Supports Android 8.0+ (Oreo) for Instant, notification channels, and biometric APIs.
+13. **Android geofence limit is 100**: Android allows 100 geofences vs iOS 20.
+14. **Hilt for DI**: All ViewModels use @HiltViewModel, all services injected via @Inject constructor.
+15. **Room, not SQLite directly**: All local persistence through Room DAOs with Flow-based reactive queries.
+16. **Jetpack Compose, not XML layouts**: All UI is declarative Compose with Material 3.
+17. **EncryptedSharedPreferences**: All auth tokens and sensitive data use AndroidX Security crypto.
+18. **Same Supabase backend**: Android shares the same PostgreSQL/PostGIS backend as iOS — no backend changes needed.

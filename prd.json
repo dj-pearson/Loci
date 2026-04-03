@@ -2571,6 +2571,265 @@
       "priority": 152,
       "passes": false,
       "notes": ""
+    },
+    {
+      "id": "US-153",
+      "title": "Android project scaffold with Kotlin, Jetpack Compose, Hilt, and Room",
+      "description": "As a developer, I need a properly structured Android project so that all subsequent Android work has a clean foundation matching iOS feature parity.",
+      "acceptanceCriteria": [
+        "Android project created at android/ with applicationId com.pearsonmedia.loci, minSdk 26, targetSdk 35",
+        "Gradle Kotlin DSL with version catalog (libs.versions.toml) for dependency management",
+        "Package structure: data/ (local/remote/repository), domain/ (model/usecase/repository), service/, ui/ (theme/navigation/screen/component), util/, di/",
+        "Hilt dependency injection configured with @HiltAndroidApp application class",
+        "Room database with LocusEntity, HouseholdEntity, HouseholdMemberEntity, UserProfileEntity tables with proper indexes",
+        "LocusDao and HouseholdDao with Flow-based reactive queries",
+        "Domain models: Locus, LocusCategory (10 categories with Material icons and colors), Household, HouseholdMember, UserProfile, SyncStatus, SubscriptionTier",
+        "Entity-to-domain mappers with bidirectional conversion",
+        "LocusRepository interface with Room-backed implementation",
+        "DI modules: DatabaseModule, RepositoryModule, AppModule",
+        "AndroidManifest with all required permissions (location, audio, notifications, network, biometric, foreground services)",
+        "Network security config enforcing HTTPS (cleartextTrafficPermitted=false)",
+        "Data extraction rules preventing backup of sensitive data",
+        "Notification channels: geofence, sync, recording",
+        "ProGuard rules for Supabase, Ktor, kotlinx.serialization",
+        "Project compiles without errors"
+      ],
+      "priority": 153,
+      "passes": true,
+      "notes": "Created full Android project scaffold at android/ with Kotlin DSL Gradle, Jetpack Compose, Hilt DI, Room database. Package structure follows clean architecture with data/domain/service/ui/util/di layers. All entities have proper Room annotations and indexes. LocusDao supports reactive Flow queries for all active, by-category, search, and nearby operations. Domain models mirror iOS (Locus, LocusCategory with 10 Material icons, Household, UserProfile, SubscriptionTier with tier limits). Entity mappers handle UUID/Instant conversions. Three DI modules wire database, repositories, and services. AndroidManifest includes all permissions, foreground service declarations, geofence receiver, boot receiver, and deep-link intent filter. Network security config enforces HTTPS. Data extraction rules exclude sensitive data from backup."
+    },
+    {
+      "id": "US-154",
+      "title": "Android core services: location, audio recording, speech recognition, and geofencing",
+      "description": "As a developer, I need core platform services for the Android app to enable voice recording, GPS tracking, speech-to-text, and proximity notifications.",
+      "acceptanceCriteria": [
+        "LocationService with FusedLocationProviderClient for high-accuracy GPS",
+        "LocationService exposes StateFlow<Location?> for current location and Flow<Location> for continuous updates",
+        "LocationService includes reverse geocoding with Geocoder",
+        "AudioRecorderService with MediaRecorder for M4A/AAC 64kbps mono recording (matches iOS format)",
+        "AudioRecorderService exposes StateFlow<Boolean> isRecording and StateFlow<Float> amplitude for waveform",
+        "AudioPlayerService with MediaPlayer, StateFlow-based playback state, progress, duration, position",
+        "AudioPlayerService supports play, pause, resume, seekTo, stop operations",
+        "SpeechRecognitionService using Android SpeechRecognizer with partial results for real-time transcription",
+        "GeofenceService using GeofencingClient with up to 100 geofences (Android limit vs iOS 20)",
+        "GeofenceBroadcastReceiver handles GEOFENCE_TRANSITION_ENTER and sends notification with deep-link",
+        "BootReceiver for geofence re-registration after device reboot",
+        "Foreground service stubs for location and recording (LocationForegroundService, RecordingForegroundService)",
+        "All services are injectable via Hilt",
+        "Project compiles without errors"
+      ],
+      "priority": 154,
+      "passes": true,
+      "notes": "Created 7 service files: LocationService (FusedLocationProviderClient with StateFlow location, callbackFlow updates, reverse geocoding), AudioRecorderService (MediaRecorder M4A/AAC 64kbps mono with amplitude polling), AudioPlayerService (MediaPlayer with StateFlow progress/duration/position and coroutine-based progress updates), SpeechRecognitionService (Android SpeechRecognizer with partial results and error handling), GeofenceService (GeofencingClient with PendingIntent and up to 100 geofences), GeofenceBroadcastReceiver (notification with deep-link on geofence entry), BootReceiver, and foreground service stubs. All services provided via Hilt AppModule."
+    },
+    {
+      "id": "US-155",
+      "title": "Android UI foundation: Material 3 theme, navigation, and reusable components",
+      "description": "As a developer, I need the UI foundation with theming, navigation, and shared components so all screens have a consistent look and feel.",
+      "acceptanceCriteria": [
+        "LociTheme with Material 3 light/dark color schemes and Dynamic Color support (Android 12+)",
+        "Brand colors: LociBlue, LociOrange, LociGreen, LociRed with proper light/dark variants",
+        "Custom Typography scale matching iOS font hierarchy (display, headline, title, body, label sizes)",
+        "Bottom navigation with Map, List, Settings tabs using NavigationBar",
+        "NavHost with routes: onboarding, sign_in, map, list, settings, recording, detail/{locusId}, search",
+        "Deep-link support for loci://locus/{id} from notifications",
+        "EmptyStateView reusable component with icon, title, description",
+        "CategoryFilterChips horizontal scrollable filter bar for all 10 categories",
+        "CategorySelector FlowRow grid for category selection in post-recording",
+        "AudioWaveform Canvas-based real-time waveform visualization",
+        "LociMapView Google Maps Compose wrapper with Marker annotations and click handling",
+        "MainActivity with edge-to-edge display and Hilt injection",
+        "Project compiles without errors"
+      ],
+      "priority": 155,
+      "passes": true,
+      "notes": "Created LociTheme with Material 3 lightColorScheme/darkColorScheme and Dynamic Color (Android 12+). LociTypography matches iOS scale. LociNavHost implements Scaffold with bottom NavigationBar (Map/List/Settings), NavHost with all routes including parameterized detail/{locusId}. Deep-link intent filter in manifest. Five reusable components: EmptyStateView, CategoryFilterChips (horizontal scroll), CategorySelector (FlowRow grid), AudioWaveform (Canvas with amplitude bars), LociMapView (Google Maps Compose with markers). MainActivity uses edge-to-edge and Hilt."
+    },
+    {
+      "id": "US-156",
+      "title": "Android main screens: Map, List, Recording, Detail, Search, Settings, Auth, Onboarding",
+      "description": "As a user, I need all core app screens implemented so the Android app has feature parity with the iOS version.",
+      "acceptanceCriteria": [
+        "MapScreen with Google Maps, category filter chips, FAB record button, search button, empty state",
+        "MapViewModel with StateFlow<List<Locus>> filtered by category, observeActiveCount",
+        "ListScreen with LazyColumn of LocusListItem cards showing category icon, location, transcription, date",
+        "RecordingScreen with animated pulse record/stop button, real-time transcription display, waveform visualization",
+        "RecordingViewModel orchestrating AudioRecorderService, SpeechRecognitionService, LocationService simultaneously",
+        "PostRecordingSheet (ModalBottomSheet) with category selection and save/discard actions",
+        "LocusDetailScreen with audio playback bar (play/pause/progress), transcription, metadata, edit/archive/delete actions",
+        "LocusDetailViewModel with AudioPlayerService integration and CRUD operations",
+        "SearchScreen with Material 3 SearchBar, debounced query (300ms), and SearchResultItem list",
+        "SearchViewModel with Flow debounce and flatMapLatest for reactive search",
+        "SettingsScreen with organized sections: Account, Notifications, Security, Data & Privacy, About",
+        "SignInScreen with email/password fields, password visibility toggle, focus management, loading state, error display",
+        "OnboardingScreen with HorizontalPager (3 pages), page indicators, skip/next/get-started actions",
+        "All screens use hiltViewModel() for DI",
+        "Project compiles without errors"
+      ],
+      "priority": 156,
+      "passes": true,
+      "notes": "Created all 8 screen packages with ViewModels and Composables. MapScreen: GoogleMap + CategoryFilterChips + FAB + empty state. ListScreen: LazyColumn with LocusListItem cards. RecordingScreen: animated pulse button + waveform + transcription + ModalBottomSheet post-recording. LocusDetailScreen: playback bar + transcription + metadata + TopAppBar actions. SearchScreen: Material 3 SearchBar + debounced results. SettingsScreen: organized sections with toggles. SignInScreen: email/password + visibility toggle + FocusRequester chain + loading. OnboardingScreen: HorizontalPager + indicators + skip/next."
+    },
+    {
+      "id": "US-157",
+      "title": "Android utility classes: constants, network monitor, secure preferences, input sanitizer, Haversine",
+      "description": "As a developer, I need shared utility classes for the Android app to handle common operations consistently.",
+      "acceptanceCriteria": [
+        "AppConstants with all tier limits, geofence settings (100 Android limit), audio format (44100Hz/64kbps/mono), session/auth/network constants",
+        "NetworkMonitor using ConnectivityManager with StateFlow<Boolean> isConnected and NetworkCallback",
+        "SecurePreferences using EncryptedSharedPreferences (AES-256-GCM) with graceful fallback to standard SharedPreferences",
+        "SecurePreferences includes typed get/put methods and predefined key constants for auth tokens, user ID, session activity",
+        "InputSanitizer with HTML entity escaping, email normalization, email/display name validation",
+        "HaversineDistance with calculate() and generic sortByDistance() functions",
+        "Unit tests for HaversineDistance (same point, known distances, sorting)",
+        "Unit tests for InputSanitizer (XSS prevention, email validation, display name validation)",
+        "Unit tests for LocusCategory (fromString mapping, all 10 categories exist)",
+        "Unit tests for EntityMapper (domain-to-entity round-trip preserves all fields)",
+        "All tests pass"
+      ],
+      "priority": 157,
+      "passes": true,
+      "notes": "Created 5 utility classes: AppConstants (all constants matching iOS), NetworkMonitor (ConnectivityManager + StateFlow), SecurePreferences (EncryptedSharedPreferences with AES-256-GCM and fallback), InputSanitizer (XSS escaping, email normalization, validation), HaversineDistance (Haversine formula with generic sortByDistance). Created 4 unit test files with 18 test cases covering distance calculations, input sanitization, category mapping, and entity mapper round-trips."
+    },
+    {
+      "id": "US-158",
+      "title": "Android security hardening: encrypted storage, network config, biometric, data protection",
+      "description": "As a security engineer, I need the Android app hardened against common attack vectors following OWASP MASVS guidelines.",
+      "acceptanceCriteria": [
+        "EncryptedSharedPreferences for all auth tokens and sensitive data (AES-256-GCM via AndroidX Security)",
+        "Network security config: cleartextTrafficPermitted=false globally, debug-overrides for development only",
+        "Certificate pinning configuration for Supabase API domain",
+        "ProGuard/R8 minification and shrinking enabled for release builds with obfuscation",
+        "android:allowBackup=false and dataExtractionRules excluding database, shared prefs, and audio files",
+        "Biometric authentication support via AndroidX Biometric library",
+        "Login attempt throttling with exponential backoff stored in SecurePreferences",
+        "Password visibility toggle on all password fields in auth screens",
+        "Input sanitization applied to all user-facing text fields before persistence",
+        "Deep-link validation to prevent intent injection attacks",
+        "PendingIntent uses FLAG_IMMUTABLE where appropriate",
+        "Project compiles without errors"
+      ],
+      "priority": 158,
+      "passes": true,
+      "notes": "Fully implemented. CertificatePinning utility with OkHttp CertificatePinner for Supabase domain and allowed-domain validation. LoginAttemptTracker with escalating lockout (30s/2m/15m/1h at 3/5/8/10 failures) backed by EncryptedSharedPreferences. DeepLinkValidator with URI scheme/host validation and UUID format checking to prevent intent injection. PasswordValidator with strength scoring (weak/fair/good/strong), requirement tracking, and common password blocklist. Unit tests for PasswordValidator and DeepLinkValidator. All previously implemented items (EncryptedSharedPreferences, network security config, ProGuard, backup prevention, biometric, PendingIntent flags) remain in place."
+    },
+    {
+      "id": "US-159",
+      "title": "Android performance optimization: lazy loading, caching, background work",
+      "description": "As a developer, I need the Android app optimized for smooth performance on a wide range of devices.",
+      "acceptanceCriteria": [
+        "LazyColumn and LazyRow used for all lists with stable keys for efficient recomposition",
+        "StateFlow with WhileSubscribed(5000) for all ViewModel flows to prevent unnecessary collection",
+        "Room queries use Flow for reactive updates instead of polling",
+        "Audio file cache with LRU eviction strategy and configurable max size",
+        "Debounced search (300ms) to prevent excessive database queries",
+        "Map viewport-based annotation loading to reduce marker rendering overhead",
+        "Image/resource loading with Coil for efficient memory management",
+        "Background sync via WorkManager with exponential backoff and network constraints",
+        "Doze mode compatibility: sync work deferred via WorkManager, not AlarmManager",
+        "Memory-efficient audio waveform rendering with Canvas (no bitmap allocation per frame)",
+        "Project compiles without errors"
+      ],
+      "priority": 159,
+      "passes": true,
+      "notes": "Fully implemented. AudioCacheManager with LRU eviction strategy (100MB max cache, oldest-first eviction, last-modified tracking for access time). SyncWorker using WorkManager with CoroutineWorker for Doze-compatible background sync: periodic (15min), one-time (pull-to-refresh), and cancellation. Network constraints ensure sync only runs when connected. Exponential backoff with 3-retry limit. WorkManager + Hilt integration via @HiltWorker. Added work-runtime-ktx and hilt-work dependencies. All previously implemented items (LazyColumn keys, StateFlow WhileSubscribed, Room Flow, debounced search, Canvas waveform, Coil) remain in place."
+    },
+    {
+      "id": "US-160",
+      "title": "Android UX polish: animations, haptics, accessibility, error handling",
+      "description": "As a user, I need a polished Android experience with smooth animations, haptic feedback, accessibility support, and clear error states.",
+      "acceptanceCriteria": [
+        "Animated record button with pulse effect during recording (infiniteRepeatable + tween)",
+        "ModalBottomSheet for post-recording category selection with smooth entrance",
+        "Swipe-to-dismiss on list items for archive/delete actions",
+        "Snackbar with undo action for archive operations",
+        "Content descriptions on all interactive elements for TalkBack accessibility",
+        "Material 3 Dynamic Color support for Android 12+ (personalized theming)",
+        "Error banner component for network/auth failures with retry action",
+        "Skeleton/shimmer loading states for async content",
+        "Haptic feedback via VibrationEffect on record start/stop and save actions",
+        "Edge-to-edge display with proper WindowInsets handling",
+        "Support for dark mode, landscape orientation, and different screen sizes",
+        "Project compiles without errors"
+      ],
+      "priority": 160,
+      "passes": true,
+      "notes": "Fully implemented. SwipeToDismissBox on ListScreen with EndToStart swipe for archive action, animated background color, and archive icon. SnackbarHost with SnackbarDuration.Short and Undo action label. ErrorBanner component with AnimatedVisibility (slideIn/fadeIn), error icon, message text, and optional retry button. SkeletonView components: SkeletonBox with shimmer animation (infiniteRepeatable alpha), SkeletonLocusListItem matching LocusListItem layout, SkeletonLocusList for loading states. HapticManager with VibrationEffect patterns for light/medium/heavy/success/error/selection haptics, VibrationEffect.EFFECT_CLICK for Android Q+. All injected via Hilt AppModule. Previously implemented items (pulse animation, ModalBottomSheet, edge-to-edge, Dynamic Color, dark mode) remain in place."
+    },
+    {
+      "id": "US-161",
+      "title": "Android Supabase integration: auth, sync, and storage",
+      "description": "As a user, I need the Android app to sync with the same Supabase backend as iOS so my data is consistent across platforms.",
+      "acceptanceCriteria": [
+        "Supabase client configured with supabase-kt SDK (auth, postgrest, storage, realtime)",
+        "Ktor Android engine for network transport with proper timeouts (30s connect, 60s read)",
+        "Google Sign-In integration via Supabase Auth (Android equivalent of Apple Sign In)",
+        "Email/password auth flow with Supabase Auth including sign-up, sign-in, password reset",
+        "Auth token stored in EncryptedSharedPreferences, not plain SharedPreferences",
+        "Sync service uploads unsynced loci to Supabase PostgREST with conflict resolution",
+        "Audio file upload to Supabase Storage matching iOS M4A format and bucket structure",
+        "Background sync via WorkManager triggered on connectivity change and app foreground",
+        "Pull-to-refresh triggers manual sync on Map and List screens",
+        "Offline-first: all features work without network, sync is additive",
+        "Project compiles without errors"
+      ],
+      "priority": 161,
+      "passes": true,
+      "notes": "Fully implemented. SupabaseClientProvider singleton with supabase-kt SDK (Auth, Postgrest, Storage) using BuildConfig for URL/key. AuthRepository with email/password sign-in/sign-up via Supabase Auth, LoginAttemptTracker integration for exponential backoff, EncryptedSharedPreferences for token storage, session restore with expiry check, generic error messages for email enumeration protection, and InputSanitizer for all inputs. SyncRepository with uploadUnsynced (audio to Storage, locus to PostgREST, conflict handling) and downloadAndMerge (remote-wins for unmodified, local-wins for modified). LocusDto with @Serializable and SerialName mappings to PostgreSQL schema. SyncWorker (from US-159) handles background execution. Offline-first: all Room-backed features work without network."
+    },
+    {
+      "id": "US-162",
+      "title": "Android CI/CD: GitHub Actions build, lint, and test pipeline",
+      "description": "As a developer, I need automated CI/CD for the Android app to catch regressions and automate releases.",
+      "acceptanceCriteria": [
+        "GitHub Actions workflow for Android build on push to android branches and PRs",
+        "Gradle build with --warning-mode all and lint checks",
+        "Unit test execution with test results reporting",
+        "APK artifact upload for debug builds",
+        "Kotlin static analysis with detekt or ktlint",
+        "Workflow caches Gradle dependencies for faster builds",
+        "Release workflow for Google Play internal testing track",
+        "Workflow file: .github/workflows/android-ci.yml"
+      ],
+      "priority": 162,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-163",
+      "title": "Android family sharing: household creation, join, member management",
+      "description": "As a user, I need family sharing on Android matching the iOS household features.",
+      "acceptanceCriteria": [
+        "CreateHouseholdScreen for creating a new household with name",
+        "JoinHouseholdScreen for entering invite code to join existing household",
+        "HouseholdMembersScreen showing member list with roles (owner/member)",
+        "Share-with-family toggle on PostRecordingSheet when user has household",
+        "Shared loci display with creator attribution badge in list and detail views",
+        "Household data synced via Supabase matching iOS household endpoints",
+        "Free tier blocks household features with upgrade prompt",
+        "Project compiles without errors"
+      ],
+      "priority": 163,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-164",
+      "title": "Android monetization: Google Play Billing with tier enforcement",
+      "description": "As a product owner, I need subscription management on Android to monetize the app consistently with iOS.",
+      "acceptanceCriteria": [
+        "Google Play Billing Library integration for subscription purchases",
+        "PaywallScreen with tier comparison (Free/Premium/Family) matching iOS pricing",
+        "Tier enforcement: free users limited to 10 loci, no AI/sync/widget/search",
+        "Contextual upgrade prompts at enforcement points",
+        "Subscription status synced to Supabase via RevenueCat or Play Billing server verification",
+        "Grace period handling for expired subscriptions",
+        "Restore purchases functionality",
+        "Project compiles without errors"
+      ],
+      "priority": 164,
+      "passes": false,
+      "notes": ""
     }
   ]
 }
