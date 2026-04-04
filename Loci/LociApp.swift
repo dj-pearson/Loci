@@ -21,6 +21,8 @@ struct LociApp: App {
             fatalError("Failed to initialize ModelContainer: \(error.localizedDescription)")
         }
 
+        BuildSecretsValidator.validate()
+
         RevenueCatConfiguration.configure()
         AnalyticsService.shared.configure()
         AnalyticsService.shared.trackAppLaunch()

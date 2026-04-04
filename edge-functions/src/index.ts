@@ -11,6 +11,7 @@ import pushDigest, { generateDigests } from './routes/push-digest.js';
 import health from './routes/health.js';
 import accountDelete from './routes/account-delete.js';
 import authVerify from './routes/auth-verify.js';
+import { requestSigningMiddleware } from './middleware/request-signing.js';
 
 const app = new Hono();
 
@@ -23,6 +24,9 @@ app.use('/api/webhook/revenuecat/*', rateLimitWebhook);
 
 // US-146: Auth-specific rate limiting (DB-backed, per-email + per-IP)
 app.use('/api/auth/*', authRateLimit);
+
+// US-152: Request signing validation on sensitive mutation routes
+app.use('/api/account/*', requestSigningMiddleware);
 
 // Routes
 app.route('/api/household/invite', householdInvite);
