@@ -2484,8 +2484,8 @@
         "Typecheck passes"
       ],
       "priority": 147,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed. SignInView.swift rewritten with @FocusState field management (SignInField/SignUpField enums), password visibility toggles on all password fields, auto-focus email on appear, return key field advancement, keyboard dismiss before navigation, haptic feedback (success/error), shake animation on failure, all interactive elements disabled during loading including Apple Sign In button and links."
     },
     {
       "id": "US-148",
@@ -2502,8 +2502,8 @@
         "Typecheck passes"
       ],
       "priority": 148,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed. IntegrityCheckService.swift with 6 checks: jailbreak paths (16 paths), Cydia/Sileo/Zebra URL schemes, writable system dirs, sandbox escape, debugger detection via sysctl (skipped in DEBUG), suspicious dylibs via _dyld_image_count. IntegrityWarningBanner.swift dismissible warning UI. Wired into LociApp.swift init() and ContentView body. Logs to TelemetryDeck. Informational only per App Store guidelines."
     },
     {
       "id": "US-149",
@@ -2519,8 +2519,8 @@
         "Typecheck passes"
       ],
       "priority": 149,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed. SecurityAuditLogger.swift with SHA-256 email hashing, device info, app version. AuditLogEntry @Model with FIFO cleanup at 1000 entries. SecurityAuditLogView.swift with per-event icons/colors accessible from Settings > Security. Audit calls wired into AuthService for all 9 event types. AuditLogEntry added to SwiftData schema in ModelContainerConfiguration."
     },
     {
       "id": "US-150",
@@ -2535,8 +2535,8 @@
         "Typecheck passes"
       ],
       "priority": 150,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed. AuthService.swift: signUp shows generic 'If this email is available...' message, resetPassword is fire-and-forget (try? with no error shown), signIn failure uses 'Invalid email or password' (mapAuthError removes all specific messages). Edge function auth-rate-limit.ts: enforceMinResponseTime() adds 200ms minimum response time to prevent timing attacks."
     },
     {
       "id": "US-151",

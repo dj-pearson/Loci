@@ -7,6 +7,7 @@ enum ModelContainerConfiguration {
         Household.self,
         HouseholdMember.self,
         UserProfile.self,
+        AuditLogEntry.self,
     ])
 
     static func production() throws -> ModelContainer {

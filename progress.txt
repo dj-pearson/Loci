@@ -4,7 +4,7 @@
 ## Started: 2026-03-25
 ## Status: IN PROGRESS
 ## Total Stories: 164
-## Completed: 152/164
+## Completed: 156/164
 
 ---
 
@@ -232,10 +232,10 @@ Loci is a voice-first iOS app (SwiftUI, iOS 17+) that pins voice notes to GPS co
 - [x] US-144: Password strength validation with complexity requirements and UI indicator
 - [x] US-145: Secure session lifecycle with token rotation and forced re-authentication
 - [x] US-146: Server-side auth rate limiting and login attempt tracking
-- [ ] US-147: Auth flow UX improvements with password visibility and keyboard management
-- [ ] US-148: Jailbreak and runtime integrity detection
-- [ ] US-149: Security audit logging for authentication events
-- [ ] US-150: Email enumeration protection on auth endpoints
+- [x] US-147: Auth flow UX improvements with password visibility and keyboard management
+- [x] US-148: Jailbreak and runtime integrity detection
+- [x] US-149: Security audit logging for authentication events
+- [x] US-150: Email enumeration protection on auth endpoints
 - [ ] US-151: Android app architecture planning and Kotlin Multiplatform evaluation
 - [ ] US-152: Network security hardening with App Transport Security and request signing
 

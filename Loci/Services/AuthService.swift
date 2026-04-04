@@ -18,6 +18,12 @@ final class AuthService {
     /// Manages session lifecycle: inactivity timeout, re-auth, token refresh (US-145).
     let sessionManager = SessionManager()
 
+    /// US-149: Security audit logger for authentication events.
+    private let auditLogger = SecurityAuditLogger.shared
+
+    /// Set this from the app's model context to enable audit logging to SwiftData.
+    var auditModelContext: ModelContext?
+
     private let supabase = SupabaseClientProvider.shared
     private var authStateTask: Task<Void, Never>?
 
@@ -61,6 +67,8 @@ final class AuthService {
 
             // US-145: Check session inactivity timeout
             guard sessionManager.checkSessionValidity() else {
+                // US-149: Audit log session expiry
+                auditLogger.log(event: .sessionExpired, modelContext: auditModelContext)
                 await setError(sessionManager.sessionExpiryReason?.message ?? "")
                 try? await signOut()
                 return
@@ -136,6 +144,9 @@ final class AuthService {
             )
 
             if let session = response.session {
+                // US-149: Audit log sign-up
+                auditLogger.log(event: .signUp, email: email, modelContext: auditModelContext)
+
                 await updateLocalProfile(
                     authId: UUID(uuidString: session.user.id.uuidString) ?? UUID(),
                     displayName: sanitizedName,
@@ -143,7 +154,9 @@ final class AuthService {
                 )
             }
         } catch {
-            await setError(mapAuthError(error))
+            // US-150: Generic error to prevent email enumeration.
+            // Don't reveal whether the email already exists.
+            await setError(String(localized: "If this email is available, you will receive a confirmation."))
             throw error
         }
     }
@@ -173,6 +186,9 @@ final class AuthService {
             sessionManager.recordActivity()
             sessionManager.resetTokenRefreshFailures()
 
+            // US-149: Audit log sign-in success
+            auditLogger.log(event: .signInSuccess, email: email, modelContext: auditModelContext)
+
             await updateLocalProfile(
                 authId: UUID(uuidString: session.user.id.uuidString) ?? UUID(),
                 displayName: nil,
@@ -184,28 +200,38 @@ final class AuthService {
             if !message.contains("network") && !message.contains("connection") {
                 loginAttemptTracker.recordFailure(email: email)
             }
+
+            // US-149: Audit log sign-in failure
+            auditLogger.log(event: .signInFailure, email: email, modelContext: auditModelContext)
+
             await setError(mapAuthError(error))
             throw error
         }
     }
 
+    /// US-150: Always shows success regardless of whether the email exists,
+    /// to prevent account enumeration attacks.
     func resetPassword(email: String) async throws {
         guard isValidEmail(email) else { throw AuthError.invalidEmail }
 
         await setLoading(true)
         defer { Task { await setLoading(false) } }
 
-        do {
-            try await supabase.auth.resetPasswordForEmail(email)
-        } catch {
-            await setError(mapAuthError(error))
-            throw error
-        }
+        // US-149: Audit log password reset request
+        auditLogger.log(event: .passwordResetRequest, email: email, modelContext: auditModelContext)
+
+        // US-150: Fire-and-forget — always show success to user
+        try? await supabase.auth.resetPasswordForEmail(email)
+        // Intentionally does not throw or show error even if email doesn't exist
     }
 
     // MARK: - Sign Out & Delete (US-072)
 
     func signOut() async throws {
+        // US-149: Audit log sign-out
+        let email = try? supabaseEmail
+        auditLogger.log(event: .signOut, email: email, modelContext: auditModelContext)
+
         try await supabase.auth.signOut()
         // US-145: Clear all session data on sign out
         sessionManager.clearSession()
@@ -216,6 +242,10 @@ final class AuthService {
     }
 
     func deleteAccount(modelContext: ModelContext) async throws {
+        // US-149: Audit log account deletion
+        let email = try? supabaseEmail
+        auditLogger.log(event: .accountDeleted, email: email, modelContext: auditModelContext)
+
         // Call server-side deletion RPC
         try await supabase.rpc("delete_user_account").execute()
 
@@ -288,21 +318,19 @@ final class AuthService {
         return email.wholeMatch(of: regex) != nil
     }
 
+    /// US-150: Maps auth errors to user-facing messages without revealing
+    /// whether an email exists in the system (prevents account enumeration).
     private func mapAuthError(_ error: Error) -> String {
         if let authError = error as? AuthError {
             return authError.localizedDescription
         }
         let message = error.localizedDescription.lowercased()
-        if message.contains("invalid") || message.contains("credentials") {
-            return String(localized: "Invalid email or password. Please try again.")
-        }
-        if message.contains("already") || message.contains("exists") {
-            return String(localized: "An account with this email already exists.")
-        }
         if message.contains("network") || message.contains("connection") {
             return String(localized: "Network error. Please check your connection and try again.")
         }
-        return String(localized: "Authentication failed. Please try again.")
+        // US-150: Generic message for all credential errors — never say "email not found"
+        // or "account already exists" to prevent email enumeration.
+        return String(localized: "Invalid email or password.")
     }
 }
 

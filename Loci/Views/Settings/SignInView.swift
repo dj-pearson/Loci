@@ -10,6 +10,16 @@ struct SignInView: View {
     @State private var showSignUp = false
     @State private var showResetPassword = false
     @State private var showError = false
+    // US-147: Password visibility toggle
+    @State private var isPasswordVisible = false
+    // US-147: Error shake animation
+    @State private var errorShakeOffset: CGFloat = 0
+
+    @FocusState private var focusedField: SignInField?
+
+    private enum SignInField: Hashable {
+        case email, password
+    }
 
     var body: some View {
         NavigationStack {
@@ -40,21 +50,50 @@ struct SignInView: View {
                     .signInWithAppleButtonStyle(.black)
                     .frame(height: 50)
                     .cornerRadius(Theme.CornerRadius.medium)
+                    .disabled(authService.isLoading)
 
                     dividerRow
 
                     // Email/Password Form
                     VStack(spacing: Theme.Spacing.md) {
+                        // US-147: Auto-focus email field
                         TextField(String(localized: "Email"), text: $email)
                             .textFieldStyle(.roundedBorder)
                             .textContentType(.emailAddress)
                             .keyboardType(.emailAddress)
                             .autocorrectionDisabled()
                             .textInputAutocapitalization(.never)
+                            .focused($focusedField, equals: .email)
+                            .submitLabel(.next)
+                            .onSubmit { focusedField = .password }
+                            .disabled(authService.isLoading)
 
-                        SecureField(String(localized: "Password"), text: $password)
-                            .textFieldStyle(.roundedBorder)
-                            .textContentType(.password)
+                        // US-147: Password field with visibility toggle
+                        HStack {
+                            Group {
+                                if isPasswordVisible {
+                                    TextField(String(localized: "Password"), text: $password)
+                                        .textContentType(.password)
+                                } else {
+                                    SecureField(String(localized: "Password"), text: $password)
+                                        .textContentType(.password)
+                                }
+                            }
+                            .focused($focusedField, equals: .password)
+                            .submitLabel(.go)
+                            .onSubmit { submitSignIn() }
+                            .disabled(authService.isLoading)
+
+                            Button {
+                                isPasswordVisible.toggle()
+                            } label: {
+                                Image(systemName: isPasswordVisible ? "eye.slash" : "eye")
+                                    .foregroundStyle(Theme.textSecondary)
+                                    .frame(width: 24, height: 24)
+                            }
+                            .disabled(authService.isLoading)
+                        }
+                        .textFieldStyle(.roundedBorder)
 
                         // US-143: Lockout indicator
                         if authService.loginAttemptTracker.isLockedOut {
@@ -89,10 +128,12 @@ struct SignInView: View {
                             .padding(Theme.Spacing.sm)
                             .background(Theme.warning.opacity(0.1))
                             .cornerRadius(Theme.CornerRadius.small)
+                            // US-147: Shake animation on error
+                            .offset(x: errorShakeOffset)
                         }
 
                         Button {
-                            Task { await signInWithEmail() }
+                            submitSignIn()
                         } label: {
                             if authService.isLoading {
                                 ProgressView()
@@ -116,6 +157,7 @@ struct SignInView: View {
                             showResetPassword = true
                         }
                         .font(Theme.Typography.caption)
+                        .disabled(authService.isLoading)
 
                         // US-143: Password reset suggestion after many failures
                         if authService.loginAttemptTracker.shouldSuggestPasswordReset {
@@ -130,6 +172,7 @@ struct SignInView: View {
                             Button(String(localized: "Sign Up")) {
                                 showSignUp = true
                             }
+                            .disabled(authService.isLoading)
                         }
                         .font(Theme.Typography.body)
                     }
@@ -140,6 +183,7 @@ struct SignInView: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(String(localized: "Cancel")) { dismiss() }
+                        .disabled(authService.isLoading)
                 }
             }
             .sheet(isPresented: $showSignUp) {
@@ -162,7 +206,20 @@ struct SignInView: View {
                 Text(authService.errorMessage ?? String(localized: "An error occurred."))
             }
             .onChange(of: authService.isAuthenticated) { _, isAuth in
-                if isAuth { dismiss() }
+                if isAuth {
+                    // US-147: Dismiss keyboard before dismiss animation
+                    focusedField = nil
+                    HapticManager.saveSuccess()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        dismiss()
+                    }
+                }
+            }
+            // US-147: Auto-focus email field on appear
+            .onAppear {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    focusedField = .email
+                }
             }
         }
     }
@@ -189,19 +246,50 @@ struct SignInView: View {
                 do {
                     try await authService.signInWithApple(credential: credential)
                 } catch {
+                    HapticManager.delete()
                     showError = true
                 }
             }
         case .failure:
+            HapticManager.delete()
             showError = true
         }
+    }
+
+    // US-147: Submit via button or keyboard return key
+    private func submitSignIn() {
+        guard !email.isEmpty, !password.isEmpty else { return }
+        guard !authService.isLoading, !authService.loginAttemptTracker.isLockedOut else { return }
+        // Dismiss keyboard before async work
+        focusedField = nil
+        Task { await signInWithEmail() }
     }
 
     private func signInWithEmail() async {
         do {
             try await authService.signIn(email: email, password: password)
         } catch {
+            // US-147: Haptic error feedback + shake animation
+            HapticManager.delete()
+            triggerShakeAnimation()
             showError = true
+        }
+    }
+
+    // US-147: Error shake animation
+    private func triggerShakeAnimation() {
+        withAnimation(.default) { errorShakeOffset = 10 }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            withAnimation(.default) { errorShakeOffset = -10 }
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            withAnimation(.default) { errorShakeOffset = 8 }
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            withAnimation(.default) { errorShakeOffset = -5 }
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+            withAnimation(.default) { errorShakeOffset = 0 }
         }
     }
 }
@@ -215,6 +303,15 @@ struct SignUpView: View {
     @State private var confirmPassword = ""
     @State private var displayName = ""
     @State private var showError = false
+    // US-147: Password visibility toggles
+    @State private var isPasswordVisible = false
+    @State private var isConfirmPasswordVisible = false
+
+    @FocusState private var focusedField: SignUpField?
+
+    private enum SignUpField: Hashable {
+        case displayName, email, password, confirmPassword
+    }
 
     /// US-144: Password meets minimum requirements (fair or above).
     private var passwordMeetsMinimum: Bool {
@@ -245,9 +342,14 @@ struct SignUpView: View {
                     .padding(.top, Theme.Spacing.xl)
 
                     VStack(spacing: Theme.Spacing.md) {
+                        // US-147: Return key flows display name → email → password → confirm → submit
                         TextField(String(localized: "Display Name"), text: $displayName)
                             .textFieldStyle(.roundedBorder)
                             .textContentType(.name)
+                            .focused($focusedField, equals: .displayName)
+                            .submitLabel(.next)
+                            .onSubmit { focusedField = .email }
+                            .disabled(authService.isLoading)
 
                         TextField(String(localized: "Email"), text: $email)
                             .textFieldStyle(.roundedBorder)
@@ -255,21 +357,67 @@ struct SignUpView: View {
                             .keyboardType(.emailAddress)
                             .autocorrectionDisabled()
                             .textInputAutocapitalization(.never)
+                            .focused($focusedField, equals: .email)
+                            .submitLabel(.next)
+                            .onSubmit { focusedField = .password }
+                            .disabled(authService.isLoading)
 
-                        SecureField(String(localized: "Password"), text: $password)
-                            .textFieldStyle(.roundedBorder)
-                            .textContentType(.newPassword)
+                        // US-147: Password with visibility toggle
+                        HStack {
+                            Group {
+                                if isPasswordVisible {
+                                    TextField(String(localized: "Password"), text: $password)
+                                        .textContentType(.newPassword)
+                                } else {
+                                    SecureField(String(localized: "Password"), text: $password)
+                                        .textContentType(.newPassword)
+                                }
+                            }
+                            .focused($focusedField, equals: .password)
+                            .submitLabel(.next)
+                            .onSubmit { focusedField = .confirmPassword }
+                            .disabled(authService.isLoading)
+
+                            Button {
+                                isPasswordVisible.toggle()
+                            } label: {
+                                Image(systemName: isPasswordVisible ? "eye.slash" : "eye")
+                                    .foregroundStyle(Theme.textSecondary)
+                                    .frame(width: 24, height: 24)
+                            }
+                            .disabled(authService.isLoading)
+                        }
+                        .textFieldStyle(.roundedBorder)
 
                         // US-144: Password strength indicator
                         if !password.isEmpty {
                             PasswordStrengthView(password: password)
                         }
 
-                        // US-144: Confirm password with match indicator
+                        // US-147: Confirm password with visibility toggle and match indicator
                         HStack {
-                            SecureField(String(localized: "Confirm Password"), text: $confirmPassword)
-                                .textFieldStyle(.roundedBorder)
-                                .textContentType(.newPassword)
+                            Group {
+                                if isConfirmPasswordVisible {
+                                    TextField(String(localized: "Confirm Password"), text: $confirmPassword)
+                                        .textContentType(.newPassword)
+                                } else {
+                                    SecureField(String(localized: "Confirm Password"), text: $confirmPassword)
+                                        .textContentType(.newPassword)
+                                }
+                            }
+                            .focused($focusedField, equals: .confirmPassword)
+                            .submitLabel(.go)
+                            .onSubmit { submitSignUp() }
+                            .disabled(authService.isLoading)
+
+                            Button {
+                                isConfirmPasswordVisible.toggle()
+                            } label: {
+                                Image(systemName: isConfirmPasswordVisible ? "eye.slash" : "eye")
+                                    .foregroundStyle(Theme.textSecondary)
+                                    .frame(width: 24, height: 24)
+                            }
+                            .disabled(authService.isLoading)
 
                             if !confirmPassword.isEmpty {
                                 Image(systemName: passwordsMatch ? "checkmark.circle.fill" : "xmark.circle.fill")
@@ -277,6 +425,7 @@ struct SignUpView: View {
                                     .font(.system(size: 18))
                             }
                         }
+                        .textFieldStyle(.roundedBorder)
 
                         if !confirmPassword.isEmpty && !passwordsMatch {
                             Text("Passwords do not match")
@@ -286,7 +435,7 @@ struct SignUpView: View {
                         }
 
                         Button {
-                            Task { await signUp() }
+                            submitSignUp()
                         } label: {
                             if authService.isLoading {
                                 ProgressView()
@@ -308,6 +457,7 @@ struct SignUpView: View {
                         Text("Already have an account?")
                             .foregroundStyle(Theme.textSecondary)
                         Button(String(localized: "Sign In")) { dismiss() }
+                            .disabled(authService.isLoading)
                     }
                     .font(Theme.Typography.body)
                 }
@@ -317,6 +467,7 @@ struct SignUpView: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(String(localized: "Cancel")) { dismiss() }
+                        .disabled(authService.isLoading)
                 }
             }
             .alert(String(localized: "Error"), isPresented: $showError) {
@@ -325,26 +476,47 @@ struct SignUpView: View {
                 Text(authService.errorMessage ?? String(localized: "An error occurred."))
             }
             .onChange(of: authService.isAuthenticated) { _, isAuth in
-                if isAuth { dismiss() }
+                if isAuth {
+                    focusedField = nil
+                    HapticManager.saveSuccess()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        dismiss()
+                    }
+                }
+            }
+            .onAppear {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    focusedField = .displayName
+                }
             }
         }
+    }
+
+    // US-147: Submit via button or keyboard return key
+    private func submitSignUp() {
+        guard canSubmit else { return }
+        focusedField = nil
+        Task { await signUp() }
     }
 
     private func signUp() async {
         // US-144: Validate password strength before submitting
         guard passwordMeetsMinimum else {
             authService.errorMessage = AuthError.passwordTooWeak.localizedDescription
+            HapticManager.delete()
             showError = true
             return
         }
         guard passwordsMatch else {
             authService.errorMessage = AuthError.passwordsDoNotMatch.localizedDescription
+            HapticManager.delete()
             showError = true
             return
         }
         do {
             try await authService.signUp(email: email, password: password, displayName: displayName)
         } catch {
+            HapticManager.delete()
             showError = true
         }
     }
