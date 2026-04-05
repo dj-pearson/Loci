@@ -25,9 +25,13 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.pearsonmedia.loci.ui.screen.auth.SignInScreen
 import com.pearsonmedia.loci.ui.screen.detail.LocusDetailScreen
+import com.pearsonmedia.loci.ui.screen.household.CreateHouseholdScreen
+import com.pearsonmedia.loci.ui.screen.household.HouseholdMembersScreen
+import com.pearsonmedia.loci.ui.screen.household.JoinHouseholdScreen
 import com.pearsonmedia.loci.ui.screen.map.MapScreen
 import com.pearsonmedia.loci.ui.screen.map.ListScreen
 import com.pearsonmedia.loci.ui.screen.onboarding.OnboardingScreen
+import com.pearsonmedia.loci.ui.screen.paywall.PaywallScreen
 import com.pearsonmedia.loci.ui.screen.record.RecordingScreen
 import com.pearsonmedia.loci.ui.screen.search.SearchScreen
 import com.pearsonmedia.loci.ui.screen.settings.SettingsScreen
@@ -43,6 +47,10 @@ sealed class Screen(val route: String) {
         fun createRoute(locusId: String) = "detail/$locusId"
     }
     data object Search : Screen("search")
+    data object CreateHousehold : Screen("household/create")
+    data object JoinHousehold : Screen("household/join")
+    data object HouseholdMembers : Screen("household/members")
+    data object Paywall : Screen("paywall")
 }
 
 data class BottomNavItem(
@@ -136,7 +144,11 @@ fun LociNavHost(
 
             composable(Screen.Settings.route) {
                 SettingsScreen(
-                    onSignInClick = { navController.navigate(Screen.SignIn.route) }
+                    onSignInClick = { navController.navigate(Screen.SignIn.route) },
+                    onCreateHouseholdClick = { navController.navigate(Screen.CreateHousehold.route) },
+                    onJoinHouseholdClick = { navController.navigate(Screen.JoinHousehold.route) },
+                    onHouseholdMembersClick = { navController.navigate(Screen.HouseholdMembers.route) },
+                    onUpgradeClick = { navController.navigate(Screen.Paywall.route) }
                 )
             }
 
@@ -161,6 +173,32 @@ fun LociNavHost(
             composable(Screen.Search.route) {
                 SearchScreen(
                     onLocusClick = { id -> navController.navigate(Screen.Detail.createRoute(id)) },
+                    onBack = { navController.popBackStack() }
+                )
+            }
+
+            composable(Screen.CreateHousehold.route) {
+                CreateHouseholdScreen(
+                    onBack = { navController.popBackStack() },
+                    onUpgradeClick = { navController.navigate(Screen.Paywall.route) }
+                )
+            }
+
+            composable(Screen.JoinHousehold.route) {
+                JoinHouseholdScreen(
+                    onBack = { navController.popBackStack() },
+                    onUpgradeClick = { navController.navigate(Screen.Paywall.route) }
+                )
+            }
+
+            composable(Screen.HouseholdMembers.route) {
+                HouseholdMembersScreen(
+                    onBack = { navController.popBackStack() }
+                )
+            }
+
+            composable(Screen.Paywall.route) {
+                PaywallScreen(
                     onBack = { navController.popBackStack() }
                 )
             }

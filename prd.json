@@ -2021,8 +2021,8 @@
         "Typecheck passes"
       ],
       "priority": 121,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed. BuildSecretsValidator.swift validates all secrets at runtime (DEBUG warns, RELEASE crashes on missing critical). generate-secrets.sh now validates required env vars before generating. BuildSecrets.swift.example updated with comprehensive docs for each field. All services already reference BuildSecrets — no placeholder strings in production code paths."
     },
     {
       "id": "US-122",
@@ -2072,8 +2072,8 @@
         "Typecheck passes"
       ],
       "priority": 124,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed. rate-limit.ts rewritten with RedisStore (INCR+EXPIRE) and InMemoryStore fallback. Redis key format: ratelimit:{endpoint}:{userKey}. Redis 7-alpine added to docker-compose.yml with healthcheck and 128MB LRU. REDIS_URL env var in edge-functions. ioredis 5.3.2 added to package.json. All 5 rate limit tiers preserved."
     },
     {
       "id": "US-125",
@@ -2160,8 +2160,8 @@
         "Typecheck passes"
       ],
       "priority": 129,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed. Fastlane Matchfile, Fastfile (test/beta/release/app_store_release lanes), Appfile created. testflight.yml workflow triggers on v*-beta* tags. ci.yml updated with test job. Build number uses CI_BUILD_NUMBER or github.run_number."
     },
     {
       "id": "US-130",
@@ -2484,8 +2484,8 @@
         "Typecheck passes"
       ],
       "priority": 147,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed. SignInView.swift rewritten with @FocusState field management (SignInField/SignUpField enums), password visibility toggles on all password fields, auto-focus email on appear, return key field advancement, keyboard dismiss before navigation, haptic feedback (success/error), shake animation on failure, all interactive elements disabled during loading including Apple Sign In button and links."
     },
     {
       "id": "US-148",
@@ -2502,8 +2502,8 @@
         "Typecheck passes"
       ],
       "priority": 148,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed. IntegrityCheckService.swift with 6 checks: jailbreak paths (16 paths), Cydia/Sileo/Zebra URL schemes, writable system dirs, sandbox escape, debugger detection via sysctl (skipped in DEBUG), suspicious dylibs via _dyld_image_count. IntegrityWarningBanner.swift dismissible warning UI. Wired into LociApp.swift init() and ContentView body. Logs to TelemetryDeck. Informational only per App Store guidelines."
     },
     {
       "id": "US-149",
@@ -2519,8 +2519,8 @@
         "Typecheck passes"
       ],
       "priority": 149,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed. SecurityAuditLogger.swift with SHA-256 email hashing, device info, app version. AuditLogEntry @Model with FIFO cleanup at 1000 entries. SecurityAuditLogView.swift with per-event icons/colors accessible from Settings > Security. Audit calls wired into AuthService for all 9 event types. AuditLogEntry added to SwiftData schema in ModelContainerConfiguration."
     },
     {
       "id": "US-150",
@@ -2535,8 +2535,8 @@
         "Typecheck passes"
       ],
       "priority": 150,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed. AuthService.swift: signUp shows generic 'If this email is available...' message, resetPassword is fire-and-forget (try? with no error shown), signIn failure uses 'Invalid email or password' (mapAuthError removes all specific messages). Edge function auth-rate-limit.ts: enforceMinResponseTime() adds 200ms minimum response time to prevent timing attacks."
     },
     {
       "id": "US-151",
@@ -2552,8 +2552,8 @@
         "File created: android/ARCHITECTURE.md"
       ],
       "priority": 151,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed. android/ARCHITECTURE.md created with: native Kotlin/Compose rationale, iOS→Android service mapping table (12 pairs), story progress (9/12), Android-specific considerations (Doze, channels, 100 geofences, foreground services, PendingIntent security), API 26 minimum rationale, shared backend documentation."
     },
     {
       "id": "US-152",
@@ -2569,8 +2569,8 @@
         "Typecheck passes"
       ],
       "priority": 152,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed. ATS already enforced (no NSAllowsArbitraryLoads in Info.plist). RequestSigningService.swift: HMAC-SHA256 with method+path+timestamp+bodyHash. SecureURLSession.swift: 30s/60s timeouts, X-Client-Version header, certificate pinning delegate. request-signing.ts edge function middleware with timing-safe comparison and 5-min replay protection. Applied to /api/account/* route. requestSigningKey added to BuildSecrets."
     },
     {
       "id": "US-153",
@@ -2792,8 +2792,8 @@
         "Workflow file: .github/workflows/android-ci.yml"
       ],
       "priority": 162,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed. android-ci.yml with lint (ktlint + Android lint) and build+test jobs, Gradle caching, APK artifact upload, test results upload. android-release.yml with manual trigger, track selection (internal/alpha/beta/production), keystore decoding, AAB signing, Google Play upload via r0adkll/upload-google-play action."
     },
     {
       "id": "US-163",
@@ -2810,8 +2810,8 @@
         "Project compiles without errors"
       ],
       "priority": 163,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed. HouseholdViewModel with Supabase CRUD (create/join/remove/leave). CreateHouseholdScreen with invite code generation and copy. JoinHouseholdScreen with code entry. HouseholdMembersScreen with member list, role badges, owner remove, leave dialog. All screens show upgrade prompt for free tier. Routes wired into LociNavHost. Family section added to SettingsScreen."
     },
     {
       "id": "US-164",
@@ -2828,8 +2828,8 @@
         "Project compiles without errors"
       ],
       "priority": 164,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed. BillingService with BillingClient, PurchasesUpdatedListener, product queries (subs + in-app), launch purchase flow, acknowledge, restore. PaywallViewModel/PaywallScreen with 3 tier cards, monthly/yearly toggle, feature comparison, restore button. UpgradePrompt reusable component. billing-ktx:6.1.0 added to build.gradle.kts. BillingService provided via AppModule. Paywall route wired into LociNavHost."
     }
   ]
 }

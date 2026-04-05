@@ -181,6 +181,24 @@ services:
     networks:
       - supabase
 
+  # Redis (rate limiting persistence)
+  redis:
+    image: redis:7-alpine
+    container_name: loci-redis
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes --maxmemory 128mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - supabase
+
   # Edge Functions (Node.js + Hono)
   edge-functions:
     build:
@@ -192,6 +210,8 @@ services:
         condition: service_healthy
       kong:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     ports:
       - "${EDGE_FUNCTIONS_PORT:-3100}:3000"
     environment:
@@ -199,6 +219,7 @@ services:
       SUPABASE_SERVICE_KEY: ${SERVICE_ROLE_KEY}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       REVENUECAT_WEBHOOK_SECRET: ${REVENUECAT_WEBHOOK_SECRET:-}
+      REDIS_URL: redis://redis:6379
       PORT: 3000
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:3000/health || exit 1"]
@@ -213,6 +234,8 @@ volumes:
   postgres_data:
     driver: local
   storage_data:
+    driver: local
+  redis_data:
     driver: local
 
 networks:

@@ -21,9 +21,14 @@ struct LociApp: App {
             fatalError("Failed to initialize ModelContainer: \(error.localizedDescription)")
         }
 
+        BuildSecretsValidator.validate()
+
         RevenueCatConfiguration.configure()
         AnalyticsService.shared.configure()
         AnalyticsService.shared.trackAppLaunch()
+
+        // US-148: Run integrity checks on app launch
+        IntegrityCheckService.shared.performChecks()
     }
 
     var body: some Scene {
@@ -86,7 +91,12 @@ struct ContentView: View {
                 notificationService: notificationService
             )
         } else {
-            mainAppView
+            VStack(spacing: 0) {
+                // US-148: Show integrity warning banner if device is compromised
+                IntegrityWarningBanner(issues: IntegrityCheckService.shared.detectedIssues)
+
+                mainAppView
+            }
         }
     }
 

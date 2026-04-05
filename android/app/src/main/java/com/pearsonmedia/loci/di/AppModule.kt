@@ -7,6 +7,7 @@ import com.google.android.gms.location.LocationServices
 import com.pearsonmedia.loci.service.AudioCacheManager
 import com.pearsonmedia.loci.service.AudioRecorderService
 import com.pearsonmedia.loci.service.AudioPlayerService
+import com.pearsonmedia.loci.service.BillingService
 import com.pearsonmedia.loci.service.LocationService
 import com.pearsonmedia.loci.service.SpeechRecognitionService
 import com.pearsonmedia.loci.util.HapticManager
@@ -88,4 +89,10 @@ object AppModule {
     fun provideAudioCacheManager(
         @ApplicationContext context: Context
     ): AudioCacheManager = AudioCacheManager(context)
+
+    @Provides
+    @Singleton
+    fun provideBillingService(
+        @ApplicationContext context: Context
+    ): BillingService = BillingService(context)
 }

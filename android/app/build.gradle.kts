@@ -146,6 +146,9 @@ dependencies {
     implementation(libs.hilt.work)
     ksp(libs.hilt.work.compiler)
 
+    // Google Play Billing
+    implementation("com.android.billingclient:billing-ktx:6.1.0")
+
     // Image Loading
     implementation(libs.coil.compose)
 

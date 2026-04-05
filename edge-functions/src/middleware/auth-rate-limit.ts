@@ -132,11 +132,17 @@ export async function recordLoginAttempt(record: LoginAttemptRecord): Promise<vo
 
 /**
  * GET /api/auth/verify-limits?email=xxx
- * Returns lockout status for a given email (used by iOS client pre-check).
+ * Returns lockout status for a given email (used by iOS/Android client pre-check).
+ *
+ * US-150: Uses consistent response timing to prevent timing-based email enumeration.
  */
 export async function verifyLimits(c: Context) {
+  const startTime = Date.now();
+  const MIN_RESPONSE_TIME_MS = 200; // Consistent timing to prevent enumeration
+
   const email = c.req.query('email')?.toLowerCase();
   if (!email) {
+    await enforceMinResponseTime(startTime, MIN_RESPONSE_TIME_MS);
     return c.json({ error: 'email parameter required' }, 400);
   }
 
@@ -149,15 +155,32 @@ export async function verifyLimits(c: Context) {
   });
 
   if (error) {
+    await enforceMinResponseTime(startTime, MIN_RESPONSE_TIME_MS);
     return c.json({ error: 'Failed to check lockout status' }, 500);
   }
 
   const lockout = data?.[0] as LockoutStatus | undefined;
+
+  // US-150: Consistent response timing regardless of email existence
+  await enforceMinResponseTime(startTime, MIN_RESPONSE_TIME_MS);
+
   return c.json({
     isLockedOut: lockout?.is_locked_out ?? false,
     retryAfterSeconds: lockout?.lockout_seconds_remaining ?? 0,
     recentFailures: lockout?.recent_failures ?? 0,
   });
+}
+
+/**
+ * US-150: Enforce minimum response time to prevent timing-based enumeration.
+ * Pads the response to a consistent duration so attackers can't determine
+ * whether an email exists based on response speed.
+ */
+async function enforceMinResponseTime(startTime: number, minMs: number): Promise<void> {
+  const elapsed = Date.now() - startTime;
+  if (elapsed < minMs) {
+    await new Promise((resolve) => setTimeout(resolve, minMs - elapsed));
+  }
 }
 
 // MARK: - Helpers

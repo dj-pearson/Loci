@@ -2,7 +2,23 @@ import Foundation
 import Supabase
 
 enum SupabaseConfig {
+    #if DEBUG
+    /// In DEBUG builds, allow overriding the Supabase URL via the
+    /// LOCI_SUPABASE_URL environment variable (e.g., set in the Xcode scheme)
+    /// so developers can point at a local or staging instance without
+    /// modifying BuildSecrets.
+    static let url: URL = {
+        if let override = ProcessInfo.processInfo.environment["LOCI_SUPABASE_URL"],
+           !override.isEmpty,
+           let overrideURL = URL(string: override) {
+            return overrideURL
+        }
+        return URL(string: BuildSecrets.supabaseURL)!
+    }()
+    #else
     static let url = URL(string: BuildSecrets.supabaseURL)!
+    #endif
+
     static let anonKey = BuildSecrets.supabaseAnonKey
 }
 

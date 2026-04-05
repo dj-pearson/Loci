@@ -72,6 +72,16 @@ struct SettingsView: View {
                     .foregroundStyle(.tertiary)
             }
 
+            // US-149: Security audit log for transparency
+            NavigationLink {
+                SecurityAuditLogView()
+            } label: {
+                Label(
+                    String(localized: "Security Log"),
+                    systemImage: "shield.checkered"
+                )
+            }
+
             // Data export
             Button {
                 Task { await exportData() }

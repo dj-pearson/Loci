@@ -4,7 +4,7 @@
 ## Started: 2026-03-25
 ## Status: IN PROGRESS
 ## Total Stories: 164
-## Completed: 152/164
+## Completed: 164/164
 
 ---
 
@@ -204,15 +204,15 @@ Loci is a voice-first iOS app (SwiftUI, iOS 17+) that pins voice notes to GPS co
 - [x] US-120: Create Coolify deployment configuration for Supabase and edge functions
 
 ## Phase 22: Production Readiness (US-121 → US-140)
-- [ ] US-121: Configure production API credentials and certificate pinning
+- [x] US-121: Configure production API credentials and certificate pinning
 - [x] US-122: Restrict CORS origins in Kong API gateway
 - [x] US-123: Add webhook replay protection with timestamp validation
-- [ ] US-124: Replace in-memory rate limiting with Redis-backed store
+- [x] US-124: Replace in-memory rate limiting with Redis-backed store
 - [x] US-125: Wire LocusDetailView into deep-link navigation replacing placeholder
 - [x] US-126: Add network reachability monitoring and offline sync queue
 - [x] US-127: Implement TelemetryDeck analytics integration
 - [x] US-128: Add comprehensive input sanitization for all user-facing text fields
-- [ ] US-129: Add Fastlane match signing and GitHub Actions CI/CD pipeline
+- [x] US-129: Add Fastlane match signing and GitHub Actions CI/CD pipeline
 - [x] US-130: Add comprehensive error recovery and retry logic for Supabase operations
 - [x] US-131: Add data export and account deletion compliance (GDPR/App Store requirement)
 - [x] US-132: Add notification permission re-prompt and settings deep link
@@ -232,12 +232,12 @@ Loci is a voice-first iOS app (SwiftUI, iOS 17+) that pins voice notes to GPS co
 - [x] US-144: Password strength validation with complexity requirements and UI indicator
 - [x] US-145: Secure session lifecycle with token rotation and forced re-authentication
 - [x] US-146: Server-side auth rate limiting and login attempt tracking
-- [ ] US-147: Auth flow UX improvements with password visibility and keyboard management
-- [ ] US-148: Jailbreak and runtime integrity detection
-- [ ] US-149: Security audit logging for authentication events
-- [ ] US-150: Email enumeration protection on auth endpoints
-- [ ] US-151: Android app architecture planning and Kotlin Multiplatform evaluation
-- [ ] US-152: Network security hardening with App Transport Security and request signing
+- [x] US-147: Auth flow UX improvements with password visibility and keyboard management
+- [x] US-148: Jailbreak and runtime integrity detection
+- [x] US-149: Security audit logging for authentication events
+- [x] US-150: Email enumeration protection on auth endpoints
+- [x] US-151: Android app architecture planning and Kotlin Multiplatform evaluation
+- [x] US-152: Network security hardening with App Transport Security and request signing
 
 ## Phase 24: Android App (US-153 → US-164)
 - [x] US-153: Android project scaffold with Kotlin, Jetpack Compose, Hilt, and Room
@@ -249,9 +249,9 @@ Loci is a voice-first iOS app (SwiftUI, iOS 17+) that pins voice notes to GPS co
 - [x] US-159: Android performance optimization: lazy loading, caching, background work
 - [x] US-160: Android UX polish: animations, haptics, accessibility, error handling
 - [x] US-161: Android Supabase integration: auth, sync, and storage
-- [ ] US-162: Android CI/CD: GitHub Actions build, lint, and test pipeline
-- [ ] US-163: Android family sharing: household creation, join, member management
-- [ ] US-164: Android monetization: Google Play Billing with tier enforcement
+- [x] US-162: Android CI/CD: GitHub Actions build, lint, and test pipeline
+- [x] US-163: Android family sharing: household creation, join, member management
+- [x] US-164: Android monetization: Google Play Billing with tier enforcement
 
 ---
 

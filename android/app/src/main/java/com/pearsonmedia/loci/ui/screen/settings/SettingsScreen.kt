@@ -18,7 +18,10 @@ import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Group
+import androidx.compose.material.icons.filled.GroupAdd
 import androidx.compose.material.icons.filled.Security
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Storage
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -42,7 +45,11 @@ import androidx.compose.ui.unit.dp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    onSignInClick: () -> Unit
+    onSignInClick: () -> Unit,
+    onCreateHouseholdClick: () -> Unit = {},
+    onJoinHouseholdClick: () -> Unit = {},
+    onHouseholdMembersClick: () -> Unit = {},
+    onUpgradeClick: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -58,6 +65,40 @@ fun SettingsScreen(
                 title = "Sign In",
                 subtitle = "Sync your loci across devices",
                 onClick = onSignInClick
+            )
+        }
+
+        // Subscription Section
+        SettingsSection(title = "Subscription") {
+            SettingsItem(
+                icon = Icons.Default.Star,
+                title = "Upgrade",
+                subtitle = "Unlock Premium or Family features",
+                onClick = onUpgradeClick
+            )
+        }
+
+        // Family Section
+        SettingsSection(title = "Family") {
+            SettingsItem(
+                icon = Icons.Default.Group,
+                title = "Create Household",
+                subtitle = "Start a family sharing group",
+                onClick = onCreateHouseholdClick
+            )
+            HorizontalDivider()
+            SettingsItem(
+                icon = Icons.Default.GroupAdd,
+                title = "Join Household",
+                subtitle = "Enter an invite code",
+                onClick = onJoinHouseholdClick
+            )
+            HorizontalDivider()
+            SettingsItem(
+                icon = Icons.Default.Person,
+                title = "Household Members",
+                subtitle = "Manage your family group",
+                onClick = onHouseholdMembersClick
             )
         }
 
