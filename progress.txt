@@ -253,6 +253,18 @@ Loci is a voice-first iOS app (SwiftUI, iOS 17+) that pins voice notes to GPS co
 - [x] US-163: Android family sharing: household creation, join, member management
 - [x] US-164: Android monetization: Google Play Billing with tier enforcement
 
+## Phase 25: Mobile UI/UX Premium Polish (US-165 → US-174)
+- [x] US-165: Premium design token system (iOS + Android) — DesignSystem.swift + DesignTokens.kt with Space/Radius/Elevation/Gradients/Motion/Duration/Surface, premiumCard modifier on both platforms
+- [ ] US-166: Hero record button redesign with premium motion (gradient, breathing halo, haptic sequence)
+- [ ] US-167: Premium map experience — styled map, animated pin drop, selection halo
+- [ ] US-168: Premium locus list card redesign — elevation, category glyph tile, waveform preview, gradient swipe action
+- [ ] US-169: Motion and haptic orchestration system — sequence helpers, coordinated transitions
+- [ ] US-170: Paywall premium redesign with animated tier showcase and feature carousel
+- [ ] US-171: Delightful empty states and shimmer hero loading
+- [ ] US-172: Onboarding premium polish with animated hero illustrations and live previews
+- [ ] US-173: Premium settings and account header redesign with tier badge
+- [ ] US-174: Accessibility premium parity — Reduce Motion, Dynamic Type, VoiceOver rotor
+
 ---
 
 ## Features Added Beyond PRD (for MVP excellence)

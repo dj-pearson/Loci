@@ -2830,6 +2830,185 @@
       "priority": 164,
       "passes": true,
       "notes": "Completed. BillingService with BillingClient, PurchasesUpdatedListener, product queries (subs + in-app), launch purchase flow, acknowledge, restore. PaywallViewModel/PaywallScreen with 3 tier cards, monthly/yearly toggle, feature comparison, restore button. UpgradePrompt reusable component. billing-ktx:6.1.0 added to build.gradle.kts. BillingService provided via AppModule. Paywall route wired into LociNavHost."
+    },
+    {
+      "id": "US-165",
+      "title": "Premium design token system (iOS + Android)",
+      "description": "As a user, I want the app to feel cohesive, polished, and premium so that every surface reinforces the sense that Loci is a high-quality product worth paying for.",
+      "acceptanceCriteria": [
+        "iOS: DesignSystem.swift introduces Space (2/4/8/12/16/20/24/32/48), Radius (6/10/14/20/28/full), Elevation (level1–level4 layered shadows), Gradients (primary, primaryHalo, record, premium, family, glassTint), Motion spring presets (snappy, smooth, gentle, bouncy, amplitude), Duration presets, and Surface materials (glassThin, glass, glassThick)",
+        "iOS: View.elevation(_:) and View.premiumCard(radius:elevation:glass:) modifiers for one-line premium surfaces",
+        "Android: DesignTokens.kt introduces matching Space, Radius, Elevation, and Motion spring/tween presets",
+        "Android: LociGradients object exposes Primary, Record, Premium, Family, PrimaryHalo, and GlassTint brushes",
+        "Android: Modifier.premiumCard(radius, elevation, background, border) composable extension",
+        "All tokens resolve via semantic theme colors (Theme / MaterialTheme) so they adapt to light and dark mode",
+        "Existing Theme.swift / Theme.kt remain untouched — DesignSystem is additive, not a replacement",
+        "Typecheck passes on both platforms"
+      ],
+      "priority": 165,
+      "passes": true,
+      "notes": "Completed. iOS: Loci/Utilities/DesignSystem.swift adds Space, Radius, Elevation, Gradients, Motion, Duration, and Surface tokens plus View.elevation(_:) and View.premiumCard(radius:elevation:glass:) modifiers layered on top of Theme.swift. Android: ui/theme/DesignTokens.kt adds matching DesignTokens object, LociGradients brushes, and Modifier.premiumCard extension. Foundation for US-166 → US-174 premium polish work."
+    },
+    {
+      "id": "US-166",
+      "title": "Hero record button redesign with premium motion",
+      "description": "As a user, I want the primary record action to feel alive and delightful so that creating a voice note is the most satisfying moment in the app.",
+      "acceptanceCriteria": [
+        "iOS: RecordButton uses DesignSystem.Gradients.record for active state and DesignSystem.Gradients.primary for idle state",
+        "iOS: Breathing halo driven by DesignSystem.Motion.gentle spring with TimelineView fallback for reduce-motion",
+        "iOS: Press-down scale uses DesignSystem.Motion.snappy and triggers HapticManager.recordStart on press-in",
+        "iOS: Active amplitude ring animates with DesignSystem.Motion.amplitude and is capped to max diameter so it never overflows its container",
+        "Android: Matching HeroRecordButton composable using LociGradients.Record and DesignTokens.Motion springs",
+        "Android: Pulse animation uses rememberInfiniteTransition with StiffnessLow spring and respects Settings.Global reduce-motion",
+        "Both platforms: tappable area ≥ 72dp/pt, full VoiceOver/TalkBack labels, Dynamic Type-safe layout",
+        "Typecheck passes on both platforms"
+      ],
+      "priority": 166,
+      "passes": false,
+      "notes": "Pending. Depends on US-165. Will replace Loci/Views/Record/RecordButton.swift with gradient + motion tokens and add android/app/.../ui/component/HeroRecordButton.kt."
+    },
+    {
+      "id": "US-167",
+      "title": "Premium map experience: styled map, animated pins, selection halo",
+      "description": "As a user, I want the map to feel like a premium travel app — custom-styled, depth-layered pins, and smooth camera motion — so that browsing my loci feels cinematic.",
+      "acceptanceCriteria": [
+        "iOS: Custom map style (MKMapConfiguration.preferredConfiguration) with reduced POI clutter and category-tinted pin annotations using DesignSystem.Elevation.level3",
+        "iOS: New pin drop animation using DesignSystem.Motion.bouncy when a locus appears on screen",
+        "iOS: Selected pin shows an animated halo ring using DesignSystem.Gradients.primaryHalo",
+        "iOS: Camera transitions use MKMapView smooth animated region changes (0.5s ease-out)",
+        "Android: Google Maps style JSON for muted POIs and brand-tinted roads in both light and dark mode",
+        "Android: Marker icons use rememberVectorPainter with category colors and drop-in animation via AnimatedVisibility + scaleIn(initialScale = 0.6f, DesignTokens.Motion.bouncy)",
+        "Android: Selected marker shows a pulsing halo Canvas overlay that respects reduce-motion",
+        "Both platforms: empty-map state uses hero illustration with primary halo gradient",
+        "Typecheck passes on both platforms"
+      ],
+      "priority": 167,
+      "passes": false,
+      "notes": "Pending. Depends on US-165. Will update HomeMapView.swift, CategoryPinView.swift, and LociMapView.kt."
+    },
+    {
+      "id": "US-168",
+      "title": "Premium locus list card redesign",
+      "description": "As a user, I want the list view to feel tactile, skimmable, and rich with preview information so I can quickly find the note I need.",
+      "acceptanceCriteria": [
+        "iOS: LocusListRow uses View.premiumCard() with level2 elevation, category glyph tile (44x44 rounded square with category color), truncated transcription (2 lines), relative timestamp, and a mini static waveform preview",
+        "iOS: Row press uses DesignSystem.Motion.snappy scale feedback and HapticManager.tabSelection",
+        "iOS: Swipe-to-archive reveals a gradient action background using DesignSystem.Gradients.premium",
+        "Android: LocusListItem composable uses Modifier.premiumCard() with matching layout (category tile + transcription + timestamp + waveform mini)",
+        "Android: SwipeToDismissBox end-to-start reveal uses LociGradients.Premium background",
+        "Both platforms: items animate in with a 40ms stagger using Motion.smooth",
+        "Both platforms: Dynamic Type / font scaling verified up to XXL",
+        "Typecheck passes on both platforms"
+      ],
+      "priority": 168,
+      "passes": false,
+      "notes": "Pending. Depends on US-165. Will update LocusListView.swift and Android screens/map/ListScreen.kt LocusListItem."
+    },
+    {
+      "id": "US-169",
+      "title": "Motion and haptic orchestration system",
+      "description": "As a user, I want motion and haptics throughout the app to feel coordinated and intentional so that the product feels crafted, not assembled.",
+      "acceptanceCriteria": [
+        "iOS: HapticManager gains sequence helpers — recordStartSequence (medium + delayed light), saveSuccessSequence (light → success notification), unlockSequence (selection → bouncy impact → success)",
+        "iOS: All primary screen transitions adopt DesignSystem.Motion.smooth; sheet presentations use DesignSystem.Motion.gentle",
+        "Android: HapticManager gains recordStartSequence, saveSuccessSequence, and unlockSequence using VibrationEffect waveforms",
+        "Android: NavHost transitions adopt AnimatedContentTransitionScope with DesignTokens.Motion.smooth spring for enter/exit",
+        "Both platforms: all tab switches trigger selection haptic; all destructive confirmations trigger error haptic",
+        "Both platforms: reduce-motion / reduce-haptics system settings disable non-essential sequences",
+        "Typecheck passes on both platforms"
+      ],
+      "priority": 169,
+      "passes": false,
+      "notes": "Pending. Depends on US-165. Will extend Loci/Utilities/HapticManager.swift and android/.../util/HapticManager.kt."
+    },
+    {
+      "id": "US-170",
+      "title": "Paywall premium redesign with animated tier showcase",
+      "description": "As a prospective premium subscriber, I want the paywall to feel aspirational and clearly communicate value so that upgrading feels like unlocking a better version of the app.",
+      "acceptanceCriteria": [
+        "iOS: PaywallView hero uses DesignSystem.Gradients.premium with animated parallax gradient and a rotating feature highlight carousel (auto-advance every 4s, pause on drag)",
+        "iOS: Each tier card uses View.premiumCard(radius: .lg, elevation: .level3) with glow ring on the recommended tier",
+        "iOS: CTA button uses DesignSystem.Gradients.primary with breathing glow and HapticManager.unlockSequence on successful purchase",
+        "Android: PaywallScreen hero uses LociGradients.Premium + animated feature carousel via HorizontalPager with auto-advance",
+        "Android: Tier cards use Modifier.premiumCard with elevated recommended-tier glow using LociGradients.Family border",
+        "Android: CTA uses Brush-tinted Button with haptic unlockSequence on purchase",
+        "Both platforms: tier comparison clearly lists Free vs Premium vs Family with icons, matching CLAUDE.md monetization table",
+        "Both platforms: restore purchases and terms/privacy links remain accessible",
+        "Typecheck passes on both platforms"
+      ],
+      "priority": 170,
+      "passes": false,
+      "notes": "Pending. Depends on US-165, US-169. Will redesign PaywallView.swift and PaywallScreen.kt."
+    },
+    {
+      "id": "US-171",
+      "title": "Delightful empty states and shimmer hero loading",
+      "description": "As a user, I want empty and loading states to feel intentional and on-brand so that the first minute of using Loci still feels premium.",
+      "acceptanceCriteria": [
+        "iOS: EmptyStateView upgraded with hero SF Symbol on a DesignSystem.Gradients.primaryHalo background, headline + supporting copy, and a primary CTA button",
+        "iOS: SkeletonView gains a shimmer overlay using a moving LinearGradient driven by TimelineView; disabled under reduce-motion",
+        "iOS: Map and List show shimmer placeholders on first load until first query resolves",
+        "Android: EmptyStateView composable matches — brush halo behind icon, headline, supporting text, CTA",
+        "Android: SkeletonView uses infiniteRepeatable gradient brush translation; disabled under reduce-motion",
+        "Both platforms: copy localized with String(localized:) / stringResource",
+        "Typecheck passes on both platforms"
+      ],
+      "priority": 171,
+      "passes": false,
+      "notes": "Pending. Depends on US-165. Will update EmptyStateView and SkeletonView on both platforms."
+    },
+    {
+      "id": "US-172",
+      "title": "Onboarding premium polish with animated hero illustrations",
+      "description": "As a new user, I want onboarding to feel cinematic and reassuring so that I trust the app with microphone and location permissions.",
+      "acceptanceCriteria": [
+        "iOS: OnboardingView gains per-page SF Symbol hero illustrations with parallax + gradient halos using DesignSystem.Gradients.primaryHalo",
+        "iOS: Page transitions use DesignSystem.Motion.gentle and a dot indicator that morphs between pages",
+        "iOS: Permission pages show a live mock (map preview, record button preview) with reduced-motion fallback",
+        "Android: OnboardingScreen HorizontalPager gains matching hero illustrations, gradient halos, and dot indicator morph via animateFloatAsState",
+        "Android: Permission pages show live previews with reduce-motion fallback",
+        "Both platforms: primary button uses DesignSystem.Gradients.primary / LociGradients.Primary and haptic selection on page change",
+        "Typecheck passes on both platforms"
+      ],
+      "priority": 172,
+      "passes": false,
+      "notes": "Pending. Depends on US-165. Will update OnboardingView.swift and OnboardingScreen.kt."
+    },
+    {
+      "id": "US-173",
+      "title": "Premium settings and account header redesign",
+      "description": "As a user, I want Settings to feel like a curated preferences hub so that managing my account and preferences feels premium and trustworthy.",
+      "acceptanceCriteria": [
+        "iOS: SettingsView gains an account header card (premiumCard, level3 elevation) with avatar/initial, display name, tier badge, and upgrade CTA if free",
+        "iOS: Settings rows grouped into icon-tile cards (category tile + title + chevron) with smooth selection feedback via DesignSystem.Motion.snappy",
+        "iOS: Destructive actions (sign out, delete account) use Theme.error with HapticManager.delete confirmation",
+        "Android: SettingsScreen gains matching account header Card and tinted icon tiles for each row",
+        "Android: Destructive actions use colorScheme.error and HapticManager.error",
+        "Both platforms: tier badge uses DesignSystem.Gradients.premium / LociGradients.Premium",
+        "Typecheck passes on both platforms"
+      ],
+      "priority": 173,
+      "passes": false,
+      "notes": "Pending. Depends on US-165. Will update SettingsView.swift and SettingsScreen.kt."
+    },
+    {
+      "id": "US-174",
+      "title": "Accessibility premium parity — Reduce Motion, Dynamic Type, VoiceOver rotor",
+      "description": "As a user with accessibility needs, I want all the new premium visuals to gracefully degrade so that the premium experience is inclusive.",
+      "acceptanceCriteria": [
+        "iOS: All DesignSystem.Motion animations have a reduce-motion path (instant transition or opacity-only) gated on @Environment(\\.accessibilityReduceMotion)",
+        "iOS: All premium cards pass Dynamic Type from XS to AX5 without clipping — text wraps, layouts reflow",
+        "iOS: Map annotations expose VoiceOver rotor for category filtering and distance traits on each pin",
+        "iOS: All gradient-on-gradient surfaces meet WCAG AA contrast for text (4.5:1) — verified with Xcode Accessibility Inspector",
+        "Android: All motion respects Settings.Global.TRANSITION_ANIMATION_SCALE == 0 and animatorScale == 0 (ValueAnimator.areAnimatorsEnabled())",
+        "Android: Font scale up to 2.0x renders correctly for all premium cards",
+        "Android: All composables have contentDescription and minimum touch target 48dp",
+        "Both platforms: no regressions in existing accessibility tests",
+        "Typecheck passes on both platforms"
+      ],
+      "priority": 174,
+      "passes": false,
+      "notes": "Pending. Depends on US-165 → US-173. Final polish story covering accessibility for the entire premium redesign."
     }
   ]
 }
