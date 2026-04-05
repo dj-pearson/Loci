@@ -58,6 +58,38 @@ class HapticManager @Inject constructor(
         }
     }
 
+    // --- Premium sequences (US-169) ---
+
+    /**
+     * Two-beat "lock-in" feel when a recording starts: medium impact
+     * followed by a light tap ~90ms later.
+     */
+    fun recordStartSequence() {
+        val timings = longArrayOf(0, 50, 40, 20)
+        val amplitudes = intArrayOf(0, 180, 0, 90)
+        vibrate(VibrationEffect.createWaveform(timings, amplitudes, -1))
+    }
+
+    /**
+     * Light tap priming the user before a success chime — used when a
+     * locus is saved.
+     */
+    fun saveSuccessSequence() {
+        val timings = longArrayOf(0, 25, 90, 40, 40, 100)
+        val amplitudes = intArrayOf(0, 90, 0, 140, 0, 200)
+        vibrate(VibrationEffect.createWaveform(timings, amplitudes, -1))
+    }
+
+    /**
+     * Selection → heavy impact → success celebration. Used when a paid
+     * tier is unlocked or a household invite is accepted.
+     */
+    fun unlockSequence() {
+        val timings = longArrayOf(0, 20, 80, 80, 120, 60, 60, 100)
+        val amplitudes = intArrayOf(0, 80, 0, 220, 0, 140, 0, 200)
+        vibrate(VibrationEffect.createWaveform(timings, amplitudes, -1))
+    }
+
     private fun vibrate(effect: VibrationEffect) {
         if (vibrator.hasVibrator()) {
             vibrator.vibrate(effect)

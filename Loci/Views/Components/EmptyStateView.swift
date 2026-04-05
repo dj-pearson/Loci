@@ -1,5 +1,10 @@
 import SwiftUI
 
+/// Premium empty state (US-171).
+///
+/// Hero SF Symbol on a gradient halo background, headline, supporting copy,
+/// and a gradient CTA button. Respects Reduce Motion — the halo animation
+/// collapses into a static glow.
 struct EmptyStateView: View {
     let systemImage: String
     let title: String
@@ -7,36 +12,65 @@ struct EmptyStateView: View {
     var buttonTitle: String?
     var onButtonTap: (() -> Void)?
 
+    @State private var haloPulse = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     var body: some View {
-        VStack(spacing: Theme.Spacing.md) {
-            Image(systemName: systemImage)
-                .font(.system(size: 56))
-                .foregroundStyle(Theme.textSecondary.opacity(0.5))
+        VStack(spacing: DesignSystem.Space.md) {
+            // Hero icon on a gradient halo.
+            ZStack {
+                Circle()
+                    .fill(DesignSystem.Gradients.primaryHalo)
+                    .frame(width: 220, height: 220)
+                    .scaleEffect(reduceMotion ? 1.0 : (haloPulse ? 1.06 : 0.94))
+                    .opacity(reduceMotion ? 0.6 : (haloPulse ? 0.4 : 0.8))
+                    .animation(
+                        reduceMotion
+                            ? nil
+                            : DesignSystem.Motion.gentle.repeatForever(autoreverses: true),
+                        value: haloPulse
+                    )
+                    .allowsHitTesting(false)
+
+                ZStack {
+                    Circle()
+                        .fill(DesignSystem.Gradients.primary)
+                        .frame(width: 96, height: 96)
+                        .elevation(.level3)
+
+                    Image(systemName: systemImage)
+                        .font(.system(size: 44, weight: .medium))
+                        .foregroundStyle(.white)
+                }
+            }
+            .onAppear { haloPulse = true }
 
             Text(title)
-                .font(Theme.Typography.title)
+                .font(.title2.weight(.bold))
                 .foregroundStyle(Theme.textPrimary)
                 .multilineTextAlignment(.center)
 
             Text(subtitle)
-                .font(Theme.Typography.body)
+                .font(.body)
                 .foregroundStyle(Theme.textSecondary)
                 .multilineTextAlignment(.center)
-                .padding(.horizontal, Theme.Spacing.xl)
+                .padding(.horizontal, DesignSystem.Space.xl)
 
             if let buttonTitle, let onButtonTap {
                 Button(action: onButtonTap) {
                     Text(buttonTitle)
                         .font(.subheadline.weight(.semibold))
-                        .padding(.horizontal, 24)
-                        .padding(.vertical, 10)
-                        .background(Theme.primary, in: Capsule())
+                        .padding(.horizontal, 28)
+                        .padding(.vertical, 12)
+                        .background(DesignSystem.Gradients.primary, in: Capsule())
                         .foregroundStyle(.white)
+                        .elevation(.level2)
                 }
-                .padding(.top, Theme.Spacing.sm)
+                .buttonStyle(.plain)
+                .padding(.top, DesignSystem.Space.xs)
             }
         }
-        .padding(Theme.Spacing.xl)
+        .padding(DesignSystem.Space.xl)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }

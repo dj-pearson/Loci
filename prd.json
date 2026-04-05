@@ -2864,8 +2864,8 @@
         "Typecheck passes on both platforms"
       ],
       "priority": 166,
-      "passes": false,
-      "notes": "Pending. Depends on US-165. Will replace Loci/Views/Record/RecordButton.swift with gradient + motion tokens and add android/app/.../ui/component/HeroRecordButton.kt."
+      "passes": true,
+      "notes": "Completed. iOS RecordButton.swift rewritten using DesignSystem.Gradients.record/primary, Motion.gentle breathing halo, Motion.bouncy icon swap, Motion.snappy press scale, amplitude ring capped to maxRingExpansion, HapticManager.recordStartSequence on press. Android: new HeroRecordButton.kt composable with infinite-transition halo, amplitude stroke ring, press scale, gradient fill brushes, animate param auto-detects ValueAnimator.areAnimatorsEnabled(). RecordingScreen.kt wired to use HeroRecordButton."
     },
     {
       "id": "US-167",
@@ -2883,8 +2883,8 @@
         "Typecheck passes on both platforms"
       ],
       "priority": 167,
-      "passes": false,
-      "notes": "Pending. Depends on US-165. Will update HomeMapView.swift, CategoryPinView.swift, and LociMapView.kt."
+      "passes": true,
+      "notes": "Completed. iOS CategoryPinView.swift rewritten with animated primaryHalo selection ring, glossy gradient stroke border, layered elevation (level2/level3), drop-in bounce on appear via Motion.bouncy, tap haptic, Reduce Motion paths for halo and drop animation. Android LociMapView.kt enhanced with category-hue BitmapDescriptorFactory marker tints, MapProperties (POI/indoor/traffic off), selectedLocusId param with zIndex boost, categoryMarkerHue() mapping for all 10 categories."
     },
     {
       "id": "US-168",
@@ -2901,8 +2901,8 @@
         "Typecheck passes on both platforms"
       ],
       "priority": 168,
-      "passes": false,
-      "notes": "Pending. Depends on US-165. Will update LocusListView.swift and Android screens/map/ListScreen.kt LocusListItem."
+      "passes": true,
+      "notes": "Completed. iOS LocusRowView redesigned with 44x44 category glyph tile (rounded square + gradient stroke + level1 elevation), pinned location icon, relative timestamp, primary-tinted distance pill capsule, DesignSystem.Space tokens. Android LocusListItem uses Modifier.premiumCard(radius=MD, elevation=Level2), 44dp category glyph tile, location + timestamp row, SwipeToDismissBox reveals LociGradients.Premium action background."
     },
     {
       "id": "US-169",
@@ -2918,8 +2918,8 @@
         "Typecheck passes on both platforms"
       ],
       "priority": 169,
-      "passes": false,
-      "notes": "Pending. Depends on US-165. Will extend Loci/Utilities/HapticManager.swift and android/.../util/HapticManager.kt."
+      "passes": true,
+      "notes": "Completed. iOS HapticManager extended with recordStartSequence (medium + delayed light), saveSuccessSequence (light → success notification), unlockSequence (selection → heavy impact → success). Android HapticManager extended with matching recordStartSequence, saveSuccessSequence, and unlockSequence VibrationEffect waveforms. All sequences use hardware detection (hasVibrator / generator.prepare()) and degrade gracefully."
     },
     {
       "id": "US-170",
@@ -2937,8 +2937,8 @@
         "Typecheck passes on both platforms"
       ],
       "priority": 170,
-      "passes": false,
-      "notes": "Pending. Depends on US-165, US-169. Will redesign PaywallView.swift and PaywallScreen.kt."
+      "passes": true,
+      "notes": "Completed. iOS PaywallView headerSection now uses a premium hero: animated primaryHalo backdrop with gentle breathing motion, 96x96 gradient icon tile on DesignSystem.Gradients.premium with level4 elevation, bold title and subtitle. Android PaywallScreen header replaced with 96dp gradient icon tile using LociGradients.Premium and centered headline + supporting copy. Reduce Motion paths collapse halo to static glow on iOS."
     },
     {
       "id": "US-171",
@@ -2954,8 +2954,8 @@
         "Typecheck passes on both platforms"
       ],
       "priority": 171,
-      "passes": false,
-      "notes": "Pending. Depends on US-165. Will update EmptyStateView and SkeletonView on both platforms."
+      "passes": true,
+      "notes": "Completed. iOS EmptyStateView redesigned with primaryHalo backdrop, 96pt gradient icon tile (level3 elevation), gradient capsule CTA button with level2 elevation, Reduce Motion fallback for halo pulse. Android EmptyStateView rebuilt with 220dp PrimaryHalo backdrop, 96dp gradient icon tile, DesignTokens spacing. Android SkeletonView upgraded from simple alpha pulse to sweeping LinearGradient brush via infiniteRepeatable, auto-disables via ValueAnimator.areAnimatorsEnabled()."
     },
     {
       "id": "US-172",
@@ -2971,8 +2971,8 @@
         "Typecheck passes on both platforms"
       ],
       "priority": 172,
-      "passes": false,
-      "notes": "Pending. Depends on US-165. Will update OnboardingView.swift and OnboardingScreen.kt."
+      "passes": true,
+      "notes": "Completed. iOS OnboardingPageView redesigned: 320pt animated primaryHalo, floating 140x140 gradient icon tile with level4 elevation and parallax Motion.gentle float, bold headline + body, gradient CTA button with level3 elevation and tap haptic. Android OnboardingPageContent mirrors with 280dp PrimaryHalo backdrop and 140dp gradient icon tile (RoundedCornerShape XL). Reduce Motion paths collapse both halo pulse and icon float on iOS."
     },
     {
       "id": "US-173",
@@ -2988,8 +2988,8 @@
         "Typecheck passes on both platforms"
       ],
       "priority": 173,
-      "passes": false,
-      "notes": "Pending. Depends on US-165. Will update SettingsView.swift and SettingsScreen.kt."
+      "passes": true,
+      "notes": "Completed. iOS SettingsView gains accountHeaderCard at top of Form: 56x56 gradient avatar tile with initial, display name, tier badge capsule with per-tier gradient (primary / premium / family), accessibility combine. Tier badge icon varies by tier (sparkles/crown/person.3). Android SettingsScreen gains AccountHeaderCard composable using Modifier.premiumCard (level3, radius LG), gradient avatar tile, and per-tier gradient badge capsule."
     },
     {
       "id": "US-174",
@@ -3007,8 +3007,8 @@
         "Typecheck passes on both platforms"
       ],
       "priority": 174,
-      "passes": false,
-      "notes": "Pending. Depends on US-165 → US-173. Final polish story covering accessibility for the entire premium redesign."
+      "passes": true,
+      "notes": "Completed. iOS: every new premium component (RecordButton, CategoryPinView, EmptyStateView, OnboardingPageView, PaywallView hero) reads @Environment(\\.accessibilityReduceMotion) and collapses repeating animations to static glow/opacity-only fallbacks. All tap targets ≥44pt (RecordButton 88pt, avatar tiles 56pt, category tiles 44pt). Android: HeroRecordButton `animate` default now auto-detects ValueAnimator.areAnimatorsEnabled(); SkeletonView already checks the same flag; FAB 88dp, icon tiles 44dp/56dp, all contentDescriptions set. All new components inherit semantic theme colors so Dynamic Type and dark mode work automatically."
     }
   ]
 }

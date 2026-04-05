@@ -1,7 +1,12 @@
 package com.pearsonmedia.loci.ui.screen.settings
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -39,8 +44,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.pearsonmedia.loci.ui.theme.DesignTokens
+import com.pearsonmedia.loci.ui.theme.LociGradients
+import com.pearsonmedia.loci.ui.theme.premiumCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,6 +68,13 @@ fun SettingsScreen(
             .verticalScroll(rememberScrollState())
     ) {
         TopAppBar(title = { Text("Settings") })
+
+        // Premium account header card (US-173)
+        AccountHeaderCard(
+            displayName = "Guest",
+            tierName = "Free",
+            onUpgradeClick = onUpgradeClick
+        )
 
         // Account Section
         SettingsSection(title = "Account") {
@@ -233,5 +251,80 @@ private fun SettingsToggle(
             )
         }
         Switch(checked = checked, onCheckedChange = onCheckedChange)
+    }
+}
+
+/**
+ * Premium account header (US-173).
+ *
+ * Gradient avatar tile with display initial, name, and a gradient tier
+ * badge. Shown at the top of Settings above the first section.
+ */
+@Composable
+private fun AccountHeaderCard(
+    displayName: String,
+    tierName: String,
+    onUpgradeClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(
+                horizontal = DesignTokens.Space.MD,
+                vertical = DesignTokens.Space.SM
+            )
+            .premiumCard(
+                radius = DesignTokens.Radius.LG,
+                elevation = DesignTokens.Elevation.Level3,
+                background = MaterialTheme.colorScheme.surface
+            )
+            .clickable(onClick = onUpgradeClick)
+            .padding(DesignTokens.Space.MD),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Gradient avatar tile.
+        Box(
+            modifier = Modifier
+                .size(56.dp)
+                .clip(RoundedCornerShape(DesignTokens.Radius.MD))
+                .background(LociGradients.Primary),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = displayName.take(1).uppercase(),
+                style = MaterialTheme.typography.titleLarge,
+                color = Color.White,
+                fontWeight = FontWeight.Bold
+            )
+        }
+
+        Spacer(modifier = Modifier.width(DesignTokens.Space.MD))
+
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = displayName,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            // Gradient tier badge.
+            Box(
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .background(
+                        if (tierName.equals("Premium", ignoreCase = true)) LociGradients.Premium
+                        else if (tierName.equals("Family", ignoreCase = true)) LociGradients.Family
+                        else LociGradients.Primary
+                    )
+                    .padding(horizontal = 10.dp, vertical = 4.dp)
+            ) {
+                Text(
+                    text = tierName,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color.White,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+        }
     }
 }

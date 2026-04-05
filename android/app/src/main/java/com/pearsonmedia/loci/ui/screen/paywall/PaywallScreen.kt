@@ -2,7 +2,15 @@ package com.pearsonmedia.loci.ui.screen.paywall
 
 import android.app.Activity
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.ui.draw.clip
+import com.pearsonmedia.loci.ui.theme.DesignTokens
+import com.pearsonmedia.loci.ui.theme.LociGradients
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -97,16 +105,34 @@ fun PaywallScreen(
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Premium hero tile (US-170)
+            Box(
+                modifier = Modifier
+                    .size(96.dp)
+                    .clip(RoundedCornerShape(DesignTokens.Radius.LG))
+                    .background(LociGradients.Premium),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.LocationOn,
+                    contentDescription = null,
+                    tint = androidx.compose.ui.graphics.Color.White,
+                    modifier = Modifier.size(48.dp)
+                )
+            }
+            Spacer(Modifier.height(DesignTokens.Space.MD))
             Text(
-                "Choose Your Plan",
+                "Unlock the Full Loci Experience",
                 style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center
             )
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(DesignTokens.Space.XS))
             Text(
-                "Unlock the full Loci experience",
+                "Pin more memories, sync everywhere, and share with family.",
                 style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center
             )
 
             Spacer(Modifier.height(16.dp))

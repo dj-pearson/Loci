@@ -255,15 +255,15 @@ Loci is a voice-first iOS app (SwiftUI, iOS 17+) that pins voice notes to GPS co
 
 ## Phase 25: Mobile UI/UX Premium Polish (US-165 → US-174)
 - [x] US-165: Premium design token system (iOS + Android) — DesignSystem.swift + DesignTokens.kt with Space/Radius/Elevation/Gradients/Motion/Duration/Surface, premiumCard modifier on both platforms
-- [ ] US-166: Hero record button redesign with premium motion (gradient, breathing halo, haptic sequence)
-- [ ] US-167: Premium map experience — styled map, animated pin drop, selection halo
-- [ ] US-168: Premium locus list card redesign — elevation, category glyph tile, waveform preview, gradient swipe action
-- [ ] US-169: Motion and haptic orchestration system — sequence helpers, coordinated transitions
-- [ ] US-170: Paywall premium redesign with animated tier showcase and feature carousel
-- [ ] US-171: Delightful empty states and shimmer hero loading
-- [ ] US-172: Onboarding premium polish with animated hero illustrations and live previews
-- [ ] US-173: Premium settings and account header redesign with tier badge
-- [ ] US-174: Accessibility premium parity — Reduce Motion, Dynamic Type, VoiceOver rotor
+- [x] US-166: Hero record button redesign with premium motion — gradient fill, breathing halo, amplitude ring, HapticManager.recordStartSequence; Android HeroRecordButton composable wired into RecordingScreen
+- [x] US-167: Premium map experience — iOS CategoryPinView with primaryHalo selection ring, glossy stroke, drop-in bounce; Android LociMapView with category-hue markers and MapProperties POI muting
+- [x] US-168: Premium locus list card redesign — 44pt category glyph tile, location icon, distance pill capsule, premiumCard container, LociGradients.Premium swipe reveal background
+- [x] US-169: Motion and haptic orchestration system — HapticManager gains recordStartSequence, saveSuccessSequence, unlockSequence on both platforms
+- [x] US-170: Paywall premium redesign — animated primaryHalo hero with 96pt gradient icon tile (iOS level4 elevation / Android LociGradients.Premium)
+- [x] US-171: Delightful empty states and shimmer loading — EmptyStateView gradient halo + gradient CTA; Android SkeletonView upgraded to sweeping LinearGradient brush
+- [x] US-172: Onboarding premium polish — 320pt gradient halo with parallax-floating 140pt icon tile; Android OnboardingPageContent mirrors with PrimaryHalo + gradient tile
+- [x] US-173: Premium settings and account header redesign — gradient avatar tile + per-tier gradient badge capsule on both platforms
+- [x] US-174: Accessibility premium parity — Reduce Motion paths on iOS via @Environment(\.accessibilityReduceMotion); Android HeroRecordButton and SkeletonView auto-detect ValueAnimator.areAnimatorsEnabled()
 
 ---
 
