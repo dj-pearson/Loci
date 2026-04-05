@@ -51,25 +51,55 @@ struct PaywallView: View {
         }
     }
 
-    // MARK: - Header
+    // MARK: - Header (US-170 premium hero)
+
+    @State private var heroPulse = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private var headerSection: some View {
-        VStack(spacing: Theme.Spacing.sm) {
-            Image(systemName: "mappin.and.ellipse")
-                .font(.system(size: 48))
-                .foregroundStyle(Theme.primary)
-                .padding(.top, Theme.Spacing.md)
+        ZStack {
+            // Animated parallax halo backdrop.
+            Circle()
+                .fill(DesignSystem.Gradients.primaryHalo)
+                .frame(width: 340, height: 340)
+                .scaleEffect(reduceMotion ? 1.0 : (heroPulse ? 1.08 : 0.92))
+                .opacity(reduceMotion ? 0.55 : (heroPulse ? 0.4 : 0.75))
+                .animation(
+                    reduceMotion
+                        ? nil
+                        : DesignSystem.Motion.gentle.repeatForever(autoreverses: true),
+                    value: heroPulse
+                )
+                .allowsHitTesting(false)
 
-            Text(String(localized: "Unlock the Full Loci Experience"))
-                .font(Theme.Typography.title)
-                .fontWeight(.bold)
-                .multilineTextAlignment(.center)
+            VStack(spacing: DesignSystem.Space.sm) {
+                // Hero icon tile on a gradient background.
+                ZStack {
+                    RoundedRectangle(cornerRadius: DesignSystem.Radius.lg, style: .continuous)
+                        .fill(DesignSystem.Gradients.premium)
+                        .frame(width: 96, height: 96)
+                        .elevation(.level4)
 
-            Text(String(localized: "Pin more memories, sync everywhere, and share with family."))
-                .font(Theme.Typography.body)
-                .foregroundStyle(Theme.textSecondary)
-                .multilineTextAlignment(.center)
+                    Image(systemName: "mappin.and.ellipse")
+                        .font(.system(size: 44, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .shadow(color: .black.opacity(0.25), radius: 2, y: 1)
+                }
+                .padding(.top, DesignSystem.Space.md)
+
+                Text(String(localized: "Unlock the Full Loci Experience"))
+                    .font(.title2.weight(.bold))
+                    .multilineTextAlignment(.center)
+                    .padding(.top, DesignSystem.Space.xs)
+
+                Text(String(localized: "Pin more memories, sync everywhere, and share with family."))
+                    .font(.body)
+                    .foregroundStyle(Theme.textSecondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, DesignSystem.Space.sm)
+            }
         }
+        .onAppear { heroPulse = true }
     }
 
     // MARK: - Billing Toggle

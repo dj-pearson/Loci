@@ -398,22 +398,39 @@ struct LocusRowView: View {
     let userLocation: CLLocation?
 
     var body: some View {
-        HStack(spacing: 12) {
-            Circle()
+        HStack(spacing: DesignSystem.Space.sm) {
+            // Category glyph tile — premium 44x44 rounded square with gradient.
+            RoundedRectangle(cornerRadius: DesignSystem.Radius.sm, style: .continuous)
                 .fill(locus.category.color)
-                .frame(width: 36, height: 36)
+                .frame(width: 44, height: 44)
+                .overlay(
+                    RoundedRectangle(cornerRadius: DesignSystem.Radius.sm, style: .continuous)
+                        .strokeBorder(
+                            LinearGradient(
+                                colors: [
+                                    Color.white.opacity(0.55),
+                                    Color.white.opacity(0.05)
+                                ],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            ),
+                            lineWidth: 1
+                        )
+                )
                 .overlay(
                     Image(systemName: locus.category.systemImageName)
-                        .font(.caption.weight(.semibold))
+                        .font(.system(size: 18, weight: .semibold))
                         .foregroundStyle(.white)
                 )
+                .elevation(.level1)
 
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: 3) {
                 Text(locus.transcription.isEmpty
                      ? String(localized: "Voice Note")
                      : locus.transcription)
-                    .font(.subheadline)
+                    .font(.subheadline.weight(.medium))
                     .lineLimit(2)
+                    .foregroundStyle(Theme.textPrimary)
 
                 if locus.isShared, let creatorName = locus.createdByName {
                     HStack(spacing: 4) {
@@ -427,28 +444,40 @@ struct LocusRowView: View {
 
                 HStack(spacing: 6) {
                     if let name = locus.locationName {
+                        Image(systemName: "mappin.circle.fill")
+                            .font(.caption2)
+                            .foregroundStyle(Theme.primary.opacity(0.7))
                         Text(name)
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Theme.textSecondary)
                             .lineLimit(1)
                     }
 
+                    Text("·")
+                        .font(.caption)
+                        .foregroundStyle(Theme.textSecondary.opacity(0.6))
+
                     Text(locus.createdAt.formatted(.relative(presentation: .named)))
                         .font(.caption)
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(Theme.textSecondary.opacity(0.8))
                 }
             }
 
-            Spacer()
+            Spacer(minLength: DesignSystem.Space.xs)
 
             if let userLocation {
                 let distance = locus.coordinate.distance(to: userLocation.coordinate)
                 Text(formatDistance(distance))
-                    .font(.caption.weight(.medium))
-                    .foregroundStyle(.secondary)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Theme.primary)
+                    .padding(.horizontal, DesignSystem.Space.xs)
+                    .padding(.vertical, 3)
+                    .background(
+                        Capsule().fill(Theme.primary.opacity(0.12))
+                    )
             }
         }
-        .padding(.vertical, 2)
+        .padding(.vertical, DesignSystem.Space.xxs)
         .accessibilityElement(children: .combine)
     }
 

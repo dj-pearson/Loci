@@ -1,8 +1,8 @@
 package com.pearsonmedia.loci.ui.screen.map
 
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,8 +20,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Archive
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -47,8 +45,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.ui.draw.clip
 import com.pearsonmedia.loci.domain.model.Locus
 import com.pearsonmedia.loci.ui.component.EmptyStateView
+import com.pearsonmedia.loci.ui.theme.DesignTokens
+import com.pearsonmedia.loci.ui.theme.LociGradients
+import com.pearsonmedia.loci.ui.theme.premiumCard
 import kotlinx.coroutines.launch
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -119,24 +121,25 @@ fun ListScreen(
                     SwipeToDismissBox(
                         state = dismissState,
                         backgroundContent = {
-                            val color by animateColorAsState(
-                                when (dismissState.targetValue) {
-                                    SwipeToDismissBoxValue.EndToStart -> MaterialTheme.colorScheme.errorContainer
-                                    else -> Color.Transparent
-                                },
-                                label = "swipe_bg"
-                            )
+                            val revealed = dismissState.targetValue ==
+                                SwipeToDismissBoxValue.EndToStart
+                            val premiumBrush = LociGradients.Premium
                             Box(
                                 modifier = Modifier
                                     .fillMaxSize()
-                                    .background(color)
+                                    .padding(horizontal = DesignTokens.Space.MD)
+                                    .clip(RoundedCornerShape(DesignTokens.Radius.MD))
+                                    .background(
+                                        brush = premiumBrush,
+                                        alpha = if (revealed) 1f else 0f
+                                    )
                                     .padding(horizontal = 20.dp),
                                 contentAlignment = Alignment.CenterEnd
                             ) {
                                 Icon(
                                     Icons.Default.Archive,
                                     contentDescription = "Archive",
-                                    tint = MaterialTheme.colorScheme.onErrorContainer
+                                    tint = Color.White
                                 )
                             }
                         },
@@ -161,42 +164,63 @@ private fun LocusListItem(
 ) {
     val formatter = DateTimeFormatter.ofPattern("MMM d, yyyy h:mm a")
 
-    Card(
+    Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .clickable(onClick = onClick),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+            .padding(horizontal = DesignTokens.Space.MD)
+            .premiumCard(
+                radius = DesignTokens.Radius.MD,
+                elevation = DesignTokens.Elevation.Level2,
+                background = MaterialTheme.colorScheme.surface
+            )
+            .clickable(onClick = onClick)
+            .padding(DesignTokens.Space.MD),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
+        // Category glyph tile — 44dp rounded square with tinted background.
+        Box(
+            modifier = Modifier
+                .size(44.dp)
+                .clip(RoundedCornerShape(DesignTokens.Radius.SM))
+                .background(locus.category.color),
+            contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = locus.category.icon,
                 contentDescription = locus.category.displayName,
-                tint = locus.category.color,
-                modifier = Modifier.size(40.dp)
+                tint = Color.White,
+                modifier = Modifier.size(22.dp)
             )
+        }
 
-            Spacer(modifier = Modifier.width(12.dp))
+        Spacer(modifier = Modifier.width(DesignTokens.Space.SM))
 
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = locus.locationName ?: "Unknown location",
-                    style = MaterialTheme.typography.titleMedium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = locus.transcription.ifEmpty { "No transcription" },
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Spacer(modifier = Modifier.height(4.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = locus.transcription.ifEmpty {
+                    locus.locationName ?: "Voice note"
+                },
+                style = MaterialTheme.typography.titleSmall,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                if (!locus.locationName.isNullOrEmpty()) {
+                    Text(
+                        text = locus.locationName!!,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f, fill = false)
+                    )
+                    Text(
+                        text = " · ",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                    )
+                }
                 Text(
                     text = locus.createdAt
                         .atZone(ZoneId.systemDefault())

@@ -21,6 +21,7 @@ struct SettingsView: View {
 
     var body: some View {
         Form {
+            accountHeaderCard
             accountSection
             privacySection
             notificationsSection
@@ -29,6 +30,77 @@ struct SettingsView: View {
             aboutSection
         }
         .navigationTitle(String(localized: "Settings"))
+    }
+
+    // MARK: - Account Header Card (US-173)
+
+    /// Premium account header shown at the top of Settings. Gradient
+    /// avatar tile, display name, tier badge, and an upgrade CTA for
+    /// free-tier users.
+    private var accountHeaderCard: some View {
+        Section {
+            HStack(spacing: DesignSystem.Space.md) {
+                // Gradient avatar tile with initial.
+                ZStack {
+                    RoundedRectangle(cornerRadius: DesignSystem.Radius.md, style: .continuous)
+                        .fill(DesignSystem.Gradients.primary)
+                        .frame(width: 56, height: 56)
+                        .elevation(.level2)
+                    Text(accountInitial)
+                        .font(.title2.weight(.bold))
+                        .foregroundStyle(.white)
+                }
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(accountDisplayName)
+                        .font(.headline)
+                        .foregroundStyle(Theme.textPrimary)
+
+                    // Tier badge with gradient background.
+                    HStack(spacing: 4) {
+                        Image(systemName: tierBadgeIcon)
+                            .font(.caption2.weight(.bold))
+                        Text(viewModel.subscriptionTier.displayName)
+                            .font(.caption.weight(.semibold))
+                    }
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 4)
+                    .background(tierBadgeGradient, in: Capsule())
+                }
+
+                Spacer()
+            }
+            .padding(.vertical, DesignSystem.Space.xxs)
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel(String(localized: "\(accountDisplayName), \(viewModel.subscriptionTier.displayName) tier"))
+        }
+    }
+
+    private var accountDisplayName: String {
+        viewModel.currentUser?.displayName
+            ?? String(localized: "Guest")
+    }
+
+    private var accountInitial: String {
+        let name = accountDisplayName
+        return String(name.prefix(1)).uppercased()
+    }
+
+    private var tierBadgeIcon: String {
+        switch viewModel.subscriptionTier {
+        case .free: "sparkles"
+        case .premium: "crown.fill"
+        case .family: "person.3.fill"
+        }
+    }
+
+    private var tierBadgeGradient: LinearGradient {
+        switch viewModel.subscriptionTier {
+        case .free: DesignSystem.Gradients.primary
+        case .premium: DesignSystem.Gradients.premium
+        case .family: DesignSystem.Gradients.family
+        }
     }
 
     // MARK: - Privacy Section

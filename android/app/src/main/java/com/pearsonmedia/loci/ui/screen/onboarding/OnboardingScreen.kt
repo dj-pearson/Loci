@@ -1,6 +1,7 @@
 package com.pearsonmedia.loci.ui.screen.onboarding
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Mic
@@ -28,7 +30,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.pearsonmedia.loci.ui.theme.DesignTokens
+import com.pearsonmedia.loci.ui.theme.LociGradients
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
@@ -136,12 +142,32 @@ private fun OnboardingPageContent(page: OnboardingPage) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Icon(
-            imageVector = page.icon,
-            contentDescription = null,
-            modifier = Modifier.size(80.dp),
-            tint = MaterialTheme.colorScheme.primary
-        )
+        // Hero icon tile on a gradient halo (US-172).
+        Box(
+            modifier = Modifier.size(280.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(280.dp)
+                    .clip(CircleShape)
+                    .background(LociGradients.PrimaryHalo)
+            )
+            Box(
+                modifier = Modifier
+                    .size(140.dp)
+                    .clip(RoundedCornerShape(DesignTokens.Radius.XL))
+                    .background(LociGradients.Primary),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = page.icon,
+                    contentDescription = null,
+                    modifier = Modifier.size(64.dp),
+                    tint = Color.White
+                )
+            }
+        }
 
         Spacer(modifier = Modifier.height(32.dp))
 

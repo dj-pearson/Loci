@@ -1,6 +1,19 @@
 import SwiftUI
 import UIKit
 
+/// Premium hero record button (US-166).
+///
+/// The button is the most important interaction in Loci, so it gets the
+/// richest motion treatment in the app:
+///   * Idle state: gradient fill with a breathing primary halo and a soft
+///     pulsing ring driven by the ``DesignSystem.Motion.gentle`` spring.
+///   * Active state: warm record gradient, an amplitude-driven ring that
+///     expands in real time, and a static inner "stop" glyph that springs in.
+///   * Press feedback: snappy scale-down using ``DesignSystem.Motion.snappy``
+///     and a two-beat ``HapticManager.recordStartSequence`` haptic.
+///   * Reduce Motion: all infinite animations fall back to static glow rings
+///     and opacity-only feedback so the button remains delightful without
+///     motion sickness risk.
 struct RecordButton: View {
     let isRecording: Bool
     let amplitude: Float
@@ -11,83 +24,101 @@ struct RecordButton: View {
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    private let buttonSize: CGFloat = 80
-    private let feedbackGenerator = UIImpactFeedbackGenerator(style: .medium)
+    private let buttonSize: CGFloat = 88
+    private let maxRingExpansion: CGFloat = 52
 
     var body: some View {
         Button {
-            feedbackGenerator.impactOccurred()
+            if isRecording {
+                HapticManager.recordStop()
+            } else {
+                HapticManager.recordStartSequence()
+            }
             action()
         } label: {
             ZStack {
-                // Amplitude ring (recording state only)
-                if isRecording {
-                    if reduceMotion {
-                        // Static ring with opacity mapped to amplitude
-                        Circle()
-                            .stroke(Theme.error.opacity(Double(min(max(amplitude, 0.2), 1))), lineWidth: 4)
-                            .frame(width: buttonSize + 20, height: buttonSize + 20)
-                    } else {
-                        Circle()
-                            .stroke(Theme.error.opacity(0.3), lineWidth: 4)
-                            .frame(width: amplitudeRingSize, height: amplitudeRingSize)
-                            .animation(.easeOut(duration: 0.1), value: amplitude)
-                    }
-                }
-
-                // Pulse ring (idle state only) — replaced with static glow for reduce motion
-                if !isRecording && !reduceMotion {
+                // Outer breathing halo (idle) — premium depth cue.
+                if !isRecording {
                     Circle()
-                        .fill(Theme.primary.opacity(0.15))
-                        .frame(width: buttonSize + 20, height: buttonSize + 20)
-                        .scaleEffect(isPulsing ? 1.15 : 1.0)
-                        .opacity(isPulsing ? 0.0 : 0.5)
+                        .fill(DesignSystem.Gradients.primaryHalo)
+                        .frame(width: buttonSize + 120, height: buttonSize + 120)
+                        .scaleEffect(reduceMotion ? 1.0 : (isPulsing ? 1.08 : 0.96))
+                        .opacity(reduceMotion ? 0.6 : (isPulsing ? 0.35 : 0.7))
                         .animation(
-                            .easeInOut(duration: 1.5).repeatForever(autoreverses: false),
+                            reduceMotion
+                                ? nil
+                                : DesignSystem.Motion.gentle.repeatForever(autoreverses: true),
                             value: isPulsing
                         )
-                } else if !isRecording {
-                    // Static subtle glow ring for reduce motion
-                    Circle()
-                        .fill(Theme.primary.opacity(0.12))
-                        .frame(width: buttonSize + 20, height: buttonSize + 20)
+                        .allowsHitTesting(false)
                 }
 
-                // Main circle
-                Circle()
-                    .fill(isRecording ? Theme.error : Theme.primary)
-                    .frame(width: buttonSize, height: buttonSize)
-                    .shadow(color: (isRecording ? Theme.error : Theme.primary).opacity(0.4), radius: 8, y: 4)
-                    .animation(reduceMotion ? nil : .easeInOut(duration: 0.25), value: isRecording)
+                // Amplitude ring (recording state).
+                if isRecording {
+                    Circle()
+                        .stroke(
+                            DesignSystem.Gradients.record,
+                            lineWidth: 4
+                        )
+                        .frame(width: amplitudeRingSize, height: amplitudeRingSize)
+                        .opacity(reduceMotion
+                                 ? Double(min(max(amplitude, 0.25), 1.0))
+                                 : 0.85)
+                        .animation(reduceMotion ? nil : DesignSystem.Motion.amplitude,
+                                   value: amplitude)
+                }
 
-                // Icon with smooth state transition
+                // Main circle with gradient fill + layered elevation.
+                Circle()
+                    .fill(isRecording
+                          ? DesignSystem.Gradients.record
+                          : DesignSystem.Gradients.primary)
+                    .frame(width: buttonSize, height: buttonSize)
+                    .elevation(.level3)
+                    .overlay(
+                        // Glossy top highlight for premium feel.
+                        Circle()
+                            .strokeBorder(
+                                LinearGradient(
+                                    colors: [
+                                        Color.white.opacity(0.45),
+                                        Color.white.opacity(0.05)
+                                    ],
+                                    startPoint: .top,
+                                    endPoint: .bottom
+                                ),
+                                lineWidth: 1.5
+                            )
+                            .frame(width: buttonSize, height: buttonSize)
+                    )
+                    .animation(reduceMotion ? nil : DesignSystem.Motion.smooth,
+                               value: isRecording)
+
+                // Icon — mic (idle) ↔ stop square (recording).
                 ZStack {
                     Image(systemName: "mic.fill")
-                        .font(.system(size: 30, weight: .medium))
+                        .font(.system(size: 32, weight: .semibold))
                         .foregroundStyle(.white)
                         .opacity(isRecording ? 0 : 1)
-                        .scaleEffect(isRecording ? 0.5 : 1)
+                        .scaleEffect(isRecording ? 0.4 : 1)
 
-                    RoundedRectangle(cornerRadius: 4)
+                    RoundedRectangle(cornerRadius: 5, style: .continuous)
                         .fill(.white)
-                        .frame(width: 24, height: 24)
+                        .frame(width: 26, height: 26)
                         .opacity(isRecording ? 1 : 0)
-                        .scaleEffect(isRecording ? 1 : 0.5)
+                        .scaleEffect(isRecording ? 1 : 0.4)
                 }
-                .animation(reduceMotion ? nil : .spring(response: 0.35, dampingFraction: 0.7), value: isRecording)
+                .animation(reduceMotion ? nil : DesignSystem.Motion.bouncy,
+                           value: isRecording)
             }
         }
         .buttonStyle(.plain)
-        .scaleEffect(isPressed ? 0.9 : 1.0)
-        .animation(reduceMotion ? nil : .spring(response: 0.3, dampingFraction: 0.6), value: isPressed)
+        .scaleEffect(isPressed ? 0.92 : 1.0)
+        .animation(reduceMotion ? nil : DesignSystem.Motion.snappy, value: isPressed)
         .simultaneousGesture(
             DragGesture(minimumDistance: 0)
-                .onChanged { _ in
-                    if !isPressed { isPressed = true }
-                }
-                .onEnded { _ in
-                    isPressed = false
-                }
+                .onChanged { _ in if !isPressed { isPressed = true } }
+                .onEnded { _ in isPressed = false }
         )
         .accessibilityLabel(isRecording
             ? String(localized: "Stop recording")
@@ -97,7 +128,6 @@ struct RecordButton: View {
             : String(localized: "Double tap to start recording"))
         .accessibilityAddTraits(.isButton)
         .onAppear {
-            feedbackGenerator.prepare()
             if !isRecording {
                 isPulsing = true
             }
@@ -109,21 +139,24 @@ struct RecordButton: View {
 
     // MARK: - Computed Properties
 
-    /// Maps amplitude (0...1) to a ring diameter that expands around the button.
+    /// Maps amplitude (0...1) to a ring diameter that expands around the
+    /// button. Clamped to ``maxRingExpansion`` so the ring never overflows
+    /// its container regardless of input spikes.
     private var amplitudeRingSize: CGFloat {
         let normalized = CGFloat(min(max(amplitude, 0), 1))
-        let minSize = buttonSize + 16
-        let maxSize = buttonSize + 48
-        return minSize + (maxSize - minSize) * normalized
+        let base = buttonSize + 18
+        return base + maxRingExpansion * normalized
     }
 }
 
 #Preview("Idle") {
     RecordButton(isRecording: false, amplitude: 0) {}
-        .padding()
+        .padding(60)
+        .background(Theme.background)
 }
 
 #Preview("Recording") {
     RecordButton(isRecording: true, amplitude: 0.6) {}
-        .padding()
+        .padding(60)
+        .background(Theme.background)
 }
