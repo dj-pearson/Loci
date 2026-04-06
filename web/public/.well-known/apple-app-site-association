@@ -1,0 +1,19 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "TEAM_ID.com.pearsonmedia.loci",
+        "paths": [
+          "/open/*",
+          "/locus/*"
+        ]
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": [
+      "TEAM_ID.com.pearsonmedia.loci"
+    ]
+  }
+}

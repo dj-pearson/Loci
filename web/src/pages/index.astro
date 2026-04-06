@@ -1,8 +1,91 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+
+const jsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Loci",
+    "url": "https://useloci.com",
+    "logo": "https://useloci.com/og-image.png",
+    "description": "Loci is a voice-first iOS app that pins voice notes to GPS coordinates with proximity-triggered notifications.",
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "email": "hello@useloci.com",
+      "contactType": "customer support"
+    }
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Loci — Your Spatial Memory",
+    "operatingSystem": "iOS 17+",
+    "applicationCategory": "UtilitiesApplication",
+    "description": "Pin voice notes to GPS locations. Get notified when you return. Share with family. Privacy-first, offline-first voice memo app with location-based reminders.",
+    "url": "https://useloci.com",
+    "downloadUrl": "https://apps.apple.com/app/loci",
+    "screenshot": "https://useloci.com/og-image.png",
+    "author": {
+      "@type": "Organization",
+      "name": "Pearson Media"
+    },
+    "offers": [
+      {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD",
+        "name": "Free",
+        "description": "Up to 10 loci, voice recording, proximity notifications, map view"
+      },
+      {
+        "@type": "Offer",
+        "price": "3.99",
+        "priceCurrency": "USD",
+        "name": "Premium",
+        "description": "Unlimited loci, AI categorization, cloud sync, widget, search",
+        "priceSpecification": {
+          "@type": "UnitPriceSpecification",
+          "billingDuration": "P1M"
+        }
+      },
+      {
+        "@type": "Offer",
+        "price": "5.99",
+        "priceCurrency": "USD",
+        "name": "Family",
+        "description": "Everything in Premium plus household sharing for up to 6 members",
+        "priceSpecification": {
+          "@type": "UnitPriceSpecification",
+          "billingDuration": "P1M"
+        }
+      }
+    ],
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "5",
+      "ratingCount": "3",
+      "bestRating": "5"
+    }
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Loci",
+    "url": "https://useloci.com",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://useloci.com/?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  }
+];
 ---
 
-<BaseLayout title="Loci — Your Spatial Memory">
+<BaseLayout
+  title="Loci — Voice Notes Pinned to Places | Location-Based Reminders App"
+  description="Pin voice notes to GPS locations and get notified when you return. Loci is a privacy-first iOS app for location-based voice memos, reminders, and family sharing."
+  jsonLd={jsonLd}
+>
   <!-- Hero -->
   <section class="relative overflow-hidden bg-gradient-to-b from-brand-50 to-white">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32 text-center">

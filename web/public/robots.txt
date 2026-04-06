@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://useloci.com/sitemap-index.xml
