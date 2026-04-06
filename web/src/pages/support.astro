@@ -1,6 +1,12 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [] as { "@type": string; name: string; acceptedAnswer: { "@type": string; text: string } }[]
+};
+
 const faqs = [
   {
     question: "Does Loci drain my battery?",
@@ -76,9 +82,21 @@ const troubleshooting = [
     ]
   }
 ];
+
+// Build FAQ JSON-LD from the faqs array
+faqs.forEach((faq) => {
+  faqJsonLd.mainEntity.push({
+    "@type": "Question",
+    "name": faq.question,
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": faq.answer
+    }
+  });
+});
 ---
 
-<BaseLayout title="Support — Loci" description="Get help with Loci. Browse FAQs, troubleshooting guides, or contact our team.">
+<BaseLayout title="Support & FAQ — Loci App Help" description="Get help with Loci. Browse FAQs about location permissions, proximity notifications, battery usage, family sharing, and more." jsonLd={faqJsonLd}>
   <!-- Hero -->
   <section class="py-16 sm:py-20 bg-gradient-to-b from-brand-50 to-white">
     <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">

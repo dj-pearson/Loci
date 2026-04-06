@@ -1,0 +1,61 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+// Deep-link redirect page.
+// When universal links are configured, iOS will intercept /open/* and open the app directly.
+// If the app isn't installed, this page shows a fallback with an App Store link.
+---
+
+<BaseLayout
+  title="Open in Loci"
+  description="Open this link in the Loci app."
+  noindex={true}
+>
+  <section class="py-24 sm:py-32 text-center">
+    <div class="max-w-xl mx-auto px-4 sm:px-6">
+      <div class="w-20 h-20 rounded-2xl bg-brand-100 text-brand-600 flex items-center justify-center mx-auto mb-8">
+        <svg width="40" height="40" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="14" cy="14" r="14" fill="currentColor" />
+          <path d="M14 7C14 7 9 12 9 16C9 18.761 11.239 21 14 21C16.761 21 19 18.761 19 16C19 12 14 7 14 7Z" fill="white" />
+        </svg>
+      </div>
+      <h1 class="text-3xl font-bold text-gray-900 mb-4">Opening in Loci...</h1>
+      <p class="text-lg text-gray-600 mb-8">
+        If the app doesn't open automatically, download it from the App Store.
+      </p>
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a
+          href="https://apps.apple.com/app/loci"
+          class="inline-flex items-center gap-3 bg-gray-900 text-white px-6 py-3 rounded-xl hover:bg-gray-800 transition-colors"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 22 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.09 22C7.79 22.05 6.8 20.68 5.96 19.47C4.25 16.56 2.93 11.3 4.69 7.95C5.56 6.29 7.29 5.22 9.17 5.2C10.45 5.18 11.67 6.08 12.45 6.08C13.23 6.08 14.72 4.99 16.26 5.15C16.88 5.18 18.75 5.42 19.95 7.17C19.86 7.23 17.58 8.57 17.6 11.3C17.63 14.56 20.47 15.63 20.5 15.64C20.47 15.71 20.03 17.24 18.71 19.5ZM13 3.5C13.73 2.67 14.94 2.04 15.94 2C16.07 3.17 15.6 4.35 14.9 5.19C14.21 6.04 13.07 6.7 11.95 6.61C11.8 5.46 12.36 4.26 13 3.5Z" />
+          </svg>
+          <div class="text-left">
+            <div class="text-[10px] leading-none opacity-80">Download on the</div>
+            <div class="text-lg font-semibold leading-tight">App Store</div>
+          </div>
+        </a>
+        <a href="/" class="text-brand-600 font-semibold hover:text-brand-700 transition-colors">
+          Learn more about Loci
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    // Attempt to open the app via custom URL scheme as fallback
+    const path = window.location.pathname + window.location.search;
+    const appUrl = `loci://${path.replace('/open', '')}`;
+
+    // Try custom scheme; if app isn't installed, user stays on this page
+    setTimeout(() => {
+      window.location.href = appUrl;
+    }, 100);
+
+    // If still here after 2 seconds, they don't have the app
+    setTimeout(() => {
+      // Page is already showing the App Store fallback, nothing more to do
+    }, 2000);
+  </script>
+</BaseLayout>

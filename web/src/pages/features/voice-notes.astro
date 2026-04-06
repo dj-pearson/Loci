@@ -1,0 +1,157 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Voice Notes App — Record & Transcribe on the Go | Loci",
+  "description": "Record voice memos that automatically transcribe and pin to your location. Loci's voice-first interface makes capturing thoughts effortless.",
+  "url": "https://useloci.com/features/voice-notes",
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "Loci",
+    "url": "https://useloci.com"
+  }
+};
+---
+
+<BaseLayout
+  title="Voice Notes App — Record & Transcribe on the Go | Loci"
+  description="Record voice memos that automatically transcribe and pin to your GPS location. Loci's voice-first design makes capturing thoughts faster than typing."
+  jsonLd={jsonLd}
+>
+  <!-- Hero -->
+  <section class="py-20 sm:py-28 bg-gradient-to-b from-red-50 to-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h1 class="text-4xl sm:text-5xl font-bold tracking-tight text-gray-900">
+        Voice Notes That Remember <em class="text-brand-600 not-italic">Where</em>
+      </h1>
+      <p class="mt-6 text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+        Tap once to record. Loci captures your voice, transcribes it on-device, and pins it to your exact GPS location — all in one step.
+      </p>
+      <div class="mt-10">
+        <a
+          href="https://apps.apple.com/app/loci"
+          class="inline-flex items-center gap-3 bg-gray-900 text-white px-6 py-3 rounded-xl hover:bg-gray-800 transition-colors"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 22 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.09 22C7.79 22.05 6.8 20.68 5.96 19.47C4.25 16.56 2.93 11.3 4.69 7.95C5.56 6.29 7.29 5.22 9.17 5.2C10.45 5.18 11.67 6.08 12.45 6.08C13.23 6.08 14.72 4.99 16.26 5.15C16.88 5.18 18.75 5.42 19.95 7.17C19.86 7.23 17.58 8.57 17.6 11.3C17.63 14.56 20.47 15.63 20.5 15.64C20.47 15.71 20.03 17.24 18.71 19.5ZM13 3.5C13.73 2.67 14.94 2.04 15.94 2C16.07 3.17 15.6 4.35 14.9 5.19C14.21 6.04 13.07 6.7 11.95 6.61C11.8 5.46 12.36 4.26 13 3.5Z" />
+          </svg>
+          <div class="text-left">
+            <div class="text-[10px] leading-none opacity-80">Download on the</div>
+            <div class="text-lg font-semibold leading-tight">App Store</div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Why voice notes -->
+  <section class="py-16 sm:py-20">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl font-bold text-gray-900 text-center mb-12">Why Voice Notes Beat Typing</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="bg-gray-50 rounded-2xl p-8">
+          <h3 class="text-lg font-semibold text-gray-900 mb-3">6x Faster Than Typing</h3>
+          <p class="text-gray-600 leading-relaxed">The average person speaks 150 words per minute but types only 40. Voice notes capture your full thought before it slips away.</p>
+        </div>
+        <div class="bg-gray-50 rounded-2xl p-8">
+          <h3 class="text-lg font-semibold text-gray-900 mb-3">Hands-Free Capture</h3>
+          <p class="text-gray-600 leading-relaxed">Driving, walking, cooking — record a thought without stopping what you're doing. One tap and you're recording.</p>
+        </div>
+        <div class="bg-gray-50 rounded-2xl p-8">
+          <h3 class="text-lg font-semibold text-gray-900 mb-3">On-Device Transcription</h3>
+          <p class="text-gray-600 leading-relaxed">Your voice is transcribed instantly using Apple's Speech framework. No cloud processing, no data leaving your phone, no internet required.</p>
+        </div>
+        <div class="bg-gray-50 rounded-2xl p-8">
+          <h3 class="text-lg font-semibold text-gray-900 mb-3">Searchable Audio</h3>
+          <p class="text-gray-600 leading-relaxed">Every recording becomes searchable text. Find any note by keyword, even months later, without listening through recordings.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section class="py-16 sm:py-20 bg-gray-50">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl font-bold text-gray-900 text-center mb-12">How Loci Voice Notes Work</h2>
+      <div class="space-y-8 max-w-2xl mx-auto">
+        <div class="flex gap-6">
+          <div class="w-10 h-10 rounded-full bg-brand-600 text-white flex items-center justify-center font-bold flex-shrink-0">1</div>
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900">Tap the record button</h3>
+            <p class="text-gray-600 mt-1">One tap starts recording. No setup, no file naming, no folder picking.</p>
+          </div>
+        </div>
+        <div class="flex gap-6">
+          <div class="w-10 h-10 rounded-full bg-brand-600 text-white flex items-center justify-center font-bold flex-shrink-0">2</div>
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900">Speak naturally</h3>
+            <p class="text-gray-600 mt-1">Record for as long as you need. Loci saves efficient M4A audio at just ~100KB per 30 seconds.</p>
+          </div>
+        </div>
+        <div class="flex gap-6">
+          <div class="w-10 h-10 rounded-full bg-brand-600 text-white flex items-center justify-center font-bold flex-shrink-0">3</div>
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900">Auto-pinned and transcribed</h3>
+            <p class="text-gray-600 mt-1">Your note is pinned to your GPS location and transcribed on-device. It appears on your map immediately.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Use cases -->
+  <section class="py-16 sm:py-20">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl font-bold text-gray-900 text-center mb-4">Perfect For</h2>
+      <p class="text-lg text-gray-500 text-center max-w-2xl mx-auto mb-12">People who think better out loud.</p>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <div class="text-center p-6">
+          <div class="text-3xl mb-3">🛒</div>
+          <h3 class="font-semibold text-gray-900 mb-2">Errands & Shopping</h3>
+          <p class="text-sm text-gray-500">"Grab milk and eggs" — pinned to your grocery store.</p>
+        </div>
+        <div class="text-center p-6">
+          <div class="text-3xl mb-3">💡</div>
+          <h3 class="font-semibold text-gray-900 mb-2">Ideas on the Go</h3>
+          <p class="text-sm text-gray-500">Capture inspiration while walking, driving, or commuting.</p>
+        </div>
+        <div class="text-center p-6">
+          <div class="text-3xl mb-3">🏠</div>
+          <h3 class="font-semibold text-gray-900 mb-2">Home Reminders</h3>
+          <p class="text-sm text-gray-500">"Fix the leaky faucet" — triggers when you get home.</p>
+        </div>
+        <div class="text-center p-6">
+          <div class="text-3xl mb-3">🏢</div>
+          <h3 class="font-semibold text-gray-900 mb-2">Work Notes</h3>
+          <p class="text-sm text-gray-500">Leave yourself context that pops up when you arrive at the office.</p>
+        </div>
+        <div class="text-center p-6">
+          <div class="text-3xl mb-3">🏕️</div>
+          <h3 class="font-semibold text-gray-900 mb-2">Travel Journals</h3>
+          <p class="text-sm text-gray-500">Record memories at landmarks and relive them when you revisit.</p>
+        </div>
+        <div class="text-center p-6">
+          <div class="text-3xl mb-3">👨‍👩‍👧</div>
+          <h3 class="font-semibold text-gray-900 mb-2">Family Coordination</h3>
+          <p class="text-sm text-gray-500">Leave voice notes at places for your partner or kids to find.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="py-16 sm:py-20 bg-gradient-to-b from-white to-brand-50">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="text-3xl font-bold text-gray-900 mb-4">Start Recording Smarter</h2>
+      <p class="text-lg text-gray-600 mb-8">Download Loci free and try voice notes that know where you are.</p>
+      <a
+        href="https://apps.apple.com/app/loci"
+        class="inline-flex items-center gap-3 bg-gray-900 text-white px-8 py-4 rounded-xl hover:bg-gray-800 transition-colors text-lg"
+      >
+        Download Free on the App Store
+      </a>
+    </div>
+  </section>
+</BaseLayout>
