@@ -19,5 +19,5 @@ dependencyResolution {
     }
 }
 
-rootProject.name = "Loci"
+rootProject.name = "Lociate"
 include(":app")

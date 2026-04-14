@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Loci</string>
+    <string name="app_name">Lociate</string>
     <string name="app_tagline">Your Spatial Memory</string>
 
     <!-- Permissions -->
     <string name="location_permission_title">Enable Location</string>
-    <string name="location_permission_description">Loci pins your voice notes to your current location so you can find them later.</string>
-    <string name="background_location_rationale">Background location lets Loci notify you when you return to a saved spot.</string>
+    <string name="location_permission_description">Lociate pins your voice notes to your current location so you can find them later.</string>
+    <string name="background_location_rationale">Background location lets Lociate notify you when you return to a saved spot.</string>
     <string name="microphone_permission_title">Enable Microphone</string>
-    <string name="microphone_permission_description">Loci records voice notes — your voice is the primary input.</string>
+    <string name="microphone_permission_description">Lociate records voice notes — your voice is the primary input.</string>
     <string name="notification_permission_title">Enable Notifications</string>
     <string name="notification_permission_description">Get reminded of your notes when you return to saved locations.</string>
 

@@ -1,4 +1,4 @@
-package com.pearsonmedia.loci.ui.component
+package com.pearsonmedia.lociate.ui.component
 
 import android.animation.ValueAnimator
 import androidx.compose.animation.animateColorAsState
@@ -39,8 +39,8 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import com.pearsonmedia.loci.ui.theme.DesignTokens
-import com.pearsonmedia.loci.ui.theme.LociGradients
+import com.pearsonmedia.lociate.ui.theme.DesignTokens
+import com.pearsonmedia.lociate.ui.theme.LociateGradients
 
 /**
  * Premium hero record button (US-166).
@@ -104,9 +104,9 @@ fun HeroRecordButton(
         label = "iconColor"
     )
 
-    val idleBrush: Brush = LociGradients.Primary
-    val recordBrush: Brush = LociGradients.Record
-    val haloBrush: Brush = LociGradients.PrimaryHalo
+    val idleBrush: Brush = LociateGradients.Primary
+    val recordBrush: Brush = LociateGradients.Record
+    val haloBrush: Brush = LociateGradients.PrimaryHalo
 
     val sizeDp = 88.dp
 

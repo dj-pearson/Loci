@@ -41,7 +41,13 @@
       "Bash(tail *)",
       "Bash(wc *)",
       "Bash(sort -t- -k2 -n)",
-      "Bash(grep -r 'import Supabase' /c/Users/pears/Documents/Loci/Loci/Loci --include=*.swift)"
+      "Bash(grep -r 'import Supabase' /c/Users/pears/Documents/Loci/Lociate/Lociate --include=*.swift)",
+      "Bash(xargs sed:*)",
+      "Bash(sed:*)",
+      "Bash(sed -i -e 's|LociApp\\\\.swift|LociateApp.swift|g' -e 's|LociApp|LociateApp|g' -e 's|Loci\\\\.entitlements|Lociate.entitlements|g' -e 's|Loci/Loci\\\\.xcodeproj|Lociate/Lociate.xcodeproj|g' -e 's|Loci/Configuration|Lociate/Configuration|g' -e 's|Loci/\\\\.swiftlint|Lociate/.swiftlint|g' -e 's|com\\\\.pearsonmedia\\\\.loci|com.pearsonmedia.lociate|g' -e 's|LociTests/|LociateTests/|g' -e 's|loci://detail/|lociate://detail/|g' -e 's|loci://paywall|lociate://paywall|g' -e 's|-scheme Loci -sdk|-scheme Lociate -sdk|g' prd.json DEPLOYMENT.md)",
+      "Bash(sed -i 's|Loci/fastlane/|Lociate/fastlane/|g; s|open Loci/|open Lociate/|g' DEPLOYMENT.md)",
+      "Bash(sed -i -e 's|^# Loci —|# Lociate —|' -e 's|deploying Loci to|deploying Lociate to|g' -e 's|^| Loci ||' -e 's|Loci/Loci/|Lociate/Lociate/|g' -e 's|^cd Loci$|cd Lociate|' -e 's|All Secrets for Loci|All Secrets for Lociate|g' -e 's|\\(unique to Loci\\)|\\(unique to Lociate\\)|g' -e 's|reuse from Loci|reuse from Lociate|g' -e 's|Documents\\\\\\\\Loci\\\\\\\\Loci|Documents\\\\\\\\Loci\\\\\\\\Lociate|g' DEPLOYMENT.md)",
+      "Bash(sed -i '41s/| Loci |/| Lociate |/; 52s/| Loci |/| Lociate |/' DEPLOYMENT.md)"
     ]
   }
 }

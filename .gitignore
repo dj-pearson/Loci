@@ -7,10 +7,10 @@
 *~
 
 # Xcode
-Loci/build/
-Loci/*.xcworkspace/xcuserdata/
-Loci/*.xcodeproj/xcuserdata/
-Loci/*.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
+Lociate/build/
+Lociate/*.xcworkspace/xcuserdata/
+Lociate/*.xcodeproj/xcuserdata/
+Lociate/*.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
 DerivedData/
 *.moved-aside
 *.xcuserstate
@@ -46,7 +46,10 @@ dist/
 *.pem
 
 # Build-time generated secrets (use BuildSecrets.swift.example as template)
-Loci/Configuration/BuildSecrets.swift
+Lociate/Configuration/BuildSecrets.swift
+
+# Trademark search reference (local doc, not source)
+tmSearchResults*.xlsx
 
 # IDE
 .vscode/

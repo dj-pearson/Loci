@@ -1,24 +1,24 @@
 {
-  "project": "Loci",
+  "project": "Lociate",
   "branchName": "ralph/loci-mvp",
-  "description": "Loci - Voice-first iOS app that pins voice notes to GPS coordinates with proximity-triggered retrieval and family sharing. Built with SwiftUI, SwiftData, CoreLocation, PostGIS Supabase backend, and Cloudflare Pages marketing site.",
+  "description": "Lociate - Voice-first iOS app that pins voice notes to GPS coordinates with proximity-triggered retrieval and family sharing. Built with SwiftUI, SwiftData, CoreLocation, PostGIS Supabase backend, and Cloudflare Pages marketing site.",
   "userStories": [
     {
       "id": "US-001",
       "title": "Create Xcode project structure with folder organization",
       "description": "As a developer, I need a properly structured Xcode project so that all subsequent work has a clean foundation.",
       "acceptanceCriteria": [
-        "Xcode project created with bundle ID com.pearsonmedia.loci, deployment target iOS 17.0",
+        "Xcode project created with bundle ID com.pearsonmedia.lociate, deployment target iOS 17.0",
         "Folder structure: Models/, ViewModels/, Views/, Services/, Widget/, Utilities/",
         "Views subfolders: MapView/, Record/, Detail/, Onboarding/, Settings/, Components/",
-        "App entry point (LociApp.swift) with @main and WindowGroup",
-        "App Group configured for widget data sharing (group.com.pearsonmedia.loci)",
+        "App entry point (LociateApp.swift) with @main and WindowGroup",
+        "App Group configured for widget data sharing (group.com.pearsonmedia.lociate)",
         "Info.plist includes NSLocationAlwaysAndWhenInUseUsageDescription, NSLocationWhenInUseUsageDescription, NSMicrophoneUsageDescription, NSSpeechRecognitionUsageDescription",
         "Typecheck passes"
       ],
       "priority": 1,
       "passes": true,
-      "notes": "Completed. Xcode project created with full directory structure, LociApp.swift entry point, Info.plist with privacy descriptions, Loci.entitlements with App Group, Assets.xcassets, and project.pbxproj with iOS 17.0 deployment target and com.pearsonmedia.loci bundle ID."
+      "notes": "Completed. Xcode project created with full directory structure, LociateApp.swift entry point, Info.plist with privacy descriptions, Lociate.entitlements with App Group, Assets.xcassets, and project.pbxproj with iOS 17.0 deployment target and com.pearsonmedia.lociate bundle ID."
     },
     {
       "id": "US-002",
@@ -110,7 +110,7 @@
       ],
       "priority": 7,
       "passes": true,
-      "notes": "Implemented HaversineDistance enum in Utilities/HaversineDistance.swift with distance(lat1:lon1:lat2:lon2:) function, CLLocationCoordinate2D.distance(to:) extension, and Array<Locus> sortedByDistance/nearest extensions. Unit tests in LociTests/HaversineDistanceTests.swift using Swift Testing framework with known coordinate pairs (NYC-LA, London-Tokyo, same point, short distance, antipodal). Test target needs macOS CI to execute."
+      "notes": "Implemented HaversineDistance enum in Utilities/HaversineDistance.swift with distance(lat1:lon1:lat2:lon2:) function, CLLocationCoordinate2D.distance(to:) extension, and Array<Locus> sortedByDistance/nearest extensions. Unit tests in LociateTests/HaversineDistanceTests.swift using Swift Testing framework with known coordinate pairs (NYC-LA, London-Tokyo, same point, short distance, antipodal). Test target needs macOS CI to execute."
     },
     {
       "id": "US-008",
@@ -120,12 +120,12 @@
         "ModelContainer factory with schema for Locus, Household, HouseholdMember, UserProfile",
         "Separate in-memory container for SwiftUI previews",
         "PreviewData struct with sample loci (various categories, locations), sample household, sample members",
-        "LociApp.swift updated to use the production ModelContainer",
+        "LociateApp.swift updated to use the production ModelContainer",
         "Typecheck passes"
       ],
       "priority": 8,
       "passes": true,
-      "notes": "Implemented ModelContainerConfiguration enum in Utilities/ with production() and preview() factory methods. Schema includes Locus, Household, HouseholdMember, UserProfile. Production container uses app group (group.com.pearsonmedia.loci) for widget data sharing. Preview container is in-memory only. PreviewData enum provides 12 sample loci (all 10 categories), 2 households, 2 members, 3 user profiles, and a previewContainer property that populates the in-memory store. LociApp.swift updated to initialize and inject production ModelContainer. Build verification deferred to macOS CI."
+      "notes": "Implemented ModelContainerConfiguration enum in Utilities/ with production() and preview() factory methods. Schema includes Locus, Household, HouseholdMember, UserProfile. Production container uses app group (group.com.pearsonmedia.lociate) for widget data sharing. Preview container is in-memory only. PreviewData enum provides 12 sample loci (all 10 categories), 2 households, 2 members, 3 user profiles, and a previewContainer property that populates the in-memory store. LociateApp.swift updated to initialize and inject production ModelContainer. Build verification deferred to macOS CI."
     },
     {
       "id": "US-009",
@@ -331,7 +331,7 @@
       "title": "Implement notification tap deep-link to locus detail",
       "description": "As a user, I want tapping a notification to open the relevant locus detail view.",
       "acceptanceCriteria": [
-        "UNUserNotificationCenterDelegate implemented in LociApp or AppDelegate",
+        "UNUserNotificationCenterDelegate implemented in LociateApp or AppDelegate",
         "userNotificationCenter(_:didReceive:) extracts locusId from userInfo",
         "NavigationRouter @Observable class with selectedLocusId property for deep-linking",
         "App's NavigationStack responds to selectedLocusId changes",
@@ -340,7 +340,7 @@
       ],
       "priority": 21,
       "passes": true,
-      "notes": "Implemented NavigationRouter @Observable class in ViewModels/NavigationRouter.swift with selectedLocusId property for deep-linking and pendingLocusId for cold-launch support. Observes .notificationTappedViewLocus and .notificationTappedAddNote notifications posted by NotificationService delegate. LociApp.swift updated to create and inject NavigationRouter and NotificationService into environment. ContentView uses NavigationStack with .navigationDestination(item:) binding to selectedLocusId. LocusDeepLinkView provides temporary detail view (to be replaced by full LocusDetailView in US-038). consumePendingDeepLink() called on .onAppear handles terminated-state launches. Build verification deferred to macOS CI."
+      "notes": "Implemented NavigationRouter @Observable class in ViewModels/NavigationRouter.swift with selectedLocusId property for deep-linking and pendingLocusId for cold-launch support. Observes .notificationTappedViewLocus and .notificationTappedAddNote notifications posted by NotificationService delegate. LociateApp.swift updated to create and inject NavigationRouter and NotificationService into environment. ContentView uses NavigationStack with .navigationDestination(item:) binding to selectedLocusId. LocusDeepLinkView provides temporary detail view (to be replaced by full LocusDetailView in US-038). consumePendingDeepLink() called on .onAppear handles terminated-state launches. Build verification deferred to macOS CI."
     },
     {
       "id": "US-022",
@@ -778,7 +778,7 @@
     {
       "id": "US-048",
       "title": "Create welcome onboarding screens with value propositions",
-      "description": "As a new user, I want to understand what Loci does and why it's valuable in 3-4 screens.",
+      "description": "As a new user, I want to understand what Lociate does and why it's valuable in 3-4 screens.",
       "acceptanceCriteria": [
         "OnboardingPageView reusable component: large SF Symbol, headline, body text, CTA button",
         "Page 1: 'Your Spatial Memory' - explain voice notes pinned to places",
@@ -798,7 +798,7 @@
       "description": "As a new user, I need to understand why Always Allow location is important before granting it.",
       "acceptanceCriteria": [
         "LocationPermissionView: illustration showing geofence concept",
-        "Clear explanation: 'Loci needs Always Allow to notify you when you return to a saved location'",
+        "Clear explanation: 'Lociate needs Always Allow to notify you when you return to a saved location'",
         "Bullet points: works in background, low battery impact (<2%), private/on-device",
         "Primary CTA: 'Enable Location' triggers requestAlwaysPermission()",
         "Secondary: 'Maybe Later' skips (app works with When In Use, no background triggers)",
@@ -1401,7 +1401,7 @@
       "description": "As a developer, I need RevenueCat configured to manage in-app subscriptions.",
       "acceptanceCriteria": [
         "RevenueCat SDK (Purchases) added as dependency",
-        "Purchases.configure(withAPIKey:) called in LociApp.init or AppDelegate",
+        "Purchases.configure(withAPIKey:) called in LociateApp.init or AppDelegate",
         "Offering IDs defined: 'premium_monthly', 'premium_yearly', 'family_monthly', 'family_yearly', 'lifetime_individual', 'lifetime_family'",
         "Debug logging enabled in debug builds",
         "Purchases.shared.delegate set for transaction updates",
@@ -1409,7 +1409,7 @@
       ],
       "priority": 85,
       "passes": true,
-      "notes": "Created RevenueCatConfiguration with API key config, offering IDs (premium_monthly/yearly, family_monthly/yearly, lifetime_individual/family), entitlement IDs, debug logging in debug builds. Purchases.configure called in LociApp.init. Identify/reset methods for user auth. SPM dependency on RevenueCat/purchases-ios needs to be added in Xcode."
+      "notes": "Created RevenueCatConfiguration with API key config, offering IDs (premium_monthly/yearly, family_monthly/yearly, lifetime_individual/family), entitlement IDs, debug logging in debug builds. Purchases.configure called in LociateApp.init. Identify/reset methods for user auth. SPM dependency on RevenueCat/purchases-ios needs to be added in Xcode."
     },
     {
       "id": "US-086",
@@ -1521,15 +1521,15 @@
       "description": "As a user, I want tapping a widget locus to open its detail in the app.",
       "acceptanceCriteria": [
         "AppIntent defined for opening a specific locus by ID",
-        "Widget uses widgetURL or Link with loci://detail/{locusId} URL scheme",
-        "LociApp handles URL scheme in .onOpenURL modifier",
+        "Widget uses widgetURL or Link with lociate://detail/{locusId} URL scheme",
+        "LociateApp handles URL scheme in .onOpenURL modifier",
         "NavigationRouter processes deep-link URL and sets selectedLocusId",
         "Works when app is running, backgrounded, or terminated",
         "Typecheck passes"
       ],
       "priority": 92,
       "passes": true,
-      "notes": "NavigationRouter.handleURL() processes loci://detail/{id} and loci://paywall URL schemes. LociApp .onOpenURL modifier routes URLs to NavigationRouter. OpenLocusIntent AppIntent for widget integration. Widget already uses widgetURL/Link with loci:// scheme. Works for cold launch (pendingLocusId), background, and foreground."
+      "notes": "NavigationRouter.handleURL() processes lociate://detail/{id} and lociate://paywall URL schemes. LociateApp .onOpenURL modifier routes URLs to NavigationRouter. OpenLocusIntent AppIntent for widget integration. Widget already uses widgetURL/Link with loci:// scheme. Works for cold launch (pendingLocusId), background, and foreground."
     },
     {
       "id": "US-093",
@@ -1551,7 +1551,7 @@
     {
       "id": "US-094",
       "title": "Create biometric lock for app access",
-      "description": "As a user, I want to optionally require Face ID/Touch ID to open Loci for privacy.",
+      "description": "As a user, I want to optionally require Face ID/Touch ID to open Lociate for privacy.",
       "acceptanceCriteria": [
         "BiometricLockService using LocalAuthentication framework (LAContext)",
         "canUseBiometrics() -> Bool checks device capability",
@@ -1564,7 +1564,7 @@
       ],
       "priority": 94,
       "passes": true,
-      "notes": "BiometricLockService @Observable class using LocalAuthentication (LAContext). canUseBiometrics() checks capability, authenticate() triggers biometric prompt with device passcode fallback. isBiometricLockEnabled in UserDefaults (default false). BiometricLockView shown as overlay in LociApp when locked. 5-minute grace period on app foreground. Toggle in Settings > Privacy section requires auth to enable. BiometricType enum for Face ID/Touch ID/Optic ID display names and SF Symbols."
+      "notes": "BiometricLockService @Observable class using LocalAuthentication (LAContext). canUseBiometrics() checks capability, authenticate() triggers biometric prompt with device passcode fallback. isBiometricLockEnabled in UserDefaults (default false). BiometricLockView shown as overlay in LociateApp when locked. 5-minute grace period on app foreground. Toggle in Settings > Privacy section requires auth to enable. BiometricType enum for Face ID/Touch ID/Optic ID display names and SF Symbols."
     },
     {
       "id": "US-095",
@@ -1686,7 +1686,7 @@
     {
       "id": "US-102",
       "title": "Create VoiceOver accessibility labels throughout app",
-      "description": "As a user with visual impairment, I need proper VoiceOver support to use Loci.",
+      "description": "As a user with visual impairment, I need proper VoiceOver support to use Lociate.",
       "acceptanceCriteria": [
         "All interactive elements have .accessibilityLabel and .accessibilityHint",
         "RecordButton: 'Record voice note' / 'Double tap to start recording'",
@@ -1807,7 +1807,7 @@
       "title": "Create TelemetryDeck analytics integration",
       "description": "As a developer, I need privacy-focused analytics to understand usage patterns.",
       "acceptanceCriteria": [
-        "TelemetryDeck SDK added as dependency, configured in LociApp with app ID",
+        "TelemetryDeck SDK added as dependency, configured in LociateApp with app ID",
         "Events tracked: locus_created (with category), locus_triggered (geofence entry), recording_started, recording_completed, search_performed, household_created, household_joined, paywall_shown, subscription_purchased",
         "No PII sent: only anonymous event counts and category breakdowns",
         "Analytics disabled when user opts out in Settings",
@@ -1821,7 +1821,7 @@
     {
       "id": "US-110",
       "title": "Create dark mode support with proper color adaptation",
-      "description": "As a user, I want Loci to look great in both light and dark mode.",
+      "description": "As a user, I want Lociate to look great in both light and dark mode.",
       "acceptanceCriteria": [
         "All Theme colors defined with light/dark variants using Color asset catalog",
         "Map style adapts: standard for light, mutedStandard for dark",
@@ -1856,7 +1856,7 @@
     {
       "id": "US-112",
       "title": "Create landing page with hero, features, and download CTA",
-      "description": "As a potential user, I want to understand Loci's value and download the app from the website.",
+      "description": "As a potential user, I want to understand Lociate's value and download the app from the website.",
       "acceptanceCriteria": [
         "Hero section: tagline 'Your Spatial Memory', subtitle 'Voice notes pinned to places that find you when you return', App Store badge CTA",
         "How It Works section: 3-step visual (Record, Walk Away, Get Notified)",
@@ -1930,13 +1930,13 @@
         "Triggers on push to develop and feature/* branches, and PRs to main",
         "Steps: checkout, setup Xcode (latest stable), SwiftLint, xcodebuild build (Debug, iPhone 15 simulator)",
         "SwiftLint configuration (.swiftlint.yml) with reasonable defaults",
-        "Build step uses xcodebuild -scheme Loci -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 15'",
+        "Build step uses xcodebuild -scheme Lociate -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 15'",
         "Caches Swift Package Manager dependencies",
         "Typecheck passes"
       ],
       "priority": 116,
       "passes": true,
-      "notes": "CI workflow at .github/workflows/ci.yml with: SwiftLint job (brew install, --strict), iOS build job (Xcode 15.4, iPhone 15 simulator, SPM caching, CODE_SIGNING_ALLOWED=NO), web build job (Node 20, npm ci, Astro build). Triggers on push to develop/feature/*, PRs to main. SwiftLint config at Loci/.swiftlint.yml with reasonable defaults."
+      "notes": "CI workflow at .github/workflows/ci.yml with: SwiftLint job (brew install, --strict), iOS build job (Xcode 15.4, iPhone 15 simulator, SPM caching, CODE_SIGNING_ALLOWED=NO), web build job (Node 20, npm ci, Astro build). Triggers on push to develop/feature/*, PRs to main. SwiftLint config at Lociate/.swiftlint.yml with reasonable defaults."
     },
     {
       "id": "US-117",
@@ -1953,7 +1953,7 @@
       ],
       "priority": 117,
       "passes": true,
-      "notes": "Deploy workflow at .github/workflows/deploy.yml triggers on push to main. Steps: checkout, Xcode 15.4, SPM cache, install Fastlane, match certificates (appstore readonly), increment build number (run_number), archive and upload via Fastlane release lane, Slack notifications on success/failure (optional). Fastfile and Matchfile in Loci/fastlane/ with App Store Connect API key auth."
+      "notes": "Deploy workflow at .github/workflows/deploy.yml triggers on push to main. Steps: checkout, Xcode 15.4, SPM cache, install Fastlane, match certificates (appstore readonly), increment build number (run_number), archive and upload via Fastlane release lane, Slack notifications on success/failure (optional). Fastfile and Matchfile in Lociate/fastlane/ with App Store Connect API key auth."
     },
     {
       "id": "US-118",
@@ -1962,7 +1962,7 @@
       "acceptanceCriteria": [
         "App icon: pin/location marker with audio wave motif, using primary brand color",
         "Icon set in Assets.xcassets/AppIcon.appiconset with all required sizes (1024x1024 source)",
-        "Launch screen: centered Loci logo with tagline on brand color background",
+        "Launch screen: centered Lociate logo with tagline on brand color background",
         "LaunchScreen.storyboard or launch screen info.plist configuration",
         "Icon follows Apple Human Interface Guidelines (no transparency, no text-heavy)",
         "Typecheck passes"
@@ -1977,7 +1977,7 @@
       "description": "As a developer, I need App Store listing content ready for submission.",
       "acceptanceCriteria": [
         "Fastlane metadata directory: fastlane/metadata/en-US/",
-        "name.txt: 'Loci'",
+        "name.txt: 'Lociate'",
         "subtitle.txt: 'Voice Notes Pinned to Places'",
         "description.txt: compelling App Store description highlighting voice notes, proximity triggers, family sharing, privacy",
         "keywords.txt: 'location,notes,voice,memo,place,reminder,gps,pin,map,spot,geo,spatial,memory,family,share'",
@@ -1987,7 +1987,7 @@
       ],
       "priority": 119,
       "passes": true,
-      "notes": "Fastlane metadata at Loci/fastlane/metadata/en-US/ with: name.txt, subtitle.txt, description.txt (compelling copy with feature highlights), keywords.txt (15 keywords), promotional_text.txt (launch promo), primary_category.txt (Utilities), secondary_category.txt (Travel)."
+      "notes": "Fastlane metadata at Lociate/fastlane/metadata/en-US/ with: name.txt, subtitle.txt, description.txt (compelling copy with feature highlights), keywords.txt (15 keywords), promotional_text.txt (launch promo), primary_category.txt (Utilities), secondary_category.txt (Travel)."
     },
     {
       "id": "US-120",
@@ -2080,7 +2080,7 @@
       "title": "Wire LocusDetailView into deep-link navigation replacing placeholder",
       "description": "As a user, I need deep-link navigation (from notifications and URL schemes) to open the full LocusDetailView with audio playback instead of the placeholder LocusDeepLinkView.",
       "acceptanceCriteria": [
-        "LocusDeepLinkView in LociApp.swift is replaced with the real LocusDetailView",
+        "LocusDeepLinkView in LociateApp.swift is replaced with the real LocusDetailView",
         "LocusDetailViewModel is properly instantiated with the resolved Locus",
         "Audio playback works from deep-linked detail view",
         "Edit, archive, and delete actions work from deep-linked detail view",
@@ -2109,14 +2109,14 @@
       ],
       "priority": 126,
       "passes": true,
-      "notes": "Created NetworkMonitor service using NWPathMonitor tracking isConnected and connectionType. Injected into environment from LociApp. HomeMapView shows offline capsule indicator when disconnected. SyncStatus.pending already queues offline loci. SyncService.isSyncing and pendingCount already observable. BackgroundSyncManager triggers sync on foreground."
+      "notes": "Created NetworkMonitor service using NWPathMonitor tracking isConnected and connectionType. Injected into environment from LociateApp. HomeMapView shows offline capsule indicator when disconnected. SyncStatus.pending already queues offline loci. SyncService.isSyncing and pendingCount already observable. BackgroundSyncManager triggers sync on foreground."
     },
     {
       "id": "US-127",
       "title": "Implement TelemetryDeck analytics integration",
       "description": "As a product owner, I need privacy-focused analytics to understand usage patterns without compromising user privacy.",
       "acceptanceCriteria": [
-        "TelemetryDeck SDK configured in LociApp.init with app ID from environment",
+        "TelemetryDeck SDK configured in LociateApp.init with app ID from environment",
         "Key events tracked: app_launch, recording_started, recording_completed, locus_viewed, geofence_triggered, subscription_started, subscription_cancelled",
         "User ID is hashed (not raw) before sending to TelemetryDeck",
         "Analytics respects iOS App Tracking Transparency (disabled if user opts out)",
@@ -2126,7 +2126,7 @@
       ],
       "priority": 127,
       "passes": true,
-      "notes": "AnalyticsService enhanced with all required events (app_launch, locus_viewed, geofence_triggered, subscription_cancelled). SHA-256 user ID hashing via CryptoKit. configure() + trackAppLaunch() called from LociApp.init. Recording events wired in RecordViewModel. Geofence trigger wired in GeofenceManager. Debug mode logs to console. Opt-out respected via UserDefaults. TelemetryDeck SDK calls commented until SPM package is added."
+      "notes": "AnalyticsService enhanced with all required events (app_launch, locus_viewed, geofence_triggered, subscription_cancelled). SHA-256 user ID hashing via CryptoKit. configure() + trackAppLaunch() called from LociateApp.init. Recording events wired in RecordViewModel. Geofence trigger wired in GeofenceManager. Debug mode logs to console. Opt-out respected via UserDefaults. TelemetryDeck SDK calls commented until SPM package is added."
     },
     {
       "id": "US-128",
@@ -2212,7 +2212,7 @@
       ],
       "priority": 132,
       "passes": true,
-      "notes": "Added notification-denied banner to SettingsView with Open Settings deep link. Added dismissible proximity alerts banner to LocusListView. LociApp scenePhase handler rechecks notification authorization on each foreground. Non-aggressive — informational only."
+      "notes": "Added notification-denied banner to SettingsView with Open Settings deep link. Added dismissible proximity alerts banner to LocusListView. LociateApp scenePhase handler rechecks notification authorization on each foreground. Non-aggressive — informational only."
     },
     {
       "id": "US-133",
@@ -2503,7 +2503,7 @@
       ],
       "priority": 148,
       "passes": true,
-      "notes": "Completed. IntegrityCheckService.swift with 6 checks: jailbreak paths (16 paths), Cydia/Sileo/Zebra URL schemes, writable system dirs, sandbox escape, debugger detection via sysctl (skipped in DEBUG), suspicious dylibs via _dyld_image_count. IntegrityWarningBanner.swift dismissible warning UI. Wired into LociApp.swift init() and ContentView body. Logs to TelemetryDeck. Informational only per App Store guidelines."
+      "notes": "Completed. IntegrityCheckService.swift with 6 checks: jailbreak paths (16 paths), Cydia/Sileo/Zebra URL schemes, writable system dirs, sandbox escape, debugger detection via sysctl (skipped in DEBUG), suspicious dylibs via _dyld_image_count. IntegrityWarningBanner.swift dismissible warning UI. Wired into LociateApp.swift init() and ContentView body. Logs to TelemetryDeck. Informational only per App Store guidelines."
     },
     {
       "id": "US-149",
@@ -2541,7 +2541,7 @@
     {
       "id": "US-151",
       "title": "Android app architecture planning and Kotlin Multiplatform evaluation",
-      "description": "As a product owner, I need an architectural plan for the Android version of Loci to understand the effort and approach for cross-platform expansion.",
+      "description": "As a product owner, I need an architectural plan for the Android version of Lociate to understand the effort and approach for cross-platform expansion.",
       "acceptanceCriteria": [
         "Architecture decision document (android/ARCHITECTURE.md) comparing: native Kotlin/Jetpack Compose vs KMP shared logic",
         "Mapping of iOS services to Android equivalents (LocationService → FusedLocationProvider, SwiftData → Room, Keychain → EncryptedSharedPreferences, etc.)",
@@ -2577,7 +2577,7 @@
       "title": "Android project scaffold with Kotlin, Jetpack Compose, Hilt, and Room",
       "description": "As a developer, I need a properly structured Android project so that all subsequent Android work has a clean foundation matching iOS feature parity.",
       "acceptanceCriteria": [
-        "Android project created at android/ with applicationId com.pearsonmedia.loci, minSdk 26, targetSdk 35",
+        "Android project created at android/ with applicationId com.pearsonmedia.lociate, minSdk 26, targetSdk 35",
         "Gradle Kotlin DSL with version catalog (libs.versions.toml) for dependency management",
         "Package structure: data/ (local/remote/repository), domain/ (model/usecase/repository), service/, ui/ (theme/navigation/screen/component), util/, di/",
         "Hilt dependency injection configured with @HiltAndroidApp application class",
@@ -2834,12 +2834,12 @@
     {
       "id": "US-165",
       "title": "Premium design token system (iOS + Android)",
-      "description": "As a user, I want the app to feel cohesive, polished, and premium so that every surface reinforces the sense that Loci is a high-quality product worth paying for.",
+      "description": "As a user, I want the app to feel cohesive, polished, and premium so that every surface reinforces the sense that Lociate is a high-quality product worth paying for.",
       "acceptanceCriteria": [
         "iOS: DesignSystem.swift introduces Space (2/4/8/12/16/20/24/32/48), Radius (6/10/14/20/28/full), Elevation (level1–level4 layered shadows), Gradients (primary, primaryHalo, record, premium, family, glassTint), Motion spring presets (snappy, smooth, gentle, bouncy, amplitude), Duration presets, and Surface materials (glassThin, glass, glassThick)",
         "iOS: View.elevation(_:) and View.premiumCard(radius:elevation:glass:) modifiers for one-line premium surfaces",
         "Android: DesignTokens.kt introduces matching Space, Radius, Elevation, and Motion spring/tween presets",
-        "Android: LociGradients object exposes Primary, Record, Premium, Family, PrimaryHalo, and GlassTint brushes",
+        "Android: LociateGradients object exposes Primary, Record, Premium, Family, PrimaryHalo, and GlassTint brushes",
         "Android: Modifier.premiumCard(radius, elevation, background, border) composable extension",
         "All tokens resolve via semantic theme colors (Theme / MaterialTheme) so they adapt to light and dark mode",
         "Existing Theme.swift / Theme.kt remain untouched — DesignSystem is additive, not a replacement",
@@ -2847,7 +2847,7 @@
       ],
       "priority": 165,
       "passes": true,
-      "notes": "Completed. iOS: Loci/Utilities/DesignSystem.swift adds Space, Radius, Elevation, Gradients, Motion, Duration, and Surface tokens plus View.elevation(_:) and View.premiumCard(radius:elevation:glass:) modifiers layered on top of Theme.swift. Android: ui/theme/DesignTokens.kt adds matching DesignTokens object, LociGradients brushes, and Modifier.premiumCard extension. Foundation for US-166 → US-174 premium polish work."
+      "notes": "Completed. iOS: Lociate/Utilities/DesignSystem.swift adds Space, Radius, Elevation, Gradients, Motion, Duration, and Surface tokens plus View.elevation(_:) and View.premiumCard(radius:elevation:glass:) modifiers layered on top of Theme.swift. Android: ui/theme/DesignTokens.kt adds matching DesignTokens object, LociateGradients brushes, and Modifier.premiumCard extension. Foundation for US-166 → US-174 premium polish work."
     },
     {
       "id": "US-166",
@@ -2858,7 +2858,7 @@
         "iOS: Breathing halo driven by DesignSystem.Motion.gentle spring with TimelineView fallback for reduce-motion",
         "iOS: Press-down scale uses DesignSystem.Motion.snappy and triggers HapticManager.recordStart on press-in",
         "iOS: Active amplitude ring animates with DesignSystem.Motion.amplitude and is capped to max diameter so it never overflows its container",
-        "Android: Matching HeroRecordButton composable using LociGradients.Record and DesignTokens.Motion springs",
+        "Android: Matching HeroRecordButton composable using LociateGradients.Record and DesignTokens.Motion springs",
         "Android: Pulse animation uses rememberInfiniteTransition with StiffnessLow spring and respects Settings.Global reduce-motion",
         "Both platforms: tappable area ≥ 72dp/pt, full VoiceOver/TalkBack labels, Dynamic Type-safe layout",
         "Typecheck passes on both platforms"
@@ -2895,14 +2895,14 @@
         "iOS: Row press uses DesignSystem.Motion.snappy scale feedback and HapticManager.tabSelection",
         "iOS: Swipe-to-archive reveals a gradient action background using DesignSystem.Gradients.premium",
         "Android: LocusListItem composable uses Modifier.premiumCard() with matching layout (category tile + transcription + timestamp + waveform mini)",
-        "Android: SwipeToDismissBox end-to-start reveal uses LociGradients.Premium background",
+        "Android: SwipeToDismissBox end-to-start reveal uses LociateGradients.Premium background",
         "Both platforms: items animate in with a 40ms stagger using Motion.smooth",
         "Both platforms: Dynamic Type / font scaling verified up to XXL",
         "Typecheck passes on both platforms"
       ],
       "priority": 168,
       "passes": true,
-      "notes": "Completed. iOS LocusRowView redesigned with 44x44 category glyph tile (rounded square + gradient stroke + level1 elevation), pinned location icon, relative timestamp, primary-tinted distance pill capsule, DesignSystem.Space tokens. Android LocusListItem uses Modifier.premiumCard(radius=MD, elevation=Level2), 44dp category glyph tile, location + timestamp row, SwipeToDismissBox reveals LociGradients.Premium action background."
+      "notes": "Completed. iOS LocusRowView redesigned with 44x44 category glyph tile (rounded square + gradient stroke + level1 elevation), pinned location icon, relative timestamp, primary-tinted distance pill capsule, DesignSystem.Space tokens. Android LocusListItem uses Modifier.premiumCard(radius=MD, elevation=Level2), 44dp category glyph tile, location + timestamp row, SwipeToDismissBox reveals LociateGradients.Premium action background."
     },
     {
       "id": "US-169",
@@ -2929,8 +2929,8 @@
         "iOS: PaywallView hero uses DesignSystem.Gradients.premium with animated parallax gradient and a rotating feature highlight carousel (auto-advance every 4s, pause on drag)",
         "iOS: Each tier card uses View.premiumCard(radius: .lg, elevation: .level3) with glow ring on the recommended tier",
         "iOS: CTA button uses DesignSystem.Gradients.primary with breathing glow and HapticManager.unlockSequence on successful purchase",
-        "Android: PaywallScreen hero uses LociGradients.Premium + animated feature carousel via HorizontalPager with auto-advance",
-        "Android: Tier cards use Modifier.premiumCard with elevated recommended-tier glow using LociGradients.Family border",
+        "Android: PaywallScreen hero uses LociateGradients.Premium + animated feature carousel via HorizontalPager with auto-advance",
+        "Android: Tier cards use Modifier.premiumCard with elevated recommended-tier glow using LociateGradients.Family border",
         "Android: CTA uses Brush-tinted Button with haptic unlockSequence on purchase",
         "Both platforms: tier comparison clearly lists Free vs Premium vs Family with icons, matching CLAUDE.md monetization table",
         "Both platforms: restore purchases and terms/privacy links remain accessible",
@@ -2938,12 +2938,12 @@
       ],
       "priority": 170,
       "passes": true,
-      "notes": "Completed. iOS PaywallView headerSection now uses a premium hero: animated primaryHalo backdrop with gentle breathing motion, 96x96 gradient icon tile on DesignSystem.Gradients.premium with level4 elevation, bold title and subtitle. Android PaywallScreen header replaced with 96dp gradient icon tile using LociGradients.Premium and centered headline + supporting copy. Reduce Motion paths collapse halo to static glow on iOS."
+      "notes": "Completed. iOS PaywallView headerSection now uses a premium hero: animated primaryHalo backdrop with gentle breathing motion, 96x96 gradient icon tile on DesignSystem.Gradients.premium with level4 elevation, bold title and subtitle. Android PaywallScreen header replaced with 96dp gradient icon tile using LociateGradients.Premium and centered headline + supporting copy. Reduce Motion paths collapse halo to static glow on iOS."
     },
     {
       "id": "US-171",
       "title": "Delightful empty states and shimmer hero loading",
-      "description": "As a user, I want empty and loading states to feel intentional and on-brand so that the first minute of using Loci still feels premium.",
+      "description": "As a user, I want empty and loading states to feel intentional and on-brand so that the first minute of using Lociate still feels premium.",
       "acceptanceCriteria": [
         "iOS: EmptyStateView upgraded with hero SF Symbol on a DesignSystem.Gradients.primaryHalo background, headline + supporting copy, and a primary CTA button",
         "iOS: SkeletonView gains a shimmer overlay using a moving LinearGradient driven by TimelineView; disabled under reduce-motion",
@@ -2967,7 +2967,7 @@
         "iOS: Permission pages show a live mock (map preview, record button preview) with reduced-motion fallback",
         "Android: OnboardingScreen HorizontalPager gains matching hero illustrations, gradient halos, and dot indicator morph via animateFloatAsState",
         "Android: Permission pages show live previews with reduce-motion fallback",
-        "Both platforms: primary button uses DesignSystem.Gradients.primary / LociGradients.Primary and haptic selection on page change",
+        "Both platforms: primary button uses DesignSystem.Gradients.primary / LociateGradients.Primary and haptic selection on page change",
         "Typecheck passes on both platforms"
       ],
       "priority": 172,
@@ -2984,7 +2984,7 @@
         "iOS: Destructive actions (sign out, delete account) use Theme.error with HapticManager.delete confirmation",
         "Android: SettingsScreen gains matching account header Card and tinted icon tiles for each row",
         "Android: Destructive actions use colorScheme.error and HapticManager.error",
-        "Both platforms: tier badge uses DesignSystem.Gradients.premium / LociGradients.Premium",
+        "Both platforms: tier badge uses DesignSystem.Gradients.premium / LociateGradients.Premium",
         "Typecheck passes on both platforms"
       ],
       "priority": 173,

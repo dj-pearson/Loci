@@ -1,11 +1,11 @@
-package com.pearsonmedia.loci.ui.screen.paywall
+package com.pearsonmedia.lociate.ui.screen.paywall
 
 import android.app.Activity
 import androidx.lifecycle.ViewModel
 import com.android.billingclient.api.ProductDetails
-import com.pearsonmedia.loci.domain.model.SubscriptionTier
-import com.pearsonmedia.loci.service.BillingService
-import com.pearsonmedia.loci.service.PurchaseResult
+import com.pearsonmedia.lociate.domain.model.SubscriptionTier
+import com.pearsonmedia.lociate.service.BillingService
+import com.pearsonmedia.lociate.service.PurchaseResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

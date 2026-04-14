@@ -1,11 +1,11 @@
-package com.pearsonmedia.loci
+package com.pearsonmedia.lociate
 
 import com.google.common.truth.Truth.assertThat
-import com.pearsonmedia.loci.data.local.converter.toDomain
-import com.pearsonmedia.loci.data.local.converter.toEntity
-import com.pearsonmedia.loci.domain.model.Locus
-import com.pearsonmedia.loci.domain.model.LocusCategory
-import com.pearsonmedia.loci.domain.model.SyncStatus
+import com.pearsonmedia.lociate.data.local.converter.toDomain
+import com.pearsonmedia.lociate.data.local.converter.toEntity
+import com.pearsonmedia.lociate.domain.model.Locus
+import com.pearsonmedia.lociate.domain.model.LocusCategory
+import com.pearsonmedia.lociate.domain.model.SyncStatus
 import org.junit.Test
 import java.time.Instant
 import java.util.UUID
@@ -50,7 +50,7 @@ class EntityMapperTest {
 
     @Test
     fun `entity category maps correctly`() {
-        val entity = com.pearsonmedia.loci.data.local.entity.LocusEntity(
+        val entity = com.pearsonmedia.lociate.data.local.entity.LocusEntity(
             id = UUID.randomUUID().toString(),
             latitude = 0.0,
             longitude = 0.0,

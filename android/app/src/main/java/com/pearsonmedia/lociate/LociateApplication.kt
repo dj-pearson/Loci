@@ -1,4 +1,4 @@
-package com.pearsonmedia.loci
+package com.pearsonmedia.lociate
 
 import android.app.Application
 import android.app.NotificationChannel
@@ -7,7 +7,7 @@ import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
 
 @HiltAndroidApp
-class LociApplication : Application() {
+class LociateApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()

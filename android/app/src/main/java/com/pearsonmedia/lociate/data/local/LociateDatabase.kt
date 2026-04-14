@@ -1,13 +1,13 @@
-package com.pearsonmedia.loci.data.local
+package com.pearsonmedia.lociate.data.local
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import com.pearsonmedia.loci.data.local.dao.HouseholdDao
-import com.pearsonmedia.loci.data.local.dao.LocusDao
-import com.pearsonmedia.loci.data.local.entity.HouseholdEntity
-import com.pearsonmedia.loci.data.local.entity.HouseholdMemberEntity
-import com.pearsonmedia.loci.data.local.entity.LocusEntity
-import com.pearsonmedia.loci.data.local.entity.UserProfileEntity
+import com.pearsonmedia.lociate.data.local.dao.HouseholdDao
+import com.pearsonmedia.lociate.data.local.dao.LocusDao
+import com.pearsonmedia.lociate.data.local.entity.HouseholdEntity
+import com.pearsonmedia.lociate.data.local.entity.HouseholdMemberEntity
+import com.pearsonmedia.lociate.data.local.entity.LocusEntity
+import com.pearsonmedia.lociate.data.local.entity.UserProfileEntity
 
 @Database(
     entities = [
@@ -19,7 +19,7 @@ import com.pearsonmedia.loci.data.local.entity.UserProfileEntity
     version = 1,
     exportSchema = true
 )
-abstract class LociDatabase : RoomDatabase() {
+abstract class LociateDatabase : RoomDatabase() {
     abstract fun locusDao(): LocusDao
     abstract fun householdDao(): HouseholdDao
 }

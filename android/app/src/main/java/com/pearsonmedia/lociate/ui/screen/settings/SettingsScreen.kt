@@ -1,4 +1,4 @@
-package com.pearsonmedia.loci.ui.screen.settings
+package com.pearsonmedia.lociate.ui.screen.settings
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -49,9 +49,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.pearsonmedia.loci.ui.theme.DesignTokens
-import com.pearsonmedia.loci.ui.theme.LociGradients
-import com.pearsonmedia.loci.ui.theme.premiumCard
+import com.pearsonmedia.lociate.ui.theme.DesignTokens
+import com.pearsonmedia.lociate.ui.theme.LociateGradients
+import com.pearsonmedia.lociate.ui.theme.premiumCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -158,7 +158,7 @@ fun SettingsScreen(
         SettingsSection(title = "About") {
             SettingsItem(
                 icon = Icons.Default.Info,
-                title = "About Loci",
+                title = "About Lociate",
                 subtitle = "Version 1.0.0",
                 onClick = { }
             )
@@ -287,7 +287,7 @@ private fun AccountHeaderCard(
             modifier = Modifier
                 .size(56.dp)
                 .clip(RoundedCornerShape(DesignTokens.Radius.MD))
-                .background(LociGradients.Primary),
+                .background(LociateGradients.Primary),
             contentAlignment = Alignment.Center
         ) {
             Text(
@@ -312,9 +312,9 @@ private fun AccountHeaderCard(
                 modifier = Modifier
                     .clip(CircleShape)
                     .background(
-                        if (tierName.equals("Premium", ignoreCase = true)) LociGradients.Premium
-                        else if (tierName.equals("Family", ignoreCase = true)) LociGradients.Family
-                        else LociGradients.Primary
+                        if (tierName.equals("Premium", ignoreCase = true)) LociateGradients.Premium
+                        else if (tierName.equals("Family", ignoreCase = true)) LociateGradients.Family
+                        else LociateGradients.Primary
                     )
                     .padding(horizontal = 10.dp, vertical = 4.dp)
             ) {

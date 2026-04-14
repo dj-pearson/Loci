@@ -1,10 +1,10 @@
-package com.pearsonmedia.loci.di
+package com.pearsonmedia.lociate.di
 
 import android.content.Context
 import androidx.room.Room
-import com.pearsonmedia.loci.data.local.LociDatabase
-import com.pearsonmedia.loci.data.local.dao.HouseholdDao
-import com.pearsonmedia.loci.data.local.dao.LocusDao
+import com.pearsonmedia.lociate.data.local.LociateDatabase
+import com.pearsonmedia.lociate.data.local.dao.HouseholdDao
+import com.pearsonmedia.lociate.data.local.dao.LocusDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -18,10 +18,10 @@ object DatabaseModule {
 
     @Provides
     @Singleton
-    fun provideDatabase(@ApplicationContext context: Context): LociDatabase {
+    fun provideDatabase(@ApplicationContext context: Context): LociateDatabase {
         return Room.databaseBuilder(
             context,
-            LociDatabase::class.java,
+            LociateDatabase::class.java,
             "loci_database"
         )
             .fallbackToDestructiveMigration()
@@ -29,8 +29,8 @@ object DatabaseModule {
     }
 
     @Provides
-    fun provideLocusDao(database: LociDatabase): LocusDao = database.locusDao()
+    fun provideLocusDao(database: LociateDatabase): LocusDao = database.locusDao()
 
     @Provides
-    fun provideHouseholdDao(database: LociDatabase): HouseholdDao = database.householdDao()
+    fun provideHouseholdDao(database: LociateDatabase): HouseholdDao = database.householdDao()
 }

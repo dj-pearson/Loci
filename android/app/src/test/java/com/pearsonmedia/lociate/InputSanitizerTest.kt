@@ -1,7 +1,7 @@
-package com.pearsonmedia.loci
+package com.pearsonmedia.lociate
 
 import com.google.common.truth.Truth.assertThat
-import com.pearsonmedia.loci.util.InputSanitizer
+import com.pearsonmedia.lociate.util.InputSanitizer
 import org.junit.Test
 
 class InputSanitizerTest {

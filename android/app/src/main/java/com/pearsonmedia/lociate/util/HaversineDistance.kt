@@ -1,4 +1,4 @@
-package com.pearsonmedia.loci.util
+package com.pearsonmedia.lociate.util
 
 import kotlin.math.atan2
 import kotlin.math.cos

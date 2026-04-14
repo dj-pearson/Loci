@@ -1,4 +1,4 @@
-package com.pearsonmedia.loci.ui.screen.household
+package com.pearsonmedia.lociate.ui.screen.household
 
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -48,8 +48,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.pearsonmedia.loci.domain.model.HouseholdMember
-import com.pearsonmedia.loci.domain.model.MemberRole
+import com.pearsonmedia.lociate.domain.model.HouseholdMember
+import com.pearsonmedia.lociate.domain.model.MemberRole
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

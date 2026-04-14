@@ -35,7 +35,7 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
-        android:name=".LociApplication"
+        android:name=".LociateApplication"
         android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="false"
@@ -44,13 +44,13 @@
         android:networkSecurityConfig="@xml/network_security_config"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Loci"
+        android:theme="@style/Theme.Lociate"
         tools:targetApi="35">
 
         <activity
             android:name=".ui.MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.Loci"
+            android:theme="@style/Theme.Lociate"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -63,7 +63,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <data
                     android:host="locus"
-                    android:scheme="loci" />
+                    android:scheme="lociate" />
             </intent-filter>
         </activity>
 
@@ -72,7 +72,7 @@
             android:name=".service.GeofenceBroadcastReceiver"
             android:exported="false">
             <intent-filter>
-                <action android:name="com.pearsonmedia.loci.GEOFENCE_EVENT" />
+                <action android:name="com.pearsonmedia.lociate.GEOFENCE_EVENT" />
             </intent-filter>
         </receiver>
 

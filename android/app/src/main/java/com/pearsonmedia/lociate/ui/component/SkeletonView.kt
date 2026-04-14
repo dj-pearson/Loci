@@ -1,4 +1,4 @@
-package com.pearsonmedia.loci.ui.component
+package com.pearsonmedia.lociate.ui.component
 
 import android.animation.ValueAnimator
 import androidx.compose.animation.core.LinearEasing

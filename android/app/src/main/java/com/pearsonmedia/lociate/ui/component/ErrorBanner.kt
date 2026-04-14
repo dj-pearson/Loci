@@ -1,4 +1,4 @@
-package com.pearsonmedia.loci.ui.component
+package com.pearsonmedia.lociate.ui.component
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn

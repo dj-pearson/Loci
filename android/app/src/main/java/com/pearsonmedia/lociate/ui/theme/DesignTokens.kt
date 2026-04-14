@@ -1,4 +1,4 @@
-package com.pearsonmedia.loci.ui.theme
+package com.pearsonmedia.lociate.ui.theme
 
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 /**
- * Premium design tokens that layer on top of [LociTheme] to give the Loci
+ * Premium design tokens that layer on top of [LociateTheme] to give the Lociate
  * Android app a cohesive, high-end visual language. Keep the [MaterialTheme]
  * color scheme as the semantic source of truth; this file adds motion,
  * elevation, gradient, spacing, and radius primitives for the premium feel.
@@ -96,7 +96,7 @@ object DesignTokens {
  * Brand gradients. Use these for premium hero surfaces, paywall cards,
  * and the record button.
  */
-object LociGradients {
+object LociateGradients {
 
     /** Primary diagonal — top-leading to bottom-trailing. */
     val Primary: Brush
@@ -112,7 +112,7 @@ object LociGradients {
         @Composable get() = Brush.verticalGradient(
             colors = listOf(
                 MaterialTheme.colorScheme.error,
-                LociOrange
+                LociateOrange
             )
         )
 

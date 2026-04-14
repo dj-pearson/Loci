@@ -70,7 +70,7 @@ app.route('/api/health', health);
 
 const port = parseInt(process.env.PORT || '3000', 10);
 
-console.log(`Loci edge functions starting on port ${port}`);
+console.log(`Lociate edge functions starting on port ${port}`);
 
 serve({ fetch: app.fetch, port });
 

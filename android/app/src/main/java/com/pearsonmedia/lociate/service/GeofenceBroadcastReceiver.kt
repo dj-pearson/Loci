@@ -1,4 +1,4 @@
-package com.pearsonmedia.loci.service
+package com.pearsonmedia.lociate.service
 
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -8,9 +8,9 @@ import android.content.Intent
 import androidx.core.app.NotificationCompat
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofencingEvent
-import com.pearsonmedia.loci.LociApplication
-import com.pearsonmedia.loci.R
-import com.pearsonmedia.loci.ui.MainActivity
+import com.pearsonmedia.lociate.LociateApplication
+import com.pearsonmedia.lociate.R
+import com.pearsonmedia.lociate.ui.MainActivity
 import timber.log.Timber
 
 class GeofenceBroadcastReceiver : BroadcastReceiver() {
@@ -47,7 +47,7 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val notification = NotificationCompat.Builder(context, LociApplication.CHANNEL_GEOFENCE)
+        val notification = NotificationCompat.Builder(context, LociateApplication.CHANNEL_GEOFENCE)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle("You're near a saved locus")
             .setContentText("Tap to listen to your voice note")

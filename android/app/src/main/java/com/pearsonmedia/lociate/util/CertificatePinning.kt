@@ -1,4 +1,4 @@
-package com.pearsonmedia.loci.util
+package com.pearsonmedia.lociate.util
 
 import android.content.Context
 import java.io.InputStream

@@ -1,4 +1,4 @@
-package com.pearsonmedia.loci.ui.component
+package com.pearsonmedia.lociate.ui.component
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -13,21 +13,21 @@ import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
-import com.pearsonmedia.loci.domain.model.Locus
-import com.pearsonmedia.loci.domain.model.LocusCategory
+import com.pearsonmedia.lociate.domain.model.Locus
+import com.pearsonmedia.lociate.domain.model.LocusCategory
 
 /**
  * Premium styled map (US-167).
  *
  * Each marker is tinted with a category-specific hue using
- * [BitmapDescriptorFactory.defaultMarker] so Loci notes are visually
+ * [BitmapDescriptorFactory.defaultMarker] so Lociate notes are visually
  * distinguishable at a glance without shipping custom raster assets.
  *
  * POI clutter is suppressed and indoor mode is disabled to keep the map
  * focused on the user's saved loci.
  */
 @Composable
-fun LociMapView(
+fun LociateMapView(
     loci: List<Locus>,
     onLocusClick: (String) -> Unit,
     modifier: Modifier = Modifier,

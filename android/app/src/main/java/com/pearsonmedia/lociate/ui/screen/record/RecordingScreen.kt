@@ -1,4 +1,4 @@
-package com.pearsonmedia.loci.ui.screen.record
+package com.pearsonmedia.lociate.ui.screen.record
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -28,10 +28,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.pearsonmedia.loci.domain.model.LocusCategory
-import com.pearsonmedia.loci.ui.component.CategorySelector
-import com.pearsonmedia.loci.ui.component.AudioWaveform
-import com.pearsonmedia.loci.ui.component.HeroRecordButton
+import com.pearsonmedia.lociate.domain.model.LocusCategory
+import com.pearsonmedia.lociate.ui.component.CategorySelector
+import com.pearsonmedia.lociate.ui.component.AudioWaveform
+import com.pearsonmedia.lociate.ui.component.HeroRecordButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

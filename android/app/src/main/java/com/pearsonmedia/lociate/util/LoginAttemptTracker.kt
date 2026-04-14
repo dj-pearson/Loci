@@ -1,4 +1,4 @@
-package com.pearsonmedia.loci.util
+package com.pearsonmedia.lociate.util
 
 import timber.log.Timber
 import java.time.Instant

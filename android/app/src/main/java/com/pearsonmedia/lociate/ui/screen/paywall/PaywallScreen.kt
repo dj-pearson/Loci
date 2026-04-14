@@ -1,4 +1,4 @@
-package com.pearsonmedia.loci.ui.screen.paywall
+package com.pearsonmedia.lociate.ui.screen.paywall
 
 import android.app.Activity
 import androidx.compose.foundation.BorderStroke
@@ -9,8 +9,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.ui.draw.clip
-import com.pearsonmedia.loci.ui.theme.DesignTokens
-import com.pearsonmedia.loci.ui.theme.LociGradients
+import com.pearsonmedia.lociate.ui.theme.DesignTokens
+import com.pearsonmedia.lociate.ui.theme.LociateGradients
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -51,8 +51,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.pearsonmedia.loci.service.BillingService
-import com.pearsonmedia.loci.service.PurchaseResult
+import com.pearsonmedia.lociate.service.BillingService
+import com.pearsonmedia.lociate.service.PurchaseResult
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -110,7 +110,7 @@ fun PaywallScreen(
                 modifier = Modifier
                     .size(96.dp)
                     .clip(RoundedCornerShape(DesignTokens.Radius.LG))
-                    .background(LociGradients.Premium),
+                    .background(LociateGradients.Premium),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
@@ -122,7 +122,7 @@ fun PaywallScreen(
             }
             Spacer(Modifier.height(DesignTokens.Space.MD))
             Text(
-                "Unlock the Full Loci Experience",
+                "Unlock the Full Lociate Experience",
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center
@@ -167,7 +167,7 @@ fun PaywallScreen(
                     FeatureItem("Search", false),
                     FeatureItem("Family sharing", false)
                 ),
-                isCurrentPlan = currentTier == com.pearsonmedia.loci.domain.model.SubscriptionTier.FREE,
+                isCurrentPlan = currentTier == com.pearsonmedia.lociate.domain.model.SubscriptionTier.FREE,
                 onSelect = {}
             )
 
@@ -188,7 +188,7 @@ fun PaywallScreen(
                     FeatureItem("Search", true),
                     FeatureItem("Family sharing", false)
                 ),
-                isCurrentPlan = currentTier == com.pearsonmedia.loci.domain.model.SubscriptionTier.PREMIUM,
+                isCurrentPlan = currentTier == com.pearsonmedia.lociate.domain.model.SubscriptionTier.PREMIUM,
                 isRecommended = true,
                 onSelect = {
                     (context as? Activity)?.let { activity ->
@@ -214,7 +214,7 @@ fun PaywallScreen(
                     FeatureItem("Search", true),
                     FeatureItem("Family sharing (up to 6)", true)
                 ),
-                isCurrentPlan = currentTier == com.pearsonmedia.loci.domain.model.SubscriptionTier.FAMILY,
+                isCurrentPlan = currentTier == com.pearsonmedia.lociate.domain.model.SubscriptionTier.FAMILY,
                 onSelect = {
                     (context as? Activity)?.let { activity ->
                         viewModel.purchase(activity, familyId)

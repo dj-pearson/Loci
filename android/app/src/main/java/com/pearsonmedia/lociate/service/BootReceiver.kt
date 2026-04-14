@@ -1,4 +1,4 @@
-package com.pearsonmedia.loci.service
+package com.pearsonmedia.lociate.service
 
 import android.content.BroadcastReceiver
 import android.content.Context

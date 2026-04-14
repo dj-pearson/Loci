@@ -1,7 +1,7 @@
-package com.pearsonmedia.loci
+package com.pearsonmedia.lociate
 
 import com.google.common.truth.Truth.assertThat
-import com.pearsonmedia.loci.domain.model.LocusCategory
+import com.pearsonmedia.lociate.domain.model.LocusCategory
 import org.junit.Test
 
 class LocusCategoryTest {

@@ -1,7 +1,7 @@
-package com.pearsonmedia.loci.data.remote.dto
+package com.pearsonmedia.lociate.data.remote.dto
 
-import com.pearsonmedia.loci.data.local.entity.LocusEntity
-import com.pearsonmedia.loci.domain.model.Locus
+import com.pearsonmedia.lociate.data.local.entity.LocusEntity
+import com.pearsonmedia.lociate.domain.model.Locus
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

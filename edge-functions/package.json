@@ -1,7 +1,7 @@
 {
   "name": "loci-edge-functions",
   "version": "1.0.0",
-  "description": "Loci edge functions — Node.js + Hono sidecar",
+  "description": "Lociate edge functions — Node.js + Hono sidecar",
   "type": "module",
   "engines": {
     "node": ">=20.0.0"

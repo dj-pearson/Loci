@@ -1,4 +1,4 @@
-package com.pearsonmedia.loci.ui.screen.map
+package com.pearsonmedia.lociate.ui.screen.map
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,10 +21,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.pearsonmedia.loci.domain.model.LocusCategory
-import com.pearsonmedia.loci.ui.component.CategoryFilterChips
-import com.pearsonmedia.loci.ui.component.EmptyStateView
-import com.pearsonmedia.loci.ui.component.LociMapView
+import com.pearsonmedia.lociate.domain.model.LocusCategory
+import com.pearsonmedia.lociate.ui.component.CategoryFilterChips
+import com.pearsonmedia.lociate.ui.component.EmptyStateView
+import com.pearsonmedia.lociate.ui.component.LociateMapView
 
 @Composable
 fun MapScreen(
@@ -52,7 +52,7 @@ fun MapScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                LociMapView(
+                LociateMapView(
                     loci = loci,
                     onLocusClick = onLocusClick,
                     modifier = Modifier.weight(1f)

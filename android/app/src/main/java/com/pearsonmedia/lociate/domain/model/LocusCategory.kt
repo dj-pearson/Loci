@@ -1,4 +1,4 @@
-package com.pearsonmedia.loci.domain.model
+package com.pearsonmedia.lociate.domain.model
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Dining

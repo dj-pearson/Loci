@@ -1,4 +1,4 @@
-package com.pearsonmedia.loci.ui.screen.auth
+package com.pearsonmedia.lociate.ui.screen.auth
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -58,7 +58,7 @@ fun SignInScreen(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "Welcome to Loci",
+            text = "Welcome to Lociate",
             style = MaterialTheme.typography.headlineLarge
         )
 

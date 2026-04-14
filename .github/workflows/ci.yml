@@ -25,7 +25,7 @@ jobs:
         run: brew install swiftlint
 
       - name: Run SwiftLint
-        run: swiftlint --config Loci/.swiftlint.yml --strict
+        run: swiftlint --config Lociate/.swiftlint.yml --strict
 
   build:
     name: Build (iOS Simulator)
@@ -50,14 +50,14 @@ jobs:
 
       - name: Resolve Package Dependencies
         run: |
-          xcodebuild -project Loci/Loci.xcodeproj \
-            -scheme Loci \
+          xcodebuild -project Lociate/Lociate.xcodeproj \
+            -scheme Lociate \
             -resolvePackageDependencies
 
       - name: Build for Simulator
         run: |
-          xcodebuild -project Loci/Loci.xcodeproj \
-            -scheme Loci \
+          xcodebuild -project Lociate/Lociate.xcodeproj \
+            -scheme Lociate \
             -sdk iphonesimulator \
             -destination 'platform=iOS Simulator,name=iPhone 15' \
             -configuration Debug \
@@ -87,14 +87,14 @@ jobs:
 
       - name: Resolve Package Dependencies
         run: |
-          xcodebuild -project Loci/Loci.xcodeproj \
-            -scheme Loci \
+          xcodebuild -project Lociate/Lociate.xcodeproj \
+            -scheme Lociate \
             -resolvePackageDependencies
 
       - name: Run Unit Tests
         run: |
-          xcodebuild -project Loci/Loci.xcodeproj \
-            -scheme Loci \
+          xcodebuild -project Lociate/Lociate.xcodeproj \
+            -scheme Lociate \
             -sdk iphonesimulator \
             -destination 'platform=iOS Simulator,name=iPhone 15' \
             -configuration Debug \

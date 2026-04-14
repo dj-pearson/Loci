@@ -1,7 +1,7 @@
-package com.pearsonmedia.loci.domain.repository
+package com.pearsonmedia.lociate.domain.repository
 
-import com.pearsonmedia.loci.domain.model.Locus
-import com.pearsonmedia.loci.domain.model.LocusCategory
+import com.pearsonmedia.lociate.domain.model.Locus
+import com.pearsonmedia.lociate.domain.model.LocusCategory
 import kotlinx.coroutines.flow.Flow
 
 interface LocusRepository {

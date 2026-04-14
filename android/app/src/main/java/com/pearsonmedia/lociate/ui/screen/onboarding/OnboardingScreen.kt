@@ -1,4 +1,4 @@
-package com.pearsonmedia.loci.ui.screen.onboarding
+package com.pearsonmedia.lociate.ui.screen.onboarding
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -33,8 +33,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.pearsonmedia.loci.ui.theme.DesignTokens
-import com.pearsonmedia.loci.ui.theme.LociGradients
+import com.pearsonmedia.lociate.ui.theme.DesignTokens
+import com.pearsonmedia.lociate.ui.theme.LociateGradients
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
@@ -151,13 +151,13 @@ private fun OnboardingPageContent(page: OnboardingPage) {
                 modifier = Modifier
                     .size(280.dp)
                     .clip(CircleShape)
-                    .background(LociGradients.PrimaryHalo)
+                    .background(LociateGradients.PrimaryHalo)
             )
             Box(
                 modifier = Modifier
                     .size(140.dp)
                     .clip(RoundedCornerShape(DesignTokens.Radius.XL))
-                    .background(LociGradients.Primary),
+                    .background(LociateGradients.Primary),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(

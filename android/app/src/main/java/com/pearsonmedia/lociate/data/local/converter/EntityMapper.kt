@@ -1,17 +1,17 @@
-package com.pearsonmedia.loci.data.local.converter
+package com.pearsonmedia.lociate.data.local.converter
 
-import com.pearsonmedia.loci.data.local.entity.HouseholdEntity
-import com.pearsonmedia.loci.data.local.entity.HouseholdMemberEntity
-import com.pearsonmedia.loci.data.local.entity.LocusEntity
-import com.pearsonmedia.loci.data.local.entity.UserProfileEntity
-import com.pearsonmedia.loci.domain.model.Household
-import com.pearsonmedia.loci.domain.model.HouseholdMember
-import com.pearsonmedia.loci.domain.model.Locus
-import com.pearsonmedia.loci.domain.model.LocusCategory
-import com.pearsonmedia.loci.domain.model.MemberRole
-import com.pearsonmedia.loci.domain.model.SubscriptionTier
-import com.pearsonmedia.loci.domain.model.SyncStatus
-import com.pearsonmedia.loci.domain.model.UserProfile
+import com.pearsonmedia.lociate.data.local.entity.HouseholdEntity
+import com.pearsonmedia.lociate.data.local.entity.HouseholdMemberEntity
+import com.pearsonmedia.lociate.data.local.entity.LocusEntity
+import com.pearsonmedia.lociate.data.local.entity.UserProfileEntity
+import com.pearsonmedia.lociate.domain.model.Household
+import com.pearsonmedia.lociate.domain.model.HouseholdMember
+import com.pearsonmedia.lociate.domain.model.Locus
+import com.pearsonmedia.lociate.domain.model.LocusCategory
+import com.pearsonmedia.lociate.domain.model.MemberRole
+import com.pearsonmedia.lociate.domain.model.SubscriptionTier
+import com.pearsonmedia.lociate.domain.model.SyncStatus
+import com.pearsonmedia.lociate.domain.model.UserProfile
 import java.time.Instant
 import java.util.UUID
 

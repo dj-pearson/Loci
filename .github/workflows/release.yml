@@ -63,12 +63,12 @@ jobs:
           MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
           FASTLANE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
-          cd Loci
+          cd Lociate
           fastlane match appstore --readonly
 
       - name: Set Version & Build Number
         run: |
-          cd Loci
+          cd Lociate
           agvtool new-marketing-version ${{ inputs.version }}
           agvtool new-version -all ${{ github.run_number }}
 
@@ -79,7 +79,7 @@ jobs:
           APP_STORE_CONNECT_API_KEY_KEY: ${{ secrets.ASC_API_KEY }}
           FASTLANE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
-          cd Loci
+          cd Lociate
           fastlane app_store_release version:"${{ inputs.version }}" whats_new:"${{ inputs.whats_new }}"
 
       - name: Create GitHub Release
@@ -99,7 +99,7 @@ jobs:
           if [ -n "$SLACK_WEBHOOK_URL" ]; then
             curl -s -X POST "$SLACK_WEBHOOK_URL" \
               -H 'Content-Type: application/json' \
-              -d "{\"text\":\"Loci v${{ inputs.version }} submitted to App Store review.\"}"
+              -d "{\"text\":\"Lociate v${{ inputs.version }} submitted to App Store review.\"}"
           fi
 
       - name: Notify on Failure
@@ -110,5 +110,5 @@ jobs:
           if [ -n "$SLACK_WEBHOOK_URL" ]; then
             curl -s -X POST "$SLACK_WEBHOOK_URL" \
               -H 'Content-Type: application/json' \
-              -d "{\"text\":\"Loci v${{ inputs.version }} App Store release FAILED. Check: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}"
+              -d "{\"text\":\"Lociate v${{ inputs.version }} App Store release FAILED. Check: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}"
           fi

@@ -1,9 +1,9 @@
-package com.pearsonmedia.loci.data.remote.api
+package com.pearsonmedia.lociate.data.remote.api
 
-import com.pearsonmedia.loci.data.remote.SupabaseClientProvider
-import com.pearsonmedia.loci.util.InputSanitizer
-import com.pearsonmedia.loci.util.LoginAttemptTracker
-import com.pearsonmedia.loci.util.SecurePreferences
+import com.pearsonmedia.lociate.data.remote.SupabaseClientProvider
+import com.pearsonmedia.lociate.util.InputSanitizer
+import com.pearsonmedia.lociate.util.LoginAttemptTracker
+import com.pearsonmedia.lociate.util.SecurePreferences
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.builtin.Email
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -134,7 +134,7 @@ class AuthRepository @Inject constructor(
 
             // Check session expiry
             val lastActivity = securePreferences.getLong(SecurePreferences.KEY_LAST_ACTIVITY, 0)
-            val expiryMs = com.pearsonmedia.loci.util.AppConstants.SESSION_EXPIRY_DAYS * 24 * 60 * 60 * 1000L
+            val expiryMs = com.pearsonmedia.lociate.util.AppConstants.SESSION_EXPIRY_DAYS * 24 * 60 * 60 * 1000L
             if (System.currentTimeMillis() - lastActivity > expiryMs) {
                 signOut()
                 return false

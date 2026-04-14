@@ -1,4 +1,4 @@
-# Loci Android -- Architecture Document
+# Lociate Android -- Architecture Document
 
 ## 1. Architecture Decision: Native Kotlin/Jetpack Compose
 
@@ -6,7 +6,7 @@
 
 **Rationale**:
 
-- **Platform-specific APIs dominate the codebase.** Loci's core functionality relies heavily on APIs that have no cross-platform abstraction: `FusedLocationProviderClient` and `GeofencingClient` for location/geofencing, `MediaRecorder` for audio capture, `SpeechRecognizer` for on-device transcription, and `WorkManager` for Doze-compatible background sync. A KMP shared module would need `expect`/`actual` declarations for nearly every service, negating the code-sharing benefit.
+- **Platform-specific APIs dominate the codebase.** Lociate's core functionality relies heavily on APIs that have no cross-platform abstraction: `FusedLocationProviderClient` and `GeofencingClient` for location/geofencing, `MediaRecorder` for audio capture, `SpeechRecognizer` for on-device transcription, and `WorkManager` for Doze-compatible background sync. A KMP shared module would need `expect`/`actual` declarations for nearly every service, negating the code-sharing benefit.
 
 - **No shared UI benefit.** iOS uses SwiftUI and Android uses Jetpack Compose. These are fundamentally different UI toolkits. KMP does not share UI code between them (Compose Multiplatform for iOS is experimental and not production-ready for this use case). The UI layer -- which constitutes the majority of app code -- would remain platform-specific regardless.
 
@@ -79,7 +79,7 @@ Android enforces strict background execution limits starting with Android 8.0 (O
 
 ### Notification Channels
 
-Android 8.0+ requires notification channels. Loci defines three:
+Android 8.0+ requires notification channels. Lociate defines three:
 
 1. **Geofence** (`geofence_channel`): Proximity alerts when entering a locus radius. High importance.
 2. **Sync** (`sync_channel`): Background sync status updates. Low importance.
@@ -149,11 +149,11 @@ android/
 ├── gradle.properties               # Gradle and Android properties
 ├── gradle/                         # Gradle wrapper
 └── app/
-    └── src/main/java/com/pearsonmedia/loci/
-        ├── LociApplication.kt      # @HiltAndroidApp entry point
+    └── src/main/java/com/pearsonmedia/lociate/
+        ├── LociateApplication.kt   # @HiltAndroidApp entry point
         ├── data/
         │   ├── local/
-        │   │   ├── LociDatabase.kt         # Room database definition
+        │   │   ├── LociateDatabase.kt      # Room database definition
         │   │   ├── dao/                     # LocusDao, HouseholdDao
         │   │   ├── entity/                  # LocusEntity, HouseholdEntity
         │   │   └── converter/               # EntityMapper (domain <-> entity)
@@ -185,7 +185,7 @@ android/
         ├── ui/
         │   ├── MainActivity.kt             # Edge-to-edge, Hilt
         │   ├── theme/                      # Material 3, Dynamic Color
-        │   ├── navigation/                 # LociNavHost, routes
+        │   ├── navigation/                 # LociateNavHost, routes
         │   ├── screen/
         │   │   ├── map/                    # MapScreen, MapViewModel
         │   │   ├── record/                 # RecordingScreen, RecordingViewModel
@@ -201,7 +201,7 @@ android/
         │       ├── CategorySelector.kt     # FlowRow grid
         │       ├── EmptyStateView.kt       # Empty state placeholder
         │       ├── ErrorBanner.kt          # Animated error display
-        │       ├── LociMapView.kt          # Google Maps Compose
+        │       ├── LociateMapView.kt       # Google Maps Compose
         │       └── SkeletonView.kt         # Shimmer loading states
         └── util/
             ├── AppConstants.kt             # Tier limits, geofence config

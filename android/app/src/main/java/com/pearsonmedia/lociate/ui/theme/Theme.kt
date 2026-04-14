@@ -1,4 +1,4 @@
-package com.pearsonmedia.loci.ui.theme
+package com.pearsonmedia.lociate.ui.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -11,44 +11,44 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
-// Loci Brand Colors
-val LociBlue = Color(0xFF4A90D9)
-val LociBlueLight = Color(0xFF7BB3E8)
-val LociBlueDark = Color(0xFF2D6CB5)
-val LociOrange = Color(0xFFFF8A50)
-val LociGreen = Color(0xFF66BB6A)
-val LociRed = Color(0xFFEF5350)
-val LociSurface = Color(0xFFFAFAFA)
-val LociSurfaceDark = Color(0xFF1C1C1E)
-val LociBackground = Color(0xFFFFFFFF)
-val LociBackgroundDark = Color(0xFF000000)
+// Lociate Brand Colors
+val LociateBlue = Color(0xFF4A90D9)
+val LociateBlueLight = Color(0xFF7BB3E8)
+val LociateBlueDark = Color(0xFF2D6CB5)
+val LociateOrange = Color(0xFFFF8A50)
+val LociateGreen = Color(0xFF66BB6A)
+val LociateRed = Color(0xFFEF5350)
+val LociateSurface = Color(0xFFFAFAFA)
+val LociateSurfaceDark = Color(0xFF1C1C1E)
+val LociateBackground = Color(0xFFFFFFFF)
+val LociateBackgroundDark = Color(0xFF000000)
 
 private val LightColorScheme = lightColorScheme(
-    primary = LociBlue,
+    primary = LociateBlue,
     onPrimary = Color.White,
-    primaryContainer = LociBlueLight,
-    onPrimaryContainer = LociBlueDark,
-    secondary = LociOrange,
+    primaryContainer = LociateBlueLight,
+    onPrimaryContainer = LociateBlueDark,
+    secondary = LociateOrange,
     onSecondary = Color.White,
-    tertiary = LociGreen,
-    background = LociBackground,
-    surface = LociSurface,
-    error = LociRed,
+    tertiary = LociateGreen,
+    background = LociateBackground,
+    surface = LociateSurface,
+    error = LociateRed,
     onBackground = Color(0xFF1C1C1E),
     onSurface = Color(0xFF1C1C1E),
     outline = Color(0xFFD1D1D6)
 )
 
 private val DarkColorScheme = darkColorScheme(
-    primary = LociBlueLight,
+    primary = LociateBlueLight,
     onPrimary = Color(0xFF003258),
-    primaryContainer = LociBlueDark,
+    primaryContainer = LociateBlueDark,
     onPrimaryContainer = Color(0xFFD1E4FF),
-    secondary = LociOrange,
+    secondary = LociateOrange,
     onSecondary = Color(0xFF4E2600),
-    tertiary = LociGreen,
-    background = LociBackgroundDark,
-    surface = LociSurfaceDark,
+    tertiary = LociateGreen,
+    background = LociateBackgroundDark,
+    surface = LociateSurfaceDark,
     error = Color(0xFFFFB4AB),
     onBackground = Color(0xFFE6E1E5),
     onSurface = Color(0xFFE6E1E5),
@@ -56,7 +56,7 @@ private val DarkColorScheme = darkColorScheme(
 )
 
 @Composable
-fun LociTheme(
+fun LociateTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
@@ -72,7 +72,7 @@ fun LociTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = LociTypography,
+        typography = LociateTypography,
         content = content
     )
 }

@@ -1,7 +1,7 @@
-package com.pearsonmedia.loci.di
+package com.pearsonmedia.lociate.di
 
-import com.pearsonmedia.loci.data.repository.LocusRepositoryImpl
-import com.pearsonmedia.loci.domain.repository.LocusRepository
+import com.pearsonmedia.lociate.data.repository.LocusRepositoryImpl
+import com.pearsonmedia.lociate.domain.repository.LocusRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

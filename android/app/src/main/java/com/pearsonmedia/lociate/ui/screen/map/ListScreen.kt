@@ -1,4 +1,4 @@
-package com.pearsonmedia.loci.ui.screen.map
+package com.pearsonmedia.lociate.ui.screen.map
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -46,11 +46,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.ui.draw.clip
-import com.pearsonmedia.loci.domain.model.Locus
-import com.pearsonmedia.loci.ui.component.EmptyStateView
-import com.pearsonmedia.loci.ui.theme.DesignTokens
-import com.pearsonmedia.loci.ui.theme.LociGradients
-import com.pearsonmedia.loci.ui.theme.premiumCard
+import com.pearsonmedia.lociate.domain.model.Locus
+import com.pearsonmedia.lociate.ui.component.EmptyStateView
+import com.pearsonmedia.lociate.ui.theme.DesignTokens
+import com.pearsonmedia.lociate.ui.theme.LociateGradients
+import com.pearsonmedia.lociate.ui.theme.premiumCard
 import kotlinx.coroutines.launch
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -123,7 +123,7 @@ fun ListScreen(
                         backgroundContent = {
                             val revealed = dismissState.targetValue ==
                                 SwipeToDismissBoxValue.EndToStart
-                            val premiumBrush = LociGradients.Premium
+                            val premiumBrush = LociateGradients.Premium
                             Box(
                                 modifier = Modifier
                                     .fillMaxSize()

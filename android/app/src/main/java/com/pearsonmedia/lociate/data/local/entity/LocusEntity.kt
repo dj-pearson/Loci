@@ -1,4 +1,4 @@
-package com.pearsonmedia.loci.data.local.entity
+package com.pearsonmedia.lociate.data.local.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

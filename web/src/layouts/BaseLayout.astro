@@ -6,7 +6,7 @@ interface Props {
   noindex?: boolean;
 }
 
-const { title, description = 'Loci — Your Spatial Memory. Pin voice notes to places and rediscover them when you return.', jsonLd, noindex = false } = Astro.props;
+const { title, description = 'Lociate — Your Spatial Memory. Pin voice notes to places and rediscover them when you return.', jsonLd, noindex = false } = Astro.props;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 ---
 
@@ -39,8 +39,8 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     <meta property="og:image" content={new URL('/og-image.png', Astro.site)} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="Loci — Voice notes pinned to places" />
-    <meta property="og:site_name" content="Loci" />
+    <meta property="og:image:alt" content="Lociate — Voice notes pinned to places" />
+    <meta property="og:site_name" content="Lociate" />
     <meta property="og:locale" content="en_US" />
 
     <!-- Twitter Card -->
@@ -68,7 +68,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
             <circle cx="14" cy="14" r="14" fill="currentColor" />
             <path d="M14 7C14 7 9 12 9 16C9 18.761 11.239 21 14 21C16.761 21 19 18.761 19 16C19 12 14 7 14 7Z" fill="white" />
           </svg>
-          Loci
+          Lociate
         </a>
         <div class="flex items-center gap-6">
           <a href="/#features" class="text-sm font-medium text-gray-600 hover:text-brand-600 transition-colors">Features</a>
@@ -92,7 +92,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
-            <span class="font-bold text-lg text-brand-600">Loci</span>
+            <span class="font-bold text-lg text-brand-600">Lociate</span>
             <p class="mt-2 text-sm text-gray-500">Your Spatial Memory. Pin voice notes to places.</p>
           </div>
           <div>

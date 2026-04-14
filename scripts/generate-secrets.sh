@@ -14,7 +14,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-OUTPUT_FILE="$SCRIPT_DIR/../Loci/Configuration/BuildSecrets.swift"
+OUTPUT_FILE="$SCRIPT_DIR/../Lociate/Configuration/BuildSecrets.swift"
 
 # ---------------------------------------------------------------------------
 # Validate required environment variables

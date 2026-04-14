@@ -1,4 +1,4 @@
-package com.pearsonmedia.loci.domain.model
+package com.pearsonmedia.lociate.domain.model
 
 import java.time.Instant
 import java.util.UUID

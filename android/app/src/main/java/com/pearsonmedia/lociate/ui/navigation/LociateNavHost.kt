@@ -1,4 +1,4 @@
-package com.pearsonmedia.loci.ui.navigation
+package com.pearsonmedia.lociate.ui.navigation
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -23,18 +23,18 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.pearsonmedia.loci.ui.screen.auth.SignInScreen
-import com.pearsonmedia.loci.ui.screen.detail.LocusDetailScreen
-import com.pearsonmedia.loci.ui.screen.household.CreateHouseholdScreen
-import com.pearsonmedia.loci.ui.screen.household.HouseholdMembersScreen
-import com.pearsonmedia.loci.ui.screen.household.JoinHouseholdScreen
-import com.pearsonmedia.loci.ui.screen.map.MapScreen
-import com.pearsonmedia.loci.ui.screen.map.ListScreen
-import com.pearsonmedia.loci.ui.screen.onboarding.OnboardingScreen
-import com.pearsonmedia.loci.ui.screen.paywall.PaywallScreen
-import com.pearsonmedia.loci.ui.screen.record.RecordingScreen
-import com.pearsonmedia.loci.ui.screen.search.SearchScreen
-import com.pearsonmedia.loci.ui.screen.settings.SettingsScreen
+import com.pearsonmedia.lociate.ui.screen.auth.SignInScreen
+import com.pearsonmedia.lociate.ui.screen.detail.LocusDetailScreen
+import com.pearsonmedia.lociate.ui.screen.household.CreateHouseholdScreen
+import com.pearsonmedia.lociate.ui.screen.household.HouseholdMembersScreen
+import com.pearsonmedia.lociate.ui.screen.household.JoinHouseholdScreen
+import com.pearsonmedia.lociate.ui.screen.map.MapScreen
+import com.pearsonmedia.lociate.ui.screen.map.ListScreen
+import com.pearsonmedia.lociate.ui.screen.onboarding.OnboardingScreen
+import com.pearsonmedia.lociate.ui.screen.paywall.PaywallScreen
+import com.pearsonmedia.lociate.ui.screen.record.RecordingScreen
+import com.pearsonmedia.lociate.ui.screen.search.SearchScreen
+import com.pearsonmedia.lociate.ui.screen.settings.SettingsScreen
 
 sealed class Screen(val route: String) {
     data object Onboarding : Screen("onboarding")
@@ -66,7 +66,7 @@ val bottomNavItems = listOf(
 )
 
 @Composable
-fun LociNavHost(
+fun LociateNavHost(
     navController: NavHostController = rememberNavController()
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()

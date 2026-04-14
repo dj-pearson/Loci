@@ -59,7 +59,7 @@ jobs:
           APP_STORE_CONNECT_API_KEY_KEY: ${{ secrets.ASC_API_KEY }}
           CI_BUILD_NUMBER: ${{ github.run_number }}
         run: |
-          cd Loci
+          cd Lociate
           fastlane beta
 
       - name: Notify on Success
@@ -70,7 +70,7 @@ jobs:
           if [ -n "$SLACK_WEBHOOK_URL" ]; then
             curl -s -X POST "$SLACK_WEBHOOK_URL" \
               -H 'Content-Type: application/json' \
-              -d "{\"text\":\"Loci beta build #${{ github.run_number }} (${{ github.ref_name }}) uploaded to TestFlight.\"}"
+              -d "{\"text\":\"Lociate beta build #${{ github.run_number }} (${{ github.ref_name }}) uploaded to TestFlight.\"}"
           fi
 
       - name: Notify on Failure
@@ -81,5 +81,5 @@ jobs:
           if [ -n "$SLACK_WEBHOOK_URL" ]; then
             curl -s -X POST "$SLACK_WEBHOOK_URL" \
               -H 'Content-Type: application/json' \
-              -d "{\"text\":\"Loci beta build #${{ github.run_number }} (${{ github.ref_name }}) FAILED. Check: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}"
+              -d "{\"text\":\"Lociate beta build #${{ github.run_number }} (${{ github.ref_name }}) FAILED. Check: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}"
           fi

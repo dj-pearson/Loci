@@ -1,4 +1,4 @@
-# Loci — Your Spatial Memory
+# Lociate — Your Spatial Memory
 
 Voice-first iOS app that pins voice notes to GPS coordinates. When you return to a location, your notes find you via proximity-triggered push notifications. Family members share notes through invite-only household groups.
 
@@ -22,14 +22,14 @@ Voice-first iOS app that pins voice notes to GPS coordinates. When you return to
 ## Project Structure
 
 ```
-Loci/
+Lociate/
 ├── CLAUDE.md                 # Project context for Claude Code
 ├── prd.json                  # Ralph user stories (120 stories, 21 phases)
 ├── progress.txt              # Ralph progress tracker
 ├── ralph-prompt.md           # Prompt fed to each Ralph iteration
 ├── ralph.ps1                 # Ralph loop script (PowerShell/Windows)
 ├── ralph.sh                  # Ralph loop script (Bash/macOS/Linux)
-├── Loci/                     # Xcode project
+├── Lociate/                  # Xcode project
 │   ├── Models/               # SwiftData @Model classes
 │   ├── ViewModels/           # @Observable view models
 │   ├── Views/                # SwiftUI views (MapView, Record, Detail, etc.)

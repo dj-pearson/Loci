@@ -1,4 +1,4 @@
-package com.pearsonmedia.loci.ui.component
+package com.pearsonmedia.lociate.ui.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -22,8 +22,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.pearsonmedia.loci.ui.theme.DesignTokens
-import com.pearsonmedia.loci.ui.theme.LociGradients
+import com.pearsonmedia.lociate.ui.theme.DesignTokens
+import com.pearsonmedia.lociate.ui.theme.LociateGradients
 
 /**
  * Premium empty state (US-171).
@@ -52,13 +52,13 @@ fun EmptyStateView(
                 modifier = Modifier
                     .size(220.dp)
                     .clip(CircleShape)
-                    .background(LociGradients.PrimaryHalo)
+                    .background(LociateGradients.PrimaryHalo)
             )
             Box(
                 modifier = Modifier
                     .size(96.dp)
                     .clip(CircleShape)
-                    .background(LociGradients.Primary),
+                    .background(LociateGradients.Primary),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(

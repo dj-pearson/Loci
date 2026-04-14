@@ -1,5 +1,5 @@
-# Loci - Ralph Progress Tracker
-## Project: Loci — Your Spatial Memory
+# Lociate - Ralph Progress Tracker
+## Project: Lociate — Your Spatial Memory
 ## Branch: ralph/loci-mvp
 ## Started: 2026-03-25
 ## Status: IN PROGRESS
@@ -11,7 +11,9 @@
 ## Important Context for Ralph Iterations
 
 ### Project Overview
-Loci is a voice-first iOS app (SwiftUI, iOS 17+) that pins voice notes to GPS coordinates with proximity-triggered push notifications and family sharing. Backend is self-hosted Supabase with PostGIS on Contabo/Coolify. Marketing site on Cloudflare Pages (Astro).
+Lociate is a voice-first iOS app (SwiftUI, iOS 17+) that pins voice notes to GPS coordinates with proximity-triggered push notifications and family sharing. Backend is self-hosted Supabase with PostGIS on Contabo/Coolify. Marketing site on Cloudflare Pages (Astro).
+
+Note: "loci" (lowercase, plural) remains the internal domain term for saved pins (singular: "locus") — the `Locus` SwiftData model, `loci` variables, and references to "loci" in acceptance criteria are intentionally preserved. Only the product brand changed from "Loci" → "Lociate".
 
 ### Tech Stack
 - **iOS**: Swift 5.9+, SwiftUI, SwiftData, CoreLocation (CLMonitor), AVFoundation, Apple Speech, MapKit, WidgetKit, RevenueCat, supabase-swift, TelemetryDeck
@@ -311,7 +313,7 @@ Loci is a voice-first iOS app (SwiftUI, iOS 17+) that pins voice notes to GPS co
 
 ## Notes for Ralph Iterations
 
-1. **iOS Build**: Use `xcodebuild -scheme Loci -sdk iphonesimulator` for build verification.
+1. **iOS Build**: Use `xcodebuild -scheme Lociate -sdk iphonesimulator` for build verification.
 2. **SwiftData requires iOS 17+**: All @Model classes use SwiftData, not Core Data.
 3. **CLMonitor is iOS 17+**: Do not use legacy CLLocationManager region monitoring.
 4. **@Observable not ObservableObject**: Use the Observation framework, not Combine.

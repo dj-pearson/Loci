@@ -1,4 +1,4 @@
-package com.pearsonmedia.loci.util
+package com.pearsonmedia.lociate.util
 
 import android.content.Intent
 import android.net.Uri
@@ -15,7 +15,7 @@ object DeepLinkValidator {
 
     /**
      * Validates and extracts a locus ID from a deep-link intent.
-     * Returns null if the intent is not a valid Loci deep-link.
+     * Returns null if the intent is not a valid Lociate deep-link.
      */
     fun extractLocusId(intent: Intent?): String? {
         if (intent == null) return null

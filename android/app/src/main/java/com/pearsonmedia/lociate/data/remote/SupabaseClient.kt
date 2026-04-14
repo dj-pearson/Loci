@@ -1,6 +1,6 @@
-package com.pearsonmedia.loci.data.remote
+package com.pearsonmedia.lociate.data.remote
 
-import com.pearsonmedia.loci.BuildConfig
+import com.pearsonmedia.lociate.BuildConfig
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.createSupabaseClient
@@ -10,7 +10,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Supabase client singleton configured for the Loci backend.
+ * Supabase client singleton configured for the Lociate backend.
  * Shares the same PostgreSQL/PostGIS backend as the iOS app.
  */
 @Singleton

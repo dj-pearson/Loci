@@ -1,12 +1,12 @@
-package com.pearsonmedia.loci.data.local.dao
+package com.pearsonmedia.lociate.data.local.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.pearsonmedia.loci.data.local.entity.HouseholdEntity
-import com.pearsonmedia.loci.data.local.entity.HouseholdMemberEntity
-import com.pearsonmedia.loci.data.local.entity.UserProfileEntity
+import com.pearsonmedia.lociate.data.local.entity.HouseholdEntity
+import com.pearsonmedia.lociate.data.local.entity.HouseholdMemberEntity
+import com.pearsonmedia.lociate.data.local.entity.UserProfileEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao

@@ -1,7 +1,9 @@
-# Loci — Your Spatial Memory
+# Lociate — Your Spatial Memory
 
 ## What Is This?
-Loci is a voice-first iOS app that pins voice notes to GPS coordinates. When users return to a location, their notes find them via proximity-triggered push notifications. Family members share notes through invite-only household groups.
+Lociate is a voice-first iOS app that pins voice notes to GPS coordinates. When users return to a location, their notes find them via proximity-triggered push notifications. Family members share notes through invite-only household groups.
+
+The app's internal domain language still uses "locus" (singular) and "loci" (plural) as the nouns for a saved pin — do not rename `Locus`/`loci` in code, variables, or acceptance criteria. Only the product name is "Lociate".
 
 ## Tech Stack
 
@@ -40,14 +42,14 @@ Loci is a voice-first iOS app that pins voice notes to GPS coordinates. When use
 ## Project Structure
 
 ```
-Loci/
+Lociate/
 ├── CLAUDE.md                    # This file
 ├── prd.json                     # Ralph user stories (source of truth)
 ├── progress.txt                 # Ralph progress tracking
 ├── ralph-prompt.md              # Prompt fed to each Ralph iteration
 ├── ralph.sh                     # Ralph loop orchestrator
-├── Loci/                        # Xcode project
-│   ├── LociApp.swift            # @main entry point
+├── Lociate/                     # Xcode project
+│   ├── LociateApp.swift         # @main entry point
 │   ├── Models/                  # SwiftData @Model classes
 │   ├── ViewModels/              # @Observable view models
 │   ├── Views/
@@ -111,13 +113,13 @@ Loci/
 
 ```bash
 # iOS build (simulator)
-xcodebuild -project Loci/Loci.xcodeproj -scheme Loci \
+xcodebuild -project Lociate/Lociate.xcodeproj -scheme Lociate \
   -sdk iphonesimulator \
   -destination 'platform=iOS Simulator,name=iPhone 15' \
   build 2>&1 | tail -5
 
 # Swift lint
-swiftlint --config Loci/.swiftlint.yml
+swiftlint --config Lociate/.swiftlint.yml
 
 # Edge functions
 cd edge-functions && npm run build && npm test

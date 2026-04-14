@@ -1,11 +1,11 @@
-package com.pearsonmedia.loci.data.remote.api
+package com.pearsonmedia.lociate.data.remote.api
 
-import com.pearsonmedia.loci.data.local.converter.toDomain
-import com.pearsonmedia.loci.data.local.converter.toEntity
-import com.pearsonmedia.loci.data.local.dao.LocusDao
-import com.pearsonmedia.loci.data.remote.SupabaseClientProvider
-import com.pearsonmedia.loci.data.remote.dto.LocusDto
-import com.pearsonmedia.loci.domain.model.SyncStatus
+import com.pearsonmedia.lociate.data.local.converter.toDomain
+import com.pearsonmedia.lociate.data.local.converter.toEntity
+import com.pearsonmedia.lociate.data.local.dao.LocusDao
+import com.pearsonmedia.lociate.data.remote.SupabaseClientProvider
+import com.pearsonmedia.lociate.data.remote.dto.LocusDto
+import com.pearsonmedia.lociate.domain.model.SyncStatus
 import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.storage.storage
 import kotlinx.coroutines.Dispatchers

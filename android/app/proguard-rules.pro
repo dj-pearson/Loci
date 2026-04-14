@@ -1,10 +1,10 @@
-# Loci ProGuard Rules
+# Lociate ProGuard Rules
 
 # Keep Supabase models
--keep class com.pearsonmedia.loci.data.remote.dto.** { *; }
+-keep class com.pearsonmedia.lociate.data.remote.dto.** { *; }
 
 # Keep Room entities
--keep class com.pearsonmedia.loci.data.local.entity.** { *; }
+-keep class com.pearsonmedia.lociate.data.local.entity.** { *; }
 
 # Ktor
 -keep class io.ktor.** { *; }
@@ -19,10 +19,10 @@
 -keepclasseswithmembers class kotlinx.serialization.json.** {
     kotlinx.serialization.KSerializer serializer(...);
 }
--keep,includedescriptorclasses class com.pearsonmedia.loci.**$$serializer { *; }
--keepclassmembers class com.pearsonmedia.loci.** {
+-keep,includedescriptorclasses class com.pearsonmedia.lociate.**$$serializer { *; }
+-keepclassmembers class com.pearsonmedia.lociate.** {
     *** Companion;
 }
--keepclasseswithmembers class com.pearsonmedia.loci.** {
+-keepclasseswithmembers class com.pearsonmedia.lociate.** {
     kotlinx.serialization.KSerializer serializer(...);
 }
