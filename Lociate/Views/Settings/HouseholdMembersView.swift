@@ -149,8 +149,8 @@ struct HouseholdMembersView: View {
                         Spacer()
 
                         ShareLink(
-                            item: String(localized: "Join my family on Loci! Use invite code: \(code)"),
-                            subject: Text(String(localized: "Join my family on Loci"))
+                            item: String(localized: "Join my family on Lociate! Use invite code: \(code)"),
+                            subject: Text(String(localized: "Join my family on Lociate"))
                         ) {
                             Image(systemName: "square.and.arrow.up")
                         }

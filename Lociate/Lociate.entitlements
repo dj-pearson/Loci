@@ -6,7 +6,7 @@
 	<string>development</string>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>group.com.pearsonmedia.loci</string>
+		<string>group.com.pearsonmedia.lociate</string>
 	</array>
 </dict>
 </plist>

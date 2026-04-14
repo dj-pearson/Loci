@@ -3,7 +3,7 @@ import UIKit
 
 /// Premium hero record button (US-166).
 ///
-/// The button is the most important interaction in Loci, so it gets the
+/// The button is the most important interaction in Lociate, so it gets the
 /// richest motion treatment in the app:
 ///   * Idle state: gradient fill with a breathing primary halo and a soft
 ///     pulsing ring driven by the ``DesignSystem.Motion.gentle`` spring.

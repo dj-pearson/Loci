@@ -15,7 +15,7 @@ struct BiometricLockView: View {
                     .font(.system(size: 64))
                     .foregroundStyle(Theme.primary)
 
-                Text(String(localized: "Loci is Locked"))
+                Text(String(localized: "Lociate is Locked"))
                     .font(Theme.Typography.title)
 
                 Text(String(localized: "Authenticate to access your notes"))

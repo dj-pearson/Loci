@@ -147,7 +147,7 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
         var localizedDescription: String {
             switch self {
             case .denied:
-                String(localized: "Location access has been denied. Please enable it in Settings to use Loci.")
+                String(localized: "Location access has been denied. Please enable it in Settings to use Lociate.")
             case .restricted:
                 String(localized: "Location access is restricted on this device.")
             case .locationUnavailable:

@@ -141,7 +141,7 @@ struct CreateHouseholdView: View {
     private var shareButton: some View {
         ShareLink(
             item: shareText,
-            subject: Text(String(localized: "Join my family on Loci")),
+            subject: Text(String(localized: "Join my family on Lociate")),
             message: Text(shareText)
         ) {
             Label(String(localized: "Share Invite Code"), systemImage: "square.and.arrow.up")
@@ -208,6 +208,6 @@ struct CreateHouseholdView: View {
 
     private var shareText: String {
         let code = viewModel.inviteCode ?? ""
-        return String(localized: "Join my family on Loci! Use invite code: \(code)")
+        return String(localized: "Join my family on Lociate! Use invite code: \(code)")
     }
 }

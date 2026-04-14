@@ -13,7 +13,7 @@ struct LaunchScreenView: View {
                     .font(.system(size: 64, weight: .medium))
                     .foregroundStyle(.white)
 
-                Text("Loci")
+                Text("Lociate")
                     .font(.system(size: 36, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
 

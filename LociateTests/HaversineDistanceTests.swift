@@ -1,6 +1,6 @@
 import CoreLocation
 import Testing
-@testable import Loci
+@testable import Lociate
 
 struct HaversineDistanceTests {
 

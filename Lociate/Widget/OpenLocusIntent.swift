@@ -3,7 +3,7 @@ import Foundation
 
 struct OpenLocusIntent: AppIntent {
     static var title: LocalizedStringResource = "Open Locus"
-    static var description: IntentDescription = "Opens a specific locus in the Loci app."
+    static var description: IntentDescription = "Opens a specific locus in the Lociate app."
     static var openAppWhenRun = true
 
     @Parameter(title: "Locus ID")

@@ -314,7 +314,7 @@ struct SettingsView: View {
                     .foregroundStyle(Theme.warning)
             }
 
-            Text(String(localized: "Loci uses notifications to alert you when you return to a saved location. Enable notifications to receive proximity alerts."))
+            Text(String(localized: "Lociate uses notifications to alert you when you return to a saved location. Enable notifications to receive proximity alerts."))
                 .font(.caption)
                 .foregroundStyle(Theme.textSecondary)
 

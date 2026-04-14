@@ -87,7 +87,7 @@ struct PaywallView: View {
                 }
                 .padding(.top, DesignSystem.Space.md)
 
-                Text(String(localized: "Unlock the Full Loci Experience"))
+                Text(String(localized: "Unlock the Full Lociate Experience"))
                     .font(.title2.weight(.bold))
                     .multilineTextAlignment(.center)
                     .padding(.top, DesignSystem.Space.xs)

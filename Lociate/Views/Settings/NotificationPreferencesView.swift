@@ -13,7 +13,7 @@ struct NotificationPreferencesView: View {
                     Label(String(localized: "Proximity Notifications"), systemImage: "bell.badge")
                 }
             } footer: {
-                Text(String(localized: "When enabled, Loci notifies you when you return to a place where you left a voice note."))
+                Text(String(localized: "When enabled, Lociate notifies you when you return to a place where you left a voice note."))
             }
 
             if viewModel.notificationsEnabled {
@@ -57,7 +57,7 @@ struct NotificationPreferencesView: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 HStack {
-                    Text("Loci")
+                    Text("Lociate")
                         .font(.caption.weight(.semibold))
                     Spacer()
                     Text(String(localized: "now"))

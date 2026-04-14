@@ -18,7 +18,7 @@ struct MicrophonePermissionView: View {
                 .fontWeight(.bold)
                 .multilineTextAlignment(.center)
 
-            Text(String(localized: "Loci is voice-first — tap to record, and your note is pinned to where you are. Microphone access is the core of the experience."))
+            Text(String(localized: "Lociate is voice-first — tap to record, and your note is pinned to where you are. Microphone access is the core of the experience."))
                 .font(Theme.Typography.body)
                 .foregroundStyle(Theme.textSecondary)
                 .multilineTextAlignment(.center)

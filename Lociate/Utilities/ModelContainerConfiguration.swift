@@ -12,17 +12,17 @@ enum ModelContainerConfiguration {
 
     static func production() throws -> ModelContainer {
         let configuration = ModelConfiguration(
-            "Loci",
+            "Lociate",
             schema: schema,
             isStoredInMemoryOnly: false,
-            groupContainer: .identifier("group.com.pearsonmedia.loci")
+            groupContainer: .identifier("group.com.pearsonmedia.lociate")
         )
         return try ModelContainer(for: schema, configurations: [configuration])
     }
 
     static func preview() throws -> ModelContainer {
         let configuration = ModelConfiguration(
-            "LociPreview",
+            "LociatePreview",
             schema: schema,
             isStoredInMemoryOnly: true
         )

@@ -18,7 +18,7 @@ struct LocationPermissionView: View {
                 .fontWeight(.bold)
                 .multilineTextAlignment(.center)
 
-            Text(String(localized: "Loci needs Always Allow location to notify you when you return to a saved location."))
+            Text(String(localized: "Lociate needs Always Allow location to notify you when you return to a saved location."))
                 .font(Theme.Typography.body)
                 .foregroundStyle(Theme.textSecondary)
                 .multilineTextAlignment(.center)

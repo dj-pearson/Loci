@@ -3,7 +3,7 @@ import SwiftData
 import SwiftUI
 
 @main
-struct LociApp: App {
+struct LociateApp: App {
     let modelContainer: ModelContainer
 
     @State private var navigationRouter = NavigationRouter()

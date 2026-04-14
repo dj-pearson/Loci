@@ -1,16 +1,16 @@
-Loci turns the places you visit into a personal audio journal. Record a voice note, and Loci pins it to that exact spot. When you return, it finds you — a gentle notification with the memory you left behind.
+Lociate turns the places you visit into a personal audio journal. Record a voice note, and Lociate pins it to that exact spot. When you return, it finds you — a gentle notification with the memory you left behind.
 
 RECORD ANYWHERE, REMEMBER EVERYWHERE
-Tap once to start recording. Loci captures your voice, tags it with your GPS location, and transcribes it on-device — no internet needed, no cloud processing, completely private.
+Tap once to start recording. Lociate captures your voice, tags it with your GPS location, and transcribes it on-device — no internet needed, no cloud processing, completely private.
 
 PROXIMITY NOTIFICATIONS
-Walk past a coffee shop where you saved a note? Loci quietly reminds you. The geofence triggers are powered by iOS, so they work without draining your battery.
+Walk past a coffee shop where you saved a note? Lociate quietly reminds you. The geofence triggers are powered by iOS, so they work without draining your battery.
 
 FAMILY SHARING
 Pin a note to grandma's house for your kids. Share grocery reminders at the store with your partner. With Family plans, up to 6 household members can share and discover each other's loci.
 
 AI-POWERED CATEGORIES
-Loci automatically suggests categories for your notes — groceries, ideas, memories, tasks — so everything stays organized without effort.
+Lociate automatically suggests categories for your notes — groceries, ideas, memories, tasks — so everything stays organized without effort.
 
 MAP & LIST VIEWS
 Browse all your loci on a beautiful map with color-coded pins, or switch to a searchable list view. Filter by category, search by keyword, or find notes near your current location.
@@ -29,4 +29,4 @@ PLANS & PRICING
 • Premium ($3.99/mo): Unlimited loci, AI categories, cloud sync, widgets, search
 • Family ($5.99/mo): Everything in Premium + sharing for up to 6 members
 
-Start building your spatial memory today. Your places have stories — Loci helps you remember them.
+Start building your spatial memory today. Your places have stories — Lociate helps you remember them.

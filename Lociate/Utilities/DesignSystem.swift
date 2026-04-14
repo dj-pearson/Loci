@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Premium design tokens that layer on top of ``Theme`` to give Loci a
+/// Premium design tokens that layer on top of ``Theme`` to give Lociate a
 /// cohesive, high-end visual language across the app. ``Theme`` remains the
 /// single source of truth for base semantic colors; ``DesignSystem`` adds the
 /// motion, elevation, gradient, and spacing primitives needed for a premium

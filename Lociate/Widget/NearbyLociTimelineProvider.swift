@@ -112,7 +112,7 @@ struct NearbyLociTimelineProvider: TimelineProvider {
     private static func createModelContainer() throws -> ModelContainer {
         let schema = ModelContainerConfiguration.schema
         let configuration = ModelConfiguration(
-            "Loci",
+            "Lociate",
             schema: schema,
             isStoredInMemoryOnly: false,
             groupContainer: .identifier(appGroupID)

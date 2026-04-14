@@ -31,7 +31,7 @@ struct SignInView: View {
                             .font(.system(size: 64))
                             .foregroundStyle(Theme.primary)
 
-                        Text("Sign in to Loci")
+                        Text("Sign in to Lociate")
                             .font(Theme.Typography.largeTitle)
 
                         Text("Sync your notes across devices and share with family.")

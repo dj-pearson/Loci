@@ -28,7 +28,7 @@ enum RevenueCatConfiguration {
 
     // MARK: - Configure
 
-    /// Call this once during app startup (e.g., in LociApp.init).
+    /// Call this once during app startup (e.g., in LociateApp.init).
     static func configure() {
         Purchases.logLevel = {
             #if DEBUG

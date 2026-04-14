@@ -18,7 +18,7 @@ struct NotificationPermissionView: View {
                 .fontWeight(.bold)
                 .multilineTextAlignment(.center)
 
-            Text(String(localized: "Loci sends a notification when you return to a place where you left a voice note — so your memories find you."))
+            Text(String(localized: "Lociate sends a notification when you return to a place where you left a voice note — so your memories find you."))
                 .font(Theme.Typography.body)
                 .foregroundStyle(Theme.textSecondary)
                 .multilineTextAlignment(.center)

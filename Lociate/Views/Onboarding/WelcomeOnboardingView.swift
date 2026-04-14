@@ -15,7 +15,7 @@ struct WelcomeOnboardingView: View {
         (
             "bell.badge",
             String(localized: "Notes Find You"),
-            String(localized: "When you return to a saved location, Loci notifies you automatically. Never forget what you wanted to remember.")
+            String(localized: "When you return to a saved location, Lociate notifies you automatically. Never forget what you wanted to remember.")
         ),
         (
             "person.2.fill",

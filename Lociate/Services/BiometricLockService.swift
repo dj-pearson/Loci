@@ -50,7 +50,7 @@ final class BiometricLockService {
         context.localizedFallbackTitle = String(localized: "Use Passcode")
 
         // Use deviceOwnerAuthentication to allow passcode fallback
-        let reason = String(localized: "Unlock Loci to access your notes")
+        let reason = String(localized: "Unlock Lociate to access your notes")
 
         do {
             let success = try await context.evaluatePolicy(
