@@ -41,7 +41,11 @@
       "Bash(tail *)",
       "Bash(wc *)",
       "Bash(sort -t- -k2 -n)",
-      "Bash(grep -r 'import Supabase' /c/Users/pears/Documents/Loci/Loci/Loci --include=*.swift)"
+      "Bash(grep -r 'import Supabase' /c/Users/pears/Documents/Loci/Loci/Loci --include=*.swift)",
+      "Bash(grep -r \"SUPABASE_URL\\\\|SUPABASE_ANON_KEY\\\\|RevenueCat\\\\|TelemetryDeck\\\\|API_KEY\" /c/Users/pears/Documents/Loci/Loci/Loci/*.swift /c/Users/pears/Documents/Loci/Loci/Loci/Services/*.swift)",
+      "Bash(grep -r \"REPLACE_WITH\\\\|your-\\\\|placeholder\\\\|TODO\\\\|FIXME\" /c/Users/pears/Documents/Loci/Loci/Loci/Services/*.swift /c/Users/pears/Documents/Loci/Loci/Loci/Utilities/*.swift)",
+      "Bash(find /c/Users/pears/Documents/Loci/Loci/Loci/Loci.xcodeproj -type f -name \"*.pbxproj\" -exec grep -o \"\\\\\"Loci\\\\\"\\\\|schemes\\\\|buildSettings\" {} \\\\;)",
+      "Bash(grep -r \"struct.*View\\\\|class.*ViewController\" /c/Users/pears/Documents/Loci/Loci/Loci/Views/*.swift)"
     ]
   }
 }
