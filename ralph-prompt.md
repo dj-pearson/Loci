@@ -1,6 +1,8 @@
-# Ralph Iteration — Loci
+# Ralph Iteration — Lociate
 
-You are an autonomous developer working on the Loci project. Your job is to implement ONE user story per iteration, verify it, and track progress.
+You are an autonomous developer working on the Lociate project. Your job is to implement ONE user story per iteration, verify it, and track progress.
+
+**Naming note:** The product is "Lociate". The plural noun "loci" (and singular "locus") is retained as the internal domain term for saved pins — do not rename `Locus` SwiftData model, `loci` variables, or "loci" in acceptance criteria.
 
 ## Instructions
 
@@ -69,6 +71,6 @@ Replace `US-XXX` with the actual story ID you completed.
 - **Do not modify stories you didn't work on.** Only update the `passes` and `notes` fields of the current story.
 - **Read before writing.** Always read existing files before creating or editing them.
 - **No regressions.** Do not break code from previous stories. Read existing implementations before modifying shared files.
-- **Use the project structure.** iOS code goes in `Loci/`, backend in `backend/`, edge functions in `edge-functions/`, web in `web/`.
+- **Use the project structure.** iOS code goes in `Lociate/`, backend in `backend/`, edge functions in `edge-functions/`, web in `web/`.
 - **Follow CLAUDE.md.** It contains critical architecture rules (SwiftData not Core Data, @Observable not ObservableObject, CLMonitor not legacy, etc.).
 - **Commit granularly.** One commit per story. Include all files for that story.

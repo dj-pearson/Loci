@@ -55,12 +55,12 @@ jobs:
           MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
           FASTLANE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
-          cd Loci
+          cd Lociate
           fastlane match appstore --readonly
 
       - name: Increment Build Number
         run: |
-          cd Loci
+          cd Lociate
           BUILD_NUMBER=${{ github.run_number }}
           agvtool new-version -all $BUILD_NUMBER
 
@@ -71,7 +71,7 @@ jobs:
           APP_STORE_CONNECT_API_KEY_KEY: ${{ secrets.ASC_API_KEY }}
           FASTLANE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
-          cd Loci
+          cd Lociate
           fastlane release
 
       - name: Notify on Success
@@ -82,7 +82,7 @@ jobs:
           if [ -n "$SLACK_WEBHOOK_URL" ]; then
             curl -s -X POST "$SLACK_WEBHOOK_URL" \
               -H 'Content-Type: application/json' \
-              -d "{\"text\":\"Loci build #${{ github.run_number }} uploaded to TestFlight successfully.\"}"
+              -d "{\"text\":\"Lociate build #${{ github.run_number }} uploaded to TestFlight successfully.\"}"
           else
             echo "No Slack webhook configured — skipping notification."
           fi
@@ -95,7 +95,7 @@ jobs:
           if [ -n "$SLACK_WEBHOOK_URL" ]; then
             curl -s -X POST "$SLACK_WEBHOOK_URL" \
               -H 'Content-Type: application/json' \
-              -d "{\"text\":\"Loci build #${{ github.run_number }} failed. Check: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}"
+              -d "{\"text\":\"Lociate build #${{ github.run_number }} failed. Check: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}"
           else
             echo "No Slack webhook configured — skipping notification."
           fi

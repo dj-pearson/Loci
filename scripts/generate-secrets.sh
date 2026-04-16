@@ -9,11 +9,42 @@
 #   TELEMETRYDECK_APP_ID     — TelemetryDeck app identifier
 #   CERT_PIN_HASH            — Primary certificate pin (SPKI SHA-256, base64)
 #   CERT_BACKUP_PIN_HASH     — Backup certificate pin (optional, defaults to Let's Encrypt)
+#   REQUEST_SIGNING_KEY      — HMAC-SHA256 secret for request signing (optional)
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-OUTPUT_FILE="$SCRIPT_DIR/../Loci/Configuration/BuildSecrets.swift"
+OUTPUT_FILE="$SCRIPT_DIR/../Lociate/Configuration/BuildSecrets.swift"
+
+# ---------------------------------------------------------------------------
+# Validate required environment variables
+# ---------------------------------------------------------------------------
+MISSING=()
+
+required_vars=(
+    "SUPABASE_URL"
+    "SUPABASE_ANON_KEY"
+    "REVENUECAT_API_KEY"
+    "TELEMETRYDECK_APP_ID"
+    "CERT_PIN_HASH"
+)
+
+for var in "${required_vars[@]}"; do
+    if [ -z "${!var:-}" ]; then
+        MISSING+=("$var")
+    fi
+done
+
+if [ ${#MISSING[@]} -ne 0 ]; then
+    echo "ERROR: The following required environment variables are empty or unset:" >&2
+    for var in "${MISSING[@]}"; do
+        echo "  - $var" >&2
+    done
+    echo "" >&2
+    echo "Set them in your environment or in CI secrets before running this script." >&2
+    echo "For local development, copy BuildSecrets.swift.example instead." >&2
+    exit 1
+fi
 
 # Defaults
 CERT_BACKUP="${CERT_BACKUP_PIN_HASH:-C5+lpZ7tcVwmwQIMcRtPbsQtWLABXhQzejna0wHFr8M=}"
@@ -43,6 +74,10 @@ enum BuildSecrets {
 
     static let certificatePinHash = "${CERT_PIN_HASH}"
     static let certificateBackupPinHash = "${CERT_BACKUP}"
+
+    // MARK: - Request Signing
+
+    static let requestSigningKey = "${REQUEST_SIGNING_KEY:-}"
 }
 SWIFT
 

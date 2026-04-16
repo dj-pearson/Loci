@@ -1,6 +1,6 @@
-# Loci — iOS Deployment Guide
+# Lociate — iOS Deployment Guide
 
-Complete guide for setting up CI/CD, code signing, and deploying Loci to the App Store via GitHub Actions.
+Complete guide for setting up CI/CD, code signing, and deploying Lociate to the App Store via GitHub Actions.
 
 ---
 
@@ -38,9 +38,9 @@ Go to [Apple Developer > Identifiers](https://developer.apple.com/account/resour
 
 | Field | Value |
 |-------|-------|
-| Description | Loci |
-| Bundle ID | `com.pearsonmedia.loci` (Explicit) |
-| Capabilities | Push Notifications, App Groups (`group.com.pearsonmedia.loci`) |
+| Description | Lociate |
+| Bundle ID | `com.pearsonmedia.lociate` (Explicit) |
+| Capabilities | Push Notifications, App Groups (`group.com.pearsonmedia.lociate`) |
 
 ### 2. Create App in App Store Connect
 
@@ -49,10 +49,10 @@ Go to [App Store Connect > My Apps](https://appstoreconnect.apple.com/apps) > "+
 | Field | Value |
 |-------|-------|
 | Platform | iOS |
-| Name | Loci |
+| Name | Lociate |
 | Primary Language | English (U.S.) |
-| Bundle ID | `com.pearsonmedia.loci` |
-| SKU | `com.pearsonmedia.loci` |
+| Bundle ID | `com.pearsonmedia.lociate` |
+| SKU | `com.pearsonmedia.lociate` |
 
 ### 3. Find Your Team ID
 
@@ -133,8 +133,8 @@ Write-Host "MATCH_GIT_BASIC_AUTHORIZATION=$MATCH_GIT_BASIC_AUTHORIZATION"
 This must be done from a Mac with Xcode installed:
 
 ```bash
-# From the Loci/Loci/ directory (where Fastfile lives)
-cd Loci
+# From the Lociate/Lociate/ directory (where Fastfile lives)
+cd Lociate
 
 # Set environment variables
 export MATCH_GIT_URL="https://github.com/pearsonmedia/ios-certificates.git"
@@ -226,7 +226,7 @@ The backup pin defaults to Let's Encrypt ISRG Root X1. Override only if your ser
 
 Go to your repo: **Settings > Secrets and variables > Actions > New repository secret**
 
-### All Secrets for Loci
+### All Secrets for Lociate
 
 | Secret Name | Description | Shared? | How to Get |
 |------------|-------------|---------|------------|
@@ -249,7 +249,7 @@ Go to your repo: **Settings > Secrets and variables > Actions > New repository s
 
 ```powershell
 # Navigate to your repo directory first
-cd C:\Users\pears\Documents\Loci\Loci
+cd C:\Users\pears\Documents\Loci\Lociate
 
 # ─── SHARED SECRETS (reuse across all iOS apps) ───
 gh secret set APPLE_TEAM_ID --body "YOUR_TEAM_ID"
@@ -266,7 +266,7 @@ gh secret set MATCH_GIT_BASIC_AUTHORIZATION --body $auth
 # Optional
 gh secret set SLACK_WEBHOOK_URL --body "https://hooks.slack.com/services/T.../B.../xxxx"
 
-# ─── APP-SPECIFIC SECRETS (unique to Loci) ───
+# ─── APP-SPECIFIC SECRETS (unique to Lociate) ───
 gh secret set SUPABASE_URL --body "https://supabase.yourdomain.com"
 gh secret set SUPABASE_ANON_KEY --body "eyJhbGciOiJIUzI1NiIs..."
 gh secret set REVENUECAT_API_KEY --body "appl_xxxx"
@@ -301,14 +301,14 @@ git clone https://github.com/pearsonmedia/loci-ios.git
 cd loci-ios
 
 # 2. Copy the secrets template
-cp Loci/Configuration/BuildSecrets.swift.example Loci/Configuration/BuildSecrets.swift
+cp Lociate/Configuration/BuildSecrets.swift.example Lociate/Configuration/BuildSecrets.swift
 
 # 3. Edit BuildSecrets.swift with your local development values
 # For local Supabase, the defaults (localhost:8000) are fine.
 # For RevenueCat testing, use your sandbox API key.
 
 # 4. Open in Xcode
-open Loci/Loci.xcodeproj
+open Lociate/Lociate.xcodeproj
 ```
 
 The `BuildSecrets.swift` file is in `.gitignore` and will never be committed.
@@ -387,7 +387,7 @@ Before your first release, ensure these are done:
 
 - [ ] App ID registered with Push Notifications capability enabled
 - [ ] Push notification certificate or key configured (APNs key is reusable)
-- [ ] App Group (`group.com.pearsonmedia.loci`) added to App ID
+- [ ] App Group (`group.com.pearsonmedia.lociate`) added to App ID
 
 ### In RevenueCat
 
@@ -406,7 +406,7 @@ Before your first release, ensure these are done:
 
 ```bash
 # If you want to automate screenshots:
-cd Loci
+cd Lociate
 fastlane snapshot
 # Configure Snapfile first — see Fastlane docs
 ```
@@ -415,7 +415,7 @@ fastlane snapshot
 
 ## Shared Secrets Across Apps
 
-Here's what you can reuse from Loci when setting up your next iOS app:
+Here's what you can reuse from Lociate when setting up your next iOS app:
 
 | Secret | Reusable? | Notes |
 |--------|-----------|-------|

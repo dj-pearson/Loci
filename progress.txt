@@ -1,17 +1,19 @@
-# Loci - Ralph Progress Tracker
-## Project: Loci — Your Spatial Memory
+# Lociate - Ralph Progress Tracker
+## Project: Lociate — Your Spatial Memory
 ## Branch: ralph/loci-mvp
 ## Started: 2026-03-25
 ## Status: IN PROGRESS
-## Total Stories: 152
-## Completed: 143/152
+## Total Stories: 164
+## Completed: 164/164
 
 ---
 
 ## Important Context for Ralph Iterations
 
 ### Project Overview
-Loci is a voice-first iOS app (SwiftUI, iOS 17+) that pins voice notes to GPS coordinates with proximity-triggered push notifications and family sharing. Backend is self-hosted Supabase with PostGIS on Contabo/Coolify. Marketing site on Cloudflare Pages (Astro).
+Lociate is a voice-first iOS app (SwiftUI, iOS 17+) that pins voice notes to GPS coordinates with proximity-triggered push notifications and family sharing. Backend is self-hosted Supabase with PostGIS on Contabo/Coolify. Marketing site on Cloudflare Pages (Astro).
+
+Note: "loci" (lowercase, plural) remains the internal domain term for saved pins (singular: "locus") — the `Locus` SwiftData model, `loci` variables, and references to "loci" in acceptance criteria are intentionally preserved. Only the product brand changed from "Loci" → "Lociate".
 
 ### Tech Stack
 - **iOS**: Swift 5.9+, SwiftUI, SwiftData, CoreLocation (CLMonitor), AVFoundation, Apple Speech, MapKit, WidgetKit, RevenueCat, supabase-swift, TelemetryDeck
@@ -204,15 +206,15 @@ Loci is a voice-first iOS app (SwiftUI, iOS 17+) that pins voice notes to GPS co
 - [x] US-120: Create Coolify deployment configuration for Supabase and edge functions
 
 ## Phase 22: Production Readiness (US-121 → US-140)
-- [ ] US-121: Configure production API credentials and certificate pinning
+- [x] US-121: Configure production API credentials and certificate pinning
 - [x] US-122: Restrict CORS origins in Kong API gateway
 - [x] US-123: Add webhook replay protection with timestamp validation
-- [ ] US-124: Replace in-memory rate limiting with Redis-backed store
+- [x] US-124: Replace in-memory rate limiting with Redis-backed store
 - [x] US-125: Wire LocusDetailView into deep-link navigation replacing placeholder
 - [x] US-126: Add network reachability monitoring and offline sync queue
 - [x] US-127: Implement TelemetryDeck analytics integration
 - [x] US-128: Add comprehensive input sanitization for all user-facing text fields
-- [ ] US-129: Add Fastlane match signing and GitHub Actions CI/CD pipeline
+- [x] US-129: Add Fastlane match signing and GitHub Actions CI/CD pipeline
 - [x] US-130: Add comprehensive error recovery and retry logic for Supabase operations
 - [x] US-131: Add data export and account deletion compliance (GDPR/App Store requirement)
 - [x] US-132: Add notification permission re-prompt and settings deep link
@@ -232,12 +234,38 @@ Loci is a voice-first iOS app (SwiftUI, iOS 17+) that pins voice notes to GPS co
 - [x] US-144: Password strength validation with complexity requirements and UI indicator
 - [x] US-145: Secure session lifecycle with token rotation and forced re-authentication
 - [x] US-146: Server-side auth rate limiting and login attempt tracking
-- [ ] US-147: Auth flow UX improvements with password visibility and keyboard management
-- [ ] US-148: Jailbreak and runtime integrity detection
-- [ ] US-149: Security audit logging for authentication events
-- [ ] US-150: Email enumeration protection on auth endpoints
-- [ ] US-151: Android app architecture planning and Kotlin Multiplatform evaluation
-- [ ] US-152: Network security hardening with App Transport Security and request signing
+- [x] US-147: Auth flow UX improvements with password visibility and keyboard management
+- [x] US-148: Jailbreak and runtime integrity detection
+- [x] US-149: Security audit logging for authentication events
+- [x] US-150: Email enumeration protection on auth endpoints
+- [x] US-151: Android app architecture planning and Kotlin Multiplatform evaluation
+- [x] US-152: Network security hardening with App Transport Security and request signing
+
+## Phase 24: Android App (US-153 → US-164)
+- [x] US-153: Android project scaffold with Kotlin, Jetpack Compose, Hilt, and Room
+- [x] US-154: Android core services: location, audio recording, speech recognition, and geofencing
+- [x] US-155: Android UI foundation: Material 3 theme, navigation, and reusable components
+- [x] US-156: Android main screens: Map, List, Recording, Detail, Search, Settings, Auth, Onboarding
+- [x] US-157: Android utility classes: constants, network monitor, secure preferences, input sanitizer, Haversine
+- [x] US-158: Android security hardening: encrypted storage, network config, biometric, data protection
+- [x] US-159: Android performance optimization: lazy loading, caching, background work
+- [x] US-160: Android UX polish: animations, haptics, accessibility, error handling
+- [x] US-161: Android Supabase integration: auth, sync, and storage
+- [x] US-162: Android CI/CD: GitHub Actions build, lint, and test pipeline
+- [x] US-163: Android family sharing: household creation, join, member management
+- [x] US-164: Android monetization: Google Play Billing with tier enforcement
+
+## Phase 25: Mobile UI/UX Premium Polish (US-165 → US-174)
+- [x] US-165: Premium design token system (iOS + Android) — DesignSystem.swift + DesignTokens.kt with Space/Radius/Elevation/Gradients/Motion/Duration/Surface, premiumCard modifier on both platforms
+- [x] US-166: Hero record button redesign with premium motion — gradient fill, breathing halo, amplitude ring, HapticManager.recordStartSequence; Android HeroRecordButton composable wired into RecordingScreen
+- [x] US-167: Premium map experience — iOS CategoryPinView with primaryHalo selection ring, glossy stroke, drop-in bounce; Android LociMapView with category-hue markers and MapProperties POI muting
+- [x] US-168: Premium locus list card redesign — 44pt category glyph tile, location icon, distance pill capsule, premiumCard container, LociGradients.Premium swipe reveal background
+- [x] US-169: Motion and haptic orchestration system — HapticManager gains recordStartSequence, saveSuccessSequence, unlockSequence on both platforms
+- [x] US-170: Paywall premium redesign — animated primaryHalo hero with 96pt gradient icon tile (iOS level4 elevation / Android LociGradients.Premium)
+- [x] US-171: Delightful empty states and shimmer loading — EmptyStateView gradient halo + gradient CTA; Android SkeletonView upgraded to sweeping LinearGradient brush
+- [x] US-172: Onboarding premium polish — 320pt gradient halo with parallax-floating 140pt icon tile; Android OnboardingPageContent mirrors with PrimaryHalo + gradient tile
+- [x] US-173: Premium settings and account header redesign — gradient avatar tile + per-tier gradient badge capsule on both platforms
+- [x] US-174: Accessibility premium parity — Reduce Motion paths on iOS via @Environment(\.accessibilityReduceMotion); Android HeroRecordButton and SkeletonView auto-detect ValueAnimator.areAnimatorsEnabled()
 
 ---
 
@@ -285,7 +313,7 @@ Loci is a voice-first iOS app (SwiftUI, iOS 17+) that pins voice notes to GPS co
 
 ## Notes for Ralph Iterations
 
-1. **iOS Build**: Use `xcodebuild -scheme Loci -sdk iphonesimulator` for build verification.
+1. **iOS Build**: Use `xcodebuild -scheme Lociate -sdk iphonesimulator` for build verification.
 2. **SwiftData requires iOS 17+**: All @Model classes use SwiftData, not Core Data.
 3. **CLMonitor is iOS 17+**: Do not use legacy CLLocationManager region monitoring.
 4. **@Observable not ObservableObject**: Use the Observation framework, not Combine.
@@ -295,3 +323,11 @@ Loci is a voice-first iOS app (SwiftUI, iOS 17+) that pins voice notes to GPS co
 8. **Audio format**: M4A/AAC at 64kbps mono, ~100KB per 30 seconds.
 9. **Geofence limit**: iOS enforces max 20 CLCircularRegions per app.
 10. **The edge functions are Node.js/Hono in Docker, NOT Supabase Edge Functions (Deno).**
+11. **Android Build**: Use `cd android && ./gradlew assembleDebug` for build verification.
+12. **Android minSdk 26**: Supports Android 8.0+ (Oreo) for Instant, notification channels, and biometric APIs.
+13. **Android geofence limit is 100**: Android allows 100 geofences vs iOS 20.
+14. **Hilt for DI**: All ViewModels use @HiltViewModel, all services injected via @Inject constructor.
+15. **Room, not SQLite directly**: All local persistence through Room DAOs with Flow-based reactive queries.
+16. **Jetpack Compose, not XML layouts**: All UI is declarative Compose with Material 3.
+17. **EncryptedSharedPreferences**: All auth tokens and sensitive data use AndroidX Security crypto.
+18. **Same Supabase backend**: Android shares the same PostgreSQL/PostGIS backend as iOS — no backend changes needed.

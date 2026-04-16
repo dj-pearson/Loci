@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>UILaunchScreen</key>
+	<dict>
+		<key>BackgroundColor</key>
+		<string>LaunchBackground</string>
+		<key>ImageName</key>
+		<string>LaunchIcon</string>
+		<key>ImageRespectsSafeAreaInsets</key>
+		<true/>
+	</dict>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Lociate needs your location to pin voice notes to places and notify you when you return.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Lociate needs your location to pin voice notes to places you visit.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Lociate needs microphone access to record voice notes.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Lociate uses speech recognition to transcribe your voice notes on-device.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+		<string>audio</string>
+		<string>fetch</string>
+		<string>remote-notification</string>
+	</array>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>com.pearsonmedia.lociate.sync</string>
+		<string>com.pearsonmedia.lociate.geofence-refresh</string>
+	</array>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+</dict>
+</plist>

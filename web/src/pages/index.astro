@@ -1,8 +1,91 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+
+const jsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Lociate",
+    "url": "https://useloci.com",
+    "logo": "https://useloci.com/og-image.png",
+    "description": "Lociate is a voice-first iOS app that pins voice notes to GPS coordinates with proximity-triggered notifications.",
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "email": "hello@useloci.com",
+      "contactType": "customer support"
+    }
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Lociate — Your Spatial Memory",
+    "operatingSystem": "iOS 17+",
+    "applicationCategory": "UtilitiesApplication",
+    "description": "Pin voice notes to GPS locations. Get notified when you return. Share with family. Privacy-first, offline-first voice memo app with location-based reminders.",
+    "url": "https://useloci.com",
+    "downloadUrl": "https://apps.apple.com/app/loci",
+    "screenshot": "https://useloci.com/og-image.png",
+    "author": {
+      "@type": "Organization",
+      "name": "Pearson Media"
+    },
+    "offers": [
+      {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD",
+        "name": "Free",
+        "description": "Up to 10 loci, voice recording, proximity notifications, map view"
+      },
+      {
+        "@type": "Offer",
+        "price": "3.99",
+        "priceCurrency": "USD",
+        "name": "Premium",
+        "description": "Unlimited loci, AI categorization, cloud sync, widget, search",
+        "priceSpecification": {
+          "@type": "UnitPriceSpecification",
+          "billingDuration": "P1M"
+        }
+      },
+      {
+        "@type": "Offer",
+        "price": "5.99",
+        "priceCurrency": "USD",
+        "name": "Family",
+        "description": "Everything in Premium plus household sharing for up to 6 members",
+        "priceSpecification": {
+          "@type": "UnitPriceSpecification",
+          "billingDuration": "P1M"
+        }
+      }
+    ],
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "5",
+      "ratingCount": "3",
+      "bestRating": "5"
+    }
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Lociate",
+    "url": "https://useloci.com",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://useloci.com/?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  }
+];
 ---
 
-<BaseLayout title="Loci — Your Spatial Memory">
+<BaseLayout
+  title="Lociate — Voice Notes Pinned to Places | Location-Based Reminders App"
+  description="Pin voice notes to GPS locations and get notified when you return. Lociate is a privacy-first iOS app for location-based voice memos, reminders, and family sharing."
+  jsonLd={jsonLd}
+>
   <!-- Hero -->
   <section class="relative overflow-hidden bg-gradient-to-b from-brand-50 to-white">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32 text-center">
@@ -44,7 +127,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           <div class="w-16 h-16 rounded-2xl bg-brand-100 text-brand-600 flex items-center justify-center text-2xl font-bold">1</div>
           <h3 class="mt-6 text-xl font-semibold text-gray-900">Record</h3>
           <p class="mt-3 text-gray-500 leading-relaxed">
-            Tap and speak. Loci captures your voice note and pins it to your exact GPS location.
+            Tap and speak. Lociate captures your voice note and pins it to your exact GPS location.
           </p>
         </div>
         <!-- Step 2: Walk Away -->
@@ -60,7 +143,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           <div class="w-16 h-16 rounded-2xl bg-brand-100 text-brand-600 flex items-center justify-center text-2xl font-bold">3</div>
           <h3 class="mt-6 text-xl font-semibold text-gray-900">Get Notified</h3>
           <p class="mt-3 text-gray-500 leading-relaxed">
-            Return to that spot and Loci nudges you with your note. The right memory, at the right place.
+            Return to that spot and Lociate nudges you with your note. The right memory, at the right place.
           </p>
         </div>
       </div>
@@ -324,7 +407,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   <section class="py-20 sm:py-28 bg-brand-600">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
       <h2 class="text-3xl sm:text-4xl font-bold text-white">Ready to Remember Better?</h2>
-      <p class="mt-4 text-lg text-brand-100 max-w-2xl mx-auto">Download Loci and start pinning voice notes to the places that matter.</p>
+      <p class="mt-4 text-lg text-brand-100 max-w-2xl mx-auto">Download Lociate and start pinning voice notes to the places that matter.</p>
       <a
         href="https://apps.apple.com/app/loci"
         class="mt-8 inline-flex items-center gap-3 bg-white text-brand-600 px-6 py-3 rounded-xl font-semibold hover:bg-brand-50 transition-colors"

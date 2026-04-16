@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Lociate</string>
+    <string name="app_tagline">Your Spatial Memory</string>
+
+    <!-- Permissions -->
+    <string name="location_permission_title">Enable Location</string>
+    <string name="location_permission_description">Lociate pins your voice notes to your current location so you can find them later.</string>
+    <string name="background_location_rationale">Background location lets Lociate notify you when you return to a saved spot.</string>
+    <string name="microphone_permission_title">Enable Microphone</string>
+    <string name="microphone_permission_description">Lociate records voice notes — your voice is the primary input.</string>
+    <string name="notification_permission_title">Enable Notifications</string>
+    <string name="notification_permission_description">Get reminded of your notes when you return to saved locations.</string>
+
+    <!-- Navigation -->
+    <string name="nav_map">Map</string>
+    <string name="nav_list">List</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Recording -->
+    <string name="record_button_label">Record a voice note</string>
+    <string name="recording_in_progress">Recording…</string>
+    <string name="stop_recording">Stop recording</string>
+    <string name="transcription_placeholder">Your words will appear here…</string>
+
+    <!-- Map -->
+    <string name="map_empty_state_title">No loci yet</string>
+    <string name="map_empty_state_description">Tap the record button to pin your first voice note.</string>
+
+    <!-- Detail -->
+    <string name="locus_detail">Locus Detail</string>
+    <string name="edit_locus">Edit</string>
+    <string name="delete_locus">Delete</string>
+    <string name="archive_locus">Archive</string>
+    <string name="share_with_family">Share with family</string>
+    <string name="undo">Undo</string>
+
+    <!-- Auth -->
+    <string name="sign_in">Sign In</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="email_label">Email</string>
+    <string name="password_label">Password</string>
+    <string name="confirm_password_label">Confirm Password</string>
+    <string name="display_name_label">Display Name</string>
+    <string name="forgot_password">Forgot password?</string>
+    <string name="invalid_credentials">Invalid email or password</string>
+    <string name="sign_in_with_google">Sign in with Google</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="account_section">Account</string>
+    <string name="notifications_section">Notifications</string>
+    <string name="security_section">Security</string>
+    <string name="data_section">Data &amp; Privacy</string>
+    <string name="about_section">About</string>
+    <string name="biometric_lock">Biometric Lock</string>
+    <string name="quiet_hours">Quiet Hours</string>
+    <string name="export_data">Export Data</string>
+    <string name="delete_account">Delete Account</string>
+
+    <!-- Subscription -->
+    <string name="free_tier">Free</string>
+    <string name="premium_tier">Premium</string>
+    <string name="family_tier">Family</string>
+    <string name="upgrade">Upgrade</string>
+    <string name="free_limit_reached">You\'ve reached the free limit of %d loci. Upgrade to Premium for unlimited.</string>
+
+    <!-- Errors -->
+    <string name="error_generic">Something went wrong. Please try again.</string>
+    <string name="error_network">No internet connection. Your data is saved locally.</string>
+    <string name="error_location_unavailable">Location unavailable. Please check your settings.</string>
+
+    <!-- Categories -->
+    <string name="category_general">General</string>
+    <string name="category_food">Food</string>
+    <string name="category_shopping">Shopping</string>
+    <string name="category_parking">Parking</string>
+    <string name="category_health">Health</string>
+    <string name="category_travel">Travel</string>
+    <string name="category_tip">Tip</string>
+    <string name="category_warning">Warning</string>
+    <string name="category_home">Home</string>
+    <string name="category_outdoor">Outdoor</string>
+</resources>

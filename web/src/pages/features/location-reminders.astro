@@ -1,0 +1,171 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Location-Based Reminders — Never Forget at the Right Place | Lociate",
+  "description": "Set reminders that trigger when you arrive at a location. Lociate uses iOS geofencing to notify you at the right place, not just the right time.",
+  "url": "https://useloci.com/features/location-reminders"
+};
+---
+
+<BaseLayout
+  title="Location-Based Reminders — Notifications That Know Where You Are | Lociate"
+  description="Set reminders that trigger when you arrive at a location. Lociate uses iOS geofencing for proximity notifications — never forget what you need to do at the grocery store, office, or home."
+  jsonLd={jsonLd}
+>
+  <!-- Hero -->
+  <section class="py-20 sm:py-28 bg-gradient-to-b from-brand-50 to-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h1 class="text-4xl sm:text-5xl font-bold tracking-tight text-gray-900">
+        Reminders That Trigger at the <em class="text-brand-600 not-italic">Right Place</em>
+      </h1>
+      <p class="mt-6 text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+        Time-based reminders go off when you can't act on them. Location-based reminders wait until you're exactly where you need to be.
+      </p>
+      <div class="mt-10">
+        <a
+          href="https://apps.apple.com/app/loci"
+          class="inline-flex items-center gap-3 bg-gray-900 text-white px-6 py-3 rounded-xl hover:bg-gray-800 transition-colors"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 22 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.09 22C7.79 22.05 6.8 20.68 5.96 19.47C4.25 16.56 2.93 11.3 4.69 7.95C5.56 6.29 7.29 5.22 9.17 5.2C10.45 5.18 11.67 6.08 12.45 6.08C13.23 6.08 14.72 4.99 16.26 5.15C16.88 5.18 18.75 5.42 19.95 7.17C19.86 7.23 17.58 8.57 17.6 11.3C17.63 14.56 20.47 15.63 20.5 15.64C20.47 15.71 20.03 17.24 18.71 19.5ZM13 3.5C13.73 2.67 14.94 2.04 15.94 2C16.07 3.17 15.6 4.35 14.9 5.19C14.21 6.04 13.07 6.7 11.95 6.61C11.8 5.46 12.36 4.26 13 3.5Z" />
+          </svg>
+          <div class="text-left">
+            <div class="text-[10px] leading-none opacity-80">Download on the</div>
+            <div class="text-lg font-semibold leading-tight">App Store</div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Problem/Solution -->
+  <section class="py-16 sm:py-20">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+        <div>
+          <h2 class="text-2xl font-bold text-gray-900 mb-6">The Problem With Time-Based Reminders</h2>
+          <ul class="space-y-4 text-gray-600">
+            <li class="flex gap-3">
+              <span class="text-red-400 flex-shrink-0">&#10007;</span>
+              "Remind me at 5pm to buy milk" — but you're not at the store at 5pm
+            </li>
+            <li class="flex gap-3">
+              <span class="text-red-400 flex-shrink-0">&#10007;</span>
+              You dismiss the notification and forget again
+            </li>
+            <li class="flex gap-3">
+              <span class="text-red-400 flex-shrink-0">&#10007;</span>
+              You can't predict when you'll be at a specific place
+            </li>
+            <li class="flex gap-3">
+              <span class="text-red-400 flex-shrink-0">&#10007;</span>
+              Recurring time reminders create notification fatigue
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h2 class="text-2xl font-bold text-gray-900 mb-6">The Lociate Solution</h2>
+          <ul class="space-y-4 text-gray-600">
+            <li class="flex gap-3">
+              <span class="text-green-500 flex-shrink-0">&#10003;</span>
+              Record "buy milk" at the grocery store — it triggers next time you're there
+            </li>
+            <li class="flex gap-3">
+              <span class="text-green-500 flex-shrink-0">&#10003;</span>
+              Notifications arrive when you can actually act on them
+            </li>
+            <li class="flex gap-3">
+              <span class="text-green-500 flex-shrink-0">&#10003;</span>
+              No scheduling needed — just record and walk away
+            </li>
+            <li class="flex gap-3">
+              <span class="text-green-500 flex-shrink-0">&#10003;</span>
+              Uses iOS geofencing — battery-efficient, no GPS tracking
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How geofencing works -->
+  <section class="py-16 sm:py-20 bg-gray-50">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl font-bold text-gray-900 text-center mb-12">How Proximity Notifications Work</h2>
+      <div class="max-w-2xl mx-auto space-y-8">
+        <div class="flex gap-6">
+          <div class="w-10 h-10 rounded-full bg-brand-600 text-white flex items-center justify-center font-bold flex-shrink-0">1</div>
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900">Save a voice note anywhere</h3>
+            <p class="text-gray-600 mt-1">Record your reminder, idea, or note. Lociate tags it with your GPS coordinates automatically.</p>
+          </div>
+        </div>
+        <div class="flex gap-6">
+          <div class="w-10 h-10 rounded-full bg-brand-600 text-white flex items-center justify-center font-bold flex-shrink-0">2</div>
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900">A geofence is created</h3>
+            <p class="text-gray-600 mt-1">iOS registers a ~100-meter geofence around the location. This uses hardware-level monitoring — no battery drain.</p>
+          </div>
+        </div>
+        <div class="flex gap-6">
+          <div class="w-10 h-10 rounded-full bg-brand-600 text-white flex items-center justify-center font-bold flex-shrink-0">3</div>
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900">Return and get notified</h3>
+            <p class="text-gray-600 mt-1">Walk, drive, or bike back to that location and your phone gently reminds you with your own voice note.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Scenarios -->
+  <section class="py-16 sm:py-20">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl font-bold text-gray-900 text-center mb-4">Real-World Scenarios</h2>
+      <p class="text-lg text-gray-500 text-center max-w-2xl mx-auto mb-12">Location reminders work best for recurring places in your life.</p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div class="bg-gray-50 rounded-2xl p-6">
+          <h3 class="font-semibold text-gray-900 mb-2">At the grocery store</h3>
+          <p class="text-sm text-gray-600">"We're out of olive oil and paper towels" — pops up next time you walk in.</p>
+        </div>
+        <div class="bg-gray-50 rounded-2xl p-6">
+          <h3 class="font-semibold text-gray-900 mb-2">At the office</h3>
+          <p class="text-sm text-gray-600">"Ask Sarah about the Q3 report" — reminds you Monday morning when you arrive.</p>
+        </div>
+        <div class="bg-gray-50 rounded-2xl p-6">
+          <h3 class="font-semibold text-gray-900 mb-2">At home</h3>
+          <p class="text-sm text-gray-600">"Check the washing machine" — triggers when you walk through the door.</p>
+        </div>
+        <div class="bg-gray-50 rounded-2xl p-6">
+          <h3 class="font-semibold text-gray-900 mb-2">At the gym</h3>
+          <p class="text-sm text-gray-600">"Try the new stretching routine" — waiting for you when you arrive.</p>
+        </div>
+        <div class="bg-gray-50 rounded-2xl p-6">
+          <h3 class="font-semibold text-gray-900 mb-2">At the pharmacy</h3>
+          <p class="text-sm text-gray-600">"Refill prescription and grab sunscreen" — no more wasted trips.</p>
+        </div>
+        <div class="bg-gray-50 rounded-2xl p-6">
+          <h3 class="font-semibold text-gray-900 mb-2">At school pickup</h3>
+          <p class="text-sm text-gray-600">"Ask teacher about field trip permission slip" — right when you arrive.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="py-16 sm:py-20 bg-gradient-to-b from-white to-brand-50">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="text-3xl font-bold text-gray-900 mb-4">Try Location-Based Reminders Free</h2>
+      <p class="text-lg text-gray-600 mb-8">Download Lociate and save up to 10 location reminders for free. No account required.</p>
+      <a
+        href="https://apps.apple.com/app/loci"
+        class="inline-flex items-center gap-3 bg-gray-900 text-white px-8 py-4 rounded-xl hover:bg-gray-800 transition-colors text-lg"
+      >
+        Download Free on the App Store
+      </a>
+    </div>
+  </section>
+</BaseLayout>

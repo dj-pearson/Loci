@@ -1,0 +1,135 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Family Sharing — Share Voice Notes With Your Household | Lociate",
+  "description": "Share location-based voice notes with up to 6 family members. Leave notes at places for your partner, kids, or roommates to discover.",
+  "url": "https://useloci.com/features/family-sharing"
+};
+---
+
+<BaseLayout
+  title="Family Sharing — Share Location Notes With Your Household | Lociate"
+  description="Share location-pinned voice notes with up to 6 family members. Leave reminders at the grocery store, school, or home for your household to find when they arrive."
+  jsonLd={jsonLd}
+>
+  <!-- Hero -->
+  <section class="py-20 sm:py-28 bg-gradient-to-b from-purple-50 to-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h1 class="text-4xl sm:text-5xl font-bold tracking-tight text-gray-900">
+        Leave Notes for Your Family at <em class="text-purple-600 not-italic">Places</em>
+      </h1>
+      <p class="mt-6 text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+        Share voice notes with your household. Your partner gets reminded to grab milk when they walk into the store — not when you text them at the wrong time.
+      </p>
+      <div class="mt-10">
+        <a
+          href="https://apps.apple.com/app/loci"
+          class="inline-flex items-center gap-3 bg-gray-900 text-white px-6 py-3 rounded-xl hover:bg-gray-800 transition-colors"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 22 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.09 22C7.79 22.05 6.8 20.68 5.96 19.47C4.25 16.56 2.93 11.3 4.69 7.95C5.56 6.29 7.29 5.22 9.17 5.2C10.45 5.18 11.67 6.08 12.45 6.08C13.23 6.08 14.72 4.99 16.26 5.15C16.88 5.18 18.75 5.42 19.95 7.17C19.86 7.23 17.58 8.57 17.6 11.3C17.63 14.56 20.47 15.63 20.5 15.64C20.47 15.71 20.03 17.24 18.71 19.5ZM13 3.5C13.73 2.67 14.94 2.04 15.94 2C16.07 3.17 15.6 4.35 14.9 5.19C14.21 6.04 13.07 6.7 11.95 6.61C11.8 5.46 12.36 4.26 13 3.5Z" />
+          </svg>
+          <div class="text-left">
+            <div class="text-[10px] leading-none opacity-80">Download on the</div>
+            <div class="text-lg font-semibold leading-tight">App Store</div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section class="py-16 sm:py-20">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl font-bold text-gray-900 text-center mb-12">How Family Sharing Works</h2>
+      <div class="max-w-2xl mx-auto space-y-8">
+        <div class="flex gap-6">
+          <div class="w-10 h-10 rounded-full bg-purple-600 text-white flex items-center justify-center font-bold flex-shrink-0">1</div>
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900">Create a household</h3>
+            <p class="text-gray-600 mt-1">Set up a household from Lociate's settings and invite up to 5 other members (6 total).</p>
+          </div>
+        </div>
+        <div class="flex gap-6">
+          <div class="w-10 h-10 rounded-full bg-purple-600 text-white flex items-center justify-center font-bold flex-shrink-0">2</div>
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900">Toggle "Share with Family"</h3>
+            <p class="text-gray-600 mt-1">When recording or editing a note, flip the family toggle to make it visible to your household.</p>
+          </div>
+        </div>
+        <div class="flex gap-6">
+          <div class="w-10 h-10 rounded-full bg-purple-600 text-white flex items-center justify-center font-bold flex-shrink-0">3</div>
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900">Family members get notified</h3>
+            <p class="text-gray-600 mt-1">When any household member approaches the location, they receive the proximity notification with your voice note.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Use cases -->
+  <section class="py-16 sm:py-20 bg-gray-50">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl font-bold text-gray-900 text-center mb-4">Better Than a Group Text</h2>
+      <p class="text-lg text-gray-500 text-center max-w-2xl mx-auto mb-12">Texts get buried. Location notes arrive exactly when they're useful.</p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div class="bg-white rounded-2xl p-6 border border-gray-100">
+          <h3 class="font-semibold text-gray-900 mb-2">Grocery runs</h3>
+          <p class="text-sm text-gray-600">"We need diapers and bananas" — whoever goes to the store next gets reminded.</p>
+        </div>
+        <div class="bg-white rounded-2xl p-6 border border-gray-100">
+          <h3 class="font-semibold text-gray-900 mb-2">School & daycare</h3>
+          <p class="text-sm text-gray-600">"Don't forget the permission slip" — triggers at pickup time when you're there.</p>
+        </div>
+        <div class="bg-white rounded-2xl p-6 border border-gray-100">
+          <h3 class="font-semibold text-gray-900 mb-2">Shared spaces</h3>
+          <p class="text-sm text-gray-600">"The garage door sensor is acting up" — note pinned to the garage for your partner.</p>
+        </div>
+        <div class="bg-white rounded-2xl p-6 border border-gray-100">
+          <h3 class="font-semibold text-gray-900 mb-2">Coordinating errands</h3>
+          <p class="text-sm text-gray-600">Drop a note at the dry cleaners, pharmacy, or hardware store for whoever goes first.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Privacy -->
+  <section class="py-16 sm:py-20">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="text-3xl font-bold text-gray-900 mb-6">Private by Design</h2>
+      <p class="text-lg text-gray-600 mb-8">Family sharing is invite-only. There are no public profiles, no social features, and no way for anyone outside your household to see your notes. You control exactly which notes are shared.</p>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 text-left">
+        <div class="p-4">
+          <h3 class="font-semibold text-gray-900 mb-1">Invite-only</h3>
+          <p class="text-sm text-gray-500">Only people you explicitly invite can join your household.</p>
+        </div>
+        <div class="p-4">
+          <h3 class="font-semibold text-gray-900 mb-1">Per-note control</h3>
+          <p class="text-sm text-gray-500">Each note has its own sharing toggle. Private by default.</p>
+        </div>
+        <div class="p-4">
+          <h3 class="font-semibold text-gray-900 mb-1">Creator attribution</h3>
+          <p class="text-sm text-gray-500">Shared notes show who created them so everyone knows the source.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section class="py-16 sm:py-20 bg-gray-50">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="text-3xl font-bold text-gray-900 mb-4">Family Plan — $5.99/month</h2>
+      <p class="text-lg text-gray-600 mb-8">Includes everything in Premium plus household sharing for up to 6 members. One subscription covers the whole family.</p>
+      <a
+        href="https://apps.apple.com/app/loci"
+        class="inline-flex items-center gap-3 bg-gray-900 text-white px-8 py-4 rounded-xl hover:bg-gray-800 transition-colors text-lg"
+      >
+        Start Family Trial
+      </a>
+    </div>
+  </section>
+</BaseLayout>

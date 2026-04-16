@@ -1,18 +1,24 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [] as { "@type": string; name: string; acceptedAnswer: { "@type": string; text: string } }[]
+};
+
 const faqs = [
   {
-    question: "Does Loci drain my battery?",
-    answer: "Loci uses iOS's built-in geofence monitoring, which is extremely power-efficient. It does not continuously track your GPS. Apple's system wakes the app only when you enter or exit a monitored area. Most users see no noticeable impact on battery life."
+    question: "Does Lociate drain my battery?",
+    answer: "Lociate uses iOS's built-in geofence monitoring, which is extremely power-efficient. It does not continuously track your GPS. Apple's system wakes the app only when you enter or exit a monitored area. Most users see no noticeable impact on battery life."
   },
   {
-    question: "Why does Loci need 'Always Allow' location access?",
-    answer: "Proximity notifications only work when Loci can monitor your location in the background. 'Always Allow' lets iOS notify you when you return to a place with a saved locus — even when the app isn't open. Without it, you'll only get notifications while actively using the app."
+    question: "Why does Lociate need 'Always Allow' location access?",
+    answer: "Proximity notifications only work when Lociate can monitor your location in the background. 'Always Allow' lets iOS notify you when you return to a place with a saved locus — even when the app isn't open. Without it, you'll only get notifications while actively using the app."
   },
   {
     question: "How do proximity triggers work?",
-    answer: "When you save a locus, Loci registers a geofence around that location with iOS. When your device detects you've entered that area, it wakes Loci, which sends you a notification with your saved note. This all happens on-device — no server tracking involved."
+    answer: "When you save a locus, Lociate registers a geofence around that location with iOS. When your device detects you've entered that area, it wakes Lociate, which sends you a notification with your saved note. This all happens on-device — no server tracking involved."
   },
   {
     question: "How does family sharing work?",
@@ -20,15 +26,15 @@ const faqs = [
   },
   {
     question: "How do I manage my subscription?",
-    answer: "Subscriptions are managed through the Apple App Store. Go to Settings → Apple ID → Subscriptions on your iPhone to change plans, cancel, or manage billing. You can also upgrade or view your plan from Loci's Settings screen."
+    answer: "Subscriptions are managed through the Apple App Store. Go to Settings → Apple ID → Subscriptions on your iPhone to change plans, cancel, or manage billing. You can also upgrade or view your plan from Lociate's Settings screen."
   },
   {
     question: "Is my data private?",
     answer: "Yes. All transcription happens on-device using Apple's Speech framework — your audio never leaves your phone for processing. Data is stored locally by default. Cloud sync is optional (Premium/Family) and uses encrypted connections. We never sell your data."
   },
   {
-    question: "Can I use Loci without an account?",
-    answer: "Yes. Loci's core features — recording, playback, transcription, and proximity notifications — work entirely offline without an account. An account is only needed for cloud sync and family sharing (Premium/Family plans)."
+    question: "Can I use Lociate without an account?",
+    answer: "Yes. Lociate's core features — recording, playback, transcription, and proximity notifications — work entirely offline without an account. An account is only needed for cloud sync and family sharing (Premium/Family plans)."
   },
   {
     question: "What's the limit on free accounts?",
@@ -40,8 +46,8 @@ const troubleshooting = [
   {
     title: "Notifications not working",
     steps: [
-      "Open Settings → Loci and confirm Notifications are enabled",
-      "Check that Location is set to 'Always' (Settings → Loci → Location)",
+      "Open Settings → Lociate and confirm Notifications are enabled",
+      "Check that Location is set to 'Always' (Settings → Lociate → Location)",
       "Make sure you have loci saved near places you visit — notifications trigger within ~100 meters",
       "Restart your iPhone if permissions were recently changed",
       "Ensure Low Power Mode is off, as it can delay background monitoring"
@@ -51,7 +57,7 @@ const troubleshooting = [
     title: "Location permissions issue",
     steps: [
       "Go to Settings → Privacy & Security → Location Services",
-      "Find Loci and select 'Always'",
+      "Find Lociate and select 'Always'",
       "If 'Always' is not available, select 'While Using the App' first, use the app, then change to 'Always'",
       "Make sure Location Services is turned on globally at the top of the screen"
     ]
@@ -59,7 +65,7 @@ const troubleshooting = [
   {
     title: "Microphone not working",
     steps: [
-      "Go to Settings → Loci and confirm Microphone access is enabled",
+      "Go to Settings → Lociate and confirm Microphone access is enabled",
       "Try closing and reopening the app",
       "Check if another app is using the microphone (active orange dot in status bar)",
       "Restart your iPhone if the issue persists"
@@ -70,15 +76,27 @@ const troubleshooting = [
     steps: [
       "Confirm you have an active Premium or Family subscription",
       "Check your internet connection",
-      "Go to Loci Settings → Data Management and try a manual sync",
+      "Go to Lociate Settings → Data Management and try a manual sync",
       "Sign out and sign back in to refresh your session",
       "If issues persist, contact us at hello@useloci.com"
     ]
   }
 ];
+
+// Build FAQ JSON-LD from the faqs array
+faqs.forEach((faq) => {
+  faqJsonLd.mainEntity.push({
+    "@type": "Question",
+    "name": faq.question,
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": faq.answer
+    }
+  });
+});
 ---
 
-<BaseLayout title="Support — Loci" description="Get help with Loci. Browse FAQs, troubleshooting guides, or contact our team.">
+<BaseLayout title="Support & FAQ — Lociate App Help" description="Get help with Lociate. Browse FAQs about location permissions, proximity notifications, battery usage, family sharing, and more." jsonLd={faqJsonLd}>
   <!-- Hero -->
   <section class="py-16 sm:py-20 bg-gradient-to-b from-brand-50 to-white">
     <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -193,8 +211,8 @@ const troubleshooting = [
   <!-- App Store Review -->
   <section class="py-16 sm:py-20 bg-gradient-to-b from-white to-brand-50">
     <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-      <h2 class="text-2xl font-bold text-gray-900 mb-3">Enjoying Loci?</h2>
-      <p class="text-gray-600 mb-6">We'd love to hear from you. A review helps others discover Loci and helps us improve.</p>
+      <h2 class="text-2xl font-bold text-gray-900 mb-3">Enjoying Lociate?</h2>
+      <p class="text-gray-600 mb-6">We'd love to hear from you. A review helps others discover Lociate and helps us improve.</p>
       <a
         href="https://apps.apple.com/app/loci-your-spatial-memory/id0000000000?action=write-review"
         target="_blank"

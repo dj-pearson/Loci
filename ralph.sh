@@ -1,6 +1,6 @@
 #!/bin/bash
 # ============================================================================
-# ralph.sh — Autonomous Ralph Loop for Loci
+# ralph.sh — Autonomous Ralph Loop for Lociate
 # Runs Claude Code CLI in non-interactive mode, one user story per iteration.
 # Usage: bash ralph.sh [--max-iterations N] [--delay SECONDS]
 # ============================================================================
@@ -49,7 +49,7 @@ done
 # Pre-flight checks
 # ---------------------------------------------------------------------------
 echo "============================================"
-echo "  RALPH — Loci Autonomous Build Loop"
+echo "  RALPH — Lociate Autonomous Build Loop"
 echo "============================================"
 echo ""
 
