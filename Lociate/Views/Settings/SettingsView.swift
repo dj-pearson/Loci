@@ -221,8 +221,9 @@ struct SettingsView: View {
                     }
                 }
 
+                // US-176: Real Manage Subscription destination (was a Text placeholder).
                 NavigationLink {
-                    Text(String(localized: "Manage Subscription"))
+                    ManageSubscriptionView()
                 } label: {
                     Label(String(localized: "Manage Subscription"), systemImage: "creditcard")
                 }
@@ -244,8 +245,9 @@ struct SettingsView: View {
                     Text(String(localized: "Your local data will be kept, but cloud sync will stop."))
                 }
             } else {
+                // US-176: Real Sign In destination (was a Text placeholder).
                 NavigationLink {
-                    Text(String(localized: "Sign In"))
+                    SignInView()
                 } label: {
                     Label(String(localized: "Sign In"), systemImage: "person.badge.plus")
                 }
@@ -396,12 +398,8 @@ struct SettingsView: View {
             } message: {
                 Text(String(localized: "\(deletedArchivedCount) audio file(s) deleted."))
             }
-
-            NavigationLink {
-                Text(String(localized: "Export Data"))
-            } label: {
-                Label(String(localized: "Export Data"), systemImage: "square.and.arrow.up")
-            }
+            // US-176: Removed duplicate "Export Data" NavigationLink stub — the
+            // working "Export My Data" button already lives in the Privacy section.
         }
     }
 

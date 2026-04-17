@@ -144,9 +144,12 @@ final class AudioService {
         isRecording = false
         currentAmplitude = 0.0
 
-        // Encrypt the recorded audio file at rest
+        // US-177: Encrypt on a background task so the UI and record sheet animation
+        // are not blocked by CryptoKit work (previously a 50–100ms main-thread freeze).
         if let url = currentRecordingURL {
-            try? AudioEncryptionService.encryptFile(at: url)
+            Task.detached(priority: .utility) {
+                try? AudioEncryptionService.encryptFile(at: url)
+            }
         }
 
         let generator = UIImpactFeedbackGenerator(style: .light)

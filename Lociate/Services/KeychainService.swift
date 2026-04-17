@@ -34,7 +34,17 @@ enum KeychainService {
 
     // MARK: - Save
 
+    /// Saves data to the Keychain with the most restrictive accessibility attributes:
+    /// - kSecAttrAccessibleWhenUnlockedThisDeviceOnly: data is inaccessible while device is
+    ///   locked and is never migrated to a new device on restore (unlike AfterFirstUnlock).
+    /// - kSecAttrSynchronizable=false: never replicated to iCloud Keychain.
     static func save(key: String, data: Data) throws {
+        try saveWithAccessibility(key: key, data: data, accessibility: kSecAttrAccessibleWhenUnlockedThisDeviceOnly)
+    }
+
+    /// Explicit accessibility override for callers that need a different class
+    /// (e.g., background fetch tokens). Synchronizable is always forced to false.
+    static func saveWithAccessibility(key: String, data: Data, accessibility: CFString) throws {
         // Delete existing item first to avoid duplicates
         try? delete(key: key)
 
@@ -42,7 +52,8 @@ enum KeychainService {
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrAccount as String: key,
             kSecValueData as String: data,
-            kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlock,
+            kSecAttrAccessible as String: accessibility,
+            kSecAttrSynchronizable as String: kCFBooleanFalse as Any,
         ]
 
         let status = SecItemAdd(query as CFDictionary, nil)

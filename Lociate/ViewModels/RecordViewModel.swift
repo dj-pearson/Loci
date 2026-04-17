@@ -3,6 +3,7 @@ import CoreLocation
 import Foundation
 import SwiftData
 import UIKit
+import WidgetKit
 
 @Observable
 final class RecordViewModel {
@@ -202,6 +203,10 @@ final class RecordViewModel {
 
     /// Saves a recorded locus to SwiftData, reverse geocodes its location, auto-categorizes
     /// the transcription, refreshes geofences, and fires a success haptic.
+    ///
+    /// US-177: Geocoding and keyword categorization now run off the main actor with a
+    /// 2-second timeout on geocoding; if the network is slow, the locus is saved
+    /// immediately with a nil locationName and the name is patched in a follow-up task.
     func saveLocus(
         audioURL: URL,
         transcription: String,
@@ -218,13 +223,19 @@ final class RecordViewModel {
 
         isSaving = true
 
-        // Reverse geocode location name (best-effort, non-blocking on failure)
-        let locationName = try? await geocodingService.reverseGeocode(coordinate)
+        // US-177: Bounded reverse geocode — never block the save by more than 2s.
+        let locationName = await Self.geocodeWithTimeout(
+            coordinate: coordinate,
+            geocodingService: geocodingService,
+            timeout: .seconds(2)
+        )
 
-        // Auto-categorize if the user kept the default general category
+        // US-177: Keyword categorization runs off the main actor.
         let finalCategory: LocusCategory
         if category == .general {
-            finalCategory = AICategoryService.categorize(transcription: transcription)
+            finalCategory = await Task.detached(priority: .userInitiated) {
+                AICategoryService.categorize(transcription: transcription)
+            }.value
         } else {
             finalCategory = category
         }
@@ -252,8 +263,24 @@ final class RecordViewModel {
             return
         }
 
+        // US-177: If geocoding timed out, patch the location name in the background
+        // so the UI feels instant but the final locus still gets a readable label.
+        if locationName == nil {
+            let locusID = locus.id
+            let geocoder = geocodingService
+            Task.detached(priority: .utility) { [weak self] in
+                guard let late = try? await geocoder.reverseGeocode(coordinate),
+                      let self else { return }
+                await self.applyLateLocationName(late, to: locusID)
+            }
+        }
+
         // Notify the geofence system about the new locus
         NotificationCenter.default.post(name: .locusDidCreate, object: nil)
+
+        // US-178: Nudge the widget so its hourly refresh cadence never leaves the
+        // "Nearby Loci" list visibly stale after a fresh recording.
+        WidgetCenter.shared.reloadAllTimelines()
 
         // Success haptic
         let generator = UINotificationFeedbackGenerator()
@@ -264,6 +291,42 @@ final class RecordViewModel {
 
         isSaving = false
         didSaveLocus = true
+    }
+
+    /// Patches the locationName of a previously-saved Locus if the deferred geocode
+    /// completes after the save. Runs on the main actor so SwiftData mutations are
+    /// serialized.
+    @MainActor
+    private func applyLateLocationName(_ name: String, to locusID: UUID) {
+        guard let modelContext else { return }
+        let descriptor = FetchDescriptor<Locus>(
+            predicate: #Predicate<Locus> { $0.id == locusID }
+        )
+        guard let match = try? modelContext.fetch(descriptor).first else { return }
+        match.locationName = name
+        match.updatedAt = Date()
+        try? modelContext.save()
+    }
+
+    /// US-177: Races the reverse-geocode call against a deadline. Returns `nil` if
+    /// the deadline elapses — the caller saves immediately and patches the name later.
+    private static func geocodeWithTimeout(
+        coordinate: CLLocationCoordinate2D,
+        geocodingService: ReverseGeocodingService,
+        timeout: Duration
+    ) async -> String? {
+        await withTaskGroup(of: String?.self) { group in
+            group.addTask {
+                try? await geocodingService.reverseGeocode(coordinate)
+            }
+            group.addTask {
+                try? await Task.sleep(for: timeout)
+                return nil
+            }
+            defer { group.cancelAll() }
+            if let first = await group.next() { return first }
+            return nil
+        }
     }
 
     // MARK: - Duration Timer

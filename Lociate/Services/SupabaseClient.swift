@@ -66,6 +66,10 @@ private struct KeychainAuthStorage: AuthLocalStorage {
 
         var addQuery = query
         addQuery[kSecValueData as String] = value
+        // Inaccessible while device is locked; never migrated to other devices.
+        addQuery[kSecAttrAccessible as String] = kSecAttrAccessibleWhenUnlockedThisDeviceOnly
+        // Never replicated to iCloud Keychain.
+        addQuery[kSecAttrSynchronizable as String] = kCFBooleanFalse as Any
 
         let status = SecItemAdd(addQuery as CFDictionary, nil)
         guard status == errSecSuccess else {

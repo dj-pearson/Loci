@@ -3,8 +3,8 @@
 ## Branch: ralph/loci-mvp
 ## Started: 2026-03-25
 ## Status: IN PROGRESS
-## Total Stories: 164
-## Completed: 164/164
+## Total Stories: 184
+## Completed: 178/184
 
 ---
 
@@ -254,6 +254,20 @@ Note: "loci" (lowercase, plural) remains the internal domain term for saved pins
 - [x] US-162: Android CI/CD: GitHub Actions build, lint, and test pipeline
 - [x] US-163: Android family sharing: household creation, join, member management
 - [x] US-164: Android monetization: Google Play Billing with tier enforcement
+
+## Phase 26: 2026-04 Deep-Dive Audit — Top-4 Critical Fixes (US-175 → US-178)
+- [x] US-175: Critical security hardening — Keychain accessibility + biometric background lock + app-switcher privacy overlay + Apple Sign In nonce
+- [x] US-176: Fix broken Settings navigation stubs (Sign In, Manage Subscription, duplicate Export Data)
+- [x] US-177: Cold-start performance — defer RevenueCat/Analytics/Integrity init + move save-flow work off main thread
+- [x] US-178: Widget efficient fetch (spatial predicate + hourly cadence) + decrypted audio temp file cleanup
+
+## Phase 27: Backlog from 2026-04 Deep-Dive Audit (US-179 → US-184) — DEFERRED
+- [ ] US-179: Account & Subscription management hub (full profile edit flow)
+- [ ] US-180: Map long-press to pin a locus retroactively
+- [ ] US-181: Bulk actions — multi-select archive / delete / share on list view
+- [ ] US-182: Share sheet for locus transcription and audio
+- [ ] US-183: Map render optimization — cache clustering and bound @Query fetches
+- [ ] US-184: Session timeout reduction + jailbreak gating + backup exclusion
 
 ## Phase 25: Mobile UI/UX Premium Polish (US-165 → US-174)
 - [x] US-165: Premium design token system (iOS + Android) — DesignSystem.swift + DesignTokens.kt with Space/Radius/Elevation/Gradients/Motion/Duration/Surface, premiumCard modifier on both platforms
