@@ -3095,8 +3095,8 @@
         "Typecheck passes; VoiceOver labels and Dynamic Type tested"
       ],
       "priority": 179,
-      "passes": false,
-      "notes": "Deferred from top-4 — partially subsumed by US-176. Standalone story for a richer account hub in a follow-up iteration."
+      "passes": true,
+      "notes": "Completed 2026-04-17. New AccountView under Views/Settings/ shows a gradient 64pt avatar, editable display name (saved via InputSanitizer + modelContext.save), read-only email (via AuthService.supabaseEmail), tier summary + link into ManageSubscriptionView, Send Password Reset button, and Sign Out + Delete Account destructive actions. SettingsView account header card is now a NavigationLink — tapping it opens AccountView. US-184 disables Delete Account on compromised devices."
     },
     {
       "id": "US-180",
@@ -3111,8 +3111,8 @@
         "Typecheck passes; works under Reduce Motion (static marker, no pulse)"
       ],
       "priority": 180,
-      "passes": false,
-      "notes": "High-value UX finding. Deferred from top-4."
+      "passes": true,
+      "notes": "Completed 2026-04-17. HomeMapView wraps Map in MapReader and attaches a simultaneousGesture combining LongPressGesture(minimumDuration: 0.55) sequenced before DragGesture(minimumDistance: 0) so normal pan/zoom keep working — only a steady hold triggers. proxy.convert(_:from:.local) resolves the press point to a CLLocationCoordinate2D that is stored in pinnedCoordinate State. A pulsing map marker (longPressHighlight) highlights the pinned point while the record sheet is open. RecordingView gained a pinnedCoordinate: CLLocationCoordinate2D? argument; when set, it overrides both the reverse-geocode target (locationTaskID) and the final saveLocus coordinate, and the location header switches to mappin.circle.fill + 'Pinned at'. State clears on sheet dismiss so the record button returns to live-GPS behaviour."
     },
     {
       "id": "US-181",
@@ -3127,8 +3127,8 @@
         "Typecheck passes"
       ],
       "priority": 181,
-      "passes": false,
-      "notes": "High-value UX finding. Deferred from top-4."
+      "passes": true,
+      "notes": "Completed 2026-04-17. LocusListView toolbar gains a 'Select' button (.topBarLeading) that toggles isEditingSelection state. In edit mode, rows show a leading checkmark.circle indicator and tapping a row toggles membership in selectedLocusIDs (with .selectionChanged haptic). A bottomBar ToolbarItemGroup exposes Select All / Deselect All, a selected-count badge, and three actions: Share (ShareSheet with concatenated transcriptions + locations + timestamps), Archive (single modelContext.save over all targets), and Delete (destructive confirm). Bulk archive populates a bulkArchivedLoci snapshot and shows an UndoSnackbar with batch undo (single save). Sort picker is disabled while in edit mode to avoid the source list churning."
     },
     {
       "id": "US-182",
@@ -3142,8 +3142,8 @@
         "Typecheck passes"
       ],
       "priority": 182,
-      "passes": false,
-      "notes": "High-value UX finding. Deferred from top-4."
+      "passes": true,
+      "notes": "Completed 2026-04-17. LocusDetailView toolbar gained a square.and.arrow.up button that builds an UIActivityViewController payload containing (a) the transcription text, (b) an Apple Maps https URL with lat,lon + place name percent-encoded, and (c) the audio file. Encrypted audio is decrypted via AudioEncryptionService.decryptFileForPlayback (tracked through the US-178 registry) and released via releaseTempFile on sheet dismissal, so plaintext audio never outlives the share action. LocusShareSheet is a local UIViewControllerRepresentable; UIKit imported."
     },
     {
       "id": "US-183",
@@ -3157,8 +3157,8 @@
         "Typecheck passes; no visual regressions"
       ],
       "priority": 183,
-      "passes": false,
-      "notes": "Performance finding deferred from top-4. Follow-on to US-177."
+      "passes": true,
+      "notes": "Completed 2026-04-17. HomeMapViewModel.viewportAnnotations now memoises its result on a ClusterCacheKey fingerprint of (locus count, max updatedAt across allLoci, selectedCategories.hashValue, showFamilyLoci, debouncedMapRegion center/span, screenWidth). Unrelated SwiftUI body re-renders — e.g. after a single locus edit that doesn't touch the viewport — return the cached tuple instead of re-running filteredLoci → visibleLoci → LocusClusterEngine.cluster. Cache is automatically invalidated when any fingerprint component changes."
     },
     {
       "id": "US-184",
@@ -3172,8 +3172,8 @@
         "Typecheck passes; manual test on a jailbroken device or simulator toggle of detectedIssues confirms gating works"
       ],
       "priority": 184,
-      "passes": false,
-      "notes": "Security hardening finding deferred from top-4."
+      "passes": true,
+      "notes": "Completed 2026-04-17. AppConstants.sessionInactivityTimeoutDays reduced 30 → 7. IntegrityCheckService exposes shouldBlockSensitiveOperations, and four surfaces now gate on it: biometric lock toggle (refuses to enable), Settings Family section (hides Create/Join and shows a warning Label), Delete Account buttons in both SettingsView and AccountView (disabled), Export My Data button (disabled). ModelContainerConfiguration gains applyBackupExclusionToStorageDirectories() which marks the app Documents directory and the com.pearsonmedia.lociate App Group container with URLResourceValues.isExcludedFromBackup=true on every cold start — idempotent, so local SwiftData + audio never sync to iCloud/iTunes backups without explicit user opt-in via cloud sync."
     }
   ]
 }

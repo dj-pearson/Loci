@@ -36,6 +36,26 @@ final class HomeMapViewModel {
 
     private var regionDebounceTask: Task<Void, Never>?
 
+    // MARK: - US-183: Clustering Cache
+
+    /// Fingerprint that uniquely identifies a clustering input so we can
+    /// return the same result when SwiftUI re-renders without the loci or
+    /// viewport actually changing.
+    private struct ClusterCacheKey: Equatable {
+        let locusCount: Int
+        let maxUpdatedAt: Double
+        let selectedCategoriesHash: Int
+        let showFamilyLoci: Bool
+        let centerLat: Double
+        let centerLon: Double
+        let spanLat: Double
+        let spanLon: Double
+        let screenWidth: Double
+    }
+
+    private var cachedClusterKey: ClusterCacheKey?
+    private var cachedClusterResult: (singles: [Locus], clusters: [LocusCluster])?
+
     // MARK: - Initialization
 
     init(locationService: LocationService) {
@@ -113,10 +133,35 @@ final class HomeMapViewModel {
     /// Clusters visible loci for the current viewport, enforcing the max annotation limit.
     /// When visible annotations exceed `maxAnnotations`, clustering threshold is increased
     /// until the total count (singles + clusters) fits within the budget.
+    ///
+    /// US-183: Result is memoised on a fingerprint of (loci identity,
+    /// category filter, family toggle, viewport, screen width). Unrelated
+    /// SwiftUI body re-renders hit the cache instead of re-running
+    /// filtering + clustering (previously O(n) on every @Query update).
     func viewportAnnotations(
         from allLoci: [Locus],
         screenWidth: CGFloat
     ) -> (singles: [Locus], clusters: [LocusCluster]) {
+        let maxUpdatedAt = allLoci.reduce(0.0) { partial, locus in
+            max(partial, locus.updatedAt.timeIntervalSinceReferenceDate)
+        }
+
+        let key = ClusterCacheKey(
+            locusCount: allLoci.count,
+            maxUpdatedAt: maxUpdatedAt,
+            selectedCategoriesHash: selectedCategories.hashValue,
+            showFamilyLoci: showFamilyLoci,
+            centerLat: debouncedMapRegion.center.latitude,
+            centerLon: debouncedMapRegion.center.longitude,
+            spanLat: debouncedMapRegion.span.latitudeDelta,
+            spanLon: debouncedMapRegion.span.longitudeDelta,
+            screenWidth: Double(screenWidth)
+        )
+
+        if key == cachedClusterKey, let cached = cachedClusterResult {
+            return cached
+        }
+
         let visible = visibleLoci(from: allLoci)
         var threshold: CGFloat = 60
         var result = LocusClusterEngine.cluster(
@@ -139,6 +184,8 @@ final class HomeMapViewModel {
             totalAnnotations = result.singles.count + result.clusters.count
         }
 
+        cachedClusterKey = key
+        cachedClusterResult = result
         return result
     }
 

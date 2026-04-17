@@ -13,6 +13,12 @@ final class IntegrityCheckService {
     private(set) var isCompromised = false
     private(set) var detectedIssues: [IntegrityIssue] = []
 
+    /// US-184: Gate for sensitive operations — household management,
+    /// biometric enrolment, account deletion, and data export refuse to
+    /// proceed when this returns true. Surfaces a user-facing banner
+    /// explaining why.
+    var shouldBlockSensitiveOperations: Bool { isCompromised }
+
     private let logger = Logger(subsystem: "com.pearsonmedia.loci", category: "IntegrityCheck")
 
     enum IntegrityIssue: String, CaseIterable {
