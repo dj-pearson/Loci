@@ -1,11 +1,17 @@
 import MapKit
 import SwiftUI
+import UIKit
 
 struct LocusDetailView: View {
     @Bindable var viewModel: LocusDetailViewModel
     @Environment(\.dismiss) private var dismiss
     @State private var showEditSheet = false
     @State private var showDeleteConfirmation = false
+    // US-182: Share sheet state.
+    @State private var shareItems: [Any] = []
+    @State private var showShareSheet = false
+    @State private var isPreparingShare = false
+    @State private var shareDecryptedAudioURL: URL?
 
     private var locus: Locus { viewModel.locus }
 
@@ -42,6 +48,20 @@ struct LocusDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
+                // US-182: Share transcription, location, and audio outside
+                // of family sharing (Messages, Mail, Notes, AirDrop, etc.).
+                Button {
+                    Task { await prepareAndShowShareSheet() }
+                } label: {
+                    if isPreparingShare {
+                        ProgressView()
+                    } else {
+                        Image(systemName: "square.and.arrow.up")
+                    }
+                }
+                .accessibilityLabel(String(localized: "Share voice note"))
+                .disabled(isPreparingShare)
+
                 Button {
                     showEditSheet = true
                 } label: {
@@ -65,6 +85,17 @@ struct LocusDetailView: View {
                     Image(systemName: "trash")
                 }
             }
+        }
+        .sheet(isPresented: $showShareSheet, onDismiss: {
+            // US-182: Release the decrypted audio temp file so plaintext
+            // audio doesn't linger in /tmp after sharing.
+            if let url = shareDecryptedAudioURL {
+                AudioEncryptionService.releaseTempFile(at: url)
+                shareDecryptedAudioURL = nil
+            }
+            shareItems = []
+        }) {
+            LocusShareSheet(items: shareItems)
         }
         .sheet(isPresented: $showEditSheet) {
             EditLocusSheet(viewModel: viewModel)
@@ -196,4 +227,56 @@ struct LocusDetailView: View {
         .padding(Theme.Spacing.sm)
         .background(Theme.primary.opacity(0.08), in: RoundedRectangle(cornerRadius: Theme.CornerRadius.small))
     }
+
+    // MARK: - US-182: Share
+
+    /// Builds the share payload (transcription, Apple Maps link, audio file)
+    /// and presents UIActivityViewController. Audio is decrypted into a
+    /// tracked temp file that is released when the share sheet dismisses.
+    private func prepareAndShowShareSheet() async {
+        isPreparingShare = true
+        defer { isPreparingShare = false }
+
+        var items: [Any] = []
+
+        let transcript = locus.transcription
+        if !transcript.isEmpty {
+            items.append(transcript)
+        }
+
+        let coord = locus.coordinate
+        let place = locus.locationName.map { $0.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? $0 }
+            ?? ""
+        let mapsURLString = "https://maps.apple.com/?ll=\(coord.latitude),\(coord.longitude)&q=\(place)"
+        if let mapsURL = URL(string: mapsURLString) {
+            items.append(mapsURL)
+        }
+
+        if let audioURL = viewModel.audioURL,
+           FileManager.default.fileExists(atPath: audioURL.path) {
+            if AudioEncryptionService.isFileEncrypted(at: audioURL) {
+                if let decrypted = try? AudioEncryptionService.decryptFileForPlayback(at: audioURL) {
+                    shareDecryptedAudioURL = decrypted
+                    items.append(decrypted)
+                }
+            } else {
+                items.append(audioURL)
+            }
+        }
+
+        shareItems = items
+        showShareSheet = true
+    }
+}
+
+// MARK: - US-182: Share Sheet Wrapper
+
+private struct LocusShareSheet: UIViewControllerRepresentable {
+    let items: [Any]
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: items, applicationActivities: nil)
+    }
+
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }

@@ -1,4 +1,5 @@
 import AuthenticationServices
+import CryptoKit
 import SwiftUI
 
 struct SignInView: View {
@@ -14,6 +15,8 @@ struct SignInView: View {
     @State private var isPasswordVisible = false
     // US-147: Error shake animation
     @State private var errorShakeOffset: CGFloat = 0
+    // US-175: Raw Apple Sign In nonce (SHA256 sent on request, raw sent to Supabase)
+    @State private var currentAppleNonce: String?
 
     @FocusState private var focusedField: SignInField?
 
@@ -44,6 +47,11 @@ struct SignInView: View {
                     // Apple Sign In
                     SignInWithAppleButton(.signIn) { request in
                         request.requestedScopes = [.fullName, .email]
+                        // US-175: SHA256-hashed nonce on the request; raw nonce is
+                        // forwarded to Supabase for replay-attack protection.
+                        let nonce = Self.randomNonceString()
+                        currentAppleNonce = nonce
+                        request.nonce = Self.sha256(nonce)
                     } onCompletion: { result in
                         handleAppleSignIn(result)
                     }
@@ -242,18 +250,51 @@ struct SignInView: View {
         switch result {
         case .success(let authorization):
             guard let credential = authorization.credential as? ASAuthorizationAppleIDCredential else { return }
+            // US-175: Pair the credential with the raw nonce generated in the request
+            // builder. Consume once — a fresh nonce is generated for every attempt.
+            let rawNonce = currentAppleNonce
+            currentAppleNonce = nil
             Task {
                 do {
-                    try await authService.signInWithApple(credential: credential)
+                    try await authService.signInWithApple(credential: credential, rawNonce: rawNonce)
                 } catch {
                     HapticManager.delete()
                     showError = true
                 }
             }
         case .failure:
+            currentAppleNonce = nil
             HapticManager.delete()
             showError = true
         }
+    }
+
+    // MARK: - US-175: Apple Sign In Nonce
+
+    /// Generates a cryptographically random URL-safe nonce string. Uses SecRandomCopyBytes
+    /// so we never expose a predictable or low-entropy value to the identity provider.
+    private static func randomNonceString(length: Int = 32) -> String {
+        precondition(length > 0)
+        let charset: [Character] = Array("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-._")
+        var result = ""
+        var remaining = length
+        while remaining > 0 {
+            var randoms = [UInt8](repeating: 0, count: 16)
+            let status = SecRandomCopyBytes(kSecRandomDefault, randoms.count, &randoms)
+            precondition(status == errSecSuccess, "Unable to generate secure random bytes")
+            for byte in randoms where remaining > 0 {
+                if byte < charset.count {
+                    result.append(charset[Int(byte)])
+                    remaining -= 1
+                }
+            }
+        }
+        return result
+    }
+
+    private static func sha256(_ input: String) -> String {
+        let digest = SHA256.hash(data: Data(input.utf8))
+        return digest.map { String(format: "%02x", $0) }.joined()
     }
 
     // US-147: Submit via button or keyboard return key

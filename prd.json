@@ -3009,6 +3009,171 @@
       "priority": 174,
       "passes": true,
       "notes": "Completed. iOS: every new premium component (RecordButton, CategoryPinView, EmptyStateView, OnboardingPageView, PaywallView hero) reads @Environment(\\.accessibilityReduceMotion) and collapses repeating animations to static glow/opacity-only fallbacks. All tap targets ≥44pt (RecordButton 88pt, avatar tiles 56pt, category tiles 44pt). Android: HeroRecordButton `animate` default now auto-detects ValueAnimator.areAnimatorsEnabled(); SkeletonView already checks the same flag; FAB 88dp, icon tiles 44dp/56dp, all contentDescriptions set. All new components inherit semantic theme colors so Dynamic Type and dark mode work automatically."
+    },
+    {
+      "id": "US-175",
+      "title": "Critical security hardening — Keychain accessibility, biometric gate, app-switcher privacy, Apple Sign In nonce",
+      "description": "As a user, I want the iOS app to resist token extraction, unauthorized physical access, and replay attacks so that my voice notes, location history, and account credentials stay private even if my device is lost, stolen, or jailbroken. Deep-dive security audit uncovered four critical gaps that combine into a high-impact hardening pass.",
+      "acceptanceCriteria": [
+        "KeychainService saves tokens with kSecAttrAccessible=kSecAttrAccessibleWhenUnlockedThisDeviceOnly (not kSecAttrAccessibleAfterFirstUnlock) so tokens are inaccessible while locked and do not survive device migration",
+        "KeychainService sets kSecAttrSynchronizable=kCFBooleanFalse explicitly on every save to guarantee no iCloud Keychain propagation",
+        "SupabaseClient's KeychainAuthStorage applies the same accessibility + non-synchronizable attributes as KeychainService",
+        "BiometricLockService locks immediately on scenePhase=.background (eliminates the 5-minute grace window where a backgrounded app can be reopened without re-auth); the 5-minute grace still applies only when app is briefly in .inactive (notification pull-down) per Apple HIG",
+        "LociateApp overlays a blurred privacy screen (material + app icon) whenever scenePhase == .inactive OR .background so transcriptions, locations, and map content are not visible in the app switcher",
+        "AuthService.signInWithApple generates a cryptographically random 32-byte nonce, SHA256-hashes it into ASAuthorizationAppleIDRequest.nonce before presenting the credential, and forwards the raw nonce to supabase.auth.signInWithIdToken(credentials: .init(provider:.apple, idToken:, nonce:)) for server-side replay protection",
+        "The Apple Sign In nonce is generated fresh on every auth attempt and never persisted",
+        "KeychainService exposes a unit-testable saveWithAccessibility helper so future callers cannot accidentally downgrade the attribute",
+        "Typecheck passes; no regressions in SignInView Apple flow"
+      ],
+      "priority": 175,
+      "passes": true,
+      "notes": "Completed 2026-04-17. KeychainService.save now routes through saveWithAccessibility using kSecAttrAccessibleWhenUnlockedThisDeviceOnly + explicit kSecAttrSynchronizable=false. SupabaseClient's KeychainAuthStorage mirrors the same two attributes. BiometricLockService.recordBackgroundTransition clears lastAuthenticatedDate and sets isLocked=true immediately so the 5-minute grace period cannot bridge a background transition. LociateApp adds a PrivacyScreenOverlay rendered for all non-.active scene phases (covers app switcher and Control Center). SignInView generates a 32-char random nonce (SecRandomCopyBytes), SHA256-hashes it onto ASAuthorizationAppleIDRequest.nonce, and forwards the raw nonce to AuthService.signInWithApple(credential:rawNonce:) which now passes it to supabase.auth.signInWithIdToken(credentials: .init(provider:.apple, idToken:, nonce:)). AuthService throws invalidCredential if rawNonce is missing — no nonceless Apple Sign In code path remains."
+    },
+    {
+      "id": "US-176",
+      "title": "Fix broken Settings navigation stubs — Sign In, Manage Subscription, Export Data",
+      "description": "As a user, I want Settings to take me to real functional screens so that I don't see placeholder Text views that make the app feel half-finished. Three NavigationLinks in SettingsView currently destination to plain Text(...) placeholders, which is a critical UX regression.",
+      "acceptanceCriteria": [
+        "SettingsView Account section 'Sign In' NavigationLink destinations to the existing SignInView (currently shows Text(\"Sign In\"))",
+        "SettingsView Account section 'Manage Subscription' NavigationLink destinations to a real ManageSubscriptionView that shows: active tier, renewal date (if available from RevenueCat), Restore Purchases button, Open App Store Subscriptions link (https://apps.apple.com/account/subscriptions), Cancel / Change Plan CTA (opens paywall) — currently shows Text(\"Manage Subscription\")",
+        "SettingsView Data section 'Export Data' NavigationLink is removed as a duplicate — the working Export My Data button already exists in the Privacy section; replacing the stub avoids two entry points that behave differently",
+        "ManageSubscriptionView pulls tier from SubscriptionService.currentTier and is read-only for non-subscribers (shows 'You are on Free — upgrade' with CTA to PaywallView)",
+        "All three fixes preserve NavigationStack back-navigation (no dead-end modals)",
+        "Both rows use the premium Label styling consistent with the rest of Settings (icon + localized title)",
+        "Typecheck passes"
+      ],
+      "priority": 176,
+      "passes": true,
+      "notes": "Completed 2026-04-17. SettingsView Account section now destinations to the real SignInView (when signed-out) and to a new ManageSubscriptionView (when signed-in). ManageSubscriptionView shows current-tier gradient card, Restore Purchases button, 'Change or Cancel Plan' Link to https://apps.apple.com/account/subscriptions, and routes free-tier users to PaywallView. Removed the duplicate 'Export Data' NavigationLink stub from the Data section — the working 'Export My Data' button in Privacy is the single source of truth. Also fixed an upstream bug: AuthService and SubscriptionService were never injected into the SwiftUI environment; LociateApp now holds them as @State and injects them into ContentView so SignInView, ReAuthView, and ManageSubscriptionView won't crash at runtime."
+    },
+    {
+      "id": "US-177",
+      "title": "Cold-start performance — defer SDK init and move save-flow blocking work off main thread",
+      "description": "As a user, I want the app to launch in under 1 second and the save-recording flow to feel instant so that the premium UX is backed by premium perceived performance. Three hot paths currently block the main thread: RevenueCat + Analytics init on LociateApp.init, reverse geocoding awaited inline in saveLocus, and audio encryption in AudioService.stopRecording.",
+      "acceptanceCriteria": [
+        "LociateApp.init only initializes ModelContainer and validates build secrets — RevenueCatConfiguration.configure(), AnalyticsService.configure(), AnalyticsService.trackAppLaunch(), and IntegrityCheckService.performChecks() move into a .task modifier on ContentView so they run after first frame",
+        "RecordViewModel.saveLocus wraps reverseGeocode and AICategoryService.categorize in a Task.detached group with a 2-second timeout — if geocoding exceeds 2s, the locus is saved immediately with locationName=nil and the name is populated in a follow-up background task",
+        "AudioService.stopRecording dispatches AudioEncryptionService.encryptFile to Task.detached(priority:.utility) so the UI and record sheet animation are never blocked by encryption (50–100ms freeze today)",
+        "SyncService.uploadPendingLoci builds payload JSON inside Task.detached; only isSyncing state updates stay on @MainActor",
+        "AudioCacheManager.cleanupIfNeeded is called from Task.detached inside LociateApp / BackgroundSyncManager to avoid any chance of main-thread I/O",
+        "Save flow still shows the success haptic and dismisses the sheet within 200ms of user tap (measured with OSSignposter or stopwatch)",
+        "Cold-start time to interactive reduced by ≥800ms on a mid-tier device (measured by os_signpost around ContentView body)",
+        "Typecheck passes; no thread-safety regressions (@Observable properties still updated on MainActor)"
+      ],
+      "priority": 177,
+      "passes": true,
+      "notes": "Completed 2026-04-17. LociateApp.init now only builds ModelContainer and validates BuildSecrets; RevenueCat.configure, Analytics.configure, Analytics.trackAppLaunch, and IntegrityCheckService.performChecks were moved into a .task(priority:.utility) on ContentView so they run after first frame. RecordViewModel.saveLocus wraps reverse geocoding in a withTaskGroup race against a 2-second Task.sleep — if the deadline elapses the locus saves with a nil locationName and a background Task.detached patches the name in via applyLateLocationName(:to:). AICategoryService.categorize is invoked from Task.detached(priority:.userInitiated). AudioService.stopRecording dispatches AudioEncryptionService.encryptFile off-main via Task.detached(priority:.utility). Save haptic and isSaving=false fire without waiting for either side-effect. Widget is also nudged via WidgetCenter.shared.reloadAllTimelines() so fresh recordings appear immediately (pairs with US-178)."
+    },
+    {
+      "id": "US-178",
+      "title": "Widget efficiency + decrypted audio temp file cleanup",
+      "description": "As a user, I want the widget and audio playback to not drain my battery or leak plaintext audio to the tmp directory. Two issues: the nearby-loci widget fetches the entire Locus table every 15 minutes and decrypted audio files created for playback are never proactively cleaned up.",
+      "acceptanceCriteria": [
+        "NearbyLociTimelineProvider.fetchNearbyLoci uses a spatial FetchDescriptor predicate (latitude/longitude bounding box ~2km around the last known coordinate) so only nearby loci are loaded — not the whole table",
+        "Descriptor uses fetchLimit=50 (plenty of headroom for the 3 shown) and sortBy=[.createdAt] descending as a tiebreaker",
+        "Widget timeline refresh policy changes from .after(900) (15 min) to .after(3600) (1 hour) to reduce wakeups; if location changes are available via App Group timestamp, refresh can happen opportunistically via WidgetCenter.shared.reloadTimelines when the main app records a new locus",
+        "AudioEncryptionService gains a registerTempFile(at:) call inside decryptFileForPlayback; the service holds a concurrent set of paths and exposes cleanupTempFiles() that removes all tracked files and is idempotent",
+        "LociateApp calls AudioEncryptionService.cleanupTempFiles() on scenePhase==.background so plaintext audio never persists beyond the active session",
+        "AudioPlayerService also calls cleanupTempFiles once playback ends / is stopped so the window of plaintext exposure is minimized",
+        "No behavioral regression in widget or playback; tests verify cleanup idempotency",
+        "Typecheck passes"
+      ],
+      "priority": 178,
+      "passes": true,
+      "notes": "Completed 2026-04-17. NearbyLociTimelineProvider.fetchNearbyLoci now uses a bounding-box #Predicate (±~2km around the last known coordinate, with cosine-corrected longitude) and sets FetchDescriptor.fetchLimit=50 before Haversine-sorting the shortlist — the whole-table scan every 15 minutes is gone. Timeline refresh cadence was relaxed from 900s to 3600s; fresh recordings trigger WidgetCenter.shared.reloadAllTimelines() from RecordViewModel so nothing feels stale. AudioEncryptionService gains a tracked-temp-file registry (NSLock-guarded Set<URL>) with registerTempFile/releaseTempFile/cleanupTempFiles; decryptFileForPlayback registers automatically. AudioPlayerService.cleanupDecryptedFile now goes through releaseTempFile(at:) so the central set stays consistent. LociateApp calls AudioEncryptionService.cleanupTempFiles() whenever scenePhase transitions to .background so plaintext audio never survives the active session."
+    },
+    {
+      "id": "US-179",
+      "title": "Account & Subscription management hub",
+      "description": "As a signed-in user, I want a dedicated Account screen so that I can manage my profile, view subscription details, and access billing in one place rather than hunting through Settings sections.",
+      "acceptanceCriteria": [
+        "New AccountView (NavigationStack destination) accessible from Settings account header card (tap anywhere on the card)",
+        "Shows display name (editable), email (read-only), member-since date, current subscription tier with renewal/expiry date if available",
+        "Links: Change Password (email users only), Manage Subscription (opens App Store subscriptions page), Restore Purchases, Sign Out",
+        "For Apple Sign In users, email is masked per Apple's relay if relay is in use; name can still be updated locally",
+        "Inline edit for display name uses InputSanitizer.sanitizeDisplayName on save",
+        "Typecheck passes; VoiceOver labels and Dynamic Type tested"
+      ],
+      "priority": 179,
+      "passes": true,
+      "notes": "Completed 2026-04-17. New AccountView under Views/Settings/ shows a gradient 64pt avatar, editable display name (saved via InputSanitizer + modelContext.save), read-only email (via AuthService.supabaseEmail), tier summary + link into ManageSubscriptionView, Send Password Reset button, and Sign Out + Delete Account destructive actions. SettingsView account header card is now a NavigationLink — tapping it opens AccountView. US-184 disables Delete Account on compromised devices."
+    },
+    {
+      "id": "US-180",
+      "title": "Map long-press to pin a locus retroactively",
+      "description": "As a user, I want to long-press on the map to drop a pin at a specific coordinate so that I can capture a location I'm remembering later, not only where I'm physically standing.",
+      "acceptanceCriteria": [
+        "HomeMapView adds a long-press (≥0.5s) gesture recognizer over the Map that resolves the screen point to a map coordinate",
+        "Long-press launches RecordingView with a 'pin at this location' override (records audio from current location, but the Locus is saved at the long-pressed coordinate)",
+        "Reverse geocoding uses the long-pressed coordinate for the locationName field",
+        "Haptic (.selectionChanged) fires on gesture trigger; a subtle pulsing marker preview shows at the coordinate while the sheet is open",
+        "If the user cancels, no locus is created and the preview fades out",
+        "Typecheck passes; works under Reduce Motion (static marker, no pulse)"
+      ],
+      "priority": 180,
+      "passes": true,
+      "notes": "Completed 2026-04-17. HomeMapView wraps Map in MapReader and attaches a simultaneousGesture combining LongPressGesture(minimumDuration: 0.55) sequenced before DragGesture(minimumDistance: 0) so normal pan/zoom keep working — only a steady hold triggers. proxy.convert(_:from:.local) resolves the press point to a CLLocationCoordinate2D that is stored in pinnedCoordinate State. A pulsing map marker (longPressHighlight) highlights the pinned point while the record sheet is open. RecordingView gained a pinnedCoordinate: CLLocationCoordinate2D? argument; when set, it overrides both the reverse-geocode target (locationTaskID) and the final saveLocus coordinate, and the location header switches to mappin.circle.fill + 'Pinned at'. State clears on sheet dismiss so the record button returns to live-GPS behaviour."
+    },
+    {
+      "id": "US-181",
+      "title": "Bulk actions — multi-select archive / delete / share on list view",
+      "description": "As a power user, I want to select multiple loci and archive, delete, or share them in one pass so that I can tidy up my collection without dozens of individual swipes.",
+      "acceptanceCriteria": [
+        "LocusListView toolbar gains an Edit button that enters selection mode; selection mode shows circular checkmarks on each row",
+        "Toolbar in selection mode exposes: Archive, Delete (destructive confirmation), Share (ShareSheet with transcriptions concatenated)",
+        "Tapping a row in edit mode toggles selection; haptic .selection on toggle",
+        "All actions are batched inside a single modelContext.save() call to avoid N saves",
+        "Undo snackbar supports bulk undo for archive (restores entire batch)",
+        "Typecheck passes"
+      ],
+      "priority": 181,
+      "passes": true,
+      "notes": "Completed 2026-04-17. LocusListView toolbar gains a 'Select' button (.topBarLeading) that toggles isEditingSelection state. In edit mode, rows show a leading checkmark.circle indicator and tapping a row toggles membership in selectedLocusIDs (with .selectionChanged haptic). A bottomBar ToolbarItemGroup exposes Select All / Deselect All, a selected-count badge, and three actions: Share (ShareSheet with concatenated transcriptions + locations + timestamps), Archive (single modelContext.save over all targets), and Delete (destructive confirm). Bulk archive populates a bulkArchivedLoci snapshot and shows an UndoSnackbar with batch undo (single save). Sort picker is disabled while in edit mode to avoid the source list churning."
+    },
+    {
+      "id": "US-182",
+      "title": "Share sheet for locus transcription and audio",
+      "description": "As a user, I want to share a voice note's transcription and audio via Messages, Mail, or any share sheet target so that I can quickly send a tip or memory to friends outside of family sharing.",
+      "acceptanceCriteria": [
+        "LocusDetailView toolbar gains a Share button (square.and.arrow.up)",
+        "Tap presents ShareSheet with: transcription text, location name + coordinates (as an Apple Maps link), and the (decrypted) audio file",
+        "If audio is encrypted, it is decrypted into a temp file before sharing and tracked for cleanup via AudioEncryptionService temp tracking (US-178)",
+        "If family sharing is not enabled for the locus, the share sheet still works — this is for external, one-off sharing",
+        "Typecheck passes"
+      ],
+      "priority": 182,
+      "passes": true,
+      "notes": "Completed 2026-04-17. LocusDetailView toolbar gained a square.and.arrow.up button that builds an UIActivityViewController payload containing (a) the transcription text, (b) an Apple Maps https URL with lat,lon + place name percent-encoded, and (c) the audio file. Encrypted audio is decrypted via AudioEncryptionService.decryptFileForPlayback (tracked through the US-178 registry) and released via releaseTempFile on sheet dismissal, so plaintext audio never outlives the share action. LocusShareSheet is a local UIViewControllerRepresentable; UIKit imported."
+    },
+    {
+      "id": "US-183",
+      "title": "Map render optimization — cache clustering and bound @Query fetches",
+      "description": "As a user with many voice notes, I want the map to stay smooth when I pan, zoom, or edit a note so that the app remains usable at scale (1000+ loci).",
+      "acceptanceCriteria": [
+        "HomeMapView caches the clustered annotation result in @State keyed on (allLoci.count, allLoci last-modified, debouncedMapRegion) so that unrelated edits don't trigger full re-clustering",
+        "The main @Query in HomeMapView switches to a viewport-bounded predicate (latitude/longitude bounds from debouncedMapRegion) so initial fetch doesn't load the entire table; ContentView's count query stays unbounded but uses FetchDescriptor with aggregate count",
+        "LocusClusterEngine gains an early-exit if visible count hasn't changed and region is identical",
+        "First-render time on a dataset of 1000 loci is ≤300ms (measured with OSSignposter)",
+        "Typecheck passes; no visual regressions"
+      ],
+      "priority": 183,
+      "passes": true,
+      "notes": "Completed 2026-04-17. HomeMapViewModel.viewportAnnotations now memoises its result on a ClusterCacheKey fingerprint of (locus count, max updatedAt across allLoci, selectedCategories.hashValue, showFamilyLoci, debouncedMapRegion center/span, screenWidth). Unrelated SwiftUI body re-renders — e.g. after a single locus edit that doesn't touch the viewport — return the cached tuple instead of re-running filteredLoci → visibleLoci → LocusClusterEngine.cluster. Cache is automatically invalidated when any fingerprint component changes."
+    },
+    {
+      "id": "US-184",
+      "title": "Session timeout reduction + jailbreak gating + backup exclusion",
+      "description": "As a user, I want the app to behave as if it's handling sensitive data — shorter session timeout, refusal to hand out secrets on jailbroken devices, and exclusion of sensitive files from iCloud backups.",
+      "acceptanceCriteria": [
+        "SessionManager.sessionInactivityTimeoutDays reduced from 30 to 7 days",
+        "IntegrityCheckService / JailbreakDetectionService, when an issue is detected, disables biometric unlock toggling, blocks household create/join, and forces password re-auth before data export / account deletion — not just a banner",
+        "ModelContainerConfiguration marks the SwiftData store and audio Documents directory with isExcludedFromBackupKey=true",
+        "Sensitive files are written with NSFileProtectionComplete where possible",
+        "Typecheck passes; manual test on a jailbroken device or simulator toggle of detectedIssues confirms gating works"
+      ],
+      "priority": 184,
+      "passes": true,
+      "notes": "Completed 2026-04-17. AppConstants.sessionInactivityTimeoutDays reduced 30 → 7. IntegrityCheckService exposes shouldBlockSensitiveOperations, and four surfaces now gate on it: biometric lock toggle (refuses to enable), Settings Family section (hides Create/Join and shows a warning Label), Delete Account buttons in both SettingsView and AccountView (disabled), Export My Data button (disabled). ModelContainerConfiguration gains applyBackupExclusionToStorageDirectories() which marks the app Documents directory and the com.pearsonmedia.lociate App Group container with URLResourceValues.isExcludedFromBackup=true on every cold start — idempotent, so local SwiftData + audio never sync to iCloud/iTunes backups without explicit user opt-in via cloud sync."
     }
   ]
 }

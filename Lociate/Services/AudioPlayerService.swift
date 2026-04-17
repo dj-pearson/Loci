@@ -126,7 +126,9 @@ final class AudioPlayerService: NSObject, AVAudioPlayerDelegate {
 
     private func cleanupDecryptedFile() {
         if let tempURL = decryptedTempURL {
-            try? FileManager.default.removeItem(at: tempURL)
+            // US-178: Delegate deletion to AudioEncryptionService so the central
+            // tracker releases its entry; avoids leaving stale paths in the set.
+            AudioEncryptionService.releaseTempFile(at: tempURL)
             decryptedTempURL = nil
         }
     }

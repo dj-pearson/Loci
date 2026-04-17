@@ -30,6 +30,12 @@ struct HomeMapView: View {
     @State private var locusToEdit: Locus?
     @State private var recordViewModel: RecordViewModel?
     @State private var showMapStylePicker = false
+    /// US-180: Coordinate captured by the long-press gesture. When set,
+    /// the recording sheet opens pinned to this location instead of the
+    /// user's current GPS position.
+    @State private var pinnedCoordinate: CLLocationCoordinate2D?
+    /// US-180: Drives a brief highlight pulse at the long-pressed point.
+    @State private var longPressHighlight: CLLocationCoordinate2D?
 
     @AppStorage("loci_map_type") private var mapTypeRaw: Int = 0
 
@@ -45,6 +51,7 @@ struct HomeMapView: View {
 
     var body: some View {
         ZStack(alignment: .bottom) {
+            MapReader { proxy in
             Map(position: $mapCameraPosition, selection: $selectedLocus) {
                 UserAnnotation()
 
@@ -95,6 +102,25 @@ struct HomeMapView: View {
                     }
                     .annotationTitles(.hidden)
                 }
+
+                // US-180: Highlight the long-pressed point while the
+                // recording sheet is being prepared. A simple pulsing
+                // ring so the user confirms they're pinning the right spot.
+                if let highlight = longPressHighlight {
+                    Annotation("", coordinate: highlight) {
+                        ZStack {
+                            Circle()
+                                .stroke(Color.accentColor, lineWidth: 3)
+                                .frame(width: 44, height: 44)
+                                .opacity(0.8)
+                            Image(systemName: "mappin.circle.fill")
+                                .font(.title2)
+                                .foregroundStyle(.white, Color.accentColor)
+                        }
+                        .accessibilityHidden(true)
+                    }
+                    .annotationTitles(.hidden)
+                }
             }
             .mapStyle(currentMapStyle)
             .mapControls {
@@ -112,6 +138,19 @@ struct HomeMapView: View {
                 viewModel.mapRegion = context.region
                 viewModel.scheduleRegionUpdate()
             }
+            // US-180: Long-press-to-pin. `.simultaneousGesture` so the Map's
+            // built-in pan / zoom recognisers still receive the touch events
+            // — only a 0.55s steady press triggers the pin flow.
+            .simultaneousGesture(
+                LongPressGesture(minimumDuration: 0.55)
+                    .sequenced(before: DragGesture(minimumDistance: 0, coordinateSpace: .local))
+                    .onEnded { value in
+                        guard case .second(true, let drag?) = value else { return }
+                        guard let coord = proxy.convert(drag.location, from: .local) else { return }
+                        handleLongPress(at: coord)
+                    }
+            )
+            } // MapReader
 
             // Selected locus callout
             if let locus = selectedLocus {
@@ -186,6 +225,11 @@ struct HomeMapView: View {
         }
         .sheet(isPresented: $showRecordingView, onDismiss: {
             recordViewModel = nil
+            // US-180: clear the pin state once the sheet is dismissed so
+            // subsequent (non-long-press) record taps return to live
+            // GPS-pinning behaviour.
+            pinnedCoordinate = nil
+            longPressHighlight = nil
         }) {
             if let vm = recordViewModel {
                 RecordingView(
@@ -193,6 +237,7 @@ struct HomeMapView: View {
                     geocodingService: ReverseGeocodingService(),
                     householdName: currentHousehold?.name,
                     householdId: currentHousehold?.id,
+                    pinnedCoordinate: pinnedCoordinate,
                     onDismiss: {
                         showRecordingView = false
                     }
@@ -336,6 +381,33 @@ struct HomeMapView: View {
     private func centerOnUserIfNeeded() {
         viewModel.centerOnUserLocation()
         mapCameraPosition = .region(viewModel.mapRegion)
+    }
+
+    // MARK: - US-180: Long-Press Pinning
+
+    /// Captures the long-pressed coordinate and opens the recording sheet.
+    /// The `RecordingView` then saves the locus at this coordinate instead
+    /// of the user's current GPS position.
+    private func handleLongPress(at coordinate: CLLocationCoordinate2D) {
+        longPressHighlight = coordinate
+        pinnedCoordinate = coordinate
+
+        // Match the existing record-button code path: construct the VM if
+        // we don't already have one (the .onChange(of: showRecordingView)
+        // handler will cover the normal path, but we want the sheet to
+        // open immediately on long-press).
+        if recordViewModel == nil {
+            recordViewModel = RecordViewModel(
+                locationService: locationService,
+                audioService: AudioService(),
+                transcriptionService: TranscriptionService()
+            )
+        }
+
+        let generator = UIImpactFeedbackGenerator(style: .medium)
+        generator.impactOccurred()
+
+        showRecordingView = true
     }
 }
 

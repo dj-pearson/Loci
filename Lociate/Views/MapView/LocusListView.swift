@@ -45,6 +45,15 @@ struct LocusListView: View {
     @State private var pendingSearchDebounce: Task<Void, Never>?
     @State private var showUpgradeForSearch = false
 
+    // MARK: - US-181: Bulk Selection
+    @State private var isEditingSelection = false
+    @State private var selectedLocusIDs: Set<UUID> = []
+    @State private var bulkArchivedLoci: [Locus] = []
+    @State private var showBulkUndoSnackbar = false
+    @State private var showBulkDeleteConfirmation = false
+    @State private var showBulkShareSheet = false
+    @State private var bulkShareText: String = ""
+
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(NotificationService.self) private var notificationService
 
@@ -156,12 +165,33 @@ struct LocusListView: View {
                 Section {
                     ForEach(Array(section.loci.enumerated()), id: \.element.id) { index, locus in
                         Button {
-                            navigationRouter.selectedLocusId = locus.id
+                            if isEditingSelection {
+                                toggleSelection(for: locus)
+                            } else {
+                                navigationRouter.selectedLocusId = locus.id
+                            }
                         } label: {
-                            LocusRowView(
-                                locus: locus,
-                                userLocation: locationService.currentLocation
-                            )
+                            HStack(spacing: Theme.Spacing.sm) {
+                                // US-181: Selection indicator visible only in edit mode.
+                                if isEditingSelection {
+                                    Image(systemName: selectedLocusIDs.contains(locus.id)
+                                          ? "checkmark.circle.fill"
+                                          : "circle")
+                                        .font(.title3)
+                                        .foregroundStyle(selectedLocusIDs.contains(locus.id)
+                                                         ? Theme.primary
+                                                         : Theme.textSecondary)
+                                        .accessibilityLabel(
+                                            selectedLocusIDs.contains(locus.id)
+                                                ? String(localized: "Selected")
+                                                : String(localized: "Not selected")
+                                        )
+                                }
+                                LocusRowView(
+                                    locus: locus,
+                                    userLocation: locationService.currentLocation
+                                )
+                            }
                         }
                         .buttonStyle(.plain)
                         .opacity(appearedItems.contains(locus.id) || reduceMotion ? 1 : 0)
@@ -258,6 +288,21 @@ struct LocusListView: View {
             resetPagination()
         }
         .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                // US-181: Toggle bulk-edit mode.
+                Button {
+                    withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.2)) {
+                        isEditingSelection.toggle()
+                        if !isEditingSelection { selectedLocusIDs.removeAll() }
+                    }
+                } label: {
+                    Text(isEditingSelection
+                         ? String(localized: "Done")
+                         : String(localized: "Select"))
+                }
+                .disabled(displayLoci.isEmpty)
+            }
+
             ToolbarItem(placement: .topBarTrailing) {
                 Picker(String(localized: "Sort"), selection: $sortOrder) {
                     ForEach(LocusSortOrder.allCases) { order in
@@ -265,6 +310,54 @@ struct LocusListView: View {
                     }
                 }
                 .pickerStyle(.menu)
+                .disabled(isEditingSelection)
+            }
+
+            // US-181: Bottom action bar — visible only while in selection mode.
+            ToolbarItemGroup(placement: .bottomBar) {
+                if isEditingSelection {
+                    Button {
+                        if selectedLocusIDs.count == displayLoci.count {
+                            selectedLocusIDs.removeAll()
+                        } else {
+                            selectedLocusIDs = Set(displayLoci.map(\.id))
+                        }
+                    } label: {
+                        Text(selectedLocusIDs.count == displayLoci.count
+                             ? String(localized: "Deselect All")
+                             : String(localized: "Select All"))
+                    }
+
+                    Spacer()
+
+                    Text(String(localized: "\(selectedLocusIDs.count) selected"))
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+
+                    Spacer()
+
+                    Button {
+                        bulkShareText = composeBulkShareText()
+                        showBulkShareSheet = true
+                    } label: {
+                        Image(systemName: "square.and.arrow.up")
+                    }
+                    .disabled(selectedLocusIDs.isEmpty)
+
+                    Button {
+                        archiveSelected()
+                    } label: {
+                        Image(systemName: "archivebox")
+                    }
+                    .disabled(selectedLocusIDs.isEmpty)
+
+                    Button(role: .destructive) {
+                        showBulkDeleteConfirmation = true
+                    } label: {
+                        Image(systemName: "trash")
+                    }
+                    .disabled(selectedLocusIDs.isEmpty)
+                }
             }
         }
         .refreshable {
@@ -318,6 +411,33 @@ struct LocusListView: View {
                 .onAppear {
                     editViewModel.modelContext = modelContext
                 }
+        }
+        .alert(
+            String(localized: "Delete Voice Notes"),
+            isPresented: $showBulkDeleteConfirmation
+        ) {
+            Button(String(localized: "Delete \(selectedLocusIDs.count)"), role: .destructive) {
+                deleteSelected()
+            }
+            Button(String(localized: "Cancel"), role: .cancel) {}
+        } message: {
+            Text(String(localized: "This will permanently delete \(selectedLocusIDs.count) voice notes and their audio."))
+        }
+        .sheet(isPresented: $showBulkShareSheet) {
+            BulkShareSheet(text: bulkShareText)
+        }
+        .overlay(alignment: .bottom) {
+            if showBulkUndoSnackbar {
+                UndoSnackbar(
+                    message: String(localized: "\(bulkArchivedLoci.count) voice notes archived"),
+                    onUndo: { undoBulkArchive() },
+                    onDismiss: {
+                        withAnimation { showBulkUndoSnackbar = false }
+                        bulkArchivedLoci.removeAll()
+                    }
+                )
+                .padding(.bottom, Theme.Spacing.lg)
+            }
         }
         .searchable(
             text: $searchText,
@@ -389,6 +509,99 @@ struct LocusListView: View {
         let generator = UIImpactFeedbackGenerator(style: .medium)
         generator.impactOccurred()
     }
+
+    // MARK: - US-181: Bulk Selection Actions
+
+    private func toggleSelection(for locus: Locus) {
+        if selectedLocusIDs.contains(locus.id) {
+            selectedLocusIDs.remove(locus.id)
+        } else {
+            selectedLocusIDs.insert(locus.id)
+        }
+        let generator = UISelectionFeedbackGenerator()
+        generator.selectionChanged()
+    }
+
+    private func selectedLoci() -> [Locus] {
+        displayLoci.filter { selectedLocusIDs.contains($0.id) }
+    }
+
+    /// Archives every selected locus in a single SwiftData save; stores the
+    /// batch for a single-tap bulk undo.
+    private func archiveSelected() {
+        let targets = selectedLoci()
+        guard !targets.isEmpty else { return }
+
+        let now = Date()
+        for locus in targets {
+            locus.isArchived = true
+            locus.updatedAt = now
+        }
+        try? modelContext.save()
+        NotificationCenter.default.post(name: .locusDidCreate, object: nil)
+
+        bulkArchivedLoci = targets
+        selectedLocusIDs.removeAll()
+        isEditingSelection = false
+        HapticManager.archive()
+
+        withAnimation { showBulkUndoSnackbar = true }
+    }
+
+    private func undoBulkArchive() {
+        let now = Date()
+        for locus in bulkArchivedLoci {
+            locus.isArchived = false
+            locus.updatedAt = now
+        }
+        try? modelContext.save()
+        NotificationCenter.default.post(name: .locusDidCreate, object: nil)
+        bulkArchivedLoci.removeAll()
+        HapticManager.saveSuccess()
+        withAnimation { showBulkUndoSnackbar = false }
+    }
+
+    /// Permanently deletes every selected locus in a single save. No undo —
+    /// the confirmation dialog is the undo point.
+    private func deleteSelected() {
+        let targets = selectedLoci()
+        guard !targets.isEmpty else { return }
+
+        for locus in targets {
+            LocusActions.delete(locus, modelContext: modelContext)
+        }
+        selectedLocusIDs.removeAll()
+        isEditingSelection = false
+        HapticManager.delete()
+    }
+
+    /// Builds a plain-text share payload concatenating every selected
+    /// transcription with its location + timestamp.
+    private func composeBulkShareText() -> String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .short
+        return selectedLoci().map { locus in
+            var line = locus.transcription
+            if let name = locus.locationName {
+                line += "\n— \(name)"
+            }
+            line += " (\(formatter.string(from: locus.createdAt)))"
+            return line
+        }.joined(separator: "\n\n")
+    }
+}
+
+// MARK: - US-181: Bulk Share Sheet
+
+private struct BulkShareSheet: UIViewControllerRepresentable {
+    let text: String
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: [text], applicationActivities: nil)
+    }
+
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
 
 // MARK: - Locus Row

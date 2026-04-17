@@ -70,6 +70,9 @@ final class BiometricLockService {
     // MARK: - Lock Management
 
     /// Called when app enters foreground to determine if lock should engage.
+    /// Since we now lock immediately on `.background` (see recordBackgroundTransition),
+    /// the grace period only survives brief `.inactive` transitions (e.g. notification
+    /// center pull-down) — never a true background send.
     func lockIfNeeded() {
         guard isBiometricLockEnabled else {
             isLocked = false
@@ -78,17 +81,20 @@ final class BiometricLockService {
 
         if let lastAuth = lastAuthenticatedDate,
            Date().timeIntervalSince(lastAuth) < Self.gracePeriod {
-            // Within grace period — stay unlocked
             return
         }
 
         isLocked = true
     }
 
-    /// Records a successful background transition timestamp.
+    /// Called on scenePhase==.background. Locks immediately so an attacker who
+    /// pockets a briefly-unlocked device cannot reopen the app without biometric
+    /// re-auth. This closes the 5-minute grace-period bypass identified in the
+    /// 2026-04 security audit (US-175).
     func recordBackgroundTransition() {
-        // lastAuthenticatedDate is already set on successful auth;
-        // no additional action needed on background entry.
+        guard isBiometricLockEnabled else { return }
+        lastAuthenticatedDate = nil
+        isLocked = true
     }
 }
 

@@ -96,7 +96,10 @@ enum AudioEncryptionService {
     }
 
     /// Decrypts an encrypted audio file and returns a temporary URL for playback.
-    /// The caller is responsible for cleaning up the temporary file.
+    /// US-178: The temp file is registered with the service so it can be cleaned up
+    /// centrally on scenePhase==.background or app shutdown — callers no longer need
+    /// to track lifetimes individually (plaintext audio was previously leaking to /tmp
+    /// on crashes or abandoned playback sessions).
     static func decryptFileForPlayback(at url: URL) throws -> URL {
         let encryptedData = try Data(contentsOf: url)
         let plainData = try decrypt(data: encryptedData)
@@ -105,7 +108,45 @@ enum AudioEncryptionService {
         let tempURL = tempDir.appendingPathComponent(UUID().uuidString + ".\(AppConstants.Audio.fileExtension)")
         try plainData.write(to: tempURL)
 
+        registerTempFile(at: tempURL)
         return tempURL
+    }
+
+    // MARK: - US-178: Temp File Tracking
+
+    /// Concurrent-safe set of decrypted audio temp files awaiting cleanup.
+    private static let tempFilesLock = NSLock()
+    private static var trackedTempFiles: Set<URL> = []
+
+    /// Registers a decrypted audio URL for central cleanup. Usually called by
+    /// `decryptFileForPlayback(at:)` but exposed for external writers that skip it.
+    static func registerTempFile(at url: URL) {
+        tempFilesLock.lock()
+        defer { tempFilesLock.unlock() }
+        trackedTempFiles.insert(url)
+    }
+
+    /// Removes a single tracked temp file (e.g., when playback finishes naturally).
+    static func releaseTempFile(at url: URL) {
+        tempFilesLock.lock()
+        let removed = trackedTempFiles.remove(url)
+        tempFilesLock.unlock()
+        if removed != nil {
+            try? FileManager.default.removeItem(at: url)
+        }
+    }
+
+    /// Removes every tracked decrypted audio temp file. Called from
+    /// `LociateApp` when the scene enters the background and on app shutdown so
+    /// plaintext audio never survives the active session.
+    static func cleanupTempFiles() {
+        tempFilesLock.lock()
+        let files = trackedTempFiles
+        trackedTempFiles.removeAll()
+        tempFilesLock.unlock()
+        for url in files {
+            try? FileManager.default.removeItem(at: url)
+        }
     }
 
     /// Checks whether a file appears to be encrypted (not a valid M4A header).

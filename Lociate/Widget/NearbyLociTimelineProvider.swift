@@ -57,12 +57,21 @@ struct NearbyLociTimelineProvider: TimelineProvider {
         let isLocked = !isPremiumUser()
         let loci = isLocked ? [] : fetchNearbyLoci()
         let entry = NearbyLociEntry(date: .now, loci: loci, isLocked: isLocked)
-        let refreshDate = Date().addingTimeInterval(900) // 15 minutes
+        // US-178: Refresh every hour rather than every 15 minutes. The main app
+        // pushes an immediate reload via WidgetCenter.shared.reloadAllTimelines()
+        // whenever a locus is created, so we don't need aggressive polling.
+        let refreshDate = Date().addingTimeInterval(3600)
         let timeline = Timeline(entries: [entry], policy: .after(refreshDate))
         completion(timeline)
     }
 
     // MARK: - Data Fetching
+
+    /// US-178: Spatial pre-filter constant. Approximate 2 km radius converts to
+    /// ~0.02 degrees latitude and a longitude-corrected delta computed per-call.
+    /// At the equator 0.02° ≈ 2.2 km; near the poles longitude needs correction.
+    private static let searchRadiusKm: Double = 2.0
+    private static let kmPerLatDegree: Double = 111.0
 
     private func fetchNearbyLoci() -> [NearbyLocusData] {
         guard let coordinate = lastKnownLocation() else {
@@ -74,17 +83,33 @@ struct NearbyLociTimelineProvider: TimelineProvider {
         }
 
         let context = ModelContext(container)
-        let descriptor = FetchDescriptor<Locus>(
+
+        // US-178: Predicate-based bounding box so SwiftData doesn't page the whole
+        // Locus table into memory just to return the 3 closest notes. This cuts
+        // widget CPU and memory dramatically on large datasets.
+        let latDelta = Self.searchRadiusKm / Self.kmPerLatDegree
+        let lonDelta = latDelta / max(0.0001, cos(coordinate.latitude * .pi / 180))
+        let minLat = coordinate.latitude - latDelta
+        let maxLat = coordinate.latitude + latDelta
+        let minLon = coordinate.longitude - lonDelta
+        let maxLon = coordinate.longitude + lonDelta
+
+        var descriptor = FetchDescriptor<Locus>(
             predicate: #Predicate<Locus> { locus in
                 locus.isArchived == false
+                    && locus.latitude >= minLat
+                    && locus.latitude <= maxLat
+                    && locus.longitude >= minLon
+                    && locus.longitude <= maxLon
             }
         )
+        descriptor.fetchLimit = 50
 
-        guard let allLoci = try? context.fetch(descriptor) else {
+        guard let nearby = try? context.fetch(descriptor) else {
             return []
         }
 
-        let sorted = allLoci.sortedByDistance(from: coordinate)
+        let sorted = nearby.sortedByDistance(from: coordinate)
         return Array(sorted.prefix(3)).map { locus in
             NearbyLocusData(
                 id: locus.id,

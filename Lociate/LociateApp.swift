@@ -1,4 +1,3 @@
-import RevenueCat
 import SwiftData
 import SwiftUI
 
@@ -11,10 +10,18 @@ struct LociateApp: App {
     @State private var locationService = LocationService()
     @State private var biometricService = BiometricLockService()
     @State private var networkMonitor = NetworkMonitor()
+    // US-176: AuthService is required by SignInView / ReAuthView. Previously it
+    // was never injected, which meant the (stubbed) Sign In link would have
+    // crashed at runtime.
+    @State private var authService = AuthService()
+    @State private var subscriptionService = SubscriptionService()
 
     @Environment(\.scenePhase) private var scenePhase
 
     init() {
+        // US-177: Only the minimum required to stand up the main actor + first
+        // frame belongs here. Anything that can wait is deferred to `.task` on
+        // ContentView so launch-to-interactive is not blocked by SDK network I/O.
         do {
             modelContainer = try ModelContainerConfiguration.production()
         } catch {
@@ -22,13 +29,6 @@ struct LociateApp: App {
         }
 
         BuildSecretsValidator.validate()
-
-        RevenueCatConfiguration.configure()
-        AnalyticsService.shared.configure()
-        AnalyticsService.shared.trackAppLaunch()
-
-        // US-148: Run integrity checks on app launch
-        IntegrityCheckService.shared.performChecks()
     }
 
     var body: some Scene {
@@ -40,6 +40,8 @@ struct LociateApp: App {
                     .environment(locationService)
                     .environment(biometricService)
                     .environment(networkMonitor)
+                    .environment(authService)
+                    .environment(subscriptionService)
                     .onOpenURL { url in
                         navigationRouter.handleURL(url)
                     }
@@ -48,8 +50,19 @@ struct LociateApp: App {
                     BiometricLockView(biometricService: biometricService)
                         .transition(.opacity)
                 }
+
+                // US-175: Cover sensitive content (maps, transcripts, location names)
+                // whenever the app is not .active so the iOS app switcher snapshot
+                // and brief .inactive states (Control Center, Notification Center) do
+                // not leak user data.
+                if scenePhase != .active {
+                    PrivacyScreenOverlay()
+                        .transition(.opacity)
+                        .ignoresSafeArea()
+                }
             }
-            .animation(.easeInOut(duration: 0.3), value: biometricService.isLocked)
+            .animation(.easeInOut(duration: 0.15), value: biometricService.isLocked)
+            .animation(.easeInOut(duration: 0.15), value: scenePhase)
             .onChange(of: scenePhase) { _, newPhase in
                 switch newPhase {
                 case .active:
@@ -58,12 +71,34 @@ struct LociateApp: App {
                     notificationService.deliverQueuedNotifications()
                 case .background:
                     biometricService.recordBackgroundTransition()
+                    // US-178: Purge any plaintext decrypted audio left in /tmp.
+                    AudioEncryptionService.cleanupTempFiles()
                 default:
                     break
                 }
             }
         }
         .modelContainer(modelContainer)
+    }
+}
+
+/// US-175: Full-screen overlay that masks sensitive UI whenever the scene is not
+/// .active. Renders a branded blurred surface with the app mark.
+private struct PrivacyScreenOverlay: View {
+    var body: some View {
+        ZStack {
+            Rectangle()
+                .fill(.ultraThickMaterial)
+            VStack(spacing: 12) {
+                Image(systemName: "mappin.and.ellipse")
+                    .font(.system(size: 44, weight: .semibold))
+                    .foregroundStyle(.tint)
+                Text("Lociate")
+                    .font(.title3.weight(.semibold))
+                    .foregroundStyle(.primary)
+            }
+        }
+        .accessibilityHidden(true)
     }
 }
 
@@ -84,19 +119,29 @@ struct ContentView: View {
     @State private var onboardingViewModel = OnboardingViewModel()
 
     var body: some View {
-        if !onboardingViewModel.hasCompletedOnboarding {
-            OnboardingFlowView(
-                viewModel: onboardingViewModel,
-                locationService: locationService,
-                notificationService: notificationService
-            )
-        } else {
-            VStack(spacing: 0) {
-                // US-148: Show integrity warning banner if device is compromised
-                IntegrityWarningBanner(issues: IntegrityCheckService.shared.detectedIssues)
+        Group {
+            if !onboardingViewModel.hasCompletedOnboarding {
+                OnboardingFlowView(
+                    viewModel: onboardingViewModel,
+                    locationService: locationService,
+                    notificationService: notificationService
+                )
+            } else {
+                VStack(spacing: 0) {
+                    // US-148: Show integrity warning banner if device is compromised
+                    IntegrityWarningBanner(issues: IntegrityCheckService.shared.detectedIssues)
 
-                mainAppView
+                    mainAppView
+                }
             }
+        }
+        // US-177: Deferred launch work — runs after the first frame so
+        // RevenueCat, Analytics, and integrity checks never block startup.
+        .task(priority: .utility) {
+            RevenueCatConfiguration.configure()
+            AnalyticsService.shared.configure()
+            AnalyticsService.shared.trackAppLaunch()
+            IntegrityCheckService.shared.performChecks()
         }
     }
 

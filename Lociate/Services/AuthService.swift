@@ -92,11 +92,20 @@ final class AuthService {
         }
     }
 
-    // MARK: - Apple Sign In (US-070)
+    // MARK: - Apple Sign In (US-070, US-175)
 
-    func signInWithApple(credential: ASAuthorizationAppleIDCredential) async throws {
+    /// Signs in using an Apple ID credential. US-175: the `rawNonce` passed in must
+    /// match the SHA256 hash that was set on the original ASAuthorizationAppleIDRequest.
+    /// Supabase verifies the hash on the Apple-issued identity token, preventing replay
+    /// of a stolen identity token on a different authentication attempt.
+    func signInWithApple(credential: ASAuthorizationAppleIDCredential, rawNonce: String?) async throws {
         guard let identityToken = credential.identityToken,
               let tokenString = String(data: identityToken, encoding: .utf8) else {
+            throw AuthError.invalidCredential
+        }
+        guard let rawNonce, !rawNonce.isEmpty else {
+            // US-175: refuse credentials that were not bound to a nonce — otherwise the
+            // token is replayable. Caller must always provide a fresh random nonce.
             throw AuthError.invalidCredential
         }
 
@@ -107,7 +116,8 @@ final class AuthService {
             let session = try await supabase.auth.signInWithIdToken(
                 credentials: .init(
                     provider: .apple,
-                    idToken: tokenString
+                    idToken: tokenString,
+                    nonce: rawNonce
                 )
             )
 

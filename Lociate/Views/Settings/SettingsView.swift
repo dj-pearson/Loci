@@ -37,43 +37,52 @@ struct SettingsView: View {
     /// Premium account header shown at the top of Settings. Gradient
     /// avatar tile, display name, tier badge, and an upgrade CTA for
     /// free-tier users.
+    ///
+    /// US-179: The entire card is now a NavigationLink into AccountView so
+    /// tapping it feels natural and opens the full account hub.
     private var accountHeaderCard: some View {
         Section {
-            HStack(spacing: DesignSystem.Space.md) {
-                // Gradient avatar tile with initial.
-                ZStack {
-                    RoundedRectangle(cornerRadius: DesignSystem.Radius.md, style: .continuous)
-                        .fill(DesignSystem.Gradients.primary)
-                        .frame(width: 56, height: 56)
-                        .elevation(.level2)
-                    Text(accountInitial)
-                        .font(.title2.weight(.bold))
-                        .foregroundStyle(.white)
-                }
-
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(accountDisplayName)
-                        .font(.headline)
-                        .foregroundStyle(Theme.textPrimary)
-
-                    // Tier badge with gradient background.
-                    HStack(spacing: 4) {
-                        Image(systemName: tierBadgeIcon)
-                            .font(.caption2.weight(.bold))
-                        Text(viewModel.subscriptionTier.displayName)
-                            .font(.caption.weight(.semibold))
+            NavigationLink {
+                AccountView(viewModel: viewModel)
+            } label: {
+                HStack(spacing: DesignSystem.Space.md) {
+                    // Gradient avatar tile with initial.
+                    ZStack {
+                        RoundedRectangle(cornerRadius: DesignSystem.Radius.md, style: .continuous)
+                            .fill(DesignSystem.Gradients.primary)
+                            .frame(width: 56, height: 56)
+                            .elevation(.level2)
+                        Text(accountInitial)
+                            .font(.title2.weight(.bold))
+                            .foregroundStyle(.white)
                     }
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 4)
-                    .background(tierBadgeGradient, in: Capsule())
-                }
 
-                Spacer()
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(accountDisplayName)
+                            .font(.headline)
+                            .foregroundStyle(Theme.textPrimary)
+
+                        // Tier badge with gradient background.
+                        HStack(spacing: 4) {
+                            Image(systemName: tierBadgeIcon)
+                                .font(.caption2.weight(.bold))
+                            Text(viewModel.subscriptionTier.displayName)
+                                .font(.caption.weight(.semibold))
+                        }
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 4)
+                        .background(tierBadgeGradient, in: Capsule())
+                    }
+
+                    Spacer()
+                }
+                .padding(.vertical, DesignSystem.Space.xxs)
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel(String(localized: "\(accountDisplayName), \(viewModel.subscriptionTier.displayName) tier"))
+                .accessibilityHint(String(localized: "Opens account settings"))
             }
-            .padding(.vertical, DesignSystem.Space.xxs)
-            .accessibilityElement(children: .combine)
-            .accessibilityLabel(String(localized: "\(accountDisplayName), \(viewModel.subscriptionTier.displayName) tier"))
+            .disabled(!viewModel.isSignedIn)
         }
     }
 
@@ -111,6 +120,12 @@ struct SettingsView: View {
                 Toggle(isOn: Binding(
                     get: { biometricService.isBiometricLockEnabled },
                     set: { newValue in
+                        // US-184: Refuse to enable biometric lock on a
+                        // compromised device — the OS-level biometric API
+                        // cannot be trusted under jailbreak.
+                        if IntegrityCheckService.shared.shouldBlockSensitiveOperations {
+                            return
+                        }
                         if newValue {
                             Task {
                                 do {
@@ -132,6 +147,7 @@ struct SettingsView: View {
                         systemImage: biometricService.biometricType.systemImageName
                     )
                 }
+                .disabled(IntegrityCheckService.shared.shouldBlockSensitiveOperations)
             } else {
                 Label(
                     String(localized: "Biometric Lock"),
@@ -154,7 +170,7 @@ struct SettingsView: View {
                 )
             }
 
-            // Data export
+            // Data export — US-184: refuse on compromised devices.
             Button {
                 Task { await exportData() }
             } label: {
@@ -168,14 +184,14 @@ struct SettingsView: View {
                     Label(String(localized: "Export My Data"), systemImage: "square.and.arrow.up")
                 }
             }
-            .disabled(isExportingData)
+            .disabled(isExportingData || IntegrityCheckService.shared.shouldBlockSensitiveOperations)
             .sheet(isPresented: $showExportShare) {
                 if let url = exportURL {
                     ShareSheet(items: [url])
                 }
             }
 
-            // Account deletion
+            // Account deletion — US-184: refuse on compromised devices.
             if viewModel.isSignedIn {
                 Button(role: .destructive) {
                     showDeleteAccountConfirmation = true
@@ -190,7 +206,7 @@ struct SettingsView: View {
                         Label(String(localized: "Delete Account"), systemImage: "trash")
                     }
                 }
-                .disabled(isDeletingAccount)
+                .disabled(isDeletingAccount || IntegrityCheckService.shared.shouldBlockSensitiveOperations)
                 .alert(
                     String(localized: "Delete Account"),
                     isPresented: $showDeleteAccountConfirmation
@@ -221,8 +237,9 @@ struct SettingsView: View {
                     }
                 }
 
+                // US-176: Real Manage Subscription destination (was a Text placeholder).
                 NavigationLink {
-                    Text(String(localized: "Manage Subscription"))
+                    ManageSubscriptionView()
                 } label: {
                     Label(String(localized: "Manage Subscription"), systemImage: "creditcard")
                 }
@@ -244,8 +261,9 @@ struct SettingsView: View {
                     Text(String(localized: "Your local data will be kept, but cloud sync will stop."))
                 }
             } else {
+                // US-176: Real Sign In destination (was a Text placeholder).
                 NavigationLink {
-                    Text(String(localized: "Sign In"))
+                    SignInView()
                 } label: {
                     Label(String(localized: "Sign In"), systemImage: "person.badge.plus")
                 }
@@ -396,12 +414,8 @@ struct SettingsView: View {
             } message: {
                 Text(String(localized: "\(deletedArchivedCount) audio file(s) deleted."))
             }
-
-            NavigationLink {
-                Text(String(localized: "Export Data"))
-            } label: {
-                Label(String(localized: "Export Data"), systemImage: "square.and.arrow.up")
-            }
+            // US-176: Removed duplicate "Export Data" NavigationLink stub — the
+            // working "Export My Data" button already lives in the Privacy section.
         }
     }
 
@@ -409,7 +423,16 @@ struct SettingsView: View {
 
     private var familySection: some View {
         Section(String(localized: "Family")) {
-            if householdMembers.isEmpty {
+            if IntegrityCheckService.shared.shouldBlockSensitiveOperations {
+                // US-184: Household creation/join is disabled on compromised
+                // devices — invite codes and member lists are sensitive.
+                Label(
+                    String(localized: "Family sharing disabled on this device."),
+                    systemImage: "exclamationmark.shield"
+                )
+                .font(.caption)
+                .foregroundStyle(Theme.warning)
+            } else if householdMembers.isEmpty {
                 Button {
                     showCreateHousehold = true
                 } label: {

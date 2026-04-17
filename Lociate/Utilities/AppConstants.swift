@@ -18,8 +18,11 @@ enum AppConstants {
     static let maxRecordingDurationSeconds: TimeInterval = 300 // 5 minutes
     static let lowStorageThresholdBytes: Int64 = 100 * 1024 * 1024 // 100 MB
 
-    // MARK: - Session Security (US-145)
-    static let sessionInactivityTimeoutDays: Int = 30
+    // MARK: - Session Security (US-145, US-184)
+    /// US-184: Reduced from 30 → 7 days. A voice-note + location app with
+    /// household sharing is sensitive enough that stale sessions should
+    /// expire inside of a week rather than a month.
+    static let sessionInactivityTimeoutDays: Int = 7
     static let tokenRefreshMaxRetries: Int = 3
     static let sessionActivityUpdateIntervalSeconds: TimeInterval = 300 // 5 minutes
 

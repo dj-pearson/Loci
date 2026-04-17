@@ -8,6 +8,11 @@ struct RecordingView: View {
     var householdName: String?
     var householdId: UUID?
     var createdByName: String?
+    /// US-180: When non-nil, the saved Locus is pinned at this coordinate
+    /// instead of the device's current location. Used by the map's
+    /// long-press-to-pin gesture to capture a memory about a place that
+    /// isn't where the user is physically standing.
+    var pinnedCoordinate: CLLocationCoordinate2D?
     var onDismiss: (() -> Void)?
 
     @State private var locationName: String?
@@ -60,7 +65,7 @@ struct RecordingView: View {
             }
             .padding(.horizontal, Theme.Spacing.lg)
         }
-        .task(id: viewModel.currentLocation?.coordinate.latitude) {
+        .task(id: locationTaskID) {
             await updateLocationName()
         }
         .overlay {
@@ -95,11 +100,15 @@ struct RecordingView: View {
                     onSave: { category, shared in
                         showPostRecordingSheet = false
                         viewModel.modelContext = modelContext
+                        // US-180: Prefer the long-pressed pinned coordinate
+                        // over the device's current location when it was set
+                        // by the map gesture.
+                        let saveCoordinate = pinnedCoordinate ?? result.coordinate
                         Task {
                             await viewModel.saveLocus(
                                 audioURL: result.url,
                                 transcription: result.transcription,
-                                coordinate: result.coordinate,
+                                coordinate: saveCoordinate,
                                 category: category,
                                 isShared: shared,
                                 householdId: shared ? householdId : nil,
@@ -138,9 +147,18 @@ struct RecordingView: View {
 
     private var locationHeader: some View {
         HStack(spacing: Theme.Spacing.sm) {
-            Image(systemName: "location.fill")
+            // US-180: Different icon when we're pinning at a non-current
+            // location so the user sees they're recording about a place
+            // they long-pressed, not about where they are right now.
+            Image(systemName: pinnedCoordinate != nil ? "mappin.circle.fill" : "location.fill")
                 .font(.caption)
                 .foregroundStyle(Theme.textSecondary)
+
+            if pinnedCoordinate != nil {
+                Text(String(localized: "Pinned at"))
+                    .font(Theme.Typography.caption)
+                    .foregroundStyle(Theme.textSecondary)
+            }
 
             if let name = locationName {
                 Text(name)
@@ -252,6 +270,19 @@ struct RecordingView: View {
 
     // MARK: - Helpers
 
+    /// US-180: Drives the geocode task. When we have a pinned coordinate
+    /// from the map's long-press we lock to that; otherwise we react to
+    /// currentLocation updates as they arrive.
+    private var locationTaskID: String {
+        if let pinnedCoordinate {
+            return "pinned:\(pinnedCoordinate.latitude),\(pinnedCoordinate.longitude)"
+        }
+        if let coord = viewModel.currentLocation?.coordinate {
+            return "live:\(coord.latitude)"
+        }
+        return "none"
+    }
+
     private var formattedDuration: String {
         let totalSeconds = Int(viewModel.recordingDuration)
         let minutes = totalSeconds / 60
@@ -260,8 +291,18 @@ struct RecordingView: View {
     }
 
     private func updateLocationName() async {
-        guard let location = viewModel.currentLocation else { return }
-        let name = try? await geocodingService.reverseGeocode(location.coordinate)
+        // US-180: If a pinned coordinate was provided by the map's
+        // long-press gesture, resolve the name for that coordinate — not
+        // for where the user is physically standing.
+        let coordinate: CLLocationCoordinate2D
+        if let pinnedCoordinate {
+            coordinate = pinnedCoordinate
+        } else if let location = viewModel.currentLocation {
+            coordinate = location.coordinate
+        } else {
+            return
+        }
+        let name = try? await geocodingService.reverseGeocode(coordinate)
         locationName = name
     }
 }
