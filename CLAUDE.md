@@ -35,7 +35,7 @@ The app's internal domain language still uses "locus" (singular) and "loci" (plu
 - **Styling**: Tailwind CSS
 
 ### CI/CD
-- **Repo**: GitHub (pearsonmedia/loci-ios)
+- **Repo**: GitHub (pearsonmedia/lociate-ios)
 - **CI**: GitHub Actions (SwiftLint, xcodebuild, TestFlight)
 - **Signing**: Fastlane match
 

@@ -28,8 +28,8 @@
 	</array>
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
-		<string>com.pearsonmedia.lociate.sync</string>
-		<string>com.pearsonmedia.lociate.geofence-refresh</string>
+		<string>app.lociate.ios.sync</string>
+		<string>app.lociate.ios.geofence-refresh</string>
 	</array>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>

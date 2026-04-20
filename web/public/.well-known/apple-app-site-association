@@ -3,7 +3,7 @@
     "apps": [],
     "details": [
       {
-        "appID": "TEAM_ID.com.pearsonmedia.loci",
+        "appID": "TEAM_ID.app.lociate.ios",
         "paths": [
           "/open/*",
           "/locus/*"
@@ -13,7 +13,7 @@
   },
   "webcredentials": {
     "apps": [
-      "TEAM_ID.com.pearsonmedia.loci"
+      "TEAM_ID.app.lociate.ios"
     ]
   }
 }

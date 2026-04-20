@@ -1,4 +1,4 @@
-package com.pearsonmedia.lociate.ui.component
+package app.lociate.android.ui.component
 
 import android.animation.ValueAnimator
 import androidx.compose.animation.animateColorAsState
@@ -39,8 +39,8 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import com.pearsonmedia.lociate.ui.theme.DesignTokens
-import com.pearsonmedia.lociate.ui.theme.LociateGradients
+import app.lociate.android.ui.theme.DesignTokens
+import app.lociate.android.ui.theme.LociateGradients
 
 /**
  * Premium hero record button (US-166).

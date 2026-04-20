@@ -1,4 +1,4 @@
-package com.pearsonmedia.lociate.ui.screen.map
+package app.lociate.android.ui.screen.map
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -46,11 +46,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.ui.draw.clip
-import com.pearsonmedia.lociate.domain.model.Locus
-import com.pearsonmedia.lociate.ui.component.EmptyStateView
-import com.pearsonmedia.lociate.ui.theme.DesignTokens
-import com.pearsonmedia.lociate.ui.theme.LociateGradients
-import com.pearsonmedia.lociate.ui.theme.premiumCard
+import app.lociate.android.domain.model.Locus
+import app.lociate.android.ui.component.EmptyStateView
+import app.lociate.android.ui.theme.DesignTokens
+import app.lociate.android.ui.theme.LociateGradients
+import app.lociate.android.ui.theme.premiumCard
 import kotlinx.coroutines.launch
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter

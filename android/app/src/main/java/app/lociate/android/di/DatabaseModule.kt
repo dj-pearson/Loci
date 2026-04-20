@@ -1,10 +1,10 @@
-package com.pearsonmedia.lociate.di
+package app.lociate.android.di
 
 import android.content.Context
 import androidx.room.Room
-import com.pearsonmedia.lociate.data.local.LociateDatabase
-import com.pearsonmedia.lociate.data.local.dao.HouseholdDao
-import com.pearsonmedia.lociate.data.local.dao.LocusDao
+import app.lociate.android.data.local.LociateDatabase
+import app.lociate.android.data.local.dao.HouseholdDao
+import app.lociate.android.data.local.dao.LocusDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

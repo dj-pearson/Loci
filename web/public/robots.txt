@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://useloci.com/sitemap-index.xml
+Sitemap: https://lociate.app/sitemap-index.xml

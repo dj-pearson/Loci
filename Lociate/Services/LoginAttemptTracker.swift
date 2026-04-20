@@ -15,7 +15,7 @@ final class LoginAttemptTracker {
         (10, 3600),     // After 10 failures: 1 hour
     ]
 
-    private static let keychainPrefix = "com.pearsonmedia.loci.loginAttempts."
+    private static let keychainPrefix = "app.lociate.ios.loginAttempts."
 
     // MARK: - Observable State
 

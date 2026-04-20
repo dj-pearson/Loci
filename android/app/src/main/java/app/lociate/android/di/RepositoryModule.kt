@@ -1,7 +1,7 @@
-package com.pearsonmedia.lociate.di
+package app.lociate.android.di
 
-import com.pearsonmedia.lociate.data.repository.LocusRepositoryImpl
-import com.pearsonmedia.lociate.domain.repository.LocusRepository
+import app.lociate.android.data.repository.LocusRepositoryImpl
+import app.lociate.android.domain.repository.LocusRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

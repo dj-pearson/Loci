@@ -9,7 +9,7 @@ final class NetworkMonitor {
     private(set) var connectionType: ConnectionType = .unknown
 
     private let monitor = NWPathMonitor()
-    private let queue = DispatchQueue(label: "com.pearsonmedia.loci.network-monitor")
+    private let queue = DispatchQueue(label: "app.lociate.ios.network-monitor")
 
     enum ConnectionType {
         case wifi

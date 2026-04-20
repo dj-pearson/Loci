@@ -456,12 +456,12 @@ struct PaywallView: View {
 
             HStack(spacing: Theme.Spacing.md) {
                 Link(String(localized: "Terms of Service"),
-                     destination: URL(string: "https://useloci.com/terms")!)
+                     destination: URL(string: "https://lociate.app/terms")!)
                     .font(Theme.Typography.caption)
                     .foregroundStyle(Theme.textSecondary)
 
                 Link(String(localized: "Privacy Policy"),
-                     destination: URL(string: "https://useloci.com/privacy")!)
+                     destination: URL(string: "https://lociate.app/privacy")!)
                     .font(Theme.Typography.caption)
                     .foregroundStyle(Theme.textSecondary)
             }

@@ -1,7 +1,7 @@
-package com.pearsonmedia.lociate.domain.repository
+package app.lociate.android.domain.repository
 
-import com.pearsonmedia.lociate.domain.model.Locus
-import com.pearsonmedia.lociate.domain.model.LocusCategory
+import app.lociate.android.domain.model.Locus
+import app.lociate.android.domain.model.LocusCategory
 import kotlinx.coroutines.flow.Flow
 
 interface LocusRepository {

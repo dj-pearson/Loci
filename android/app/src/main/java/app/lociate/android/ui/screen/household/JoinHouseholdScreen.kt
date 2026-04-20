@@ -1,4 +1,4 @@
-package com.pearsonmedia.lociate.ui.screen.household
+package app.lociate.android.ui.screen.household
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -99,7 +99,7 @@ fun JoinHouseholdScreen(
                 textAlign = TextAlign.Center
             )
 
-            if (state.currentTier == com.pearsonmedia.lociate.domain.model.SubscriptionTier.FREE) {
+            if (state.currentTier == app.lociate.android.domain.model.SubscriptionTier.FREE) {
                 Card(
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.tertiaryContainer
@@ -145,13 +145,13 @@ fun JoinHouseholdScreen(
                     placeholder = { Text("e.g., AB12CD34") },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
-                    enabled = state.currentTier != com.pearsonmedia.lociate.domain.model.SubscriptionTier.FREE
+                    enabled = state.currentTier != app.lociate.android.domain.model.SubscriptionTier.FREE
                 )
 
                 Button(
                     onClick = { viewModel.joinHousehold(inviteCode) },
                     enabled = inviteCode.isNotBlank() && !state.isLoading &&
-                        state.currentTier != com.pearsonmedia.lociate.domain.model.SubscriptionTier.FREE,
+                        state.currentTier != app.lociate.android.domain.model.SubscriptionTier.FREE,
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     if (state.isLoading) {

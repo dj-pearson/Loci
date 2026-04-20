@@ -19,7 +19,7 @@ final class IntegrityCheckService {
     /// explaining why.
     var shouldBlockSensitiveOperations: Bool { isCompromised }
 
-    private let logger = Logger(subsystem: "com.pearsonmedia.loci", category: "IntegrityCheck")
+    private let logger = Logger(subsystem: "app.lociate.ios", category: "IntegrityCheck")
 
     enum IntegrityIssue: String, CaseIterable {
         case jailbreakPaths = "Suspicious file paths detected"
@@ -118,7 +118,7 @@ final class IntegrityCheckService {
 
     /// Check for sandbox escape (ability to write outside app sandbox)
     private func checkSandboxEscape() -> Bool {
-        let outsidePath = "/tmp/loci_sandbox_test_\(UUID().uuidString)"
+        let outsidePath = "/tmp/lociate_sandbox_test_\(UUID().uuidString)"
         do {
             try "test".write(toFile: outsidePath, atomically: true, encoding: .utf8)
             try? FileManager.default.removeItem(atPath: outsidePath)

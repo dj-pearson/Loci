@@ -3,7 +3,7 @@ import tailwind from '@astrojs/tailwind';
 import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
-  site: 'https://useloci.com',
+  site: 'https://lociate.app',
   integrations: [
     tailwind(),
     sitemap(),

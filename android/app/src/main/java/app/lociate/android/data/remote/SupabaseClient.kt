@@ -1,6 +1,6 @@
-package com.pearsonmedia.lociate.data.remote
+package app.lociate.android.data.remote
 
-import com.pearsonmedia.lociate.BuildConfig
+import app.lociate.android.BuildConfig
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.createSupabaseClient

@@ -1,4 +1,4 @@
-package com.pearsonmedia.lociate.service
+package app.lociate.android.service
 
 import android.content.Context
 import androidx.hilt.work.HiltWorker
@@ -11,7 +11,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import com.pearsonmedia.lociate.data.local.dao.LocusDao
+import app.lociate.android.data.local.dao.LocusDao
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import timber.log.Timber

@@ -1,9 +1,9 @@
-package com.pearsonmedia.lociate.ui.screen.search
+package app.lociate.android.ui.screen.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.pearsonmedia.lociate.domain.model.Locus
-import com.pearsonmedia.lociate.domain.repository.LocusRepository
+import app.lociate.android.domain.model.Locus
+import app.lociate.android.domain.repository.LocusRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow

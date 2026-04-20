@@ -112,7 +112,7 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
         currentLocation = location
 
         // Persist latest location to App Group for widget access
-        let defaults = UserDefaults(suiteName: "group.com.pearsonmedia.loci")
+        let defaults = UserDefaults(suiteName: "group.app.lociate.ios")
         defaults?.set(location.coordinate.latitude, forKey: "widget_last_latitude")
         defaults?.set(location.coordinate.longitude, forKey: "widget_last_longitude")
 

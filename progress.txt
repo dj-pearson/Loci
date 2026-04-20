@@ -192,7 +192,7 @@ Note: "loci" (lowercase, plural) remains the internal domain term for saved pins
 - [x] US-110: Create dark mode support with proper color adaptation
 
 ## Phase 20: Marketing Website (US-111 → US-115)
-- [x] US-111: Create Astro project for useloci.com marketing site
+- [x] US-111: Create Astro project for lociate.app marketing site
 - [x] US-112: Create landing page with hero, features, and download CTA
 - [x] US-113: Create privacy policy page
 - [x] US-114: Create terms of service page

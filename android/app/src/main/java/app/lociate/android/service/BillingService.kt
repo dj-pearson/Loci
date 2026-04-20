@@ -1,4 +1,4 @@
-package com.pearsonmedia.lociate.service
+package app.lociate.android.service
 
 import android.app.Activity
 import android.content.Context
@@ -11,7 +11,7 @@ import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.PurchasesUpdatedListener
 import com.android.billingclient.api.QueryProductDetailsParams
 import com.android.billingclient.api.QueryPurchasesParams
-import com.pearsonmedia.lociate.domain.model.SubscriptionTier
+import app.lociate.android.domain.model.SubscriptionTier
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

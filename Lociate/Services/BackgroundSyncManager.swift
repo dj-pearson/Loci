@@ -4,7 +4,7 @@ import SwiftData
 
 @Observable
 final class BackgroundSyncManager {
-    static let taskIdentifier = "com.pearsonmedia.loci.sync"
+    static let taskIdentifier = "app.lociate.ios.sync"
 
     private let syncService: SyncService
     private let audioSyncService: AudioSyncService

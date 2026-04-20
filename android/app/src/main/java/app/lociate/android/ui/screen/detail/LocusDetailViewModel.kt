@@ -1,12 +1,12 @@
-package com.pearsonmedia.lociate.ui.screen.detail
+package app.lociate.android.ui.screen.detail
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.pearsonmedia.lociate.domain.model.Locus
-import com.pearsonmedia.lociate.domain.model.LocusCategory
-import com.pearsonmedia.lociate.domain.repository.LocusRepository
-import com.pearsonmedia.lociate.service.AudioPlayerService
+import app.lociate.android.domain.model.Locus
+import app.lociate.android.domain.model.LocusCategory
+import app.lociate.android.domain.repository.LocusRepository
+import app.lociate.android.service.AudioPlayerService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

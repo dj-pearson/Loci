@@ -1,4 +1,4 @@
-package com.pearsonmedia.lociate.service
+package app.lociate.android.service
 
 import android.app.Service
 import android.content.Intent

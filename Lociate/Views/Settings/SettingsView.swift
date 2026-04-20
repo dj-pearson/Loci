@@ -478,15 +478,15 @@ struct SettingsView: View {
                     .foregroundStyle(.secondary)
             }
 
-            Link(destination: URL(string: "https://useloci.com/privacy")!) {
+            Link(destination: URL(string: "https://lociate.app/privacy")!) {
                 Label(String(localized: "Privacy Policy"), systemImage: "hand.raised")
             }
 
-            Link(destination: URL(string: "https://useloci.com/terms")!) {
+            Link(destination: URL(string: "https://lociate.app/terms")!) {
                 Label(String(localized: "Terms of Service"), systemImage: "doc.text")
             }
 
-            Link(destination: URL(string: "https://useloci.com/support")!) {
+            Link(destination: URL(string: "https://lociate.app/support")!) {
                 Label(String(localized: "Support & Feedback"), systemImage: "envelope")
             }
 

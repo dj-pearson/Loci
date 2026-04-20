@@ -1,4 +1,4 @@
-package com.pearsonmedia.lociate.util
+package app.lociate.android.util
 
 import timber.log.Timber
 import java.time.Instant

@@ -1,4 +1,4 @@
-package com.pearsonmedia.lociate.ui.screen.map
+package app.lociate.android.ui.screen.map
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,10 +21,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.pearsonmedia.lociate.domain.model.LocusCategory
-import com.pearsonmedia.lociate.ui.component.CategoryFilterChips
-import com.pearsonmedia.lociate.ui.component.EmptyStateView
-import com.pearsonmedia.lociate.ui.component.LociateMapView
+import app.lociate.android.domain.model.LocusCategory
+import app.lociate.android.ui.component.CategoryFilterChips
+import app.lociate.android.ui.component.EmptyStateView
+import app.lociate.android.ui.component.LociateMapView
 
 @Composable
 fun MapScreen(

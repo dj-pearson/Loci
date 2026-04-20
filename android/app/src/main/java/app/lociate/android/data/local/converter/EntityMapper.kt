@@ -1,17 +1,17 @@
-package com.pearsonmedia.lociate.data.local.converter
+package app.lociate.android.data.local.converter
 
-import com.pearsonmedia.lociate.data.local.entity.HouseholdEntity
-import com.pearsonmedia.lociate.data.local.entity.HouseholdMemberEntity
-import com.pearsonmedia.lociate.data.local.entity.LocusEntity
-import com.pearsonmedia.lociate.data.local.entity.UserProfileEntity
-import com.pearsonmedia.lociate.domain.model.Household
-import com.pearsonmedia.lociate.domain.model.HouseholdMember
-import com.pearsonmedia.lociate.domain.model.Locus
-import com.pearsonmedia.lociate.domain.model.LocusCategory
-import com.pearsonmedia.lociate.domain.model.MemberRole
-import com.pearsonmedia.lociate.domain.model.SubscriptionTier
-import com.pearsonmedia.lociate.domain.model.SyncStatus
-import com.pearsonmedia.lociate.domain.model.UserProfile
+import app.lociate.android.data.local.entity.HouseholdEntity
+import app.lociate.android.data.local.entity.HouseholdMemberEntity
+import app.lociate.android.data.local.entity.LocusEntity
+import app.lociate.android.data.local.entity.UserProfileEntity
+import app.lociate.android.domain.model.Household
+import app.lociate.android.domain.model.HouseholdMember
+import app.lociate.android.domain.model.Locus
+import app.lociate.android.domain.model.LocusCategory
+import app.lociate.android.domain.model.MemberRole
+import app.lociate.android.domain.model.SubscriptionTier
+import app.lociate.android.domain.model.SyncStatus
+import app.lociate.android.domain.model.UserProfile
 import java.time.Instant
 import java.util.UUID
 

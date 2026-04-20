@@ -103,7 +103,7 @@ struct ManageSubscriptionView: View {
 
     private var actionsSection: some View {
         Section(String(localized: "Help")) {
-            Link(destination: URL(string: "https://useloci.com/support")!) {
+            Link(destination: URL(string: "https://lociate.app/support")!) {
                 Label(String(localized: "Subscription Support"), systemImage: "questionmark.circle")
             }
         }

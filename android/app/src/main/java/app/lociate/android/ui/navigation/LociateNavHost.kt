@@ -1,4 +1,4 @@
-package com.pearsonmedia.lociate.ui.navigation
+package app.lociate.android.ui.navigation
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -23,18 +23,18 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.pearsonmedia.lociate.ui.screen.auth.SignInScreen
-import com.pearsonmedia.lociate.ui.screen.detail.LocusDetailScreen
-import com.pearsonmedia.lociate.ui.screen.household.CreateHouseholdScreen
-import com.pearsonmedia.lociate.ui.screen.household.HouseholdMembersScreen
-import com.pearsonmedia.lociate.ui.screen.household.JoinHouseholdScreen
-import com.pearsonmedia.lociate.ui.screen.map.MapScreen
-import com.pearsonmedia.lociate.ui.screen.map.ListScreen
-import com.pearsonmedia.lociate.ui.screen.onboarding.OnboardingScreen
-import com.pearsonmedia.lociate.ui.screen.paywall.PaywallScreen
-import com.pearsonmedia.lociate.ui.screen.record.RecordingScreen
-import com.pearsonmedia.lociate.ui.screen.search.SearchScreen
-import com.pearsonmedia.lociate.ui.screen.settings.SettingsScreen
+import app.lociate.android.ui.screen.auth.SignInScreen
+import app.lociate.android.ui.screen.detail.LocusDetailScreen
+import app.lociate.android.ui.screen.household.CreateHouseholdScreen
+import app.lociate.android.ui.screen.household.HouseholdMembersScreen
+import app.lociate.android.ui.screen.household.JoinHouseholdScreen
+import app.lociate.android.ui.screen.map.MapScreen
+import app.lociate.android.ui.screen.map.ListScreen
+import app.lociate.android.ui.screen.onboarding.OnboardingScreen
+import app.lociate.android.ui.screen.paywall.PaywallScreen
+import app.lociate.android.ui.screen.record.RecordingScreen
+import app.lociate.android.ui.screen.search.SearchScreen
+import app.lociate.android.ui.screen.settings.SettingsScreen
 
 sealed class Screen(val route: String) {
     data object Onboarding : Screen("onboarding")

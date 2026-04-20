@@ -1,4 +1,4 @@
-package com.pearsonmedia.lociate.ui.screen.household
+package app.lociate.android.ui.screen.household
 
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -102,7 +102,7 @@ fun CreateHouseholdScreen(
                 textAlign = TextAlign.Center
             )
 
-            if (state.currentTier != com.pearsonmedia.lociate.domain.model.SubscriptionTier.FAMILY) {
+            if (state.currentTier != app.lociate.android.domain.model.SubscriptionTier.FAMILY) {
                 Card(
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.tertiaryContainer
@@ -165,13 +165,13 @@ fun CreateHouseholdScreen(
                     placeholder = { Text("e.g., The Pearsons") },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
-                    enabled = state.currentTier == com.pearsonmedia.lociate.domain.model.SubscriptionTier.FAMILY
+                    enabled = state.currentTier == app.lociate.android.domain.model.SubscriptionTier.FAMILY
                 )
 
                 Button(
                     onClick = { viewModel.createHousehold(householdName) },
                     enabled = householdName.isNotBlank() && !state.isLoading &&
-                        state.currentTier == com.pearsonmedia.lociate.domain.model.SubscriptionTier.FAMILY,
+                        state.currentTier == app.lociate.android.domain.model.SubscriptionTier.FAMILY,
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     if (state.isLoading) {

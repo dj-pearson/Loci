@@ -58,7 +58,7 @@ final class AuditLogEntry {
 final class SecurityAuditLogger {
     static let shared = SecurityAuditLogger()
 
-    private let logger = Logger(subsystem: "com.pearsonmedia.loci", category: "SecurityAudit")
+    private let logger = Logger(subsystem: "app.lociate.ios", category: "SecurityAudit")
     private let maxEntries = 1000
 
     // MARK: - Public API

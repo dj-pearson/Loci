@@ -1,4 +1,4 @@
-package com.pearsonmedia.lociate.ui.theme
+package app.lociate.android.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

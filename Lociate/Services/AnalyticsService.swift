@@ -28,8 +28,8 @@ final class AnalyticsService {
     static let shared = AnalyticsService()
 
     private static let appID = BuildSecrets.telemetryDeckAppID
-    private static let optOutKey = "loci_analytics_opt_out"
-    private let logger = Logger(subsystem: "com.pearsonmedia.loci", category: "Analytics")
+    private static let optOutKey = "lociate_analytics_opt_out"
+    private let logger = Logger(subsystem: "app.lociate.ios", category: "Analytics")
 
     var isOptedOut: Bool {
         get { UserDefaults.standard.bool(forKey: Self.optOutKey) }

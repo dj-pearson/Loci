@@ -1,8 +1,8 @@
-package com.pearsonmedia.lociate
+package app.lociate.android
 
 import android.net.Uri
 import com.google.common.truth.Truth.assertThat
-import com.pearsonmedia.lociate.util.DeepLinkValidator
+import app.lociate.android.util.DeepLinkValidator
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic

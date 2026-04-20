@@ -149,7 +149,7 @@ android/
 ├── gradle.properties               # Gradle and Android properties
 ├── gradle/                         # Gradle wrapper
 └── app/
-    └── src/main/java/com/pearsonmedia/lociate/
+    └── src/main/java/app/lociate/android/
         ├── LociateApplication.kt   # @HiltAndroidApp entry point
         ├── data/
         │   ├── local/

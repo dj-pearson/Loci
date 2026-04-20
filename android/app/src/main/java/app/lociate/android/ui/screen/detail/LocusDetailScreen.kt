@@ -1,4 +1,4 @@
-package com.pearsonmedia.lociate.ui.screen.detail
+package app.lociate.android.ui.screen.detail
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row

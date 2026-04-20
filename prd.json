@@ -8,17 +8,17 @@
       "title": "Create Xcode project structure with folder organization",
       "description": "As a developer, I need a properly structured Xcode project so that all subsequent work has a clean foundation.",
       "acceptanceCriteria": [
-        "Xcode project created with bundle ID com.pearsonmedia.lociate, deployment target iOS 17.0",
+        "Xcode project created with bundle ID app.lociate.ios, deployment target iOS 17.0",
         "Folder structure: Models/, ViewModels/, Views/, Services/, Widget/, Utilities/",
         "Views subfolders: MapView/, Record/, Detail/, Onboarding/, Settings/, Components/",
         "App entry point (LociateApp.swift) with @main and WindowGroup",
-        "App Group configured for widget data sharing (group.com.pearsonmedia.lociate)",
+        "App Group configured for widget data sharing (group.app.lociate.ios)",
         "Info.plist includes NSLocationAlwaysAndWhenInUseUsageDescription, NSLocationWhenInUseUsageDescription, NSMicrophoneUsageDescription, NSSpeechRecognitionUsageDescription",
         "Typecheck passes"
       ],
       "priority": 1,
       "passes": true,
-      "notes": "Completed. Xcode project created with full directory structure, LociateApp.swift entry point, Info.plist with privacy descriptions, Lociate.entitlements with App Group, Assets.xcassets, and project.pbxproj with iOS 17.0 deployment target and com.pearsonmedia.lociate bundle ID."
+      "notes": "Completed. Xcode project created with full directory structure, LociateApp.swift entry point, Info.plist with privacy descriptions, Lociate.entitlements with App Group, Assets.xcassets, and project.pbxproj with iOS 17.0 deployment target and app.lociate.ios bundle ID."
     },
     {
       "id": "US-002",
@@ -125,7 +125,7 @@
       ],
       "priority": 8,
       "passes": true,
-      "notes": "Implemented ModelContainerConfiguration enum in Utilities/ with production() and preview() factory methods. Schema includes Locus, Household, HouseholdMember, UserProfile. Production container uses app group (group.com.pearsonmedia.lociate) for widget data sharing. Preview container is in-memory only. PreviewData enum provides 12 sample loci (all 10 categories), 2 households, 2 members, 3 user profiles, and a previewContainer property that populates the in-memory store. LociateApp.swift updated to initialize and inject production ModelContainer. Build verification deferred to macOS CI."
+      "notes": "Implemented ModelContainerConfiguration enum in Utilities/ with production() and preview() factory methods. Schema includes Locus, Household, HouseholdMember, UserProfile. Production container uses app group (group.app.lociate.ios) for widget data sharing. Preview container is in-memory only. PreviewData enum provides 12 sample loci (all 10 categories), 2 households, 2 members, 3 user profiles, and a previewContainer property that populates the in-memory store. LociateApp.swift updated to initialize and inject production ModelContainer. Build verification deferred to macOS CI."
     },
     {
       "id": "US-009",
@@ -916,9 +916,9 @@
       "description": "As a user, I want to access legal documents and app information from settings.",
       "acceptanceCriteria": [
         "AboutView section in Settings with: App version and build number",
-        "Link rows: Privacy Policy (opens Safari/SFSafariViewController to useloci.com/privacy)",
-        "Terms of Service (opens useloci.com/terms)",
-        "Support/Feedback (opens mailto:hello@useloci.com or useloci.com/support)",
+        "Link rows: Privacy Policy (opens Safari/SFSafariViewController to lociate.app/privacy)",
+        "Terms of Service (opens lociate.app/terms)",
+        "Support/Feedback (opens mailto:hello@lociate.app or lociate.app/support)",
         "Rate on App Store link (SKStoreReviewController or direct link)",
         "Credits: 'Made by Pearson Media LLC'",
         "Typecheck passes"
@@ -1837,14 +1837,14 @@
     },
     {
       "id": "US-111",
-      "title": "Create Astro project for useloci.com marketing site",
+      "title": "Create Astro project for lociate.app marketing site",
       "description": "As a developer, I need the marketing website project scaffolded for Cloudflare Pages.",
       "acceptanceCriteria": [
         "Directory: web/ with Astro project initialized",
         "Configured for Cloudflare Pages adapter (static output)",
         "Tailwind CSS integrated for styling",
         "Base layout with header (logo, nav) and footer (links, copyright)",
-        "astro.config.mjs configured with site: 'https://useloci.com'",
+        "astro.config.mjs configured with site: 'https://lociate.app'",
         "Favicon and Open Graph meta tags configured",
         "Typecheck passes",
         "Verify in browser using dev-browser skill"
@@ -1911,7 +1911,7 @@
       "acceptanceCriteria": [
         "Support page at /support",
         "FAQ section: common questions (battery life, Always Allow, how triggers work, family sharing, subscription management)",
-        "Contact section: email hello@useloci.com, contact form (Cloudflare Email Routing)",
+        "Contact section: email hello@lociate.app, contact form (Cloudflare Email Routing)",
         "Troubleshooting section: permissions, notifications not working, sync issues",
         "App Store review link",
         "Typecheck passes",
@@ -2039,7 +2039,7 @@
       ],
       "priority": 122,
       "passes": true,
-      "notes": "All 5 Kong CORS plugins configured with explicit origins whitelist (useloci.com, www.useloci.com). Each service has appropriate methods, headers, exposed_headers, credentials, and max_age. iOS native app unaffected (no Origin header). Storage includes Range header for audio streaming."
+      "notes": "All 5 Kong CORS plugins configured with explicit origins whitelist (lociate.app, www.lociate.app). Each service has appropriate methods, headers, exposed_headers, credentials, and max_age. iOS native app unaffected (no Origin header). Storage includes Range header for audio streaming."
     },
     {
       "id": "US-123",
@@ -2577,7 +2577,7 @@
       "title": "Android project scaffold with Kotlin, Jetpack Compose, Hilt, and Room",
       "description": "As a developer, I need a properly structured Android project so that all subsequent Android work has a clean foundation matching iOS feature parity.",
       "acceptanceCriteria": [
-        "Android project created at android/ with applicationId com.pearsonmedia.lociate, minSdk 26, targetSdk 35",
+        "Android project created at android/ with applicationId app.lociate.ios, minSdk 26, targetSdk 35",
         "Gradle Kotlin DSL with version catalog (libs.versions.toml) for dependency management",
         "Package structure: data/ (local/remote/repository), domain/ (model/usecase/repository), service/, ui/ (theme/navigation/screen/component), util/, di/",
         "Hilt dependency injection configured with @HiltAndroidApp application class",
@@ -3173,7 +3173,7 @@
       ],
       "priority": 184,
       "passes": true,
-      "notes": "Completed 2026-04-17. AppConstants.sessionInactivityTimeoutDays reduced 30 → 7. IntegrityCheckService exposes shouldBlockSensitiveOperations, and four surfaces now gate on it: biometric lock toggle (refuses to enable), Settings Family section (hides Create/Join and shows a warning Label), Delete Account buttons in both SettingsView and AccountView (disabled), Export My Data button (disabled). ModelContainerConfiguration gains applyBackupExclusionToStorageDirectories() which marks the app Documents directory and the com.pearsonmedia.lociate App Group container with URLResourceValues.isExcludedFromBackup=true on every cold start — idempotent, so local SwiftData + audio never sync to iCloud/iTunes backups without explicit user opt-in via cloud sync."
+      "notes": "Completed 2026-04-17. AppConstants.sessionInactivityTimeoutDays reduced 30 → 7. IntegrityCheckService exposes shouldBlockSensitiveOperations, and four surfaces now gate on it: biometric lock toggle (refuses to enable), Settings Family section (hides Create/Join and shows a warning Label), Delete Account buttons in both SettingsView and AccountView (disabled), Export My Data button (disabled). ModelContainerConfiguration gains applyBackupExclusionToStorageDirectories() which marks the app Documents directory and the app.lociate.ios App Group container with URLResourceValues.isExcludedFromBackup=true on every cold start — idempotent, so local SwiftData + audio never sync to iCloud/iTunes backups without explicit user opt-in via cloud sync."
     }
   ]
 }

@@ -39,8 +39,8 @@ Go to [Apple Developer > Identifiers](https://developer.apple.com/account/resour
 | Field | Value |
 |-------|-------|
 | Description | Lociate |
-| Bundle ID | `com.pearsonmedia.lociate` (Explicit) |
-| Capabilities | Push Notifications, App Groups (`group.com.pearsonmedia.lociate`) |
+| Bundle ID | `app.lociate.ios` (Explicit) |
+| Capabilities | Push Notifications, App Groups (`group.app.lociate.ios`) |
 
 ### 2. Create App in App Store Connect
 
@@ -51,8 +51,8 @@ Go to [App Store Connect > My Apps](https://appstoreconnect.apple.com/apps) > "+
 | Platform | iOS |
 | Name | Lociate |
 | Primary Language | English (U.S.) |
-| Bundle ID | `com.pearsonmedia.lociate` |
-| SKU | `com.pearsonmedia.lociate` |
+| Bundle ID | `app.lociate.ios` |
+| SKU | `app.lociate.ios` |
 
 ### 3. Find Your Team ID
 
@@ -102,10 +102,10 @@ Match stores encrypted signing certificates and provisioning profiles in a priva
 
 ```powershell
 # Create a PRIVATE repo for certificates (reusable across all apps)
-gh repo create pearsonmedia/ios-certificates --private --clone=false
+gh repo create pearsonmedia/lociate-certificates --private --clone=false
 
 # The repo URL:
-$MATCH_GIT_URL = "https://github.com/pearsonmedia/ios-certificates.git"
+$MATCH_GIT_URL = "https://github.com/pearsonmedia/lociate-certificates.git"
 ```
 
 ### 2. Generate a GitHub PAT for Match
@@ -114,7 +114,7 @@ Match needs to clone the certificates repo during CI. Create a Personal Access T
 
 1. Go to [GitHub > Settings > Developer settings > Personal access tokens > Fine-grained tokens](https://github.com/settings/tokens?type=beta)
 2. Name: `fastlane-match`
-3. Repository access: Select `pearsonmedia/ios-certificates`
+3. Repository access: Select `pearsonmedia/lociate-certificates`
 4. Permissions: Contents (Read and Write)
 5. Generate and copy the token
 
@@ -137,7 +137,7 @@ This must be done from a Mac with Xcode installed:
 cd Lociate
 
 # Set environment variables
-export MATCH_GIT_URL="https://github.com/pearsonmedia/ios-certificates.git"
+export MATCH_GIT_URL="https://github.com/pearsonmedia/lociate-certificates.git"
 export FASTLANE_TEAM_ID="YOUR_TEAM_ID"
 
 # Generate App Store distribution certificate + provisioning profile
@@ -174,7 +174,7 @@ Your Supabase instance provides the URL and anon key.
 
 ```powershell
 # From your Coolify/Docker deployment:
-$SUPABASE_URL = "https://supabase.yourdomain.com"
+$SUPABASE_URL = "https://api.lociate.app"
 
 # The anon key is in your Supabase .env or docker-compose.yml
 # Look for ANON_KEY in your backend/.env file
@@ -209,11 +209,11 @@ Get the SPKI SHA-256 hash of your Supabase server's TLS certificate:
 
 ```powershell
 # Using OpenSSL (available in Git Bash on Windows):
-# Replace "supabase.yourdomain.com" with your actual domain
-bash -c 'openssl s_client -connect supabase.yourdomain.com:443 -servername supabase.yourdomain.com 2>/dev/null | openssl x509 -pubkey -noout | openssl pkey -pubin -outform der | openssl dgst -sha256 -binary | base64'
+# Replace "api.lociate.app" with your actual domain
+bash -c 'openssl s_client -connect api.lociate.app:443 -servername api.lociate.app 2>/dev/null | openssl x509 -pubkey -noout | openssl pkey -pubin -outform der | openssl dgst -sha256 -binary | base64'
 
 # Or in pure PowerShell (requires OpenSSL in PATH):
-$domain = "supabase.yourdomain.com"
+$domain = "api.lociate.app"
 $hash = echo "" | openssl s_client -connect "${domain}:443" -servername $domain 2>$null | openssl x509 -pubkey -noout | openssl pkey -pubin -outform der | openssl dgst -sha256 -binary | openssl base64
 Write-Host "CERT_PIN_HASH=$hash"
 ```
@@ -234,7 +234,7 @@ Go to your repo: **Settings > Secrets and variables > Actions > New repository s
 | `ASC_KEY_ID` | App Store Connect API Key ID | Yes | [ASC API Keys](https://appstoreconnect.apple.com/access/integrations/api) |
 | `ASC_ISSUER_ID` | App Store Connect Issuer ID | Yes | Same page as above |
 | `ASC_API_KEY` | Base64-encoded .p8 file content | Yes | See [API Key section](#app-store-connect-api-key) |
-| `MATCH_GIT_URL` | Private certificates repo URL | Yes | `https://github.com/pearsonmedia/ios-certificates.git` |
+| `MATCH_GIT_URL` | Private certificates repo URL | Yes | `https://github.com/pearsonmedia/lociate-certificates.git` |
 | `MATCH_PASSWORD` | Match encryption passphrase | Yes | Set during `fastlane match` init |
 | `MATCH_GIT_BASIC_AUTHORIZATION` | Base64 `user:pat` for cert repo | Yes | See [Match section](#2-generate-a-github-pat-for-match) |
 | `SUPABASE_URL` | Production Supabase URL | No | Your Coolify deployment |
@@ -249,14 +249,14 @@ Go to your repo: **Settings > Secrets and variables > Actions > New repository s
 
 ```powershell
 # Navigate to your repo directory first
-cd C:\Users\pears\Documents\Loci\Lociate
+cd C:\Users\dpearson\Documents\Loci\Lociate
 
 # ─── SHARED SECRETS (reuse across all iOS apps) ───
 gh secret set APPLE_TEAM_ID --body "YOUR_TEAM_ID"
 gh secret set ASC_KEY_ID --body "YOUR_KEY_ID"
 gh secret set ASC_ISSUER_ID --body "YOUR_ISSUER_ID"
 gh secret set ASC_API_KEY --body ([Convert]::ToBase64String([IO.File]::ReadAllBytes("$HOME\Downloads\AuthKey_XXXX.p8")))
-gh secret set MATCH_GIT_URL --body "https://github.com/pearsonmedia/ios-certificates.git"
+gh secret set MATCH_GIT_URL --body "https://github.com/pearsonmedia/lociate-certificates.git"
 gh secret set MATCH_PASSWORD --body "your-match-passphrase"
 
 $pat = "github_pat_xxxx"
@@ -267,7 +267,7 @@ gh secret set MATCH_GIT_BASIC_AUTHORIZATION --body $auth
 gh secret set SLACK_WEBHOOK_URL --body "https://hooks.slack.com/services/T.../B.../xxxx"
 
 # ─── APP-SPECIFIC SECRETS (unique to Lociate) ───
-gh secret set SUPABASE_URL --body "https://supabase.yourdomain.com"
+gh secret set SUPABASE_URL --body "https://api.lociate.app"
 gh secret set SUPABASE_ANON_KEY --body "eyJhbGciOiJIUzI1NiIs..."
 gh secret set REVENUECAT_API_KEY --body "appl_xxxx"
 gh secret set TELEMETRYDECK_APP_ID --body "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
@@ -297,8 +297,8 @@ Or use [GitHub Organization Secrets](https://docs.github.com/en/actions/security
 
 ```powershell
 # 1. Clone the repo
-git clone https://github.com/pearsonmedia/loci-ios.git
-cd loci-ios
+git clone https://github.com/pearsonmedia/lociate-ios.git
+cd lociate-ios
 
 # 2. Copy the secrets template
 cp Lociate/Configuration/BuildSecrets.swift.example Lociate/Configuration/BuildSecrets.swift
@@ -387,7 +387,7 @@ Before your first release, ensure these are done:
 
 - [ ] App ID registered with Push Notifications capability enabled
 - [ ] Push notification certificate or key configured (APNs key is reusable)
-- [ ] App Group (`group.com.pearsonmedia.lociate`) added to App ID
+- [ ] App Group (`group.app.lociate.ios`) added to App ID
 
 ### In RevenueCat
 
@@ -398,7 +398,7 @@ Before your first release, ensure these are done:
 
 ### In Your Codebase
 
-- [ ] All GitHub Secrets set (see [reference table](#all-secrets-for-loci))
+- [ ] All GitHub Secrets set (see [reference table](#all-secrets-for-lociate))
 - [ ] `ITSAppUsesNonExemptEncryption` set to `false` in Info.plist (already done)
 - [ ] Privacy manifest if using any tracked APIs (check Apple's list)
 

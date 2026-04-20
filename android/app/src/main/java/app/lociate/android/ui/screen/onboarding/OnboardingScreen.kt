@@ -1,4 +1,4 @@
-package com.pearsonmedia.lociate.ui.screen.onboarding
+package app.lociate.android.ui.screen.onboarding
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -33,8 +33,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.pearsonmedia.lociate.ui.theme.DesignTokens
-import com.pearsonmedia.lociate.ui.theme.LociateGradients
+import app.lociate.android.ui.theme.DesignTokens
+import app.lociate.android.ui.theme.LociateGradients
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch

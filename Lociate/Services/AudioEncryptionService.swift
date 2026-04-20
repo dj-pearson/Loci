@@ -27,7 +27,7 @@ enum AudioEncryptionService {
 
     // MARK: - Key Management
 
-    private static let keychainKey = "com.pearsonmedia.loci.audioEncryptionKey"
+    private static let keychainKey = "app.lociate.ios.audioEncryptionKey"
 
     /// Retrieves or generates the AES-256 encryption key stored in Keychain.
     private static func getOrCreateKey() throws -> SymmetricKey {
@@ -186,7 +186,7 @@ enum AudioEncryptionService {
                 try encryptFile(at: fileURL)
             } catch {
                 #if DEBUG
-                Logger(subsystem: "com.pearsonmedia.loci", category: "AudioEncryption")
+                Logger(subsystem: "app.lociate.ios", category: "AudioEncryption")
                     .error("Failed to migrate \(fileURL.lastPathComponent): \(error.localizedDescription)")
                 #endif
             }

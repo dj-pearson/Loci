@@ -72,7 +72,7 @@
             android:name=".service.GeofenceBroadcastReceiver"
             android:exported="false">
             <intent-filter>
-                <action android:name="com.pearsonmedia.lociate.GEOFENCE_EVENT" />
+                <action android:name="app.lociate.android.GEOFENCE_EVENT" />
             </intent-filter>
         </receiver>
 

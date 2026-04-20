@@ -32,8 +32,8 @@ final class SessionManager {
     // MARK: - Keychain Keys
 
     private enum Keys {
-        static let lastActivity = "com.pearsonmedia.loci.session.lastActivity"
-        static let tokenRefreshFailCount = "com.pearsonmedia.loci.session.refreshFailCount"
+        static let lastActivity = "app.lociate.ios.session.lastActivity"
+        static let tokenRefreshFailCount = "app.lociate.ios.session.refreshFailCount"
     }
 
     // MARK: - Activity Tracking

@@ -1,4 +1,4 @@
-package com.pearsonmedia.lociate.ui
+package app.lociate.android.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -8,8 +8,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import com.pearsonmedia.lociate.ui.navigation.LociateNavHost
-import com.pearsonmedia.lociate.ui.theme.LociateTheme
+import app.lociate.android.ui.navigation.LociateNavHost
+import app.lociate.android.ui.theme.LociateTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

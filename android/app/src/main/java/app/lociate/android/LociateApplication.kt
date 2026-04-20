@@ -1,4 +1,4 @@
-package com.pearsonmedia.lociate
+package app.lociate.android
 
 import android.app.Application
 import android.app.NotificationChannel

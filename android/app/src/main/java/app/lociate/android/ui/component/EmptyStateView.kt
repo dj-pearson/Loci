@@ -1,4 +1,4 @@
-package com.pearsonmedia.lociate.ui.component
+package app.lociate.android.ui.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -22,8 +22,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.pearsonmedia.lociate.ui.theme.DesignTokens
-import com.pearsonmedia.lociate.ui.theme.LociateGradients
+import app.lociate.android.ui.theme.DesignTokens
+import app.lociate.android.ui.theme.LociateGradients
 
 /**
  * Premium empty state (US-171).

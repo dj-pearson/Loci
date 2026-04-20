@@ -1,4 +1,4 @@
-package com.pearsonmedia.lociate.ui.screen.settings
+package app.lociate.android.ui.screen.settings
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -49,9 +49,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.pearsonmedia.lociate.ui.theme.DesignTokens
-import com.pearsonmedia.lociate.ui.theme.LociateGradients
-import com.pearsonmedia.lociate.ui.theme.premiumCard
+import app.lociate.android.ui.theme.DesignTokens
+import app.lociate.android.ui.theme.LociateGradients
+import app.lociate.android.ui.theme.premiumCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

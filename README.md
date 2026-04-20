@@ -2,7 +2,7 @@
 
 Voice-first iOS app that pins voice notes to GPS coordinates. When you return to a location, your notes find you via proximity-triggered push notifications. Family members share notes through invite-only household groups.
 
-**Built by Pearson Media LLC** | [useloci.com](https://useloci.com)
+**Built by Pearson Media LLC** | [lociate.app](https://lociate.app)
 
 ---
 

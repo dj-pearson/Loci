@@ -5,9 +5,9 @@ enum KeychainService {
     // MARK: - Key Constants
 
     enum Key {
-        static let authToken = "com.pearsonmedia.loci.authToken"
-        static let refreshToken = "com.pearsonmedia.loci.refreshToken"
-        static let userId = "com.pearsonmedia.loci.userId"
+        static let authToken = "app.lociate.ios.authToken"
+        static let refreshToken = "app.lociate.ios.refreshToken"
+        static let userId = "app.lociate.ios.userId"
     }
 
     // MARK: - Errors

@@ -44,7 +44,7 @@ enum CertificatePinningConfig {
 final class CertificatePinningDelegate: NSObject, URLSessionDelegate {
 
     #if DEBUG
-    private let logger = Logger(subsystem: "com.pearsonmedia.loci", category: "CertificatePinning")
+    private let logger = Logger(subsystem: "app.lociate.ios", category: "CertificatePinning")
     #endif
 
     func urlSession(

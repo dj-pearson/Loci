@@ -15,7 +15,7 @@ enum ModelContainerConfiguration {
             "Lociate",
             schema: schema,
             isStoredInMemoryOnly: false,
-            groupContainer: .identifier("group.com.pearsonmedia.lociate")
+            groupContainer: .identifier("group.app.lociate.ios")
         )
         let container = try ModelContainer(for: schema, configurations: [configuration])
         // US-184: Exclude sensitive local data from iCloud/iTunes backups.
@@ -36,7 +36,7 @@ enum ModelContainerConfiguration {
             directories.append(documents)
         }
         if let group = fileManager.containerURL(
-            forSecurityApplicationGroupIdentifier: "group.com.pearsonmedia.lociate"
+            forSecurityApplicationGroupIdentifier: "group.app.lociate.ios"
         ) {
             directories.append(group)
         }

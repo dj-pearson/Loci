@@ -1,4 +1,4 @@
-package com.pearsonmedia.lociate.ui.screen.auth
+package app.lociate.android.ui.screen.auth
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

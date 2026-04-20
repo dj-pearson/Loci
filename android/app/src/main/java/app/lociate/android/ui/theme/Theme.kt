@@ -1,4 +1,4 @@
-package com.pearsonmedia.lociate.ui.theme
+package app.lociate.android.ui.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme

@@ -1,4 +1,4 @@
-package com.pearsonmedia.lociate.service
+package app.lociate.android.service
 
 import android.Manifest
 import android.app.PendingIntent
@@ -9,8 +9,8 @@ import androidx.core.content.ContextCompat
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofencingClient
 import com.google.android.gms.location.GeofencingRequest
-import com.pearsonmedia.lociate.domain.model.Locus
-import com.pearsonmedia.lociate.util.AppConstants
+import app.lociate.android.domain.model.Locus
+import app.lociate.android.util.AppConstants
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -22,7 +22,7 @@ class GeofenceService @Inject constructor(
 ) {
     private val geofencePendingIntent: PendingIntent by lazy {
         val intent = Intent(context, GeofenceBroadcastReceiver::class.java).apply {
-            action = "com.pearsonmedia.lociate.GEOFENCE_EVENT"
+            action = "app.lociate.android.GEOFENCE_EVENT"
         }
         PendingIntent.getBroadcast(
             context,

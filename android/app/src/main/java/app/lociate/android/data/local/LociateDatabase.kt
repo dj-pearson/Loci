@@ -1,13 +1,13 @@
-package com.pearsonmedia.lociate.data.local
+package app.lociate.android.data.local
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import com.pearsonmedia.lociate.data.local.dao.HouseholdDao
-import com.pearsonmedia.lociate.data.local.dao.LocusDao
-import com.pearsonmedia.lociate.data.local.entity.HouseholdEntity
-import com.pearsonmedia.lociate.data.local.entity.HouseholdMemberEntity
-import com.pearsonmedia.lociate.data.local.entity.LocusEntity
-import com.pearsonmedia.lociate.data.local.entity.UserProfileEntity
+import app.lociate.android.data.local.dao.HouseholdDao
+import app.lociate.android.data.local.dao.LocusDao
+import app.lociate.android.data.local.entity.HouseholdEntity
+import app.lociate.android.data.local.entity.HouseholdMemberEntity
+import app.lociate.android.data.local.entity.LocusEntity
+import app.lociate.android.data.local.entity.UserProfileEntity
 
 @Database(
     entities = [

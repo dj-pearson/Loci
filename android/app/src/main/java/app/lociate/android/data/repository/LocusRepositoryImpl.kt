@@ -1,11 +1,11 @@
-package com.pearsonmedia.lociate.data.repository
+package app.lociate.android.data.repository
 
-import com.pearsonmedia.lociate.data.local.converter.toDomain
-import com.pearsonmedia.lociate.data.local.converter.toEntity
-import com.pearsonmedia.lociate.data.local.dao.LocusDao
-import com.pearsonmedia.lociate.domain.model.Locus
-import com.pearsonmedia.lociate.domain.model.LocusCategory
-import com.pearsonmedia.lociate.domain.repository.LocusRepository
+import app.lociate.android.data.local.converter.toDomain
+import app.lociate.android.data.local.converter.toEntity
+import app.lociate.android.data.local.dao.LocusDao
+import app.lociate.android.domain.model.Locus
+import app.lociate.android.domain.model.LocusCategory
+import app.lociate.android.domain.repository.LocusRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject

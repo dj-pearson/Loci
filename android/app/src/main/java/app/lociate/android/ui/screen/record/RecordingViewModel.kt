@@ -1,14 +1,14 @@
-package com.pearsonmedia.lociate.ui.screen.record
+package app.lociate.android.ui.screen.record
 
 import android.location.Location
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.pearsonmedia.lociate.domain.model.Locus
-import com.pearsonmedia.lociate.domain.model.LocusCategory
-import com.pearsonmedia.lociate.domain.repository.LocusRepository
-import com.pearsonmedia.lociate.service.AudioRecorderService
-import com.pearsonmedia.lociate.service.LocationService
-import com.pearsonmedia.lociate.service.SpeechRecognitionService
+import app.lociate.android.domain.model.Locus
+import app.lociate.android.domain.model.LocusCategory
+import app.lociate.android.domain.repository.LocusRepository
+import app.lociate.android.service.AudioRecorderService
+import app.lociate.android.service.LocationService
+import app.lociate.android.service.SpeechRecognitionService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay

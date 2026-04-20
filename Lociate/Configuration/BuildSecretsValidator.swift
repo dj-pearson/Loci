@@ -4,7 +4,7 @@ import os.log
 /// Validates that BuildSecrets are properly configured at runtime.
 /// Called on app startup to catch misconfiguration early.
 enum BuildSecretsValidator {
-    private static let logger = Logger(subsystem: "com.pearsonmedia.loci", category: "BuildSecrets")
+    private static let logger = Logger(subsystem: "app.lociate.ios", category: "BuildSecrets")
 
     /// Validate that required secrets are populated.
     ///

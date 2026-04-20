@@ -8,17 +8,17 @@ plugins {
 }
 
 android {
-    namespace = "com.pearsonmedia.lociate"
+    namespace = "app.lociate.android"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.pearsonmedia.lociate"
+        applicationId = "app.lociate.android"
         minSdk = 26
         targetSdk = 35
         versionCode = 1
         versionName = "1.0.0"
 
-        testInstrumentationRunner = "com.pearsonmedia.lociate.HiltTestRunner"
+        testInstrumentationRunner = "app.lociate.android.HiltTestRunner"
 
         // Supabase configuration — replace with actual values in local.properties
         buildConfigField("String", "SUPABASE_URL", "\"${project.findProperty("SUPABASE_URL") ?: "https://your-supabase-url.com"}\"")

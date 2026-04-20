@@ -1,4 +1,4 @@
-package com.pearsonmedia.lociate.service
+package app.lociate.android.service
 
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -8,9 +8,9 @@ import android.content.Intent
 import androidx.core.app.NotificationCompat
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofencingEvent
-import com.pearsonmedia.lociate.LociateApplication
-import com.pearsonmedia.lociate.R
-import com.pearsonmedia.lociate.ui.MainActivity
+import app.lociate.android.LociateApplication
+import app.lociate.android.R
+import app.lociate.android.ui.MainActivity
 import timber.log.Timber
 
 class GeofenceBroadcastReceiver : BroadcastReceiver() {

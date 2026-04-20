@@ -35,7 +35,7 @@ struct NearbyLocusData: Identifiable {
 }
 
 struct NearbyLociTimelineProvider: TimelineProvider {
-    private static let appGroupID = "group.com.pearsonmedia.loci"
+    private static let appGroupID = "group.app.lociate.ios"
     private static let lastLatKey = "widget_last_latitude"
     private static let lastLonKey = "widget_last_longitude"
     static let isPremiumKey = "widget_is_premium"

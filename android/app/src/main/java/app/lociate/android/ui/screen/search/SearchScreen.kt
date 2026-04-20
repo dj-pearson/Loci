@@ -1,4 +1,4 @@
-package com.pearsonmedia.lociate.ui.screen.search
+package app.lociate.android.ui.screen.search
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -34,7 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.pearsonmedia.lociate.domain.model.Locus
+import app.lociate.android.domain.model.Locus
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

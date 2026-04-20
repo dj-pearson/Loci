@@ -1,4 +1,4 @@
-package com.pearsonmedia.lociate.util
+package app.lociate.android.util
 
 /**
  * Password strength validation matching iOS PasswordValidator.

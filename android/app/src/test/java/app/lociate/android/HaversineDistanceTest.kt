@@ -1,7 +1,7 @@
-package com.pearsonmedia.lociate
+package app.lociate.android
 
 import com.google.common.truth.Truth.assertThat
-import com.pearsonmedia.lociate.util.HaversineDistance
+import app.lociate.android.util.HaversineDistance
 import org.junit.Test
 
 class HaversineDistanceTest {

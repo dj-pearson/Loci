@@ -116,7 +116,7 @@ final class SubscriptionService: NSObject, PurchasesDelegate {
         }
 
         // Persist premium status to App Group for widget access
-        let defaults = UserDefaults(suiteName: "group.com.pearsonmedia.loci")
+        let defaults = UserDefaults(suiteName: "group.app.lociate.ios")
         defaults?.set(currentTier != .free, forKey: "widget_is_premium")
         WidgetCenter.shared.reloadAllTimelines()
     }

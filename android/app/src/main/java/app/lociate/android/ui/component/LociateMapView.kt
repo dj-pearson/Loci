@@ -1,4 +1,4 @@
-package com.pearsonmedia.lociate.ui.component
+package app.lociate.android.ui.component
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -13,8 +13,8 @@ import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
-import com.pearsonmedia.lociate.domain.model.Locus
-import com.pearsonmedia.lociate.domain.model.LocusCategory
+import app.lociate.android.domain.model.Locus
+import app.lociate.android.domain.model.LocusCategory
 
 /**
  * Premium styled map (US-167).

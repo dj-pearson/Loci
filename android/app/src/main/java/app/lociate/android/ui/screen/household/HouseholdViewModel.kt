@@ -1,12 +1,12 @@
-package com.pearsonmedia.lociate.ui.screen.household
+package app.lociate.android.ui.screen.household
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.pearsonmedia.lociate.data.remote.SupabaseClientProvider
-import com.pearsonmedia.lociate.domain.model.Household
-import com.pearsonmedia.lociate.domain.model.HouseholdMember
-import com.pearsonmedia.lociate.domain.model.MemberRole
-import com.pearsonmedia.lociate.domain.model.SubscriptionTier
+import app.lociate.android.data.remote.SupabaseClientProvider
+import app.lociate.android.domain.model.Household
+import app.lociate.android.domain.model.HouseholdMember
+import app.lociate.android.domain.model.MemberRole
+import app.lociate.android.domain.model.SubscriptionTier
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.jan.supabase.postgrest.from
 import kotlinx.coroutines.flow.MutableStateFlow

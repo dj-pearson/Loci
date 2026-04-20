@@ -1,4 +1,4 @@
-package com.pearsonmedia.lociate.data.local.dao
+package app.lociate.android.data.local.dao
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -6,7 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.pearsonmedia.lociate.data.local.entity.LocusEntity
+import app.lociate.android.data.local.entity.LocusEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao

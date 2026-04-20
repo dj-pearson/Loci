@@ -1,7 +1,7 @@
-package com.pearsonmedia.lociate
+package app.lociate.android
 
 import com.google.common.truth.Truth.assertThat
-import com.pearsonmedia.lociate.util.PasswordValidator
+import app.lociate.android.util.PasswordValidator
 import org.junit.Test
 
 class PasswordValidatorTest {

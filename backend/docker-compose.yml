@@ -4,18 +4,18 @@ services:
   # PostgreSQL with PostGIS
   postgres:
     image: postgis/postgis:15-3.4-alpine
-    container_name: loci-postgres
+    container_name: lociate-postgres
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB:-loci}
+      POSTGRES_DB: ${POSTGRES_DB:-lociate}
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./migrations:/docker-entrypoint-initdb.d
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-loci}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-lociate}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -26,7 +26,7 @@ services:
   # Supabase Auth (GoTrue)
   auth:
     image: supabase/gotrue:v2.151.0
-    container_name: loci-auth
+    container_name: lociate-auth
     depends_on:
       postgres:
         condition: service_healthy
@@ -37,7 +37,7 @@ services:
       GOTRUE_API_PORT: 9999
       API_EXTERNAL_URL: ${API_EXTERNAL_URL:-http://localhost:8000}
       GOTRUE_DB_DRIVER: postgres
-      GOTRUE_DB_DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-loci}?search_path=auth
+      GOTRUE_DB_DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-lociate}?search_path=auth
       GOTRUE_SITE_URL: ${SITE_URL:-http://localhost:3000}
       GOTRUE_URI_ALLOW_LIST: ${ADDITIONAL_REDIRECT_URLS:-}
       GOTRUE_DISABLE_SIGNUP: "false"
@@ -47,7 +47,7 @@ services:
       GOTRUE_JWT_EXP: 3600
       GOTRUE_JWT_SECRET: ${JWT_SECRET}
       GOTRUE_EXTERNAL_APPLE_ENABLED: "true"
-      GOTRUE_EXTERNAL_APPLE_CLIENT_ID: ${APPLE_CLIENT_ID:-com.pearsonmedia.loci}
+      GOTRUE_EXTERNAL_APPLE_CLIENT_ID: ${APPLE_CLIENT_ID:-app.lociate.ios}
       GOTRUE_EXTERNAL_APPLE_SECRET: ${APPLE_SECRET:-}
       GOTRUE_MAILER_AUTOCONFIRM: "true"
     healthcheck:
@@ -62,14 +62,14 @@ services:
   # Supabase PostgREST
   rest:
     image: postgrest/postgrest:v12.2.3
-    container_name: loci-rest
+    container_name: lociate-rest
     depends_on:
       postgres:
         condition: service_healthy
     ports:
       - "${REST_PORT:-3001}:3000"
     environment:
-      PGRST_DB_URI: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-loci}
+      PGRST_DB_URI: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-lociate}
       PGRST_DB_SCHEMAS: public,storage
       PGRST_DB_ANON_ROLE: anon
       PGRST_JWT_SECRET: ${JWT_SECRET}
@@ -86,7 +86,7 @@ services:
   # Supabase Storage
   storage:
     image: supabase/storage-api:v1.0.6
-    container_name: loci-storage
+    container_name: lociate-storage
     depends_on:
       postgres:
         condition: service_healthy
@@ -99,7 +99,7 @@ services:
       SERVICE_KEY: ${SERVICE_ROLE_KEY}
       POSTGREST_URL: http://rest:3000
       PGRST_JWT_SECRET: ${JWT_SECRET}
-      DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-loci}
+      DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-lociate}
       FILE_SIZE_LIMIT: 52428800
       STORAGE_BACKEND: file
       FILE_STORAGE_BACKEND_PATH: /var/lib/storage
@@ -120,7 +120,7 @@ services:
   # Supabase Realtime
   realtime:
     image: supabase/realtime:v2.28.32
-    container_name: loci-realtime
+    container_name: lociate-realtime
     depends_on:
       postgres:
         condition: service_healthy
@@ -132,7 +132,7 @@ services:
       DB_PORT: 5432
       DB_USER: ${POSTGRES_USER:-postgres}
       DB_PASSWORD: ${POSTGRES_PASSWORD}
-      DB_NAME: ${POSTGRES_DB:-loci}
+      DB_NAME: ${POSTGRES_DB:-lociate}
       DB_AFTER_CONNECT_QUERY: "SET search_path TO _realtime"
       DB_ENC_KEY: ${REALTIME_ENC_KEY:-supabaserealtime}
       API_JWT_SECRET: ${JWT_SECRET}
@@ -154,7 +154,7 @@ services:
   # Supabase Kong API Gateway
   kong:
     image: kong:2.8.1
-    container_name: loci-kong
+    container_name: lociate-kong
     depends_on:
       auth:
         condition: service_healthy
@@ -184,7 +184,7 @@ services:
   # Redis (rate limiting persistence)
   redis:
     image: redis:7-alpine
-    container_name: loci-redis
+    container_name: lociate-redis
     ports:
       - "${REDIS_PORT:-6379}:6379"
     volumes:
@@ -204,7 +204,7 @@ services:
     build:
       context: ../edge-functions
       dockerfile: Dockerfile
-    container_name: loci-edge-functions
+    container_name: lociate-edge-functions
     depends_on:
       postgres:
         condition: service_healthy
