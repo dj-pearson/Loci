@@ -42,3 +42,25 @@ SUPABASE_ANON_KEY=your-local-anon-key
 # to the Android app's package name + SHA-1 signing certificate fingerprint.
 # https://developers.google.com/maps/documentation/android-sdk/get-api-key
 MAPS_API_KEY=your-google-maps-api-key
+
+# -----------------------------------------------------------------------------
+# Certificate Pinning (optional — leave empty to disable)
+# -----------------------------------------------------------------------------
+# Primary SPKI SHA-256 hash (base64) of the production Supabase server's leaf
+# cert. Generate with:
+#   openssl s_client -connect your-host:443 -servername your-host </dev/null 2>/dev/null \
+#     | openssl x509 -pubkey -noout \
+#     | openssl pkey -pubin -outform DER \
+#     | openssl dgst -sha256 -binary | base64
+CERT_PIN_HASH=
+
+# Backup pin — typically an intermediate CA so the app survives leaf rotation.
+CERT_BACKUP_PIN_HASH=
+
+# -----------------------------------------------------------------------------
+# Request Signing (optional — leave empty to disable)
+# -----------------------------------------------------------------------------
+# HMAC-SHA256 shared secret for signing sensitive API mutations. Must match
+# REQUEST_SIGNING_KEY on the edge-function server and BuildSecrets.requestSigningKey
+# on iOS. Generate with: openssl rand -hex 32
+REQUEST_SIGNING_KEY=

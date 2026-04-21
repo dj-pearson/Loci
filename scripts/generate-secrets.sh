@@ -22,6 +22,11 @@
 #   SUPABASE_URL             — Production Supabase URL (shared with iOS)
 #   SUPABASE_ANON_KEY        — Production Supabase anonymous key (shared with iOS)
 #   MAPS_API_KEY             — Google Maps SDK for Android API key
+#
+# Android optional environment variables (emitted empty if unset):
+#   CERT_PIN_HASH            — Primary certificate pin (SPKI SHA-256, base64)
+#   CERT_BACKUP_PIN_HASH     — Backup certificate pin
+#   REQUEST_SIGNING_KEY      — HMAC-SHA256 secret for request signing (shared with iOS)
 
 set -euo pipefail
 
@@ -133,6 +138,9 @@ generate_android() {
         echo "SUPABASE_URL=${SUPABASE_URL}"
         echo "SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}"
         echo "MAPS_API_KEY=${MAPS_API_KEY}"
+        echo "CERT_PIN_HASH=${CERT_PIN_HASH:-}"
+        echo "CERT_BACKUP_PIN_HASH=${CERT_BACKUP_PIN_HASH:-}"
+        echo "REQUEST_SIGNING_KEY=${REQUEST_SIGNING_KEY:-}"
     } > "$ANDROID_OUTPUT"
     echo "Android local.properties generated at $ANDROID_OUTPUT"
 }

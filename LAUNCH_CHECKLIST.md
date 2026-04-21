@@ -73,22 +73,14 @@ This file is the **skimmable summary**. If an item is in `LAUNCH_RUNBOOK.md`, th
 
 ## 4. Known gaps / hardening items still to resolve
 
-These are open items discovered in the codebase audit — not yet fixed, tracked here to avoid forgetting.
+These are open items discovered in the codebase audit — resolved items are checked, open items remain.
 
-- [ ] **android-release.yml env-var flow**
-  Workflow sets `SUPABASE_URL` / `SUPABASE_ANON_KEY` as env vars, but `android/app/build.gradle.kts` reads them via `project.findProperty()`, which does **not** consult env vars — it reads `local.properties` and `-P` flags. Fix by adding a step before `./gradlew bundleRelease`:
-  ```yaml
-  - name: Generate Android local.properties
-    run: bash scripts/generate-secrets.sh --android
-    env:
-      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-      MAPS_API_KEY: ${{ secrets.MAPS_API_KEY }}
-  ```
-- [ ] **Android certificate pins are placeholders** (`android/app/src/main/java/app/lociate/android/util/CertificatePinning.kt`, lines 32–33 use `AAA…=` and `BBB…=`). Extract real pins per §9 and replace, or wire them through `local.properties` + `BuildConfig` like the Supabase keys.
-- [ ] **Android `REQUEST_SIGNING_KEY` not plumbed**. iOS has it via `BuildSecrets.swift`; Android needs an equivalent field in `local.properties.example` + `BuildConfig` once signed-request middleware is enabled.
-- [ ] **Production `backend/docker-compose.prod.yml` (Coolify stack) not committed** despite US-120 being marked done in `progress.txt`. Commit the real production compose or Coolify `stack.yaml` so deploys are reproducible.
-- [ ] **Test coverage**: critical services (`SyncService`, `GeofenceManager`, `AuthService`, tier enforcement) need at minimum unit tests before external beta. Edge functions need smoke tests for `sync-subscription` webhook signature + `account-delete` idempotency.
+- [x] **android-release.yml env-var flow** — workflow now runs `scripts/generate-secrets.sh --android` before `./gradlew bundleRelease` so `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `MAPS_API_KEY`, `CERT_PIN_HASH`, `CERT_BACKUP_PIN_HASH`, `REQUEST_SIGNING_KEY` are written to `local.properties` and read via `project.findProperty()`.
+- [x] **Android cert pins wired through BuildConfig** — `CertificatePinning.kt` now reads `BuildConfig.CERT_PIN_HASH` / `CERT_BACKUP_PIN_HASH`. Empty values produce a no-op pinner (matches iOS behaviour). **Still TODO**: attach the pinner to the supabase-kt HttpClient by switching its Ktor engine to `ktor-client-okhttp` and passing the pinner via `OkHttpClient.Builder().certificatePinner(...)`. The util is a staged utility until that wiring happens.
+- [x] **Android `REQUEST_SIGNING_KEY` plumbed** — `BuildConfig.REQUEST_SIGNING_KEY` is populated from `local.properties`; `RequestSigningInterceptor.kt` mirrors iOS's signing algorithm exactly (`HMAC-SHA256(METHOD\nPATH\nTIMESTAMP\nBODY_SHA256)`). **Still TODO**: attach the interceptor to the supabase-kt HttpClient (same Ktor-engine switch as above) so outbound requests actually carry the signature headers the edge-function middleware expects.
+- [x] **`backend/docker-compose.prod.yml`** — committed. Differs from dev: no port publishing for internal services, required vars fail loudly (`${VAR:?required}` syntax), `restart: always`, Traefik labels on Kong + edge-functions keyed off `KONG_DOMAIN` / `EDGE_DOMAIN`, migrations no longer bind-mounted (apply manually on first deploy — see the header of the compose file).
+- [ ] **Ktor engine switch to OkHttp** — required to actually activate the two staged Android utilities above. `implementation("com.squareup.okhttp3:okhttp:4.12.0")` + `implementation("io.ktor:ktor-client-okhttp:3.0.3")`, then in `SupabaseClientProvider` pass `engine = OkHttp { preconfigured = OkHttpClient.Builder().certificatePinner(...).addInterceptor(RequestSigningInterceptor()).build() }`.
+- [ ] **Test coverage** — critical services (`SyncService`, `GeofenceManager`, `AuthService`, tier enforcement) need at minimum unit tests before external beta. Edge functions need smoke tests for `sync-subscription` webhook signature + `account-delete` idempotency.
 - [ ] **RLS cross-tenant isolation test** — no automated proof that a user in household A cannot read loci from household B. Add a pgTAP or integration test before any external users.
 
 ---
@@ -142,6 +134,8 @@ Confirm all of the following are set under Repo → Settings → Secrets and var
 - [ ] `GOOGLE_PLAY_SERVICE_ACCOUNT_JSON`
 - [ ] `SUPABASE_URL`, `SUPABASE_ANON_KEY` (shared with iOS)
 - [ ] `MAPS_API_KEY`
+- [ ] `CERT_PIN_HASH`, `CERT_BACKUP_PIN_HASH` (shared with iOS; optional — empty disables pinning)
+- [ ] `REQUEST_SIGNING_KEY` (shared with iOS + edge fns; optional — empty disables signing)
 
 **Backend / infra**
 - [ ] `ANTHROPIC_API_KEY`
