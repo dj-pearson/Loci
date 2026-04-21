@@ -7,20 +7,16 @@ import okhttp3.CertificatePinner
  * Certificate pinning configuration for Supabase API traffic.
  *
  * Pins are read from BuildConfig (sourced from local.properties / CI env vars
- * via scripts/generate-secrets.sh). Extract production hashes with:
+ * via scripts/generate-secrets.sh). Attached to the Ktor OkHttp engine in
+ * SupabaseClientProvider so every outbound Supabase request is pinned.
+ *
+ * Extract production hashes with:
  *
  *   openssl s_client -connect <host>:443 -servername <host> </dev/null 2>/dev/null \
  *     | openssl x509 -pubkey -noout \
  *     | openssl pkey -pubin -outform DER \
  *     | openssl dgst -sha256 -binary \
  *     | base64
- *
- * NOTE: This pinner is currently **not attached** to the supabase-kt HttpClient
- * (which uses Ktor, not OkHttp directly). To enable, install a Ktor OkHttp
- * engine in SupabaseClientProvider and pass the pinner via
- * `OkHttpClient.Builder().certificatePinner(pinner)`. Until then, callers that
- * construct their own OkHttp clients (e.g. direct REST or WebSocket clients)
- * can opt-in by calling `createCertificatePinner()`.
  */
 object CertificatePinning {
 

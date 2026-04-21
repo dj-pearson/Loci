@@ -17,6 +17,9 @@ import javax.crypto.spec.SecretKeySpec
  * requests, matching the iOS `RequestSigningService` and the edge-function
  * `requestSigningMiddleware`.
  *
+ * Attached to the Ktor OkHttp engine in SupabaseClientProvider so every
+ * outbound Supabase request is signed.
+ *
  * Headers added when `BuildConfig.REQUEST_SIGNING_KEY` is non-empty:
  * - `X-Client-Version`: "<versionName>(<versionCode>)"
  * - `X-Request-Timestamp`: ISO 8601 timestamp (UTC)
@@ -24,10 +27,6 @@ import javax.crypto.spec.SecretKeySpec
  *
  * When the key is empty (local dev), the interceptor is a no-op and the
  * server-side middleware will also skip validation.
- *
- * NOTE: This interceptor is currently **not attached** to the supabase-kt
- * HttpClient. To enable, configure Ktor with an OkHttp engine in
- * SupabaseClientProvider and add this interceptor to the OkHttpClient builder.
  */
 class RequestSigningInterceptor(
     private val signingKey: String = BuildConfig.REQUEST_SIGNING_KEY,

@@ -136,10 +136,13 @@ dependencies {
     implementation(libs.supabase.storage)
     implementation(libs.supabase.realtime)
 
-    // Ktor
-    implementation(libs.ktor.android)
+    // Ktor (OkHttp engine lets SupabaseClient install cert pinner + signing interceptor)
+    implementation(libs.ktor.okhttp)
     implementation(libs.ktor.content.negotiation)
     implementation(libs.ktor.serialization)
+
+    // OkHttp (used by CertificatePinning + RequestSigningInterceptor)
+    implementation(libs.okhttp)
 
     // Serialization
     implementation(libs.serialization.json)
