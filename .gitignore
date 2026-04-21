@@ -48,6 +48,17 @@ dist/
 # Build-time generated secrets (use BuildSecrets.swift.example as template)
 Lociate/Configuration/BuildSecrets.swift
 
+# Android local config (use android/local.properties.example as template)
+android/local.properties
+
+# Android build output & upload keystore
+android/.gradle/
+android/build/
+android/app/build/
+android/captures/
+android/app/upload-keystore.jks
+android/**/local.properties
+
 # Trademark search reference (local doc, not source)
 tmSearchResults*.xlsx
 

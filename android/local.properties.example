@@ -1,0 +1,66 @@
+# local.properties.example
+#
+# LOCAL DEVELOPMENT SETUP:
+#   1. Copy this file to local.properties (same directory).
+#   2. Fill in values for the services you need to test locally.
+#   3. local.properties is .gitignored — never commit real keys.
+#
+# CI / PRODUCTION:
+#   scripts/generate-secrets.sh --android creates local.properties from
+#   environment variables during CI builds. See
+#   .github/workflows/android-release.yml for the required GitHub Actions
+#   secrets (SUPABASE_URL, SUPABASE_ANON_KEY, MAPS_API_KEY).
+#
+# HOW THESE ARE READ:
+#   Gradle auto-loads local.properties and exposes each line as a project
+#   property. android/app/build.gradle.kts reads them via
+#   project.findProperty("SUPABASE_URL") and injects them into BuildConfig.
+
+# -----------------------------------------------------------------------------
+# Android SDK location (required by Android Gradle Plugin)
+# -----------------------------------------------------------------------------
+# Uncomment and set to your local SDK path. Most IDEs (Android Studio) write
+# this automatically on first sync.
+# sdk.dir=/Users/you/Library/Android/sdk
+
+# -----------------------------------------------------------------------------
+# Supabase
+# -----------------------------------------------------------------------------
+# Base URL for your Supabase instance.
+# Local dev: http://10.0.2.2:8000 (Android emulator loopback to host Docker).
+# Production: https://your-project.supabase.co
+SUPABASE_URL=http://10.0.2.2:8000
+
+# Supabase anonymous (public) key — safe to embed in the client.
+# Local dev: Copy from Supabase dashboard or docker-compose output.
+SUPABASE_ANON_KEY=your-local-anon-key
+
+# -----------------------------------------------------------------------------
+# Google Maps
+# -----------------------------------------------------------------------------
+# Maps SDK for Android API key. Create in Google Cloud Console and restrict
+# to the Android app's package name + SHA-1 signing certificate fingerprint.
+# https://developers.google.com/maps/documentation/android-sdk/get-api-key
+MAPS_API_KEY=your-google-maps-api-key
+
+# -----------------------------------------------------------------------------
+# Certificate Pinning (optional — leave empty to disable)
+# -----------------------------------------------------------------------------
+# Primary SPKI SHA-256 hash (base64) of the production Supabase server's leaf
+# cert. Generate with:
+#   openssl s_client -connect your-host:443 -servername your-host </dev/null 2>/dev/null \
+#     | openssl x509 -pubkey -noout \
+#     | openssl pkey -pubin -outform DER \
+#     | openssl dgst -sha256 -binary | base64
+CERT_PIN_HASH=
+
+# Backup pin — typically an intermediate CA so the app survives leaf rotation.
+CERT_BACKUP_PIN_HASH=
+
+# -----------------------------------------------------------------------------
+# Request Signing (optional — leave empty to disable)
+# -----------------------------------------------------------------------------
+# HMAC-SHA256 shared secret for signing sensitive API mutations. Must match
+# REQUEST_SIGNING_KEY on the edge-function server and BuildSecrets.requestSigningKey
+# on iOS. Generate with: openssl rand -hex 32
+REQUEST_SIGNING_KEY=

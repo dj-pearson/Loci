@@ -1,0 +1,261 @@
+# docker-compose.prod.yml — Production stack for self-hosted Supabase + edge
+# functions on Coolify (or any Traefik-fronted Docker host).
+#
+# Differences vs docker-compose.yml (local dev):
+#   • No host port publishing for internal services (postgres, auth, rest,
+#     storage, realtime, redis). Only Kong and edge-functions are exposed, and
+#     only through the reverse proxy — not bound to host ports directly.
+#   • Environment variables have NO default fallbacks for secrets. Missing
+#     values fail the deploy instead of silently booting with a weak default.
+#   • restart: always (not unless-stopped) so a host reboot brings the stack up.
+#   • Traefik labels route KONG_DOMAIN → Kong and EDGE_DOMAIN → edge-functions.
+#     Coolify populates Traefik automatically; the labels are standard Traefik
+#     v2 syntax so this file also works on plain Docker + Traefik.
+#   • Container names removed (Coolify namespaces per-stack automatically).
+#   • REVENUECAT_WEBHOOK_SECRET, APPLE_SECRET, REQUEST_SIGNING_KEY added to
+#     edge-functions env.
+#
+# Required environment variables (set via Coolify UI or .env):
+#   POSTGRES_PASSWORD, JWT_SECRET, ANON_KEY, SERVICE_ROLE_KEY
+#   API_EXTERNAL_URL, SITE_URL, KONG_DOMAIN, EDGE_DOMAIN
+#   APPLE_CLIENT_ID, APPLE_SECRET
+#   REALTIME_ENC_KEY, REALTIME_SECRET_KEY_BASE
+#   ANTHROPIC_API_KEY, REVENUECAT_WEBHOOK_SECRET, REQUEST_SIGNING_KEY
+#
+# Migrations are NOT run automatically (./migrations is not bind-mounted).
+# Apply them on first deploy via:
+#   docker compose -f docker-compose.prod.yml exec -T postgres \
+#     psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" < migrations/001_create_users.sql
+#   # (repeat for each migration in order, or use a migration tool)
+
+services:
+  postgres:
+    image: postgis/postgis:15-3.4-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      POSTGRES_DB: ${POSTGRES_DB:-lociate}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-lociate}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
+    networks:
+      - supabase
+
+  auth:
+    image: supabase/gotrue:v2.151.0
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      GOTRUE_API_HOST: 0.0.0.0
+      GOTRUE_API_PORT: 9999
+      API_EXTERNAL_URL: ${API_EXTERNAL_URL:?API_EXTERNAL_URL is required}
+      GOTRUE_DB_DRIVER: postgres
+      GOTRUE_DB_DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-lociate}?search_path=auth
+      GOTRUE_SITE_URL: ${SITE_URL:?SITE_URL is required}
+      GOTRUE_URI_ALLOW_LIST: ${ADDITIONAL_REDIRECT_URLS:-}
+      GOTRUE_DISABLE_SIGNUP: "false"
+      GOTRUE_JWT_ADMIN_ROLES: service_role
+      GOTRUE_JWT_AUD: authenticated
+      GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
+      GOTRUE_JWT_EXP: 3600
+      GOTRUE_JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+      GOTRUE_EXTERNAL_APPLE_ENABLED: "true"
+      GOTRUE_EXTERNAL_APPLE_CLIENT_ID: ${APPLE_CLIENT_ID:?APPLE_CLIENT_ID is required}
+      GOTRUE_EXTERNAL_APPLE_SECRET: ${APPLE_SECRET:?APPLE_SECRET is required}
+      GOTRUE_MAILER_AUTOCONFIRM: "true"
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9999/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
+    networks:
+      - supabase
+
+  rest:
+    image: postgrest/postgrest:v12.2.3
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGRST_DB_URI: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-lociate}
+      PGRST_DB_SCHEMAS: public,storage
+      PGRST_DB_ANON_ROLE: anon
+      PGRST_JWT_SECRET: ${JWT_SECRET}
+      PGRST_DB_USE_LEGACY_GUCS: "false"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
+    networks:
+      - supabase
+
+  storage:
+    image: supabase/storage-api:v1.0.6
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rest:
+        condition: service_healthy
+    environment:
+      ANON_KEY: ${ANON_KEY:?ANON_KEY is required}
+      SERVICE_KEY: ${SERVICE_ROLE_KEY:?SERVICE_ROLE_KEY is required}
+      POSTGREST_URL: http://rest:3000
+      PGRST_JWT_SECRET: ${JWT_SECRET}
+      DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-lociate}
+      FILE_SIZE_LIMIT: 52428800
+      STORAGE_BACKEND: file
+      FILE_STORAGE_BACKEND_PATH: /var/lib/storage
+      TENANT_ID: stub
+      REGION: us-east-1
+      GLOBAL_S3_BUCKET: stub
+    volumes:
+      - storage_data:/var/lib/storage
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5000/status || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
+    networks:
+      - supabase
+
+  realtime:
+    image: supabase/realtime:v2.28.32
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PORT: 4000
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: ${POSTGRES_USER:-postgres}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_NAME: ${POSTGRES_DB:-lociate}
+      DB_AFTER_CONNECT_QUERY: "SET search_path TO _realtime"
+      DB_ENC_KEY: ${REALTIME_ENC_KEY:?REALTIME_ENC_KEY is required}
+      API_JWT_SECRET: ${JWT_SECRET}
+      FLY_ALLOC_ID: fly123
+      FLY_APP_NAME: realtime
+      SECRET_KEY_BASE: ${REALTIME_SECRET_KEY_BASE:?REALTIME_SECRET_KEY_BASE is required}
+      ERL_AFLAGS: "-proto_dist inet_tcp"
+      ENABLE_TAILSCALE: "false"
+      DNS_NODES: "''"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:4000/api/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
+    networks:
+      - supabase
+
+  kong:
+    image: kong:2.8.1
+    depends_on:
+      auth:
+        condition: service_healthy
+      rest:
+        condition: service_healthy
+    environment:
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: /var/lib/kong/kong.yml
+      KONG_DNS_ORDER: LAST,A,CNAME
+      KONG_PLUGINS: request-transformer,cors,key-auth,acl
+      KONG_NGINX_PROXY_PROXY_BUFFER_SIZE: 160k
+      KONG_NGINX_PROXY_PROXY_BUFFERS: 64 160k
+    volumes:
+      - ./kong.yml:/var/lib/kong/kong.yml:ro
+    healthcheck:
+      test: ["CMD", "kong", "health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
+    networks:
+      - supabase
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.lociate-kong.rule=Host(`${KONG_DOMAIN:?KONG_DOMAIN is required}`)"
+      - "traefik.http.routers.lociate-kong.entrypoints=websecure"
+      - "traefik.http.routers.lociate-kong.tls=true"
+      - "traefik.http.routers.lociate-kong.tls.certresolver=letsencrypt"
+      - "traefik.http.services.lociate-kong.loadbalancer.server.port=8000"
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes --maxmemory 128mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
+    networks:
+      - supabase
+
+  edge-functions:
+    build:
+      context: ../edge-functions
+      dockerfile: Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kong:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      SUPABASE_URL: http://kong:8000
+      SUPABASE_SERVICE_KEY: ${SERVICE_ROLE_KEY}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:?ANTHROPIC_API_KEY is required}
+      REVENUECAT_WEBHOOK_SECRET: ${REVENUECAT_WEBHOOK_SECRET:?REVENUECAT_WEBHOOK_SECRET is required}
+      REQUEST_SIGNING_KEY: ${REQUEST_SIGNING_KEY:?REQUEST_SIGNING_KEY is required}
+      REDIS_URL: redis://redis:6379
+      PORT: 3000
+      NODE_ENV: production
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
+    networks:
+      - supabase
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.lociate-edge.rule=Host(`${EDGE_DOMAIN:?EDGE_DOMAIN is required}`)"
+      - "traefik.http.routers.lociate-edge.entrypoints=websecure"
+      - "traefik.http.routers.lociate-edge.tls=true"
+      - "traefik.http.routers.lociate-edge.tls.certresolver=letsencrypt"
+      - "traefik.http.services.lociate-edge.loadbalancer.server.port=3000"
+
+volumes:
+  postgres_data:
+    driver: local
+  storage_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  supabase:
+    driver: bridge
+  # External network managed by Coolify / Traefik. Must exist before deploy:
+  #   docker network create proxy
+  proxy:
+    external: true

@@ -19,6 +19,7 @@ maps-compose = "6.2.1"
 play-services-maps = "19.0.0"
 supabase = "3.1.1"
 ktor = "3.0.3"
+okhttp = "4.12.0"
 serialization = "1.7.3"
 coil = "2.7.0"
 timber = "5.0.1"
@@ -85,10 +86,13 @@ supabase-postgrest = { group = "io.github.jan-tennert.supabase", name = "postgre
 supabase-storage = { group = "io.github.jan-tennert.supabase", name = "storage-kt", version.ref = "supabase" }
 supabase-realtime = { group = "io.github.jan-tennert.supabase", name = "realtime-kt", version.ref = "supabase" }
 
-# Ktor (for Supabase)
-ktor-android = { group = "io.ktor", name = "ktor-client-android", version.ref = "ktor" }
+# Ktor (for Supabase) — OkHttp engine so we can attach CertificatePinner + Interceptors
+ktor-okhttp = { group = "io.ktor", name = "ktor-client-okhttp", version.ref = "ktor" }
 ktor-content-negotiation = { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-serialization = { group = "io.ktor", name = "ktor-serialization-kotlinx-json", version.ref = "ktor" }
+
+# OkHttp (declared explicitly; certificate pinning + signing interceptor depend on it)
+okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
 
 # Serialization
 serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "serialization" }

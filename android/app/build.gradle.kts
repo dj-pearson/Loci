@@ -20,10 +20,17 @@ android {
 
         testInstrumentationRunner = "app.lociate.android.HiltTestRunner"
 
-        // Supabase configuration — replace with actual values in local.properties
+        // Configuration — replace with actual values in local.properties (see
+        // local.properties.example) or via scripts/generate-secrets.sh --android.
         buildConfigField("String", "SUPABASE_URL", "\"${project.findProperty("SUPABASE_URL") ?: "https://your-supabase-url.com"}\"")
         buildConfigField("String", "SUPABASE_ANON_KEY", "\"${project.findProperty("SUPABASE_ANON_KEY") ?: "your-anon-key"}\"")
         buildConfigField("String", "MAPS_API_KEY", "\"${project.findProperty("MAPS_API_KEY") ?: ""}\"")
+        // Certificate pinning (SPKI SHA-256 hashes, base64). Empty values disable pinning.
+        buildConfigField("String", "CERT_PIN_HASH", "\"${project.findProperty("CERT_PIN_HASH") ?: ""}\"")
+        buildConfigField("String", "CERT_BACKUP_PIN_HASH", "\"${project.findProperty("CERT_BACKUP_PIN_HASH") ?: ""}\"")
+        // HMAC-SHA256 shared secret for signing sensitive API mutations. Must match
+        // REQUEST_SIGNING_KEY on the edge function server. Empty disables signing.
+        buildConfigField("String", "REQUEST_SIGNING_KEY", "\"${project.findProperty("REQUEST_SIGNING_KEY") ?: ""}\"")
 
         javaCompileOptions {
             annotationProcessorOptions {
@@ -129,10 +136,13 @@ dependencies {
     implementation(libs.supabase.storage)
     implementation(libs.supabase.realtime)
 
-    // Ktor
-    implementation(libs.ktor.android)
+    // Ktor (OkHttp engine lets SupabaseClient install cert pinner + signing interceptor)
+    implementation(libs.ktor.okhttp)
     implementation(libs.ktor.content.negotiation)
     implementation(libs.ktor.serialization)
+
+    // OkHttp (used by CertificatePinning + RequestSigningInterceptor)
+    implementation(libs.okhttp)
 
     // Serialization
     implementation(libs.serialization.json)
