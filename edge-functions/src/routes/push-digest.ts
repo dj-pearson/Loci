@@ -1,35 +1,38 @@
 import { Hono } from 'hono';
 import { getSupabaseAdmin } from '../middleware/auth.js';
-import { sendApnsPush, type SendApnsOptions } from '../lib/apns.js';
+import { dispatchPush, tokenColumnFor, type DispatchOptions } from '../lib/push.js';
+import { log } from '../lib/logger.js';
 
 const pushDigest = new Hono();
 
 export interface DigestResult {
   sent: number;
   skipped: number;
-  /** Tokens APNs rejected as permanently dead, cleared from users.apns_token. */
+  /** Tokens the platform rejected as permanently dead, now cleared. */
   invalidated: number;
 }
 
 /**
- * US-196: clearing the token is not optional bookkeeping. A dead token left in
- * place is retried on every weekly run forever, and `sent` counts stay inflated.
+ * US-196/US-197: clearing a dead token is not optional bookkeeping. Left in place
+ * it is retried on every weekly run forever, and `sent` counts stay inflated.
  */
-async function clearApnsToken(
+async function clearToken(
   supabase: ReturnType<typeof getSupabaseAdmin>,
-  userId: string
+  userId: string,
+  platform: 'ios' | 'android'
 ): Promise<void> {
+  const column = tokenColumnFor(platform);
   const { error } = await supabase
     .from('users')
-    .update({ apns_token: null })
+    .update({ [column]: null })
     .eq('id', userId);
   if (error) {
-    console.error(`[push] failed to clear dead apns_token for ${userId}: ${error.message}`);
+    log.error('failed to clear dead push token', { userId, column, error: error.message });
   }
 }
 
 async function generateDigests(
-  apnsOptions: SendApnsOptions = {}
+  pushOptions: DispatchOptions = {}
 ): Promise<DigestResult> {
   const supabase = getSupabaseAdmin();
   let sent = 0;
@@ -39,21 +42,22 @@ async function generateDigests(
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
   const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
-  // Get active users with APNs tokens
+  // US-197: select both token columns and filter in code. A `.not('apns_token',
+  // 'is', null)` filter excluded every Android-only user, so they could never have
+  // received a digest even once FCM existed.
   const { data: users, error: usersError } = await supabase
     .from('users')
-    .select('id, display_name, apns_token')
-    .not('apns_token', 'is', null);
+    .select('id, display_name, apns_token, fcm_token');
 
   if (usersError || !users?.length) {
     if (usersError) {
-      console.error(`[push] failed to load users: ${usersError.message}`);
+      log.error('failed to load users for digest', { error: usersError.message });
     }
     return { sent: 0, skipped: 0, invalidated: 0 };
   }
 
   for (const user of users) {
-    if (!user.apns_token) {
+    if (!user.apns_token && !user.fcm_token) {
       skipped++;
       continue;
     }
@@ -122,8 +126,12 @@ async function generateDigests(
 
     const title = `Your Weekly Loci Digest`;
 
-    const result = await sendApnsPush(
-      user.apns_token,
+    const outcome = await dispatchPush(
+      {
+        userId: user.id,
+        apnsToken: user.apns_token,
+        fcmToken: user.fcm_token,
+      },
       {
         title,
         body,
@@ -132,27 +140,22 @@ async function generateDigests(
         // rather than stacks notifications.
         collapseId: 'weekly-digest',
       },
-      apnsOptions
+      pushOptions
     );
 
-    if (result.ok) {
-      sent++;
-      continue;
-    }
-
-    if (result.invalidToken) {
-      await clearApnsToken(supabase, user.id);
+    // Clear every dead token, even when another platform succeeded — a user with
+    // two devices should not keep a stale token on one of them.
+    for (const platform of outcome.invalid) {
+      await clearToken(supabase, user.id, platform);
       invalidated++;
-      continue;
     }
 
-    if (!result.skipped) {
-      console.error(
-        `[push] digest delivery failed for ${user.id}: ` +
-          `status=${result.status ?? 'n/a'} reason=${result.reason ?? 'unknown'}`
-      );
+    // Delivered to at least one device counts as sent.
+    if (outcome.delivered.length > 0) {
+      sent++;
+    } else if (outcome.invalid.length === 0) {
+      skipped++;
     }
-    skipped++;
   }
 
   return { sent, skipped, invalidated };

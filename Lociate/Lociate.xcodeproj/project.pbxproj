@@ -79,6 +79,7 @@
 		0AC3609B5D7D0AF3980DC02D /* BackgroundSyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4AA5FFB52C33BF098BFAD4C /* BackgroundSyncManager.swift */; };
 		D1516038F9590ECAB859A84A /* BiometricLockService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9DDE557FB90D1BFA4512CB0 /* BiometricLockService.swift */; };
 		A7049BA93886941DF3D28BE5 /* CertificatePinningDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C277C682EC112A5097FA503F /* CertificatePinningDelegate.swift */; };
+		B0D343E0BAD276020E0E8111 /* CrashReportingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49108439836A97E137747FB /* CrashReportingService.swift */; };
 		7E3E425B40F98DBBA6713833 /* GeofenceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2B2B89875B7A56B4A923902 /* GeofenceManager.swift */; };
 		C986FE158D6F886C32F20EB8 /* IntegrityCheckService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 810A9ECEB2FCD4AFDDD82639 /* IntegrityCheckService.swift */; };
 		DB1F086364B0205035A4C09A /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E931B60B3BE57D99CC066B7A /* KeychainService.swift */; };
@@ -139,6 +140,7 @@
 		D0A684BB0514060F32E3C4BA /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 65B80ACFB4419D89C0D4E646 /* Supabase */; };
 		C6B04708D8C1CCDE518A5270 /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = 5D6FC570FEBF63C8541B91EB /* RevenueCat */; };
 		8A6C959A75A5AE61D996CD48 /* TelemetryDeck in Frameworks */ = {isa = PBXBuildFile; productRef = 5858D94A147AA2EF5DDD63FF /* TelemetryDeck */; };
+		809DABA1EBFCB83C4A371FFA /* Sentry in Frameworks */ = {isa = PBXBuildFile; productRef = 849F2E516958C26393F3553C /* Sentry */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -202,6 +204,7 @@
 		F4AA5FFB52C33BF098BFAD4C /* BackgroundSyncManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundSyncManager.swift; sourceTree = "<group>"; };
 		D9DDE557FB90D1BFA4512CB0 /* BiometricLockService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BiometricLockService.swift; sourceTree = "<group>"; };
 		C277C682EC112A5097FA503F /* CertificatePinningDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CertificatePinningDelegate.swift; sourceTree = "<group>"; };
+		E49108439836A97E137747FB /* CrashReportingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReportingService.swift; sourceTree = "<group>"; };
 		D2B2B89875B7A56B4A923902 /* GeofenceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeofenceManager.swift; sourceTree = "<group>"; };
 		810A9ECEB2FCD4AFDDD82639 /* IntegrityCheckService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntegrityCheckService.swift; sourceTree = "<group>"; };
 		E931B60B3BE57D99CC066B7A /* KeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainService.swift; sourceTree = "<group>"; };
@@ -310,6 +313,7 @@
 				D0A684BB0514060F32E3C4BA /* Supabase in Frameworks */,
 				C6B04708D8C1CCDE518A5270 /* RevenueCat in Frameworks */,
 				8A6C959A75A5AE61D996CD48 /* TelemetryDeck in Frameworks */,
+				809DABA1EBFCB83C4A371FFA /* Sentry in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -366,6 +370,7 @@
 				F4AA5FFB52C33BF098BFAD4C /* BackgroundSyncManager.swift */,
 				D9DDE557FB90D1BFA4512CB0 /* BiometricLockService.swift */,
 				C277C682EC112A5097FA503F /* CertificatePinningDelegate.swift */,
+				E49108439836A97E137747FB /* CrashReportingService.swift */,
 				D2B2B89875B7A56B4A923902 /* GeofenceManager.swift */,
 				810A9ECEB2FCD4AFDDD82639 /* IntegrityCheckService.swift */,
 				E931B60B3BE57D99CC066B7A /* KeychainService.swift */,
@@ -629,6 +634,7 @@
 				65B80ACFB4419D89C0D4E646 /* Supabase */,
 				5D6FC570FEBF63C8541B91EB /* RevenueCat */,
 				5858D94A147AA2EF5DDD63FF /* TelemetryDeck */,
+				849F2E516958C26393F3553C /* Sentry */,
 			);
 			productName = Lociate;
 			productReference = 14C4C62EAB07221AAB5EB514 /* Lociate.app */;
@@ -703,6 +709,7 @@
 				683EB9CA6FEDAD2769A4E7B3 /* XCRemoteSwiftPackageReference "supabase-swift" */,
 				77B17113A8C023270F8D2FB2 /* XCRemoteSwiftPackageReference "purchases-ios" */,
 				8614ECD73431D592AD1810ED /* XCRemoteSwiftPackageReference "SwiftSDK" */,
+				7F816C5FA07E777433B1EFAC /* XCRemoteSwiftPackageReference "sentry-cocoa" */,
 			);
 			productRefGroup = EC838BF479392FA8C7D80DC4 /* Products */;
 			projectDirPath = "";
@@ -812,6 +819,7 @@
 				0AC3609B5D7D0AF3980DC02D /* BackgroundSyncManager.swift in Sources */,
 				D1516038F9590ECAB859A84A /* BiometricLockService.swift in Sources */,
 				A7049BA93886941DF3D28BE5 /* CertificatePinningDelegate.swift in Sources */,
+				B0D343E0BAD276020E0E8111 /* CrashReportingService.swift in Sources */,
 				7E3E425B40F98DBBA6713833 /* GeofenceManager.swift in Sources */,
 				C986FE158D6F886C32F20EB8 /* IntegrityCheckService.swift in Sources */,
 				DB1F086364B0205035A4C09A /* KeychainService.swift in Sources */,
@@ -1250,6 +1258,14 @@
 				minimumVersion = "2.2.0";
 			};
 		};
+		7F816C5FA07E777433B1EFAC /* XCRemoteSwiftPackageReference "sentry-cocoa" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/getsentry/sentry-cocoa.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = "8.44.0";
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1267,6 +1283,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 8614ECD73431D592AD1810ED /* XCRemoteSwiftPackageReference "SwiftSDK" */;
 			productName = TelemetryDeck;
+		};
+		849F2E516958C26393F3553C /* Sentry */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7F816C5FA07E777433B1EFAC /* XCRemoteSwiftPackageReference "sentry-cocoa" */;
+			productName = Sentry;
 		};
 /* End XCSwiftPackageProductDependency section */
 

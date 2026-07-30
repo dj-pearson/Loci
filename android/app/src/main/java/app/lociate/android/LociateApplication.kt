@@ -3,11 +3,23 @@ package app.lociate.android
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import app.lociate.android.service.PushRegistrationService
+import app.lociate.android.util.CrashReporting
 import dagger.hilt.android.HiltAndroidApp
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 @HiltAndroidApp
 class LociateApplication : Application() {
+
+    @Inject
+    lateinit var pushRegistrationService: PushRegistrationService
+
+    private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     override fun onCreate() {
         super.onCreate()
@@ -16,7 +28,22 @@ class LociateApplication : Application() {
             Timber.plant(Timber.DebugTree())
         }
 
+        // US-199: first, so a crash anywhere in the rest of startup is reported.
+        CrashReporting.initialize(this)
+
         createNotificationChannels()
+
+        // US-197: request the FCM token and flush anything queued from a previous
+        // session that could not reach the server. Off the main thread — this does
+        // network I/O and must not delay first frame.
+        if (BuildConfig.FCM_ENABLED) {
+            applicationScope.launch {
+                pushRegistrationService.registerForPush()
+                pushRegistrationService.syncPendingToken()
+            }
+        } else {
+            Timber.i("FCM disabled in this build — no google-services.json")
+        }
     }
 
     private fun createNotificationChannels() {

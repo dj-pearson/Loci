@@ -1,10 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ApnsRequest, ApnsResponse } from '../src/lib/apns.js';
+import type { FcmRequest, FcmResponse } from '../src/lib/fcm.js';
 
 interface UserRow {
   id: string;
   display_name: string;
   apns_token: string | null;
+  /** US-197: Android users are selected by the same query now. */
+  fcm_token?: string | null;
 }
 
 interface Recorded {
@@ -103,6 +106,14 @@ async function loadGenerateDigests() {
   return (await import('../src/routes/push-digest.js')).generateDigests;
 }
 
+/** Wraps an APNs transport in the DispatchOptions shape the route now takes. */
+function apnsOnly(
+  transport: (request: ApnsRequest) => Promise<ApnsResponse>,
+  extra: Record<string, unknown> = {}
+) {
+  return { apns: { config: apnsConfig, transport, ...extra }, fcm: { config: null } };
+}
+
 function transportReturning(responses: ApnsResponse[]) {
   const seen: ApnsRequest[] = [];
   let index = 0;
@@ -126,14 +137,23 @@ const apnsConfig = {
   host: 'https://api.sandbox.push.apple.com',
 };
 
+let rsaKey = '';
+
 beforeEach(async () => {
   const { generateKeyPairSync } = await import('node:crypto');
-  const { privateKey } = generateKeyPairSync('ec', {
+  const ec = generateKeyPairSync('ec', {
     namedCurve: 'prime256v1',
     privateKeyEncoding: { type: 'pkcs8', format: 'pem' },
     publicKeyEncoding: { type: 'spki', format: 'pem' },
   }) as unknown as { privateKey: string };
-  apnsConfig.keyP8 = privateKey;
+  apnsConfig.keyP8 = ec.privateKey;
+
+  const rsa = generateKeyPairSync('rsa', {
+    modulusLength: 2048,
+    privateKeyEncoding: { type: 'pkcs8', format: 'pem' },
+    publicKeyEncoding: { type: 'spki', format: 'pem' },
+  }) as unknown as { privateKey: string };
+  rsaKey = rsa.privateKey;
 });
 
 afterEach(() => {
@@ -147,7 +167,7 @@ describe('generateDigests', () => {
     const { transport, seen } = transportReturning([{ status: 200, body: '' }]);
     const generateDigests = await loadGenerateDigests();
 
-    const result = await generateDigests({ config: apnsConfig, transport });
+    const result = await generateDigests(apnsOnly(transport));
 
     expect(result).toEqual({ sent: 1, skipped: 0, invalidated: 0 });
     expect(seen).toHaveLength(1);
@@ -168,7 +188,7 @@ describe('generateDigests', () => {
     ]);
     const generateDigests = await loadGenerateDigests();
 
-    const result = await generateDigests({ config: apnsConfig, transport, sleep: async () => {} });
+    const result = await generateDigests(apnsOnly(transport, { sleep: async () => {} }));
 
     expect(result).toEqual({ sent: 0, skipped: 0, invalidated: 1 });
     const update = fake.recorded.find((r) => r.table === 'users' && r.op === 'update');
@@ -182,12 +202,9 @@ describe('generateDigests', () => {
     const { transport } = transportReturning([{ status: 503, body: '' }]);
     const generateDigests = await loadGenerateDigests();
 
-    const result = await generateDigests({
-      config: apnsConfig,
-      transport,
-      sleep: async () => {},
-      maxAttempts: 2,
-    });
+    const result = await generateDigests(
+      apnsOnly(transport, { sleep: async () => {}, maxAttempts: 2 })
+    );
 
     expect(result).toEqual({ sent: 0, skipped: 1, invalidated: 0 });
     expect(fake.recorded.some((r) => r.op === 'update')).toBe(false);
@@ -198,7 +215,7 @@ describe('generateDigests', () => {
     fake = digestFake([{ id: 'u1', display_name: 'A', apns_token: 'tok-1' }]);
     const generateDigests = await loadGenerateDigests();
 
-    const result = await generateDigests({ config: null });
+    const result = await generateDigests({ apns: { config: null }, fcm: { config: null } });
 
     expect(result).toEqual({ sent: 0, skipped: 1, invalidated: 0 });
   });
@@ -208,7 +225,7 @@ describe('generateDigests', () => {
     const { transport, seen } = transportReturning([{ status: 200, body: '' }]);
     const generateDigests = await loadGenerateDigests();
 
-    const result = await generateDigests({ config: apnsConfig, transport });
+    const result = await generateDigests(apnsOnly(transport));
 
     expect(result).toEqual({ sent: 0, skipped: 1, invalidated: 0 });
     expect(seen).toHaveLength(0);
@@ -219,17 +236,79 @@ describe('generateDigests', () => {
     const { transport, seen } = transportReturning([{ status: 200, body: '' }]);
     const generateDigests = await loadGenerateDigests();
 
-    const result = await generateDigests({ config: apnsConfig, transport });
+    const result = await generateDigests(apnsOnly(transport));
 
     expect(result.sent).toBe(0);
     expect(seen).toHaveLength(0);
+  });
+
+  it('sends to an Android-only user (previously excluded by the query)', async () => {
+    // The digest query filtered on `.not('apns_token', 'is', null)`, so a user with
+    // only an FCM token was never even considered.
+    fake = digestFake([
+      { id: 'u1', display_name: 'A', apns_token: null, fcm_token: 'android-token' },
+    ]);
+    const fcmSends: string[] = [];
+    const generateDigests = await loadGenerateDigests();
+
+    const result = await generateDigests({
+      apns: { config: null },
+      fcm: {
+        config: {
+          projectId: 'p',
+          clientEmail: 'e@x.com',
+          privateKey: rsaKey,
+        },
+        transport: async (request) => {
+          if (request.url.includes('oauth2')) {
+            return { status: 200, body: JSON.stringify({ access_token: 'ya29.fake' }) };
+          }
+          fcmSends.push(request.body);
+          return { status: 200, body: '{}' };
+        },
+      },
+    });
+
+    expect(result).toEqual({ sent: 1, skipped: 0, invalidated: 0 });
+    expect(fcmSends).toHaveLength(1);
+    expect(JSON.parse(fcmSends[0]).message.token).toBe('android-token');
+  });
+
+  it('clears fcm_token, not apns_token, when FCM reports UNREGISTERED', async () => {
+    fake = digestFake([
+      { id: 'u1', display_name: 'A', apns_token: null, fcm_token: 'dead-android' },
+    ]);
+    const generateDigests = await loadGenerateDigests();
+
+    const result = await generateDigests({
+      apns: { config: null },
+      fcm: {
+        config: { projectId: 'p', clientEmail: 'e@x.com', privateKey: rsaKey },
+        sleep: async () => {},
+        transport: async (request) => {
+          if (request.url.includes('oauth2')) {
+            return { status: 200, body: JSON.stringify({ access_token: 'ya29.fake' }) };
+          }
+          return {
+            status: 404,
+            body: JSON.stringify({
+              error: { status: 'NOT_FOUND', details: [{ errorCode: 'UNREGISTERED' }] },
+            }),
+          };
+        },
+      },
+    });
+
+    expect(result).toEqual({ sent: 0, skipped: 0, invalidated: 1 });
+    const update = fake.recorded.find((r) => r.table === 'users' && r.op === 'update');
+    expect(update?.payload).toEqual({ fcm_token: null });
   });
 
   it('returns zeroed counts when there are no users at all', async () => {
     fake = digestFake([]);
     const generateDigests = await loadGenerateDigests();
 
-    await expect(generateDigests({ config: apnsConfig })).resolves.toEqual({
+    await expect(generateDigests(apnsOnly(async () => ({ status: 200, body: '' })))).resolves.toEqual({
       sent: 0,
       skipped: 0,
       invalidated: 0,

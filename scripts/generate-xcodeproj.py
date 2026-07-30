@@ -82,6 +82,14 @@ PACKAGES = [
         "minimum": "2.2.0",
         "products": ["TelemetryDeck"],
     },
+    {
+        # US-199: crash reporting. Nothing reported crashes before, so a launch-day
+        # crash loop would have been invisible until App Store reviews arrived.
+        "name": "sentry-cocoa",
+        "url": "https://github.com/getsentry/sentry-cocoa.git",
+        "minimum": "8.44.0",
+        "products": ["Sentry"],
+    },
 ]
 
 # Directories under Lociate/ whose Swift sources belong to the app target, in

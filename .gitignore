@@ -61,6 +61,10 @@ coverage/
 # Android local config (use android/local.properties.example as template)
 android/local.properties
 
+# Firebase config (US-197) — use google-services.json.example as the template
+android/google-services.json
+android/app/google-services.json
+
 # Android build output & upload keystore
 android/.gradle/
 android/build/

@@ -33,6 +33,10 @@ struct LociateApp: App {
         }
 
         BuildSecretsValidator.validate()
+
+        // US-199: earliest safe point, so a crash in the deferred launch work below
+        // is still reported. Cheap — no network I/O on this path.
+        CrashReportingService.configure()
     }
 
     var body: some Scene {

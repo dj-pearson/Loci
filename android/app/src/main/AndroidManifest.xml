@@ -101,6 +101,26 @@
             </intent-filter>
         </receiver>
 
+        <!-- US-197: Firebase Cloud Messaging receiver. Android previously had no
+             push transport at all, so household shares and the weekly digest
+             reached iOS devices only. -->
+        <service
+            android:name=".service.LociateMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <!-- Fall back to the geofence channel and brand mark if a payload ever
+             arrives as a notification message rather than data-only. -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="geofence_notifications" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_notification" />
+
         <!-- Location Foreground Service -->
         <service
             android:name=".service.LocationForegroundService"

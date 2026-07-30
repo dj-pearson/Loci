@@ -19,6 +19,10 @@ import {
   runScheduledJob,
   type RequestLogEnv,
 } from './lib/logger.js';
+import { captureError, initCrashReporting } from './lib/crash-reporting.js';
+
+// US-199: before the app is constructed, so a fault during setup is reported too.
+initCrashReporting();
 
 const app = new Hono<RequestLogEnv>();
 
@@ -30,12 +34,15 @@ app.use('*', requestLogger);
 // US-215: an unhandled route error previously returned Hono's default 500 with no
 // log line at all, so a recurring fault was invisible.
 app.onError((error, c) => {
+  const route = new URL(c.req.url).pathname;
   log.error('unhandled route error', {
     requestId: c.get('requestId'),
-    route: new URL(c.req.url).pathname,
+    route,
     method: c.req.method,
     ...errorFields(error),
   });
+  // US-199: a recurring 500 should page someone, not wait to be noticed in logs.
+  captureError(error, { requestId: c.get('requestId'), route, method: c.req.method });
   return c.json({ error: 'Internal server error' }, 500);
 });
 
@@ -63,12 +70,16 @@ app.route('/api/auth', authVerify);
 
 // Cron: nightly AI analysis at 2 AM
 cron.schedule('0 2 * * *', async () => {
-  await runScheduledJob('analyze-loci', () => processUserClusters());
+  await runScheduledJob('analyze-loci', () => processUserClusters(), {
+    onError: (error) => captureError(error, { job: 'analyze-loci' }),
+  });
 });
 
 // Cron: weekly digest every Sunday at 10 AM
 cron.schedule('0 10 * * 0', async () => {
-  await runScheduledJob('push-digest', () => generateDigests());
+  await runScheduledJob('push-digest', () => generateDigests(), {
+    onError: (error) => captureError(error, { job: 'push-digest' }),
+  });
 });
 
 // US-146: Cron: daily cleanup of old login attempts at 3 AM
@@ -83,6 +94,8 @@ cron.schedule('0 3 * * *', async () => {
     // run instead of a successful one with an error buried in the message.
     if (error) throw new Error(error.message);
     return { recordsDeleted: data };
+  }, {
+    onError: (error) => captureError(error, { job: 'cleanup-login-attempts' }),
   });
 });
 
@@ -98,15 +111,19 @@ log.info('starting', {
   version: process.env.EDGE_FUNCTION_VERSION ?? '1.0.0',
   redisConfigured: Boolean(process.env.REDIS_URL),
   apnsConfigured: Boolean(process.env.APNS_KEY_P8),
+  fcmConfigured: Boolean(process.env.FCM_SERVICE_ACCOUNT_JSON),
+  errorReportingConfigured: Boolean(process.env.SENTRY_DSN),
 });
 
 // US-215: an unhandled rejection or uncaught exception would otherwise kill the
 // process with only Node's default stderr dump, losing the structured context.
 process.on('unhandledRejection', (reason) => {
   log.error('unhandled rejection', errorFields(reason));
+  captureError(reason, { kind: 'unhandledRejection' });
 });
 process.on('uncaughtException', (error) => {
   log.error('uncaught exception', errorFields(error));
+  captureError(error, { kind: 'uncaughtException' });
   // Re-raise: a process in an unknown state should be replaced by the orchestrator,
   // not left running.
   process.exit(1);

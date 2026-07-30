@@ -1,7 +1,7 @@
 {
   "name": "loci-edge-functions",
   "version": "1.0.0",
-  "description": "Lociate edge functions \u2014 Node.js + Hono sidecar",
+  "description": "Lociate edge functions — Node.js + Hono sidecar",
   "type": "module",
   "engines": {
     "node": ">=20.0.0"
@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@hono/node-server": "^1.8.0",
+    "@sentry/node": "^8.55.2",
     "@supabase/supabase-js": "^2.39.0",
     "hono": "^4.0.0",
     "ioredis": "^5.3.2",

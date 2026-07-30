@@ -7,6 +7,20 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
+// US-197: the Google Services plugin hard-fails when google-services.json is
+// missing, and that file is gitignored. Applying it conditionally keeps the build
+// working for a contributor without Firebase credentials — FCM then degrades to a
+// logged no-op at runtime (see PushRegistrationService.registerForPush).
+val googleServicesJson = file("google-services.json")
+if (googleServicesJson.exists()) {
+    apply(plugin = "com.google.gms.google-services")
+} else {
+    logger.lifecycle(
+        "google-services.json not found — Firebase Cloud Messaging is disabled in " +
+            "this build. See android/google-services.json.example."
+    )
+}
+
 android {
     namespace = "app.lociate.android"
     compileSdk = 35
@@ -36,6 +50,11 @@ android {
         // HMAC-SHA256 shared secret for signing sensitive API mutations. Must match
         // REQUEST_SIGNING_KEY on the edge function server. Empty disables signing.
         buildConfigField("String", "REQUEST_SIGNING_KEY", "\"${project.findProperty("REQUEST_SIGNING_KEY") ?: ""}\"")
+        // US-197: lets runtime code skip FCM work entirely rather than relying on a
+        // caught exception when Firebase was never configured.
+        buildConfigField("Boolean", "FCM_ENABLED", googleServicesJson.exists().toString())
+        // US-199: crash reporting. An empty DSN disables Sentry cleanly.
+        buildConfigField("String", "SENTRY_DSN", "\"${project.findProperty("SENTRY_DSN") ?: ""}\"")
 
         javaCompileOptions {
             annotationProcessorOptions {
@@ -190,6 +209,16 @@ dependencies {
 
     // Logging
     implementation(libs.timber)
+
+    // US-197: Firebase Cloud Messaging. The dependency compiles without
+    // google-services.json; only the generated config resources are missing, which
+    // PushRegistrationService handles.
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.messaging)
+
+    // US-199: crash reporting. SDK only — the Sentry Gradle plugin would need
+    // SENTRY_AUTH_TOKEN at build time, which no contributor should require.
+    implementation(libs.sentry.android)
 
     // Unit Testing
     testImplementation(libs.junit)

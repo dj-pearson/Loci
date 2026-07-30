@@ -17,6 +17,7 @@
 #   CERT_PIN_HASH            — Primary certificate pin (SPKI SHA-256, base64)
 #   CERT_BACKUP_PIN_HASH     — Backup certificate pin (optional, defaults to Let's Encrypt)
 #   REQUEST_SIGNING_KEY      — HMAC-SHA256 secret for request signing (optional)
+#   SENTRY_DSN               — Crash reporting DSN (optional; empty disables it)
 #
 # Android required environment variables:
 #   SUPABASE_URL             — Production Supabase URL (shared with iOS)
@@ -27,6 +28,7 @@
 #   CERT_PIN_HASH            — Primary certificate pin (SPKI SHA-256, base64)
 #   CERT_BACKUP_PIN_HASH     — Backup certificate pin
 #   REQUEST_SIGNING_KEY      — HMAC-SHA256 secret for request signing (shared with iOS)
+#   SENTRY_DSN               — Crash reporting DSN (shared with iOS)
 
 set -euo pipefail
 
@@ -141,6 +143,10 @@ enum BuildSecrets {
     // MARK: - Request Signing
 
     static let requestSigningKey = "${REQUEST_SIGNING_KEY:-}"
+
+    // MARK: - Crash Reporting (US-199)
+
+    static let sentryDSN = "${SENTRY_DSN:-}"
 }
 SWIFT
     echo "iOS BuildSecrets.swift generated at $IOS_OUTPUT"
@@ -171,6 +177,7 @@ generate_android() {
         echo "CERT_PIN_HASH=${CERT_PIN_HASH:-}"
         echo "CERT_BACKUP_PIN_HASH=${CERT_BACKUP_PIN_HASH:-}"
         echo "REQUEST_SIGNING_KEY=${REQUEST_SIGNING_KEY:-}"
+        echo "SENTRY_DSN=${SENTRY_DSN:-}"
     } > "$ANDROID_OUTPUT"
     echo "Android local.properties generated at $ANDROID_OUTPUT"
 }

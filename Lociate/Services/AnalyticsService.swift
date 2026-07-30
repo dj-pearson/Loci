@@ -158,6 +158,11 @@ final class AnalyticsService {
             return
         }
 
+        // US-199: the crash reporter uses the same hashed identity, so a crash and
+        // the analytics trail leading to it can be correlated without either
+        // holding a raw user id.
+        CrashReportingService.setUser(hashedId: hashed)
+
         guard isConfigured else { return }
         // Only the hash is ever sent — never the raw Supabase user id, and never
         // an email address.
@@ -165,6 +170,8 @@ final class AnalyticsService {
     }
 
     func clearUser() {
+        CrashReportingService.setUser(hashedId: nil)
+
         if isDebug {
             logger.debug("📊 [Analytics] User cleared")
             return

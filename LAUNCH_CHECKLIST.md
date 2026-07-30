@@ -66,6 +66,14 @@ This file is the **skimmable summary**. If an item is in `LAUNCH_RUNBOOK.md`, th
 - [ ] **⚠️** Google Play service account JSON created (for API uploads from CI) → GH secret `GOOGLE_PLAY_SERVICE_ACCOUNT_JSON`
 - [ ] **⚠️** Google Maps SDK for Android API key created in Google Cloud Console, restricted to package name + SHA-1 fingerprint → GH secret `MAPS_API_KEY`
 - [ ] **⚠️** Google Play Billing products configured matching iOS SKUs (`app.lociate.premium.monthly`, `app.lociate.family.monthly`)
+- [ ] **⚠️** Firebase project created and the Android app registered with package
+      `app.lociate.android` (US-197). Download `google-services.json` to
+      `android/google-services.json` — gitignored; see
+      `android/google-services.json.example`. Without it the build still succeeds
+      and `BuildConfig.FCM_ENABLED` is false, so remote push is skipped.
+- [ ] **⚠️** Firebase service-account key generated (Project settings → Service
+      accounts) and pasted into `backend/.env` as `FCM_SERVICE_ACCOUNT_JSON` —
+      the edge functions need it to send via FCM HTTP v1
 - [ ] App signing by Google Play enabled (Play App Signing)
 - [ ] 🔶 Internal testing track populated with tester emails
 
@@ -79,7 +87,7 @@ story in `prd.json` (US-185 onward) with the full finding in its `notes`.
 This section is generated — run `python3 scripts/sync-launch-checklist.py` after
 changing a story's status.
 
-### Resolved (25)
+### Resolved (27)
 
 - [x] **US-185** — iOS: restore Xcode project source membership for all 104 Swift files
 - [x] **US-186** — iOS: add SPM package dependencies (supabase-swift, RevenueCat, TelemetryDeck)
@@ -93,7 +101,9 @@ changing a story's status.
 - [x] **US-194** — Android: implement real sync upload in SyncWorker (currently silent data loss)
 - [x] **US-195** — iOS: register for remote notifications and persist the APNs token
 - [x] **US-196** — Edge functions: implement real APNs HTTP/2 delivery
+- [x] **US-197** — Android: add FCM push so Android has parity with iOS notifications
 - [x] **US-198** — iOS: activate TelemetryDeck instead of the commented-out no-op
+- [x] **US-199** — Add crash and error reporting across clients and edge functions
 - [x] **US-200** — iOS: add PrivacyInfo.xcprivacy privacy manifest
 - [x] **US-201** — iOS: ship a real App Store icon set
 - [x] **US-202** — iOS: use production aps-environment for Release builds
@@ -107,10 +117,8 @@ changing a story's status.
 - [x] **US-217** — Reconcile launch documentation with the audited state of the repository
 - [x] **US-218** — Fix RLS infinite recursion that broke every authenticated read of loci
 
-### Still open (9) — resolve or explicitly defer before launch
+### Still open (7) — resolve or explicitly defer before launch
 
-- [ ] **US-197** — Android: add FCM push so Android has parity with iOS notifications
-- [ ] **US-199** — Add crash and error reporting across clients and edge functions
 - [ ] **US-204** — Complete App Store and Play Store listing metadata
 - [ ] **US-208** — Android: unit tests for sync, geofencing, billing, and persistence
 - [ ] **US-209** — Android: instrumented smoke test for the core record-to-list flow
@@ -164,6 +172,9 @@ See LAUNCH_RUNBOOK.md §8–9 for the full Coolify walkthrough. Checklist summar
   - `REVENUECAT_WEBHOOK_SECRET`
   - `APPLE_SECRET` (Sign In With Apple client secret JWT)
   - `REQUEST_SIGNING_KEY` (shared with mobile)
+  - `APNS_KEY_P8`, `APNS_KEY_ID`, `APNS_TEAM_ID`, `APNS_TOPIC` (US-196)
+  - `FCM_SERVICE_ACCOUNT_JSON` (US-197)
+  - `SENTRY_DSN`, `LOG_LEVEL` (US-199, US-215)
 - [ ] **⚠️** TLS cert issued (Let's Encrypt via Coolify) — needed before extracting pins in §9
 - [ ] 🔶 Redis container healthy (used by `auth-rate-limit` middleware persistence)
 - [ ] RevenueCat webhook endpoint registered in RevenueCat dashboard → `https://<edge-fns>/webhooks/revenuecat`
@@ -204,6 +215,11 @@ See LAUNCH_RUNBOOK.md §8–9 for the full Coolify walkthrough. Checklist summar
 - [ ] **RevenueCat** — project created, Apple + Google entitlements + offerings configured; **Apple API key** copied into GH secret `REVENUECAT_API_KEY`. (LAUNCH_RUNBOOK.md §5)
 - [ ] **TelemetryDeck** — app created; App ID → GH secret `TELEMETRYDECK_APP_ID`. (LAUNCH_RUNBOOK.md §6)
 - [ ] **Anthropic** — API key for `analyze-loci` edge function → `backend/.env` `ANTHROPIC_API_KEY`
+- [ ] **Sentry** (US-199) — project created for each surface; DSNs into
+      `SENTRY_DSN` (GH secret for iOS/Android builds, `backend/.env` for edge).
+      An empty DSN disables reporting cleanly, so this is feature-gated, not a
+      blocker — but shipping without it means a launch-day crash loop is invisible
+      until store reviews arrive.
 - [ ] **Cloudflare Pages** — `web/` project connected to repo for marketing site auto-deploy
 
 ---
@@ -221,6 +237,7 @@ Confirm all of the following are set under Repo → Settings → Secrets and var
 - [ ] `TELEMETRYDECK_APP_ID`
 - [ ] `CERT_PIN_HASH` (optionally `CERT_BACKUP_PIN_HASH`)
 - [ ] `REQUEST_SIGNING_KEY`
+- [ ] `SENTRY_DSN` (optional — empty disables crash reporting)
 
 **Android (android-release.yml)**
 - [ ] `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`
@@ -229,11 +246,18 @@ Confirm all of the following are set under Repo → Settings → Secrets and var
 - [ ] `MAPS_API_KEY`
 - [ ] `CERT_PIN_HASH`, `CERT_BACKUP_PIN_HASH` (shared with iOS; optional — empty disables pinning)
 - [ ] `REQUEST_SIGNING_KEY` (shared with iOS + edge fns; optional — empty disables signing)
+- [ ] `SENTRY_DSN` (shared with iOS; optional)
+- [ ] `GOOGLE_SERVICES_JSON` — base64 of `google-services.json`, decoded in CI to
+      `android/google-services.json` (US-197)
 
 **Backend / infra**
 - [ ] `ANTHROPIC_API_KEY`
 - [ ] `REVENUECAT_WEBHOOK_SECRET`
 - [ ] `APPLE_SECRET`
+- [ ] `APNS_KEY_P8`, `APNS_KEY_ID`, `APNS_TEAM_ID` (US-196 — without these the
+      weekly digest and household-share pushes silently deliver nothing)
+- [ ] `FCM_SERVICE_ACCOUNT_JSON` (US-197 — same, for Android)
+- [ ] `SENTRY_DSN` (US-199)
 - [ ] Any Coolify deploy tokens used by `deploy.yml`
 
 ---

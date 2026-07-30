@@ -3372,8 +3372,8 @@
         "Absent Firebase config degrades to a logged no-op — the app still builds and runs"
       ],
       "priority": 197,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed. Added migration 011_fcm_token.sql (users.fcm_token plus partial indexes on both token columns — the apns_token index never existed either, and the digest cron scans for non-null tokens). Android: firebase-messaging via the Firebase BOM, a LociateMessagingService handling onNewToken and data-only payloads, and a PushRegistrationService mirroring the iOS one — queue-on-offline, flush on sign-in and app start, clear server-side before dropping the session, drop local state on account deletion. The Google Services plugin is applied conditionally because it hard-fails without google-services.json and that file is gitignored; BuildConfig.FCM_ENABLED lets runtime code skip FCM entirely rather than relying on a caught exception. Committed google-services.json.example and gitignored the real path. Edge: new src/lib/fcm.ts implementing FCM HTTP v1 (the legacy server-key API is decommissioned) with an RS256 service-account assertion exchanged for a cached access token, UNREGISTERED / INVALID_ARGUMENT / SENDER_ID_MISMATCH treated as dead tokens, bounded backoff on 429/5xx, and a token-exchange failure reported as a transport error specifically so a misconfigured service account cannot wipe every user's token. New src/lib/push.ts dispatches per row so a future caller cannot accidentally reach iOS only — which is exactly how Android ended up with no notifications. Fixed a second defect while doing this: the digest query filtered on `.not('apns_token','is',null)`, so an Android-only user was excluded before any send was even attempted. Both platforms now send for a dual-device user, and only the dead platform's column is cleared. 44 new edge tests (119 total, all passing, typecheck clean); Android unit tests could not be executed here because the network policy blocks dl.google.com."
     },
     {
       "id": "US-198",
@@ -3404,8 +3404,8 @@
         "DSN secrets documented in LAUNCH_CHECKLIST.md §7"
       ],
       "priority": 199,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed. Crash reporting on all three surfaces, each disabled cleanly by an empty DSN so a contributor or self-hosted build needs no Sentry account. iOS: sentry-cocoa added as an SPM package plus CrashReportingService, initialized in LociateApp.init() before the deferred launch work so a crash during startup is still reported; release/dist tagged as bundleId@version+build; disabled entirely in DEBUG so development crashes do not drown the production signal. Android: sentry-android (SDK only — the Gradle plugin would require SENTRY_AUTH_TOKEN at build time, which no contributor should need) initialized first in LociateApplication.onCreate. Edge: @sentry/node initialized before the app is constructed, wired into app.onError, all three cron onError hooks, and the unhandledRejection/uncaughtException handlers. PII scrubbing is layered on all three: key-based redaction of tokens, emails, invite codes, coordinates, and transcriptions, plus regex redaction of decimal coordinates and email addresses inside free text — exception messages routinely interpolate both, so key-based redaction alone is insufficient. sendDefaultPii, screenshots, and view hierarchies are all off; the edge handler strips request body, cookies, headers, and query string. The crash identity reuses the analytics SHA-256 hash, so a crash and the trail leading to it correlate without either holding a raw user id. 6 Android scrubbing tests added; the regex behaviour was additionally verified directly, including that low-precision numbers like \"1.5s\" and \"build 1.0.0\" are left alone — over-redaction would make reports useless. DSN plumbed through generate-secrets.sh for both platforms and documented in LAUNCH_CHECKLIST §6 and §7."
     },
     {
       "id": "US-200",
