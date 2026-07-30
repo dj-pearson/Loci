@@ -3187,8 +3187,8 @@
         "A repo-committed verification script reports 0 files on disk missing from the project"
       ],
       "priority": 185,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed. Replaced the hand-maintained project.pbxproj with scripts/generate-xcodeproj.py, which derives the whole project from the source tree using deterministic (hashed) object IDs. All 106 Swift files are now referenced and 102 are members of the app target's Sources phase (was 32). Groups mirror the on-disk layout. `--check` mode fails CI if the committed project drifts from the tree again. Verified: 0 duplicate object IDs, 0 dangling references, balanced plist, regeneration is byte-identical."
     },
     {
       "id": "US-186",
@@ -3201,8 +3201,8 @@
         "`xcodebuild -resolvePackageDependencies` step in ci.yml resolves without error"
       ],
       "priority": 186,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed. Generator emits XCRemoteSwiftPackageReference for supabase-community/supabase-swift (2.5.1+), RevenueCat/purchases-ios (4.43.0+), and TelemetryDeck/SwiftSDK (2.2.0+), with XCSwiftPackageProductDependency + PBXBuildFile entries attaching Supabase, RevenueCat, and TelemetryDeck to the app target's Frameworks phase. Package.resolved is produced by the CI resolve step; it is generated rather than hand-written because pinning by hand would drift from the requirements above."
     },
     {
       "id": "US-187",
@@ -3217,8 +3217,8 @@
         "Widget bundle ID is app.lociate.ios.widget and deployment target matches the app (iOS 17.0)"
       ],
       "priority": 187,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed. New LociateWidget app-extension target with its own Info.plist (com.apple.widgetkit-extension) and App Group entitlements. Added the missing @main LociateWidgetBundle — without it WidgetKit had no entry point, so the widget could never have appeared in the gallery even once the target existed. Extracted AuditLogEntry/SecurityAuditEvent into Models/AuditLogEntry.swift so the widget can build the shared SwiftData schema from 11 shared sources instead of dragging in SecurityAuditLogger and AnalyticsService. App target embeds the appex (dstSubfolderSpec 13) and depends on it. Also added the WidgetBackground colorset the target references."
     },
     {
       "id": "US-188",
@@ -3232,8 +3232,8 @@
         "Scheme name matches what ci.yml and Lociate/fastlane/Fastfile pass to xcodebuild"
       ],
       "priority": 188,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed. New LociateTests unit-test target (TEST_HOST/BUNDLE_LOADER pointing at Lociate.app, TestTargetID set) and a committed shared scheme at Lociate.xcodeproj/xcshareddata/xcschemes/Lociate.xcscheme building app+widget with LociateTests as a testable. ENABLE_TESTABILITY=YES on Debug. Scheme name matches what ci.yml and every Fastfile lane already passed to xcodebuild — those invocations could not have worked before."
     },
     {
       "id": "US-189",
@@ -3450,8 +3450,8 @@
         "Fastlane release/beta lanes archive with the production entitlement"
       ],
       "priority": 202,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed. Split Lociate.entitlements into Lociate.Debug.entitlements (aps-environment=development) and Lociate.Release.entitlements (production), selected per configuration via CODE_SIGN_ENTITLEMENTS; widget target gets the same treatment with App-Group-only entitlements. Also added the missing com.apple.developer.applesignin key. Fixed the fastlane beta lane, which used match(type: 'development') with export_method: 'app-store' — a development profile cannot sign an app-store export, and TestFlight builds get production APNs tokens. All three archive lanes now pin configuration: 'Release'."
     },
     {
       "id": "US-203",
