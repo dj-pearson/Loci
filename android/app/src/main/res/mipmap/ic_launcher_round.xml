@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- US-191: fallback for launchers that ignore mipmap-anydpi-v26. minSdk is 26
+     so this is rarely used, but resource linking requires the default-qualifier
+     resource to exist. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/ic_launcher_background" />
+    <item
+        android:drawable="@drawable/ic_launcher_foreground"
+        android:gravity="center" />
+</layer-list>

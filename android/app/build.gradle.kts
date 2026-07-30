@@ -25,6 +25,11 @@ android {
         buildConfigField("String", "SUPABASE_URL", "\"${project.findProperty("SUPABASE_URL") ?: "https://your-supabase-url.com"}\"")
         buildConfigField("String", "SUPABASE_ANON_KEY", "\"${project.findProperty("SUPABASE_ANON_KEY") ?: "your-anon-key"}\"")
         buildConfigField("String", "MAPS_API_KEY", "\"${project.findProperty("MAPS_API_KEY") ?: ""}\"")
+        // US-190: AndroidManifest.xml substitutes ${MAPS_API_KEY} into the
+        // com.google.android.geo.API_KEY meta-data. Without this placeholder the
+        // manifest merger fails and no variant can be assembled — the buildConfigField
+        // above is only readable at runtime, it does not feed the manifest.
+        manifestPlaceholders["MAPS_API_KEY"] = (project.findProperty("MAPS_API_KEY") ?: "") as String
         // Certificate pinning (SPKI SHA-256 hashes, base64). Empty values disable pinning.
         buildConfigField("String", "CERT_PIN_HASH", "\"${project.findProperty("CERT_PIN_HASH") ?: ""}\"")
         buildConfigField("String", "CERT_BACKUP_PIN_HASH", "\"${project.findProperty("CERT_BACKUP_PIN_HASH") ?: ""}\"")
@@ -44,6 +49,17 @@ android {
 
     buildTypes {
         release {
+            // US-190: a release build with no Maps key produces an app whose map
+            // screen is permanently blank, which is worse than failing here.
+            // Debug builds only warn so a contributor can work without the key.
+            val mapsKey = (project.findProperty("MAPS_API_KEY") ?: "") as String
+            if (mapsKey.isBlank() && !project.hasProperty("allowMissingMapsKey")) {
+                throw GradleException(
+                    "MAPS_API_KEY is not set. Add it to android/local.properties (see " +
+                        "local.properties.example) or run scripts/generate-secrets.sh --android. " +
+                        "Pass -PallowMissingMapsKey to bypass for a non-shippable build."
+                )
+            }
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
@@ -54,6 +70,12 @@ android {
         debug {
             isDebuggable = true
             applicationIdSuffix = ".debug"
+            if (((project.findProperty("MAPS_API_KEY") ?: "") as String).isBlank()) {
+                logger.warn(
+                    "MAPS_API_KEY is not set — the map screen will render blank in this " +
+                        "debug build. See android/local.properties.example."
+                )
+            }
         }
     }
 
@@ -174,11 +196,17 @@ dependencies {
     testImplementation(libs.core.testing)
     testImplementation(libs.room.testing)
 
-    // Android Testing
+    // Android Testing — US-192: hilt-android-testing supplies HiltTestApplication,
+    // which the custom runner in app/src/androidTest returns from newApplication().
+    // Without it the runner cannot exist and connectedAndroidTest fails to configure.
     androidTestImplementation(libs.espresso)
     androidTestImplementation(libs.test.runner)
+    androidTestImplementation(libs.test.rules)
+    androidTestImplementation(libs.test.core)
+    androidTestImplementation(libs.test.ext.junit)
     androidTestImplementation(libs.compose.ui.test.junit4)
     androidTestImplementation(libs.truth)
     androidTestImplementation(libs.hilt.android)
+    androidTestImplementation(libs.hilt.android.testing)
     kspAndroidTest(libs.hilt.compiler)
 }
