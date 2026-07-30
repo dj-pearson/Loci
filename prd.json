@@ -1,6 +1,6 @@
 {
   "project": "Lociate",
-  "branchName": "ralph/loci-mvp",
+  "branchName": "claude/production-gaps-deep-dive-yoov53",
   "description": "Lociate - Voice-first iOS app that pins voice notes to GPS coordinates with proximity-triggered retrieval and family sharing. Built with SwiftUI, SwiftData, CoreLocation, PostGIS Supabase backend, and Cloudflare Pages marketing site.",
   "userStories": [
     {
@@ -3174,6 +3174,524 @@
       "priority": 184,
       "passes": true,
       "notes": "Completed 2026-04-17. AppConstants.sessionInactivityTimeoutDays reduced 30 → 7. IntegrityCheckService exposes shouldBlockSensitiveOperations, and four surfaces now gate on it: biometric lock toggle (refuses to enable), Settings Family section (hides Create/Join and shows a warning Label), Delete Account buttons in both SettingsView and AccountView (disabled), Export My Data button (disabled). ModelContainerConfiguration gains applyBackupExclusionToStorageDirectories() which marks the app Documents directory and the app.lociate.ios App Group container with URLResourceValues.isExcludedFromBackup=true on every cold start — idempotent, so local SwiftData + audio never sync to iCloud/iTunes backups without explicit user opt-in via cloud sync."
+    },
+    {
+      "id": "US-185",
+      "title": "iOS: restore Xcode project source membership for all 104 Swift files",
+      "description": "As a developer, I need every Swift source in Lociate/ to be a member of the app target so the project actually compiles — today only 32 of 104 files are in the Sources build phase, so the app cannot build at all.",
+      "acceptanceCriteria": [
+        "Every .swift file under Lociate/ (excluding Widget/) is referenced by a PBXFileReference and included in the app target's PBXSourcesBuildPhase",
+        "PBXGroup hierarchy mirrors the on-disk folder layout (Models/, ViewModels/, Views/<subfolders>/, Services/, Utilities/, Configuration/)",
+        "No duplicate PBXBuildFile entries for any source",
+        "project.pbxproj remains a valid OpenStep plist and opens in Xcode without repair prompts",
+        "A repo-committed verification script reports 0 files on disk missing from the project"
+      ],
+      "priority": 185,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-186",
+      "title": "iOS: add SPM package dependencies (supabase-swift, RevenueCat, TelemetryDeck)",
+      "description": "As a developer, I need the third-party SPM packages declared in the Xcode project, because sources already `import Supabase` and `import RevenueCat` but the project declares zero package references — every such import is a compile error.",
+      "acceptanceCriteria": [
+        "XCRemoteSwiftPackageReference entries for supabase-community/supabase-swift, RevenueCat/purchases-ios, and TelemetryDeck/SwiftSDK with pinned upToNextMajorVersion requirements",
+        "XCSwiftPackageProductDependency + PBXBuildFile entries attach Supabase, RevenueCat, and TelemetryDeck products to the app target's Frameworks build phase",
+        "Package.resolved is committed so CI builds are reproducible and the SPM cache key is stable",
+        "`xcodebuild -resolvePackageDependencies` step in ci.yml resolves without error"
+      ],
+      "priority": 186,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-187",
+      "title": "iOS: add the widget extension target so the Premium widget actually ships",
+      "description": "As a Premium user, I need the Nearby Loci widget to exist in the built product. Lociate/Widget/ contains three Swift files that belong to no target, so the widget is dead code and the advertised Premium feature does not exist.",
+      "acceptanceCriteria": [
+        "New PBXNativeTarget 'LociateWidget' with productType com.apple.product-type.app-extension",
+        "NearbyLociWidget.swift, NearbyLociTimelineProvider.swift, OpenLocusIntent.swift are members of the widget target only",
+        "Widget target has its own Info.plist (NSExtension/WidgetKit) and entitlements with App Group group.app.lociate.ios",
+        "Shared model/utility sources needed by the widget are members of both targets, or extracted so no symbol is missing",
+        "App target has a PBXCopyFilesBuildPhase (Embed App Extensions) embedding the widget, and a target dependency on it",
+        "Widget bundle ID is app.lociate.ios.widget and deployment target matches the app (iOS 17.0)"
+      ],
+      "priority": 187,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-188",
+      "title": "iOS: add unit-test target and shared xcscheme so tests and CI can run",
+      "description": "As a developer, I need a test target and a repo-shared scheme, because LociateTests/ has no target (its one test never runs) and no .xcscheme is committed — so `xcodebuild -scheme Lociate` in ci.yml and every Fastlane lane fails before doing any work.",
+      "acceptanceCriteria": [
+        "New PBXNativeTarget 'LociateTests' (com.apple.product-type.bundle.unit-test) with TEST_HOST/BUNDLE_LOADER pointing at the app",
+        "All files under LociateTests/ are members of the test target",
+        "xcshareddata/xcschemes/Lociate.xcscheme committed, marked shared, with BuildAction covering app+widget and TestAction referencing LociateTests",
+        "ENABLE_TESTABILITY=YES in the Debug configuration",
+        "Scheme name matches what ci.yml and Lociate/fastlane/Fastfile pass to xcodebuild"
+      ],
+      "priority": 188,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-189",
+      "title": "Android: commit the Gradle wrapper so `./gradlew` exists",
+      "description": "As a developer, I need the Gradle wrapper committed. android/gradle/wrapper/ contains only gradle-wrapper.properties — there is no gradlew script and no gradle-wrapper.jar, so every `./gradlew` invocation in android-ci.yml and android-release.yml fails instantly.",
+      "acceptanceCriteria": [
+        "android/gradlew (executable, mode 755) and android/gradlew.bat committed",
+        "android/gradle/wrapper/gradle-wrapper.jar committed and matching the distributionUrl version in gradle-wrapper.properties",
+        "validate-wrapper action or checksum note documents the expected wrapper jar SHA-256",
+        ".gitignore does not exclude the wrapper jar"
+      ],
+      "priority": 189,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-190",
+      "title": "Android: define the MAPS_API_KEY manifest placeholder",
+      "description": "As a developer, I need the Google Maps API key wired as a manifest placeholder. AndroidManifest.xml references ${MAPS_API_KEY} but build.gradle.kts only declares it as a buildConfigField, so manifest merging fails and no Android variant can be assembled.",
+      "acceptanceCriteria": [
+        "defaultConfig declares manifestPlaceholders[\"MAPS_API_KEY\"] sourced from project.findProperty(\"MAPS_API_KEY\") with an empty-string fallback",
+        "Release builds fail loudly (Gradle error) when MAPS_API_KEY is blank; debug builds warn but proceed",
+        "buildConfigField for MAPS_API_KEY retained for runtime checks",
+        "android/local.properties.example documents the property"
+      ],
+      "priority": 190,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-191",
+      "title": "Android: generate launcher icon resources",
+      "description": "As a user, I need the app to have an icon. AndroidManifest.xml references @mipmap/ic_launcher and @mipmap/ic_launcher_round but no mipmap resources exist, so resource linking fails and the build cannot complete.",
+      "acceptanceCriteria": [
+        "Adaptive icon: mipmap-anydpi-v26/ic_launcher.xml and ic_launcher_round.xml with foreground/background/monochrome layers",
+        "drawable/ic_launcher_foreground.xml and values/ic_launcher_background.xml committed as vector/color resources (no binary PNG needed)",
+        "Icon artwork matches the Lociate brand mark used in Lociate/Assets.xcassets",
+        "Play Store 512x512 icon requirement documented in LAUNCH_CHECKLIST.md §3"
+      ],
+      "priority": 191,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-192",
+      "title": "Android: add androidTest source set and the missing HiltTestRunner",
+      "description": "As a developer, I need instrumented tests to be runnable. build.gradle.kts sets testInstrumentationRunner to app.lociate.android.HiltTestRunner, but that class does not exist and there is no androidTest source set — so connectedAndroidTest fails to configure.",
+      "acceptanceCriteria": [
+        "app/src/androidTest/java/app/lociate/android/HiltTestRunner.kt extends AndroidJUnitRunner and returns HiltTestApplication from newApplication",
+        "androidTestImplementation includes hilt-android-testing and kspAndroidTest hilt-compiler",
+        "At least one instrumented smoke test exists and is annotated @HiltAndroidTest",
+        "`./gradlew assembleDebugAndroidTest` configures without error"
+      ],
+      "priority": 192,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-193",
+      "title": "CI: fix workflow triggers so pipelines actually run on this repository",
+      "description": "As a maintainer, I need CI to run. ci.yml/android-ci.yml trigger on pushes to `develop`/`feature/*` and PRs into `main`, but this repository's default branch is `master` — so no workflow has ever gated a change, and deploy.yml pushes to TestFlight from a branch that does not exist.",
+      "acceptanceCriteria": [
+        "ci.yml and android-ci.yml trigger on pull_request into master and on push to master plus claude/* and feature/* branches",
+        "deploy.yml triggers on push to master (not main)",
+        "A new edge-functions job runs npm ci, npm run typecheck, and npm test",
+        "A new backend job runs the SQL/RLS test suite",
+        "All jobs are listed as required checks in a documented branch-protection note in LAUNCH_CHECKLIST.md",
+        "No workflow references a nonexistent branch name"
+      ],
+      "priority": 193,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-194",
+      "title": "Android: implement real sync upload in SyncWorker (currently silent data loss)",
+      "description": "As a Premium Android user, I need my loci to actually reach the server. SyncWorker fetches unsynced rows and immediately marks them SYNCED without uploading anything, so paying users believe their data is backed up when nothing was ever sent.",
+      "acceptanceCriteria": [
+        "SyncWorker injects SyncRepository and uploads audio to Supabase Storage then upserts the locus row via PostgREST",
+        "Sync status is only set to SYNCED after both the audio upload and the row upsert succeed",
+        "Per-locus failures mark the row as FAILED (or leave it PENDING) and do not abort the whole batch",
+        "Worker returns Result.retry() with exponential backoff on transient/network errors and Result.failure() after the attempt cap",
+        "Uploads are idempotent — re-running the worker on a partially synced batch does not duplicate rows or re-upload existing audio",
+        "The US-161 TODO and placeholder loop are removed",
+        "Unit test with a fake SyncRepository proves no row is marked SYNCED when upload throws"
+      ],
+      "priority": 194,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-195",
+      "title": "iOS: register for remote notifications and persist the APNs token",
+      "description": "As a user, I need push notifications to be deliverable. The entitlement declares aps-environment, Info.plist declares the remote-notification background mode, users.apns_token exists in Postgres, and the digest edge function reads it — but nothing on device ever calls registerForRemoteNotifications, so the column is always null and every server-side push is skipped.",
+      "acceptanceCriteria": [
+        "App delegate adaptor implements didRegisterForRemoteNotificationsWithDeviceToken and didFailToRegisterForRemoteNotificationsWithError",
+        "registerForRemoteNotifications() is called after notification authorization is granted, not before",
+        "Token is hex-encoded and upserted to users.apns_token for the signed-in user, and re-upserted on change and on sign-in",
+        "Token is cleared server-side on sign-out and on account deletion",
+        "Registration failure is logged and never blocks app launch or local notifications",
+        "Works offline: token upsert is queued and retried when connectivity returns"
+      ],
+      "priority": 195,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-196",
+      "title": "Edge functions: implement real APNs HTTP/2 delivery",
+      "description": "As a user, I need server-sent notifications to arrive. sendApnsPush() only console.logs and returns true, so the weekly digest cron reports success while delivering nothing.",
+      "acceptanceCriteria": [
+        "APNs provider JWT (ES256) minted from APNS_KEY_P8/APNS_KEY_ID/APNS_TEAM_ID env vars and cached until expiry",
+        "POST to https://api.push.apple.com/3/device/<token> over HTTP/2 with apns-topic app.lociate.ios and apns-push-type alert",
+        "APNS_HOST env var selects the sandbox gateway for non-production",
+        "410 Unregistered and 400 BadDeviceToken responses clear users.apns_token instead of retrying",
+        "Transient 429/5xx responses retry with bounded exponential backoff",
+        "Function returns a real success/failure per token so digest counts are accurate",
+        "Missing APNs credentials degrade to a logged no-op rather than crashing the sidecar",
+        "Vitest covers token-invalidation and retry paths against a mocked HTTP client"
+      ],
+      "priority": 196,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-197",
+      "title": "Android: add FCM push so Android has parity with iOS notifications",
+      "description": "As an Android user, I need remote notifications (household shares, weekly digest). The Android app has no push transport at all — no FCM dependency, no messaging service, and no server-side token column.",
+      "acceptanceCriteria": [
+        "Migration adds users.fcm_token with an index, mirroring apns_token",
+        "firebase-messaging dependency plus a FirebaseMessagingService subclass registered in AndroidManifest.xml",
+        "Token retrieved on first launch and on onNewToken, then upserted to users.fcm_token",
+        "Notification channel reused from LociateApplication; payload deep-links to lociate://locus/<id>",
+        "Edge-function dispatch sends via FCM HTTP v1 for Android tokens and APNs for iOS tokens, chosen per row",
+        "google-services.json is gitignored with a committed .example and documented in LAUNCH_CHECKLIST.md §3",
+        "Absent Firebase config degrades to a logged no-op — the app still builds and runs"
+      ],
+      "priority": 197,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-198",
+      "title": "iOS: activate TelemetryDeck instead of the commented-out no-op",
+      "description": "As a product owner, I need launch analytics. AnalyticsService defines the full event taxonomy but every TelemetryDeck call is commented out and the import is disabled, so the app emits nothing in production.",
+      "acceptanceCriteria": [
+        "`import TelemetryDeck` enabled and TelemetryDeck.initialize called once at launch when the app ID is non-empty",
+        "signal() calls enabled for all AnalyticsEvent cases with their parameter dictionaries",
+        "Empty/placeholder app ID keeps the console-only path — no crash, no network calls",
+        "DEBUG builds still log to console and do not send production signals",
+        "User identifier remains a SHA-256 hash; no raw user IDs, coordinates, transcriptions, or emails are ever sent",
+        "Analytics respects the existing opt-out setting"
+      ],
+      "priority": 198,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-199",
+      "title": "Add crash and error reporting across clients and edge functions",
+      "description": "As a maintainer, I need to know when the app crashes in the field. No crash reporter is wired on iOS, Android, or the edge sidecar, so a launch-day crash loop would be invisible until App Store reviews arrive.",
+      "acceptanceCriteria": [
+        "Sentry SDK integrated on iOS (SPM) and Android (Gradle), initialized from a build-time DSN",
+        "Edge functions initialize Sentry (or equivalent structured error reporting) and capture unhandled route errors via Hono onError",
+        "Empty DSN disables reporting cleanly on all three surfaces",
+        "PII scrubbing: no transcriptions, coordinates, audio paths, emails, or auth tokens in breadcrumbs or event payloads",
+        "Release/dist tags are set from the app version and build number so crashes group per release",
+        "DSN secrets documented in LAUNCH_CHECKLIST.md §7"
+      ],
+      "priority": 199,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-200",
+      "title": "iOS: add PrivacyInfo.xcprivacy privacy manifest",
+      "description": "As a submitter, I need the privacy manifest Apple requires. No PrivacyInfo.xcprivacy exists, so App Store Connect will reject the upload for undeclared required-reason API usage.",
+      "acceptanceCriteria": [
+        "PrivacyInfo.xcprivacy added to the app target and to the widget target",
+        "NSPrivacyAccessedAPITypes declares every required-reason API in use (file timestamp, disk space, user defaults, active keyboard as applicable) with valid reason codes",
+        "NSPrivacyCollectedDataTypes declares precise location, audio data, and user ID with linked/tracking flags matching the App Store privacy answers",
+        "NSPrivacyTracking = false and NSPrivacyTrackingDomains is empty",
+        "Declarations agree with LAUNCH_RUNBOOK.md Appendix C",
+        "Manifest is copied into the bundle by a Resources build phase"
+      ],
+      "priority": 200,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-201",
+      "title": "iOS: ship a real App Store icon set",
+      "description": "As a submitter, I need a valid app icon. AppIcon.appiconset contains only AppIcon.svg — Xcode requires PNG assets and rejects SVG for the marketing icon, so archiving and upload fail.",
+      "acceptanceCriteria": [
+        "1024x1024 PNG marketing icon (no alpha channel) committed to AppIcon.appiconset with a matching Contents.json",
+        "Single-size iOS 17 icon configuration validated by Xcode's asset catalog rules",
+        "LaunchIcon.imageset provides a PNG (or a vector marked as preserve-vector-representation) so the launch screen renders",
+        "A committed script regenerates the PNGs from the SVG source so brand changes stay reproducible",
+        "No SVG remains referenced from an appiconset"
+      ],
+      "priority": 201,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-202",
+      "title": "iOS: use production aps-environment for Release builds",
+      "description": "As a submitter, I need production push entitlements. Lociate.entitlements hardcodes aps-environment=development, so a released build's device tokens are sandbox tokens and every production push fails with BadDeviceToken.",
+      "acceptanceCriteria": [
+        "Separate Debug and Release entitlements files (development / production aps-environment), or a build-setting-driven value",
+        "CODE_SIGN_ENTITLEMENTS resolves per configuration in project.pbxproj",
+        "App Group and any other entitlement keys are identical across both files",
+        "Widget target entitlements handled the same way",
+        "Fastlane release/beta lanes archive with the production entitlement"
+      ],
+      "priority": 202,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-203",
+      "title": "Fix deep-link association files for both platforms",
+      "description": "As a user tapping a link, I need it to open the app. The AASA file still contains the literal placeholder TEAM_ID, and Android has no assetlinks.json and no https App Links intent filter — so universal links are broken on iOS and absent on Android.",
+      "acceptanceCriteria": [
+        "web/public/.well-known/apple-app-site-association has the real Team ID (or is generated at build time from a Cloudflare Pages env var)",
+        "web/public/.well-known/assetlinks.json published with package app.lociate.android and the Play App Signing SHA-256 fingerprint",
+        "AndroidManifest.xml adds an https App Links intent filter for the marketing host with android:autoVerify=\"true\", keeping the existing lociate:// scheme",
+        "Both files are served as application/json without a redirect (documented Cloudflare Pages headers rule)",
+        "DeepLinkValidator (Android) and the iOS router accept the https paths /open/* and /locus/*",
+        "Verification steps for both platforms documented in LAUNCH_CHECKLIST.md"
+      ],
+      "priority": 203,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-204",
+      "title": "Complete App Store and Play Store listing metadata",
+      "description": "As a submitter, I need complete store metadata. Lociate/fastlane/metadata/en-US has only 7 files — no support/marketing/privacy URLs, no review information, no release notes, and no screenshot pipeline — all of which block Ready for Review.",
+      "acceptanceCriteria": [
+        "fastlane metadata adds support_url.txt, marketing_url.txt, privacy_url.txt, release_notes.txt, and copyright.txt",
+        "review_information/ populated with demo account guidance and notes explaining background location use",
+        "Screenshot requirements (6.7\" and 6.5\", plus 12.9\" iPad if submitted) documented with a repeatable capture procedure",
+        "Play Store listing assets enumerated: feature graphic, phone screenshots, short and full description, data safety answers",
+        "Data safety / privacy answers are consistent with PrivacyInfo.xcprivacy and web/src/pages/privacy.astro",
+        "LAUNCH_CHECKLIST.md §2 and §3 updated with the new tickboxes"
+      ],
+      "priority": 204,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-205",
+      "title": "iOS: unit tests for the critical services",
+      "description": "As a maintainer, I need regression cover on the logic most likely to lose user data or revenue. There is one test file for 104 sources, and nothing covers sync merge, geofence rotation, tier enforcement, or request signing.",
+      "acceptanceCriteria": [
+        "Tests for TierEnforcement covering the free 10-locus cap and every gated Premium/Family feature boundary",
+        "Tests for GeofenceManager nearest-rotation proving the 20-region iOS cap is never exceeded and the nearest loci win",
+        "Tests for SyncService.mergeLocus covering last-write-wins, tombstones, and malformed PostGIS point parsing",
+        "Tests for RequestSigningService asserting the canonical HMAC string matches the Android and edge-function implementations byte for byte",
+        "Tests for AudioEncryptionService round-trip plus wrong-key failure",
+        "Tests for PasswordValidator and input sanitization",
+        "All tests are members of the LociateTests target and run in ci.yml"
+      ],
+      "priority": 205,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-206",
+      "title": "Edge functions: create the vitest suite the test script already assumes",
+      "description": "As a maintainer, I need edge-function tests. package.json declares `test: vitest run` but there are zero test files, so the command exits non-zero, and there is no lockfile for reproducible installs.",
+      "acceptanceCriteria": [
+        "vitest.config.ts committed with a node environment and coverage reporting",
+        "package-lock.json committed so npm ci is reproducible in CI",
+        "sync-subscription tests: valid signature accepted, tampered body rejected, missing secret rejected, timing-safe comparison exercised",
+        "account-delete tests: idempotent on repeat calls, requires a valid request signature, cascades to storage objects",
+        "request-signing middleware tests: clock-skew rejection and replayed-nonce/timestamp rejection",
+        "rate-limit and auth-rate-limit tests against a fake Redis, including the fail-open/fail-closed decision",
+        "health route test asserting dependency checks are reported",
+        "`npm test` and `npm run typecheck` both pass locally and in ci.yml"
+      ],
+      "priority": 206,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-207",
+      "title": "Backend: automated RLS cross-tenant isolation test",
+      "description": "As a maintainer, I need proof that household A cannot read household B's loci. There is no automated test of the RLS policies, so a policy regression would silently expose other families' voice notes.",
+      "acceptanceCriteria": [
+        "Test harness spins up Postgres with PostGIS, applies migrations 001-009, and seeds two users in two households",
+        "Asserts a member of household A cannot SELECT, UPDATE, or DELETE loci owned by household B under an authenticated JWT claim",
+        "Asserts private (non-shared) loci are invisible to household co-members",
+        "Asserts storage-object policies deny cross-tenant audio reads",
+        "Asserts the tier-enforcement trigger from 008 blocks an 11th locus for a free-tier user",
+        "Runs as a CI job on every pull request and fails the build on any leak"
+      ],
+      "priority": 207,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-208",
+      "title": "Android: unit tests for sync, geofencing, billing, and persistence",
+      "description": "As a maintainer, I need Android regression cover. Six trivial unit tests exist; nothing covers the sync worker, geofence registration, billing entitlement mapping, or the Room schema.",
+      "acceptanceCriteria": [
+        "SyncWorker tests with a fake repository: success marks SYNCED, upload failure never marks SYNCED, retry cap honoured",
+        "GeofenceService tests for the 100-geofence Android cap and nearest-first selection",
+        "BillingService tests mapping Play purchase states to subscription tiers, including grace period and expired",
+        "Room DAO tests via room-testing covering unsynced queries, search, and nearby ordering",
+        "ViewModel state tests using turbine for map, record, and paywall flows",
+        "`./gradlew testDebugUnitTest` passes and runs in android-ci.yml"
+      ],
+      "priority": 208,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-209",
+      "title": "Android: instrumented smoke test for the core record-to-list flow",
+      "description": "As a maintainer, I need one end-to-end proof the app launches and the primary flow works, so a broken Hilt graph or Compose navigation regression is caught before release.",
+      "acceptanceCriteria": [
+        "@HiltAndroidTest instrumented test launches MainActivity and asserts the map screen composes",
+        "Test drives record -> save with fake audio and location, then asserts the locus appears on the list screen",
+        "Permissions granted via GrantPermissionRule; no real network or Supabase calls",
+        "Test is stable enough to run on an emulator in CI, or is documented as a nightly job if emulator time is prohibitive"
+      ],
+      "priority": 209,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-210",
+      "title": "Remove the stale Loci/ directory and harden secret hygiene",
+      "description": "As a maintainer, I need generated secrets to stay untracked. Loci/Configuration/BuildSecrets.swift is committed at the pre-rename path that .gitignore does not cover, so the next run of generate-secrets.sh at that path would commit real credentials.",
+      "acceptanceCriteria": [
+        "Loci/ directory deleted from the working tree and from git tracking",
+        ".gitignore ignores BuildSecrets.swift at any path (**/Configuration/BuildSecrets.swift) rather than one hardcoded location",
+        "scripts/generate-secrets.sh writes only to Lociate/Configuration/BuildSecrets.swift and fails if the target path is tracked by git",
+        "A CI secret-scanning job (gitleaks or equivalent) fails the build on committed credentials",
+        "git log confirms the removed file only ever held placeholder values — documented in the story notes"
+      ],
+      "priority": 210,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-211",
+      "title": "iOS: localization catalog and migration of hardcoded strings",
+      "description": "As a user of a non-English locale, I need localized text. CLAUDE.md mandates String(localized:) for all user-facing strings, but no .xcstrings or .strings catalog exists and strings are hardcoded throughout the views.",
+      "acceptanceCriteria": [
+        "Localizable.xcstrings string catalog added to the app and widget targets with en as the source language",
+        "All user-facing strings in Views/ and error messages surfaced to users go through the catalog",
+        "Info.plist permission strings moved to InfoPlist.xcstrings",
+        "Pluralization used for count-bearing strings (\"1 locus\" / \"n loci\")",
+        "No user-visible literal remains in a SwiftUI Text/Label/Button initializer (SwiftLint rule or script enforces this)",
+        "Existing en copy is preserved verbatim so no wording changes ship with the refactor"
+      ],
+      "priority": 211,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-212",
+      "title": "Android: biometric app lock for parity with iOS",
+      "description": "As an Android user, I need the Face/fingerprint lock iOS offers. The androidx.biometric dependency is declared but BiometricPrompt is never used, so the setting silently does not exist on Android.",
+      "acceptanceCriteria": [
+        "BiometricLockService wraps BiometricPrompt with canAuthenticate capability checks",
+        "Lock preference persisted in EncryptedSharedPreferences via SecurePreferences",
+        "Lock gate shown on cold start and on return from background past the session timeout, matching the iOS timeout",
+        "Device-credential fallback offered when no biometric is enrolled",
+        "Settings screen exposes the toggle only when hardware supports it",
+        "Unit tests cover the lock-state machine independent of the framework prompt"
+      ],
+      "priority": 212,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-213",
+      "title": "Android: Glance widget for parity with the iOS Premium widget",
+      "description": "As a Premium Android user, I need the nearby-loci widget. iOS has a widget target while Android has no widget at all, so the tier table promises a feature Android cannot deliver.",
+      "acceptanceCriteria": [
+        "androidx.glance.appwidget dependency plus a GlanceAppWidget and GlanceAppWidgetReceiver registered in AndroidManifest.xml",
+        "Widget lists the nearest active loci from Room, mirroring the iOS timeline provider's content and ordering",
+        "Tapping an entry deep-links to lociate://locus/<id>",
+        "Widget content is gated on Premium entitlement and shows an upgrade prompt for free-tier users",
+        "appwidget-provider XML declares sizing and a periodic update interval that respects battery",
+        "Widget reads only local data — no network calls on the widget update path"
+      ],
+      "priority": 213,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-214",
+      "title": "Backend: idempotent migration runner with applied-version tracking",
+      "description": "As an operator, I need repeatable deploys. docker-compose.prod.yml no longer bind-mounts migrations and instructs operators to apply them by hand, with no record of what has been applied — so a partial or double apply is easy and undetectable.",
+      "acceptanceCriteria": [
+        "schema_migrations table records filename, checksum, and applied_at",
+        "scripts/apply-migrations.sh applies pending migrations in numeric order inside a transaction and is safe to re-run",
+        "Checksum mismatch on an already-applied migration aborts with a clear error",
+        "Runner is invocable from CI and from a Coolify deploy hook, and dry-run mode lists pending migrations",
+        "Existing 001-009 migrations are back-registered without re-execution on an already-provisioned database",
+        "DEPLOYMENT.md and LAUNCH_CHECKLIST.md §5 replace the manual-apply instruction"
+      ],
+      "priority": 214,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-215",
+      "title": "Operability: deep health checks, container healthcheck, and structured logs",
+      "description": "As an operator, I need to detect a degraded backend before users do. /api/health does not verify dependencies, the Dockerfile declares no HEALTHCHECK, and logging is unstructured console output.",
+      "acceptanceCriteria": [
+        "/api/health returns per-dependency status for Postgres, Redis, and Supabase Storage with an overall degraded/unhealthy rollup and a non-200 status when unhealthy",
+        "Dockerfile HEALTHCHECK probes the health endpoint; docker-compose.prod.yml declares healthcheck and depends_on conditions",
+        "Structured JSON logging with request id, route, status, and duration replaces bare console.log on request paths",
+        "Cron job outcomes are logged with counts and durations and reported to the error tracker on failure",
+        "Health endpoint leaks no secrets, versions, or connection strings",
+        "Uptime-monitor setup documented in LAUNCH_CHECKLIST.md"
+      ],
+      "priority": 215,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-216",
+      "title": "Android: AI categorization and security audit log parity",
+      "description": "As an Android user, I need the Premium AI categorization iOS offers, and the same security-audit visibility. Neither exists on Android, so the tier table overstates what Android delivers.",
+      "acceptanceCriteria": [
+        "Android client calls the analyze-loci edge function for AI categorization, gated on Premium entitlement",
+        "Suggested categories are applied with the same confidence threshold and user-override behaviour as iOS",
+        "Security audit log records auth events, biometric unlocks, and failed login attempts locally, mirroring the iOS logger",
+        "Settings screen surfaces the audit log read-only, matching the iOS view",
+        "Offline behaviour matches iOS: categorization is deferred, never blocking a save",
+        "Unit tests cover entitlement gating and the offline-deferral path"
+      ],
+      "priority": 216,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-217",
+      "title": "Reconcile launch documentation with the audited state of the repository",
+      "description": "As a maintainer, I need the launch docs to tell the truth. LAUNCH_CHECKLIST.md §4 lists only two open gaps while this audit found build-blocking defects on both platforms, so the go/no-go gate currently green-lights an unshippable build.",
+      "acceptanceCriteria": [
+        "LAUNCH_CHECKLIST.md §4 rewritten to list every gap from this audit with its US number and current state",
+        "Items resolved by US-185 through US-216 are ticked with a one-line note on how they were closed",
+        "progress.txt totals and phase list updated to include US-185 onward",
+        "README.md build instructions reflect the real prerequisites (SPM resolution, local.properties, gradle wrapper)",
+        "The go/no-go gate in §10 explicitly requires green CI on master",
+        "No checklist item claims done for something this audit found broken"
+      ],
+      "priority": 217,
+      "passes": false,
+      "notes": ""
     }
   ]
 }
