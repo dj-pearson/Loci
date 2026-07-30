@@ -32,6 +32,12 @@ fastlane/Preview.html
 fastlane/screenshots/
 fastlane/test_output/
 
+# Generated at build time from APPLE_TEAM_ID / ANDROID_SHA256_CERT_FP (US-203).
+# Committing these risks shipping the placeholder Team ID that broke universal
+# links; see web/scripts/generate-association-files.mjs.
+web/public/.well-known/apple-app-site-association
+web/public/.well-known/assetlinks.json
+
 # Node.js (edge functions + web)
 node_modules/
 dist/

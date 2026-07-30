@@ -57,13 +57,29 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <!-- Deep link for notifications -->
+            <!-- Custom-scheme deep links from notifications and the widget.
+                 US-203: `loci` is registered alongside `lociate` so links already
+                 emitted by the iOS widget resolve on Android too. -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
-                <data
-                    android:host="locus"
-                    android:scheme="lociate" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="lociate" android:host="locus" />
+                <data android:scheme="loci" android:host="locus" />
+            </intent-filter>
+
+            <!-- https App Links. autoVerify requires
+                 https://lociate.app/.well-known/assetlinks.json to list this
+                 package and its Play App Signing SHA-256 fingerprint. Paths mirror
+                 the iOS AASA file so both platforms accept the same URLs. -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" android:host="lociate.app" android:pathPrefix="/locus" />
+                <data android:scheme="https" android:host="lociate.app" android:pathPrefix="/open" />
+                <data android:scheme="https" android:host="www.lociate.app" android:pathPrefix="/locus" />
+                <data android:scheme="https" android:host="www.lociate.app" android:pathPrefix="/open" />
             </intent-filter>
         </activity>
 

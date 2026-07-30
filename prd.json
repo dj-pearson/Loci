@@ -3420,8 +3420,8 @@
         "Manifest is copied into the bundle by a Resources build phase"
       ],
       "priority": 200,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed. Added Lociate/PrivacyInfo.xcprivacy (app target, bundled via the Resources build phase) and Lociate/Widget/PrivacyInfo.xcprivacy — an app extension is a separate bundle, so the containing app's manifest does not cover it. Required-reason declarations were derived from actual call sites, not guessed: UserDefaults (CA92.1 for the app's own domain, 1C8F.1 for the App Group the widget reads), DiskSpace (E174.1 for the storage figure DataManagementView shows the user, 85F4.1 for AudioCacheManager's free-space checks), and FileTimestamp (3B52.1 for attributesOfItem(atPath:) on recordings inside the app and App Group containers during LRU eviction). NSPrivacyTracking is false with an empty tracking-domains array. The nine collected data types match LAUNCH_RUNBOOK.md Appendix C exactly — email, name, precise location, audio, other user content (transcripts), user ID, purchase history, product interaction, crash data — with the same linked/tracking flags, since Apple rejects apps whose labels disagree with the manifest. Both plists verified to parse with plistlib and the generator now emits a widget Resources phase."
     },
     {
       "id": "US-201",
@@ -3435,8 +3435,8 @@
         "No SVG remains referenced from an appiconset"
       ],
       "priority": 201,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed. Added scripts/generate-app-icons.py, which rasterizes design/AppIcon.svg and design/LaunchIcon.svg into the PNGs the stores require: a 1024x1024 marketing icon with the alpha channel flattened onto the brand blue (Apple rejects an app icon with alpha, and the SVG's rounded corners would otherwise render black), 1x/2x/3x launch icons keeping transparency, and a 512x512 Play Store listing icon. Contents.json for both asset sets is generated alongside so filenames cannot drift. Moved the SVG sources out of the asset catalog into design/ — an unreferenced file inside an .appiconset makes Xcode warn on every build. --check mode verifies the committed PNGs still match the SVGs. Verified with PIL: 1024x1024 RGB with no alpha for the marketing icon, 540x540 RGBA with transparent corners for the 3x launch icon."
     },
     {
       "id": "US-202",
@@ -3466,8 +3466,8 @@
         "Verification steps for both platforms documented in LAUNCH_CHECKLIST.md"
       ],
       "priority": 203,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed. Found the scheme contract broken three ways and unified it. iOS registered no CFBundleURLSchemes at all, so the loci:// URLs the widget emitted and NavigationRouter parsed were silent no-ops; the Android manifest declared lociate://locus while its own DeepLinkValidator only accepted loci://locus, so every link the app could receive was rejected. Canonical form is now lociate://locus/{uuid} and lociate://paywall, with the loci scheme and detail host still accepted because those URLs are already baked into installed widgets and delivered notification payloads. Info.plist registers both schemes plus NSUserActivityTypeBrowsingWeb; NavigationRouter also handles https universal links on /locus/* and /open/*; the associated-domains entitlement was added per configuration (developer mode in Debug) — without it iOS never fetches the AASA file. Android gained an autoVerify https App Links intent filter and its validator accepts both custom schemes plus the declared hosts and path prefixes, with the UUID injection guard running on every accepted route. The AASA file's literal TEAM_ID placeholder and the missing assetlinks.json are both fixed by web/scripts/generate-association-files.mjs, wired into the web build: it fails hard in production when APPLE_TEAM_ID or ANDROID_SHA256_CERT_FP is unset (verified both modes) and the generated files are gitignored so the placeholder cannot ship again. web/public/_headers serves both as application/json. Added 10 iOS XCTest cases and 8 Android Robolectric cases pinning the contract, plus a §9b verification checklist covering the Apple CDN, adb app-link verification, and content-type checks."
     },
     {
       "id": "US-204",

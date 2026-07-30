@@ -2,6 +2,46 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>app.lociate.ios.sync</string>
+		<string>app.lociate.ios.geofence-refresh</string>
+	</array>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>app.lociate.ios</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>lociate</string>
+				<string>loci</string>
+			</array>
+		</dict>
+	</array>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Lociate needs your location to pin voice notes to places and notify you when you return.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Lociate needs your location to pin voice notes to places you visit.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Lociate needs microphone access to record voice notes.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Lociate uses speech recognition to transcribe your voice notes on-device.</string>
+	<key>NSUserActivityTypes</key>
+	<array>
+		<string>NSUserActivityTypeBrowsingWeb</string>
+	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+		<string>audio</string>
+		<string>fetch</string>
+		<string>remote-notification</string>
+	</array>
 	<key>UILaunchScreen</key>
 	<dict>
 		<key>BackgroundColor</key>
@@ -11,27 +51,5 @@
 		<key>ImageRespectsSafeAreaInsets</key>
 		<true/>
 	</dict>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Lociate needs your location to pin voice notes to places and notify you when you return.</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Lociate needs your location to pin voice notes to places you visit.</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>Lociate needs microphone access to record voice notes.</string>
-	<key>NSSpeechRecognitionUsageDescription</key>
-	<string>Lociate uses speech recognition to transcribe your voice notes on-device.</string>
-	<key>UIBackgroundModes</key>
-	<array>
-		<string>location</string>
-		<string>audio</string>
-		<string>fetch</string>
-		<string>remote-notification</string>
-	</array>
-	<key>BGTaskSchedulerPermittedIdentifiers</key>
-	<array>
-		<string>app.lociate.ios.sync</string>
-		<string>app.lociate.ios.geofence-refresh</string>
-	</array>
-	<key>ITSAppUsesNonExemptEncryption</key>
-	<false/>
 </dict>
 </plist>

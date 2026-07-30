@@ -217,6 +217,38 @@ Use that value for `CERT_PIN_HASH`. For the backup pin, re-run against the inter
 
 ---
 
+---
+
+## 9b. Deep links — verification (**ℹ️ Manual**, US-203)
+
+The AASA file previously contained the literal placeholder `TEAM_ID`, and no
+`assetlinks.json` existed at all, so universal links were broken on iOS and absent
+on Android. Both files are now generated at build time by
+`web/scripts/generate-association-files.mjs`.
+
+- [ ] **⚠️** `APPLE_TEAM_ID` set in the Cloudflare Pages project (build fails
+      without it in production, by design)
+- [ ] **⚠️** `ANDROID_SHA256_CERT_FP` set to the **Play App Signing** SHA-256
+      fingerprint — not the local upload keystore, since Play re-signs the bundle
+      (Play Console → Setup → App signing)
+- [ ] Verify both files are served as `application/json` with no redirect:
+      ```
+      curl -sI https://lociate.app/.well-known/apple-app-site-association | grep -i content-type
+      curl -sI https://lociate.app/.well-known/assetlinks.json | grep -i content-type
+      ```
+      (`web/public/_headers` sets this; Cloudflare Pages honours it.)
+- [ ] iOS: confirm Apple's CDN has picked up the file —
+      `curl -s "https://app-site-association.cdn-apple.com/a/v1/lociate.app"`
+- [ ] iOS: on device, tapping `https://lociate.app/locus/<uuid>` opens the app
+      rather than Safari
+- [ ] Android: `adb shell pm get-app-links app.lociate.android` reports
+      `verified` for both hosts
+- [ ] Custom scheme still works from the widget:
+      `xcrun simctl openurl booted "lociate://locus/<uuid>"` and
+      `adb shell am start -a android.intent.action.VIEW -d "lociate://locus/<uuid>"`
+- [ ] Associated Domains capability enabled on the App ID (§2) — without it iOS
+      never fetches the AASA file
+
 ## 10. Go/no-go gate
 
 Before flipping the App Store / Play Store listings to **Ready for Review**, every box in §1, §2, §3, §5, §6, §7 must be ticked, and all items in §4 must be either resolved or explicitly deferred with a tracked issue.

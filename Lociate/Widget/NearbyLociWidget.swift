@@ -68,7 +68,7 @@ struct NearbyLociWidgetEntryView: View {
                 .lineLimit(3)
                 .frame(maxHeight: .infinity, alignment: .top)
         }
-        .widgetURL(URL(string: "loci://detail/\(locus.id.uuidString)"))
+        .widgetURL(URL(string: "lociate://locus/\(locus.id.uuidString)"))
     }
 
     // MARK: - Medium Widget
@@ -87,7 +87,7 @@ struct NearbyLociWidgetEntryView: View {
             .padding(.bottom, 2)
 
             ForEach(entry.loci.prefix(3)) { locus in
-                Link(destination: URL(string: "loci://detail/\(locus.id.uuidString)")!) {
+                Link(destination: URL(string: "lociate://locus/\(locus.id.uuidString)")!) {
                     HStack(spacing: 8) {
                         Image(systemName: locus.category.systemImageName)
                             .font(.caption)
@@ -137,7 +137,7 @@ struct NearbyLociWidgetEntryView: View {
                 .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .widgetURL(URL(string: "loci://paywall"))
+        .widgetURL(URL(string: "lociate://paywall"))
     }
 
     // MARK: - Empty State

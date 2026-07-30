@@ -8,6 +8,12 @@
 	<array>
 		<string>Default</string>
 	</array>
+	<key>com.apple.developer.associated-domains</key>
+	<array>
+		<string>applinks:lociate.app</string>
+		<string>applinks:www.lociate.app</string>
+		<string>webcredentials:lociate.app</string>
+	</array>
 	<key>com.apple.security.application-groups</key>
 	<array>
 		<string>group.app.lociate.ios</string>

@@ -112,6 +112,7 @@
 		843D8A7FC7CF99BD6D911914 /* TierEnforcement.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDCE8354DC3A4D23CF3FEC05 /* TierEnforcement.swift */; };
 		E14D94BBC4634587EB8462EE /* BuildSecretsValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F751967C0937091F2C540078 /* BuildSecretsValidator.swift */; };
 		C39842A510383BDAF71CF70F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F7B3F88BF5F008E5ED8D5DE3 /* Assets.xcassets */; };
+		07979619E1D11F5A73205FDA /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = F934461232F3ABBBBD26C893 /* PrivacyInfo.xcprivacy */; };
 		5ECE67B759770B83F354E756 /* LociateWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70BCD4382FB356E1BF3356D2 /* LociateWidgetBundle.swift */; };
 		87F057D44DA6BB2EEA6926B0 /* NearbyLociTimelineProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02AFF759939BF7653EF93CC2 /* NearbyLociTimelineProvider.swift */; };
 		AAA2427D159451E755860CD2 /* NearbyLociWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8396E0FAB3C8E414F7A98B0A /* NearbyLociWidget.swift */; };
@@ -127,7 +128,9 @@
 		0FE658CD075F71470E6191A1 /* HaversineDistance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74AA0DB14A76838F448081EA /* HaversineDistance.swift */; };
 		347EA6AA757C05DA7FFBE761 /* ModelContainerConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5627DEB75746B6F3BC6CEC70 /* ModelContainerConfiguration.swift */; };
 		1D3ACDEE7B32A5357DA51E5A /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51E8FA62CAF0F9B3D4252095 /* Theme.swift */; };
+		552707A6EEA3BD955CA6C1F0 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = CF206E76F4391C3094E443A1 /* PrivacyInfo.xcprivacy */; };
 		EDC1713CB4BC09C8300F84E5 /* HaversineDistanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD77E24A72366C7EE3AC502 /* HaversineDistanceTests.swift */; };
+		F2C6A15512BED0E6992E0339 /* NavigationRouterDeepLinkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C0EF93E308D2F16D67314B3 /* NavigationRouterDeepLinkTests.swift */; };
 		0764D4DEB3CD083BBF87CDE5 /* LociateWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = D381F7B5B33B0AA3E76EF5EF /* LociateWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		D0A684BB0514060F32E3C4BA /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 65B80ACFB4419D89C0D4E646 /* Supabase */; };
 		C6B04708D8C1CCDE518A5270 /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = 5D6FC570FEBF63C8541B91EB /* RevenueCat */; };
@@ -182,6 +185,7 @@
 		7189940B627D117C15F3584A /* Locus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Locus.swift; sourceTree = "<group>"; };
 		12EF05145B5C83B8DD1389EF /* LocusCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocusCategory.swift; sourceTree = "<group>"; };
 		F7D70F86F129CCF7F20C707B /* UserProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfile.swift; sourceTree = "<group>"; };
+		F934461232F3ABBBBD26C893 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		6ACEEB91FDA26166DCAD7332 /* AICategoryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AICategoryService.swift; sourceTree = "<group>"; };
 		9B0BB189510128685CE4A56B /* AnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsService.swift; sourceTree = "<group>"; };
 		9BF5F59C2571B006111984E0 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -285,7 +289,9 @@
 		02AFF759939BF7653EF93CC2 /* NearbyLociTimelineProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NearbyLociTimelineProvider.swift; sourceTree = "<group>"; };
 		8396E0FAB3C8E414F7A98B0A /* NearbyLociWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NearbyLociWidget.swift; sourceTree = "<group>"; };
 		8EC34171E5987F80454F2F54 /* OpenLocusIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenLocusIntent.swift; sourceTree = "<group>"; };
+		CF206E76F4391C3094E443A1 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		DCD77E24A72366C7EE3AC502 /* HaversineDistanceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HaversineDistanceTests.swift; sourceTree = "<group>"; };
+		9C0EF93E308D2F16D67314B3 /* NavigationRouterDeepLinkTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationRouterDeepLinkTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -532,6 +538,7 @@
 				02AFF759939BF7653EF93CC2 /* NearbyLociTimelineProvider.swift */,
 				8396E0FAB3C8E414F7A98B0A /* NearbyLociWidget.swift */,
 				8EC34171E5987F80454F2F54 /* OpenLocusIntent.swift */,
+				CF206E76F4391C3094E443A1 /* PrivacyInfo.xcprivacy */,
 				28E5C48DFAECB9B5D4FFED0D /* Info.plist */,
 				1E180E2AC45E2BD2D4535941 /* LociateWidget.Debug.entitlements */,
 				0819FB163F8509989ED54587 /* LociateWidget.Release.entitlements */,
@@ -543,6 +550,7 @@
 			isa = PBXGroup;
 			children = (
 				DCD77E24A72366C7EE3AC502 /* HaversineDistanceTests.swift */,
+				9C0EF93E308D2F16D67314B3 /* NavigationRouterDeepLinkTests.swift */,
 			);
 			path = ../LociateTests;
 			sourceTree = "<group>";
@@ -559,6 +567,7 @@
 				ABB73975A67536854BD00150 /* Configuration */,
 				0405E54ACD08FB788661928B /* Widget */,
 				F7B3F88BF5F008E5ED8D5DE3 /* Assets.xcassets */,
+				F934461232F3ABBBBD26C893 /* PrivacyInfo.xcprivacy */,
 				8BDBCDDF8E0AEDA8192AA1E7 /* Info.plist */,
 				43C55C7B8AFEB13F70EDD474 /* Lociate.Debug.entitlements */,
 				2F006FE9F076A54E38C16D1A /* Lociate.Release.entitlements */,
@@ -619,6 +628,7 @@
 			buildPhases = (
 				5BAA6B750BAA6921AA89429F /* Sources */,
 				CCDF396BC0D96B7A6A0E6DBF /* Frameworks */,
+				286FF9411BFE22669358D8F4 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -699,6 +709,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				C39842A510383BDAF71CF70F /* Assets.xcassets in Resources */,
+				07979619E1D11F5A73205FDA /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		286FF9411BFE22669358D8F4 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				552707A6EEA3BD955CA6C1F0 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -843,6 +862,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				EDC1713CB4BC09C8300F84E5 /* HaversineDistanceTests.swift in Sources */,
+				F2C6A15512BED0E6992E0339 /* NavigationRouterDeepLinkTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

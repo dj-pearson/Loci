@@ -133,10 +133,15 @@ def collect() -> dict:
                 )
 
     widget_dir = os.path.join(APP_DIR, "Widget")
+    widget_resources: list[str] = []
     if os.path.isdir(widget_dir):
         widget_sources = [
             f"Widget/{n}" for n in sorted(os.listdir(widget_dir)) if n.endswith(".swift")
         ]
+        # An app extension is a separate bundle, so the containing app's privacy
+        # manifest does not cover it (US-200).
+        if os.path.exists(os.path.join(widget_dir, "PrivacyInfo.xcprivacy")):
+            widget_resources.append("Widget/PrivacyInfo.xcprivacy")
 
     root_sources = [
         n for n in sorted(os.listdir(APP_DIR)) if n.endswith(".swift")
@@ -167,6 +172,7 @@ def collect() -> dict:
         "app_sources": app_sources,
         "root_sources": root_sources,
         "widget_sources": widget_sources,
+        "widget_resources": widget_resources,
         "resources": resources,
         "test_sources": test_sources,
     }
@@ -356,6 +362,7 @@ def generate(tree: dict) -> str:
     root_sources = tree["root_sources"]
     widget_sources = tree["widget_sources"]
     resources = tree["resources"]
+    widget_resources = tree["widget_resources"]
     test_sources = tree["test_sources"]
 
     # Every path is relative to Lociate/ (the project's SOURCE_ROOT).
@@ -393,6 +400,10 @@ def generate(tree: dict) -> str:
         name = os.path.basename(path)
         build_files.append(
             (uid("bf-widget", path), name, "Sources", uid("fr", path))
+        )
+    for path in widget_resources:
+        build_files.append(
+            (uid("bf-widget-res", path), os.path.basename(path), "Resources", uid("fr", path))
         )
     for path in test_sources:
         build_files.append(
@@ -476,7 +487,7 @@ def generate(tree: dict) -> str:
         "Lociate.Release.entitlements",
         ".swiftlint.yml",
     ]
-    widget_loose = [
+    widget_loose = list(widget_resources) + [
         "Widget/Info.plist",
         "Widget/LociateWidget.Debug.entitlements",
         "Widget/LociateWidget.Release.entitlements",
@@ -564,7 +575,8 @@ def generate(tree: dict) -> str:
         emit_dir_group(top)
 
     widget_children = [
-        f"{uid('fr', p)} /* {os.path.basename(p)} */," for p in widget_sources
+        f"{uid('fr', p)} /* {os.path.basename(p)} */,"
+        for p in widget_sources + widget_resources
     ] + [
         f"{uid('fr', 'Widget/Info.plist')} /* Info.plist */,",
         f"{uid('fr', 'Widget/LociateWidget.Debug.entitlements')} "
@@ -672,6 +684,7 @@ def generate(tree: dict) -> str:
         [
             f"{uid('phase', f'sources-{WIDGET}')} /* Sources */,",
             f"{uid('phase', f'frameworks-{WIDGET}')} /* Frameworks */,",
+            f"{uid('phase', 'resources-widget')} /* Resources */,",
         ],
         [],
         f"{uid('product', WIDGET)} /* {WIDGET}.appex */",
@@ -741,17 +754,21 @@ def generate(tree: dict) -> str:
 
     # ── PBXResourcesBuildPhase ────────────────────────────────────────────
     out.w("/* Begin PBXResourcesBuildPhase section */")
-    out.w(f"\t\t{uid('phase', 'resources')} /* Resources */ = {{")
-    out.w("\t\t\tisa = PBXResourcesBuildPhase;")
-    out.w("\t\t\tbuildActionMask = 2147483647;")
-    out.w("\t\t\tfiles = (")
-    for path in resources:
-        out.w(
-            f"\t\t\t\t{uid('bf-res', path)} /* {os.path.basename(path)} in Resources */,"
-        )
-    out.w("\t\t\t);")
-    out.w("\t\t\trunOnlyForDeploymentPostprocessing = 0;")
-    out.w("\t\t};")
+    for phase_key, paths, prefix in (
+        ("resources", resources, "bf-res"),
+        ("resources-widget", widget_resources, "bf-widget-res"),
+    ):
+        out.w(f"\t\t{uid('phase', phase_key)} /* Resources */ = {{")
+        out.w("\t\t\tisa = PBXResourcesBuildPhase;")
+        out.w("\t\t\tbuildActionMask = 2147483647;")
+        out.w("\t\t\tfiles = (")
+        for path in paths:
+            out.w(
+                f"\t\t\t\t{uid(prefix, path)} /* {os.path.basename(path)} in Resources */,"
+            )
+        out.w("\t\t\t);")
+        out.w("\t\t\trunOnlyForDeploymentPostprocessing = 0;")
+        out.w("\t\t};")
     out.w("/* End PBXResourcesBuildPhase section */")
     out.w()
 

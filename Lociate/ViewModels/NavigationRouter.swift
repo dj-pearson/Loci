@@ -95,19 +95,48 @@ final class NavigationRouter {
     /// Set to `true` when a paywall deep-link is received (e.g., from widget locked state).
     var showPaywall = false
 
-    /// Processes a `loci://` URL scheme for deep-linking from widgets and notifications.
-    /// Supported paths:
-    /// - `loci://detail/{locusId}` — navigates to locus detail
-    /// - `loci://paywall` — opens the paywall
+    /// Handles deep links from widgets, notifications, and universal links (US-203).
+    ///
+    /// Canonical forms — `lociate` matches the product name and the Android scheme:
+    /// - `lociate://locus/{locusId}` — navigates to locus detail
+    /// - `lociate://paywall` — opens the paywall
+    /// - `https://<marketing host>/locus/{locusId}` and `/open/{locusId}` —
+    ///   universal links, whose paths are declared in the AASA file
+    ///
+    /// Legacy forms still accepted, because URLs are already baked into installed
+    /// widgets and delivered notification payloads: the `loci` scheme, and the
+    /// `detail` host.
     func handleURL(_ url: URL) {
-        guard url.scheme == "loci" else { return }
+        switch url.scheme {
+        case "lociate", "loci":
+            handleCustomSchemeURL(url)
+        case "https":
+            handleUniversalLink(url)
+        default:
+            break
+        }
+    }
 
+    private func handleCustomSchemeURL(_ url: URL) {
         switch url.host {
-        case "detail":
-            let idString = url.lastPathComponent
-            handleDeepLink(locusIdString: idString)
+        case "locus", "detail":
+            handleDeepLink(locusIdString: url.lastPathComponent)
         case "paywall":
             showPaywall = true
+        default:
+            break
+        }
+    }
+
+    private func handleUniversalLink(_ url: URL) {
+        // Paths mirror `web/public/.well-known/apple-app-site-association`; a path
+        // accepted here but absent there would never reach the app, and vice versa.
+        let components = url.pathComponents.filter { $0 != "/" }
+        guard components.count >= 2 else { return }
+
+        switch components[0] {
+        case "locus", "open":
+            handleDeepLink(locusIdString: components[1])
         default:
             break
         }

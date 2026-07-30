@@ -93,6 +93,10 @@ android {
         buildConfig = true
     }
 
+    testOptions {
+        unitTests.isIncludeAndroidResources = true
+    }
+
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -195,6 +199,10 @@ dependencies {
     testImplementation(libs.coroutines.test)
     testImplementation(libs.core.testing)
     testImplementation(libs.room.testing)
+    // US-203: DeepLinkValidator uses android.net.Uri, which needs a real Android
+    // runtime. Robolectric provides one on the JVM so the URI contract is covered
+    // by fast unit tests rather than only by instrumented ones.
+    testImplementation(libs.robolectric)
 
     // Android Testing — US-192: hilt-android-testing supplies HiltTestApplication,
     // which the custom runner in app/src/androidTest returns from newApplication().
