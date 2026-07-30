@@ -46,7 +46,7 @@ extension View {
 // MARK: - Skeleton Shape
 
 struct SkeletonShape: View {
-    var width: CGFloat? = nil
+    var width: CGFloat?
     var height: CGFloat = 16
     var cornerRadius: CGFloat = 4
 

@@ -178,7 +178,7 @@ $SUPABASE_URL = "https://api.lociate.app"
 
 # The anon key is in your Supabase .env or docker-compose.yml
 # Look for ANON_KEY in your backend/.env file
-$SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIs..."    # Your JWT anon key
+$SUPABASE_ANON_KEY = "<your-anon-key>"    # The JWT from ANON_KEY in backend/.env
 ```
 
 ### RevenueCat

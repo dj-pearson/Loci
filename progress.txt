@@ -379,7 +379,16 @@ full findings and prd.json notes for per-story detail.
 - [x] US-217: launch documentation reconciliation
 - [x] US-219: nothing ever registered geofences on Android
 
-### All 219 stories pass. Remaining launch work is manual (portals, secrets,
+## Phase 16: Getting the Newly-Live Gates Green (US-220 → US-222)
+
+The audit above turned CI on for the first time. Four checks then failed on their
+first real run — three of them my own new gates failing on my own code.
+
+- [x] US-220: SwiftLint's first run — 93 violations, which also skipped Build + Tests
+- [x] US-221: Android CI failed at configuration time; local.properties was never read
+- [x] US-222: two password literals removed, four scanner false positives scoped
+
+### All 222 stories pass. Remaining launch work is manual (portals, secrets,
 ### screenshots, real-device verification) — see LAUNCH_CHECKLIST.md.
 
 ### Notes for future iterations
@@ -401,9 +410,21 @@ full findings and prd.json notes for per-story detail.
 25. **Never use `fallbackToDestructiveMigration()`** on Android. It drops every
     table on a schema change, destroying voice notes that had not synced. Add a
     migration to `LociateDatabaseMigrations` instead.
-26. **Wiring is the failure mode, not logic.** This audit found three separate
+26. **Wiring is the failure mode, not logic.** This audit found four separate
     pieces of correct code that nothing ever called: geofence registration, periodic
-    sync, and APNs registration. When adding a service, grep for its caller.
+    sync, APNs registration, and `local.properties` (Gradle never loaded it, so every
+    Android build secret silently fell back to a placeholder). When adding a service
+    or a config file, grep for its caller.
+27. **`swiftlint --strict` makes the `warning` tier the hard limit.** A two-tier
+    threshold in `.swiftlint.yml` is misleading under `--strict`, because the `error`
+    tier is never reached. Keep the size rules single-valued.
+28. **A gate that has never run is not a gate.** Turning the workflow triggers on
+    (US-193) surfaced 93 SwiftLint violations, a configuration-time Gradle failure,
+    and four scanner false positives — none of which were new code. Watch the first
+    real run of any check you add.
+29. **`swiftlint`'s `included: .` resolves relative to the config file**, so
+    `Lociate/.swiftlint.yml` lints the 110 files under `Lociate/` and never the 6 in
+    `LociateTests/`. Those tests are currently unlinted.
 
 ## Notes for Ralph Iterations
 

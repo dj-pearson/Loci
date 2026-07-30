@@ -1189,7 +1189,7 @@
     "Travel": {
       "extractionState": "manual"
     },
-    "Try again in \\(authService.loginAttemptTracker.formattedTime(authService.loginAttemptTracker.remainingLockoutSeconds))": {
+    "Try again in \\(tracker.formattedTime(tracker.remainingLockoutSeconds))": {
       "extractionState": "manual"
     },
     "Try broadening your search or using different keywords.": {

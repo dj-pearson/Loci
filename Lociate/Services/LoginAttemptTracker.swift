@@ -149,7 +149,9 @@ final class LoginAttemptTracker {
     }
 
     private func keychainKey(for email: String) -> String {
-        Self.keychainPrefix + email.lowercased().data(using: .utf8)!
+        // `Data(_:)` over a String's UTF-8 view is non-failing, unlike
+        // `data(using: .utf8)`, which is Optional for encodings that can fail.
+        Self.keychainPrefix + Data(email.lowercased().utf8)
             .map { String(format: "%02x", $0) }.joined().suffix(32)
     }
 
@@ -163,7 +165,7 @@ final class LoginAttemptTracker {
         // Auto-expire records older than 24 hours with no active lockout
         if let lastAttempt = record.lastAttempt,
            Date().timeIntervalSince(lastAttempt) > 86400,
-           record.lockoutEnd == nil || record.lockoutEnd! < Date() {
+           (record.lockoutEnd ?? .distantPast) < Date() {
             deleteRecord(for: email)
             return AttemptRecord(count: 0)
         }

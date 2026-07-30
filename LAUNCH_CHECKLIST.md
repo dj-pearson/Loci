@@ -150,7 +150,7 @@ story in `prd.json` (US-185 onward) with the full finding in its `notes`.
 This section is generated — run `python3 scripts/sync-launch-checklist.py` after
 changing a story's status.
 
-### Resolved (35)
+### Resolved (38)
 
 - [x] **US-185** — iOS: restore Xcode project source membership for all 104 Swift files
 - [x] **US-186** — iOS: add SPM package dependencies (supabase-swift, RevenueCat, TelemetryDeck)
@@ -187,6 +187,9 @@ changing a story's status.
 - [x] **US-217** — Reconcile launch documentation with the audited state of the repository
 - [x] **US-218** — Fix RLS infinite recursion that broke every authenticated read of loci
 - [x] **US-219** — Android: nothing ever registered geofences, so proximity notifications never worked
+- [x] **US-220** — SwiftLint gated nothing until it ran, then failed with 93 violations
+- [x] **US-221** — Android CI failed at Gradle configuration time, and local.properties was never read
+- [x] **US-222** — Secret scanners flagged four false positives and two real password literals
 
 ### Still open (0)
 

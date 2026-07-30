@@ -229,7 +229,11 @@ jobs:
         # PostGIS is required: 002_create_loci.sql declares a GEOGRAPHY column.
         image: postgis/postgis:16-3.4
         env:
-          POSTGRES_PASSWORD: postgres
+          # No password anywhere in this job. The container is ephemeral, is
+          # reachable only from this runner, and is destroyed with the job — so a
+          # password literal buys nothing and trips every secret scanner. `trust`
+          # is the entrypoint's supported way to say "no authentication".
+          POSTGRES_HOST_AUTH_METHOD: trust
           POSTGRES_USER: postgres
           POSTGRES_DB: postgres
         ports:
@@ -254,7 +258,6 @@ jobs:
           PGHOST: localhost
           PGPORT: '5432'
           PGUSER: postgres
-          PGPASSWORD: postgres
         run: bash scripts/run-backend-tests.sh
 
   web-build:

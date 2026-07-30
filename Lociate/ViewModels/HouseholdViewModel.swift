@@ -30,19 +30,6 @@ final class HouseholdViewModel {
         defer { Task { await self.setLoading(false) } }
 
         do {
-            struct CreatePayload: Encodable {
-                let name: String
-                let owner_id: String
-            }
-
-            struct HouseholdRow: Decodable {
-                let id: String
-                let name: String
-                let owner_id: String
-                let invite_code: String?
-                let invite_expires_at: String?
-            }
-
             let sanitizedName = InputSanitizer.sanitizeHouseholdName(name)
             guard !sanitizedName.isEmpty else {
                 throw HouseholdError.createFailed
@@ -50,7 +37,7 @@ final class HouseholdViewModel {
 
             let rows: [HouseholdRow] = try await supabase
                 .from("households")
-                .insert(CreatePayload(name: sanitizedName, owner_id: userId))
+                .insert(CreatePayload(name: sanitizedName, ownerId: userId))
                 .select()
                 .execute()
                 .value
@@ -60,13 +47,6 @@ final class HouseholdViewModel {
             }
 
             // Add owner as first member
-            struct MemberPayload: Encodable {
-                let household_id: String
-                let user_id: String
-                let display_name: String
-                let role: String
-            }
-
             let displayName = InputSanitizer.sanitizeDisplayName(
                 await currentDisplayName(modelContext: modelContext) ?? String(localized: "Owner")
             )
@@ -74,9 +54,9 @@ final class HouseholdViewModel {
             try await supabase
                 .from("household_members")
                 .insert(MemberPayload(
-                    household_id: row.id,
-                    user_id: userId,
-                    display_name: displayName,
+                    householdId: row.id,
+                    userId: userId,
+                    displayName: displayName,
                     role: MemberRole.owner.rawValue
                 ))
                 .execute()
@@ -85,9 +65,9 @@ final class HouseholdViewModel {
             let household = Household(
                 id: householdId,
                 name: row.name,
-                ownerId: UUID(uuidString: row.owner_id) ?? UUID(),
-                inviteCode: row.invite_code ?? "",
-                inviteExpiresAt: row.invite_expires_at.flatMap { ISO8601DateFormatter().date(from: $0) } ?? Date.distantPast
+                ownerId: UUID(uuidString: row.ownerId) ?? UUID(),
+                inviteCode: row.inviteCode ?? "",
+                inviteExpiresAt: row.inviteExpiresAt.flatMap { ISO8601DateFormatter().date(from: $0) } ?? Date.distantPast
             )
 
             let member = HouseholdMember(
@@ -97,20 +77,37 @@ final class HouseholdViewModel {
                 role: .owner
             )
 
-            await MainActor.run {
-                modelContext.insert(household)
-                modelContext.insert(member)
-                try? modelContext.save()
-                self.currentHousehold = household
-                self.members = [member]
-                self.errorMessage = nil
-            }
+            await persistNewMembership(
+                household: household,
+                member: member,
+                replacingMembers: true,
+                in: modelContext
+            )
         } catch let error as HouseholdError {
             await setError(error.localizedDescription)
             throw error
         } catch {
             await setError(String(localized: "Failed to create household. Please try again."))
             throw HouseholdError.createFailed
+        }
+    }
+
+    /// Saves a newly created or joined household and its first member, then publishes
+    /// them. `replacingMembers` distinguishes creating (this member is the only one we
+    /// know about) from joining (the full list arrives from `refreshMembers`).
+    private func persistNewMembership(
+        household: Household,
+        member: HouseholdMember,
+        replacingMembers: Bool,
+        in modelContext: ModelContext
+    ) async {
+        await MainActor.run {
+            modelContext.insert(household)
+            modelContext.insert(member)
+            try? modelContext.save()
+            self.currentHousehold = household
+            self.members = replacingMembers ? [member] : self.members + [member]
+            self.errorMessage = nil
         }
     }
 
@@ -132,17 +129,6 @@ final class HouseholdViewModel {
 
         do {
             // Validate the code first
-            struct ValidateRequest: Encodable {
-                let code: String
-            }
-
-            struct ValidateResponse: Decodable {
-                let valid: Bool
-                let householdId: String
-                let householdName: String
-                let memberCount: Int
-            }
-
             let validateResult: ValidateResponse = try await supabase.functions
                 .invoke(
                     "household-invite/validate",
@@ -150,16 +136,6 @@ final class HouseholdViewModel {
                 )
 
             // Accept the invite
-            struct AcceptRequest: Encodable {
-                let code: String
-            }
-
-            struct AcceptResponse: Decodable {
-                let householdId: String
-                let householdName: String
-                let role: String
-            }
-
             let acceptResult: AcceptResponse = try await supabase.functions
                 .invoke(
                     "household-invite/accept",
@@ -190,14 +166,12 @@ final class HouseholdViewModel {
                 role: MemberRole(rawValue: acceptResult.role) ?? .member
             )
 
-            await MainActor.run {
-                modelContext.insert(household)
-                modelContext.insert(member)
-                try? modelContext.save()
-                self.currentHousehold = household
-                self.members.append(member)
-                self.errorMessage = nil
-            }
+            await persistNewMembership(
+                household: household,
+                member: member,
+                replacingMembers: false,
+                in: modelContext
+            )
 
             // Refresh to get full member list
             await refreshMembers(modelContext: modelContext)
@@ -339,14 +313,6 @@ final class HouseholdViewModel {
         guard let household = currentHousehold else { return }
 
         do {
-            struct MemberRow: Decodable {
-                let id: String
-                let household_id: String
-                let user_id: String
-                let display_name: String
-                let role: String
-            }
-
             let rows: [MemberRow] = try await supabase
                 .from("household_members")
                 .select()
@@ -356,13 +322,13 @@ final class HouseholdViewModel {
 
             let refreshedMembers = rows.compactMap { row -> HouseholdMember? in
                 guard let id = UUID(uuidString: row.id),
-                      let householdId = UUID(uuidString: row.household_id),
-                      let userId = UUID(uuidString: row.user_id) else { return nil }
+                      let householdId = UUID(uuidString: row.householdId),
+                      let userId = UUID(uuidString: row.userId) else { return nil }
                 return HouseholdMember(
                     id: id,
                     householdId: householdId,
                     userId: userId,
-                    displayName: row.display_name,
+                    displayName: row.displayName,
                     role: MemberRole(rawValue: row.role) ?? .member
                 )
             }
@@ -470,15 +436,6 @@ final class HouseholdViewModel {
         defer { Task { await self.setLoading(false) } }
 
         do {
-            struct GenerateRequest: Encodable {
-                let householdId: String
-            }
-
-            struct GenerateResponse: Decodable {
-                let code: String
-                let expiresAt: String
-            }
-
             let result: GenerateResponse = try await supabase.functions
                 .invoke(
                     "household-invite/generate",
@@ -613,4 +570,100 @@ enum HouseholdError: LocalizedError {
             String(localized: "Failed to remove member. Please try again.")
         }
     }
+}
+
+// MARK: - Supabase Payloads
+
+// PostgREST speaks the table's snake_case column names; the Swift side stays
+// camelCase and CodingKeys does the translation. (The edge-function payloads —
+// Validate*/Accept*/Generate* — are already camelCase over the wire and need none.)
+//
+// Declared at file scope rather than inside the functions that use them: with
+// explicit CodingKeys each one runs to ~14 lines, and nesting them pushed
+// createHousehold and joinHousehold past the body-length limit.
+
+private struct CreatePayload: Encodable {
+    let name: String
+    let ownerId: String
+
+    enum CodingKeys: String, CodingKey {
+        case name
+        case ownerId = "owner_id"
+    }
+}
+
+private struct HouseholdRow: Decodable {
+    let id: String
+    let name: String
+    let ownerId: String
+    let inviteCode: String?
+    let inviteExpiresAt: String?
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case name
+        case ownerId = "owner_id"
+        case inviteCode = "invite_code"
+        case inviteExpiresAt = "invite_expires_at"
+    }
+}
+
+private struct MemberPayload: Encodable {
+    let householdId: String
+    let userId: String
+    let displayName: String
+    let role: String
+
+    enum CodingKeys: String, CodingKey {
+        case householdId = "household_id"
+        case userId = "user_id"
+        case displayName = "display_name"
+        case role
+    }
+}
+
+private struct ValidateRequest: Encodable {
+    let code: String
+}
+
+private struct ValidateResponse: Decodable {
+    let valid: Bool
+    let householdId: String
+    let householdName: String
+    let memberCount: Int
+}
+
+private struct AcceptRequest: Encodable {
+    let code: String
+}
+
+private struct AcceptResponse: Decodable {
+    let householdId: String
+    let householdName: String
+    let role: String
+}
+
+private struct MemberRow: Decodable {
+    let id: String
+    let householdId: String
+    let userId: String
+    let displayName: String
+    let role: String
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case householdId = "household_id"
+        case userId = "user_id"
+        case displayName = "display_name"
+        case role
+    }
+}
+
+private struct GenerateRequest: Encodable {
+    let householdId: String
+}
+
+private struct GenerateResponse: Decodable {
+    let code: String
+    let expiresAt: String
 }

@@ -33,6 +33,24 @@ jobs:
         with:
           cache-read-only: ${{ github.ref != 'refs/heads/develop' }}
 
+      # Mirrors the iOS `Generate BuildSecrets.swift` step. Placeholders keep a fork
+      # PR (which cannot read secrets) building; only android-release.yml requires
+      # the real values.
+      - name: Generate local.properties
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          MAPS_API_KEY: ${{ secrets.MAPS_API_KEY }}
+          CERT_PIN_HASH: ${{ secrets.CERT_PIN_HASH }}
+          CERT_BACKUP_PIN_HASH: ${{ secrets.CERT_BACKUP_PIN_HASH }}
+          REQUEST_SIGNING_KEY: ${{ secrets.REQUEST_SIGNING_KEY }}
+        run: |
+          export SUPABASE_URL="${SUPABASE_URL:-http://localhost:54321}"
+          export SUPABASE_ANON_KEY="${SUPABASE_ANON_KEY:-ci-placeholder-anon-key}"
+          export MAPS_API_KEY="${MAPS_API_KEY:-ci-placeholder-maps-key}"
+          bash scripts/generate-secrets.sh --android
+
+      # Advisory only: ktlint findings are reported but do not fail the job.
       - name: Run ktlint
         working-directory: android
         run: ./gradlew ktlintCheck --continue || true
@@ -67,6 +85,20 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           cache-read-only: ${{ github.ref != 'refs/heads/develop' }}
+
+      - name: Generate local.properties
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          MAPS_API_KEY: ${{ secrets.MAPS_API_KEY }}
+          CERT_PIN_HASH: ${{ secrets.CERT_PIN_HASH }}
+          CERT_BACKUP_PIN_HASH: ${{ secrets.CERT_BACKUP_PIN_HASH }}
+          REQUEST_SIGNING_KEY: ${{ secrets.REQUEST_SIGNING_KEY }}
+        run: |
+          export SUPABASE_URL="${SUPABASE_URL:-http://localhost:54321}"
+          export SUPABASE_ANON_KEY="${SUPABASE_ANON_KEY:-ci-placeholder-anon-key}"
+          export MAPS_API_KEY="${MAPS_API_KEY:-ci-placeholder-maps-key}"
+          bash scripts/generate-secrets.sh --android
 
       - name: Build Debug APK
         working-directory: android

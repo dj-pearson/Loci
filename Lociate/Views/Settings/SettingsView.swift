@@ -1,3 +1,4 @@
+import Foundation
 import SwiftData
 import SwiftUI
 import UIKit
@@ -216,6 +217,8 @@ struct SettingsView: View {
                     }
                     Button(String(localized: "Cancel"), role: .cancel) {}
                 } message: {
+                    // Long-form user copy. A localization key has to be a single literal, so wrapping this would break key extraction.
+                    // swiftlint:disable:next line_length
                     Text(String(localized: "This will permanently delete your account, all voice notes, audio recordings, and household memberships. This action cannot be undone."))
                 }
             }
@@ -332,6 +335,8 @@ struct SettingsView: View {
                     .foregroundStyle(Theme.warning)
             }
 
+            // Long-form user copy. A localization key has to be a single literal, so wrapping this would break key extraction.
+            // swiftlint:disable:next line_length
             Text(String(localized: "Lociate uses notifications to alert you when you return to a saved location. Enable notifications to receive proximity alerts."))
                 .font(.caption)
                 .foregroundStyle(Theme.textSecondary)
@@ -550,7 +555,7 @@ struct SettingsView: View {
         // Copy audio files
         let audioDir = tempDir.appendingPathComponent("audio")
         try? FileManager.default.createDirectory(at: audioDir, withIntermediateDirectories: true)
-        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        let documentsURL = URL.documentsDirectory
 
         for locus in loci {
             let sourceURL = documentsURL.appendingPathComponent(locus.audioFileURL)
@@ -581,6 +586,18 @@ struct SettingsView: View {
 
     // MARK: - Account Deletion
 
+    /// Deletes every locally persisted instance of `type`.
+    ///
+    /// Four near-identical fetch-and-delete blocks written inline are what pushed
+    /// `deleteAccount()` over the cyclomatic complexity limit; a fetch failure is
+    /// treated as "nothing to delete", exactly as the inline `try?` did.
+    private func deleteAllPersisted<T: PersistentModel>(_ type: T.Type) {
+        guard let objects = try? modelContext.fetch(FetchDescriptor<T>()) else { return }
+        for object in objects {
+            modelContext.delete(object)
+        }
+    }
+
     private func deleteAccount() async {
         isDeletingAccount = true
         defer { isDeletingAccount = false }
@@ -594,38 +611,15 @@ struct SettingsView: View {
         }
 
         // Clear local SwiftData
-        let lociDescriptor = FetchDescriptor<Locus>()
-        if let loci = try? modelContext.fetch(lociDescriptor) {
-            for locus in loci {
-                modelContext.delete(locus)
-            }
-        }
-
-        let profileDescriptor = FetchDescriptor<UserProfile>()
-        if let profiles = try? modelContext.fetch(profileDescriptor) {
-            for profile in profiles {
-                modelContext.delete(profile)
-            }
-        }
-
-        let householdDescriptor = FetchDescriptor<Household>()
-        if let households = try? modelContext.fetch(householdDescriptor) {
-            for household in households {
-                modelContext.delete(household)
-            }
-        }
-
-        let memberDescriptor = FetchDescriptor<HouseholdMember>()
-        if let members = try? modelContext.fetch(memberDescriptor) {
-            for member in members {
-                modelContext.delete(member)
-            }
-        }
+        deleteAllPersisted(Locus.self)
+        deleteAllPersisted(UserProfile.self)
+        deleteAllPersisted(Household.self)
+        deleteAllPersisted(HouseholdMember.self)
 
         try? modelContext.save()
 
         // Clear local audio files
-        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        let documentsURL = URL.documentsDirectory
         if let contents = try? FileManager.default.contentsOfDirectory(at: documentsURL, includingPropertiesForKeys: nil) {
             for file in contents where file.pathExtension == AppConstants.Audio.fileExtension {
                 try? FileManager.default.removeItem(at: file)

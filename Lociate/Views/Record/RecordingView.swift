@@ -18,7 +18,7 @@ struct RecordingView: View {
     @State private var locationName: String?
     @State private var detectedCategory: LocusCategory = .general
     @State private var showPostRecordingSheet = false
-    @State private var recordingResult: (url: URL, transcription: String, coordinate: CLLocationCoordinate2D)?
+    @State private var recordingResult: RecordViewModel.RecordingResult?
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 

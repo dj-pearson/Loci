@@ -2,15 +2,20 @@
 [extend]
 useDefault = true
 
-[allowlist]
-description = "Non-secret values that look like credentials"
+# Each [[allowlists]] block is evaluated independently. `condition` defaults to
+# "OR", meaning a finding is allowed if it matches any listed path *or* regex.
+
+[[allowlists]]
+description = "Template files carry deliberate placeholders"
 paths = [
-  # Template files carry deliberate placeholders.
   '''Lociate/Configuration/BuildSecrets\.swift\.example''',
   '''android/local\.properties\.example''',
   '''backend/\.env\.example''',
   '''edge-functions/\.env\.example''',
 ]
+
+[[allowlists]]
+description = "Non-secret values that look like credentials"
 regexes = [
   # Let's Encrypt ISRG Root X1 intermediate SPKI pin — a public CA fingerprint
   # shipped as the default backup certificate pin, not a secret.
@@ -18,4 +23,27 @@ regexes = [
   # Documented placeholders.
   '''your-(local-)?anon-key''',
   '''appl_REPLACE_WITH_KEY''',
+  # A truncated JWT header from an older revision of DEPLOYMENT.md. The trailing
+  # ellipsis is part of the match, so this can never allow a whole token — and
+  # `eyJhbGciOiJIUzI1NiIs` is just base64 of `{"alg":"HS256"`, identical in every
+  # HS256 JWT ever issued.
+  '''eyJhbGciOiJIUzI1NiIs\.\.\.''',
 ]
+
+# The entries below use `condition = "AND"`, so a finding is only allowed when it
+# matches BOTH the path and the regex. A path-only allowlist would blind the
+# scanner to a real credential pasted into the same file later.
+
+[[allowlists]]
+description = "APNs/FCM tests need a PEM-shaped fixture to test newline restoration"
+condition = "AND"
+paths = ['''edge-functions/test/(apns|fcm)\.test\.ts''']
+# The fixture body is the literal three characters `abc`. Anything with real key
+# material in it will not match and will still be reported.
+regexes = ['''BEGIN PRIVATE KEY-----\\+nabc\\+n-----END PRIVATE KEY''']
+
+[[allowlists]]
+description = "Reading a credential out of the environment is not a hardcoded credential"
+condition = "AND"
+paths = ['''edge-functions/src/lib/(apns|fcm)\.ts''']
+regexes = ['''^env\.[A-Z0-9_]+$''']

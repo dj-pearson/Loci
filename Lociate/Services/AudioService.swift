@@ -70,10 +70,7 @@ final class AudioService {
     // MARK: - Recording URL Generation
 
     func generateRecordingURL() -> URL {
-        let documentsDirectory = FileManager.default.urls(
-            for: .documentDirectory,
-            in: .userDomainMask
-        ).first!
+        let documentsDirectory = URL.documentsDirectory
 
         let uuid = UUID().uuidString
         let timestamp = Int(Date().timeIntervalSince1970)

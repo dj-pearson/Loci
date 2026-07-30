@@ -170,7 +170,7 @@ enum AudioEncryptionService {
     /// Encrypts all existing unencrypted audio files in the documents/audio directories.
     static func migrateUnencryptedFiles() {
         let fileManager = FileManager.default
-        let documentsDir = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
+        let documentsDir = URL.documentsDirectory
 
         let enumerator = fileManager.enumerator(
             at: documentsDir,

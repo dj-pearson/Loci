@@ -14,7 +14,7 @@ final class SettingsViewModel {
     var quietHoursStart: Date {
         get {
             UserDefaults.standard.object(forKey: "loci_quiet_hours_start") as? Date
-                ?? Calendar.current.date(from: DateComponents(hour: 22, minute: 0))!
+                ?? Self.todayAt(hour: 22)
         }
         set { UserDefaults.standard.set(newValue, forKey: "loci_quiet_hours_start") }
     }
@@ -22,9 +22,22 @@ final class SettingsViewModel {
     var quietHoursEnd: Date {
         get {
             UserDefaults.standard.object(forKey: "loci_quiet_hours_end") as? Date
-                ?? Calendar.current.date(from: DateComponents(hour: 7, minute: 0))!
+                ?? Self.todayAt(hour: 7)
         }
         set { UserDefaults.standard.set(newValue, forKey: "loci_quiet_hours_end") }
+    }
+
+    /// Today's date at `hour`:00 local time.
+    ///
+    /// Only the time-of-day is ever read from these values — the date part is
+    /// discarded by the quiet-hours comparison — so falling back to midnight on the
+    /// (unreachable) nil is harmless and avoids a force unwrap.
+    private static func todayAt(hour: Int) -> Date {
+        let calendar = Calendar.current
+        var components = calendar.dateComponents([.year, .month, .day], from: Date())
+        components.hour = hour
+        components.minute = 0
+        return calendar.date(from: components) ?? calendar.startOfDay(for: Date())
     }
 
     var defaultRadius: Double {
@@ -59,7 +72,7 @@ final class SettingsViewModel {
     // MARK: - Storage
 
     var storageUsed: Int64 {
-        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        let documentsURL = URL.documentsDirectory
         let fileManager = FileManager.default
 
         guard let enumerator = fileManager.enumerator(
@@ -102,7 +115,7 @@ final class SettingsViewModel {
         let descriptor = FetchDescriptor<Locus>(predicate: archivedPredicate)
         guard let archivedLoci = try? modelContext.fetch(descriptor) else { return 0 }
 
-        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        let documentsURL = URL.documentsDirectory
         var deletedCount = 0
 
         for locus in archivedLoci {
@@ -117,7 +130,7 @@ final class SettingsViewModel {
     }
 
     func clearCache(modelContext: ModelContext) {
-        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        let documentsURL = URL.documentsDirectory
         let fileManager = FileManager.default
 
         // Fetch all known audio file names from SwiftData

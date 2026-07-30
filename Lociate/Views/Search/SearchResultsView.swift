@@ -112,33 +112,38 @@ private struct SearchResultRow: View {
         let lowercasedText = text.lowercased()
         let lowercasedQuery = query.lowercased()
 
-        var result = Text("")
+        // Collected into an array rather than accumulated with `result = result + …`:
+        // SwiftUI's `Text` defines `+` but no `+=`, so there is no shorthand form to
+        // use here. Building the pieces first and concatenating once reads better and
+        // makes the "empty means no segments" case explicit.
+        var segments: [Text] = []
         var currentIndex = text.startIndex
 
         while currentIndex < text.endIndex {
-            let remaining = text[currentIndex...]
             let remainingLower = lowercasedText[currentIndex...]
 
-            if let range = remainingLower.range(of: lowercasedQuery) {
-                // Add non-matching text before the match
-                if currentIndex < range.lowerBound {
-                    result = result + Text(text[currentIndex..<range.lowerBound])
-                }
-
-                // Add the matched text with highlight
-                result = result + Text(text[range])
-                    .bold()
-                    .foregroundColor(Theme.primary)
-
-                currentIndex = range.upperBound
-            } else {
-                // No more matches — add the rest
-                result = result + Text(remaining)
+            guard let range = remainingLower.range(of: lowercasedQuery) else {
+                // No more matches — take the rest verbatim.
+                segments.append(Text(text[currentIndex...]))
                 break
             }
+
+            // Non-matching text before the match.
+            if currentIndex < range.lowerBound {
+                segments.append(Text(text[currentIndex..<range.lowerBound]))
+            }
+
+            // The match itself, highlighted.
+            segments.append(
+                Text(text[range])
+                    .bold()
+                    .foregroundColor(Theme.primary)
+            )
+
+            currentIndex = range.upperBound
         }
 
-        return result
+        return segments.reduce(Text("")) { $0 + $1 }
     }
 
     private func formatDistance(_ meters: CLLocationDistance) -> String {

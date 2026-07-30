@@ -18,11 +18,13 @@ enum HaversineDistance {
         let lat1Rad = lat1.degreesToRadians
         let lat2Rad = lat2.degreesToRadians
 
-        let a = sin(dLat / 2) * sin(dLat / 2)
+        // `a` and `c` in the textbook formulation: the square of half the chord
+        // length, and the angular distance in radians.
+        let halfChordSquared = sin(dLat / 2) * sin(dLat / 2)
             + cos(lat1Rad) * cos(lat2Rad) * sin(dLon / 2) * sin(dLon / 2)
-        let c = 2 * atan2(sqrt(a), sqrt(1 - a))
+        let angularDistance = 2 * atan2(sqrt(halfChordSquared), sqrt(1 - halfChordSquared))
 
-        return earthRadiusMeters * c
+        return earthRadiusMeters * angularDistance
     }
 }
 
@@ -56,6 +58,6 @@ extension Array where Element: Locus {
 
     /// Returns the nearest `count` loci to the given coordinate, sorted by distance.
     func nearest(_ count: Int, to coordinate: CLLocationCoordinate2D) -> [Locus] {
-        Array<Locus>(sortedByDistance(from: coordinate).prefix(count))
+        [Locus](sortedByDistance(from: coordinate).prefix(count))
     }
 }

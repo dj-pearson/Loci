@@ -12,13 +12,20 @@ enum BuildSecretsValidator {
     /// - In RELEASE builds: triggers a fatal error if critical secrets
     ///   (supabaseURL, supabaseAnonKey) are missing, since the app cannot
     ///   function without them.
+    /// One secret to check, and whether the app can run without it.
+    private struct SecretCheck {
+        let name: String
+        let value: String
+        let critical: Bool
+    }
+
     static func validate() {
-        let checks: [(name: String, value: String, critical: Bool)] = [
-            ("supabaseURL", BuildSecrets.supabaseURL, true),
-            ("supabaseAnonKey", BuildSecrets.supabaseAnonKey, true),
-            ("revenueCatAPIKey", BuildSecrets.revenueCatAPIKey, false),
-            ("telemetryDeckAppID", BuildSecrets.telemetryDeckAppID, false),
-            ("certificatePinHash", BuildSecrets.certificatePinHash, false),
+        let checks: [SecretCheck] = [
+            SecretCheck(name: "supabaseURL", value: BuildSecrets.supabaseURL, critical: true),
+            SecretCheck(name: "supabaseAnonKey", value: BuildSecrets.supabaseAnonKey, critical: true),
+            SecretCheck(name: "revenueCatAPIKey", value: BuildSecrets.revenueCatAPIKey, critical: false),
+            SecretCheck(name: "telemetryDeckAppID", value: BuildSecrets.telemetryDeckAppID, critical: false),
+            SecretCheck(name: "certificatePinHash", value: BuildSecrets.certificatePinHash, critical: false),
         ]
 
         let placeholders: Set<String> = [

@@ -197,10 +197,10 @@ struct HouseholdMembersView: View {
     // MARK: - Sorted Members
 
     private var sortedMembers: [HouseholdMember] {
-        viewModel.members.sorted { a, b in
-            if a.role == .owner && b.role != .owner { return true }
-            if a.role != .owner && b.role == .owner { return false }
-            return a.displayName < b.displayName
+        viewModel.members.sorted { lhs, rhs in
+            if lhs.role == .owner && rhs.role != .owner { return true }
+            if lhs.role != .owner && rhs.role == .owner { return false }
+            return lhs.displayName < rhs.displayName
         }
     }
 

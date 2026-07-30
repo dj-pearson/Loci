@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -6,6 +8,29 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlin.serialization)
 }
+
+// Gradle auto-loads `gradle.properties`, but NOT `local.properties` — that file is
+// only special to the Android SDK locator (`sdk.dir`). Every `findProperty` below
+// therefore returned null no matter what `scripts/generate-secrets.sh --android`
+// wrote, so the build silently used placeholder credentials and the release Maps-key
+// guard could never be satisfied. Loading it explicitly is what makes the generated
+// file actually reach the build.
+val localProperties = Properties().apply {
+    val file = rootProject.file("local.properties")
+    if (file.exists()) {
+        file.inputStream().use { load(it) }
+    }
+}
+
+/**
+ * Resolves a build secret: `local.properties` first, then `-P`/`gradle.properties`,
+ * then the environment (which is how CI passes them without writing a file).
+ */
+fun secret(name: String, default: String = ""): String =
+    localProperties.getProperty(name)
+        ?: project.findProperty(name) as String?
+        ?: System.getenv(name)
+        ?: default
 
 // US-197: the Google Services plugin hard-fails when google-services.json is
 // missing, and that file is gitignored. Applying it conditionally keeps the build
@@ -36,25 +61,25 @@ android {
 
         // Configuration — replace with actual values in local.properties (see
         // local.properties.example) or via scripts/generate-secrets.sh --android.
-        buildConfigField("String", "SUPABASE_URL", "\"${project.findProperty("SUPABASE_URL") ?: "https://your-supabase-url.com"}\"")
-        buildConfigField("String", "SUPABASE_ANON_KEY", "\"${project.findProperty("SUPABASE_ANON_KEY") ?: "your-anon-key"}\"")
-        buildConfigField("String", "MAPS_API_KEY", "\"${project.findProperty("MAPS_API_KEY") ?: ""}\"")
+        buildConfigField("String", "SUPABASE_URL", "\"${secret("SUPABASE_URL", "https://your-supabase-url.com")}\"")
+        buildConfigField("String", "SUPABASE_ANON_KEY", "\"${secret("SUPABASE_ANON_KEY", "your-anon-key")}\"")
+        buildConfigField("String", "MAPS_API_KEY", "\"${secret("MAPS_API_KEY")}\"")
         // US-190: AndroidManifest.xml substitutes ${MAPS_API_KEY} into the
         // com.google.android.geo.API_KEY meta-data. Without this placeholder the
         // manifest merger fails and no variant can be assembled — the buildConfigField
         // above is only readable at runtime, it does not feed the manifest.
-        manifestPlaceholders["MAPS_API_KEY"] = (project.findProperty("MAPS_API_KEY") ?: "") as String
+        manifestPlaceholders["MAPS_API_KEY"] = secret("MAPS_API_KEY")
         // Certificate pinning (SPKI SHA-256 hashes, base64). Empty values disable pinning.
-        buildConfigField("String", "CERT_PIN_HASH", "\"${project.findProperty("CERT_PIN_HASH") ?: ""}\"")
-        buildConfigField("String", "CERT_BACKUP_PIN_HASH", "\"${project.findProperty("CERT_BACKUP_PIN_HASH") ?: ""}\"")
+        buildConfigField("String", "CERT_PIN_HASH", "\"${secret("CERT_PIN_HASH")}\"")
+        buildConfigField("String", "CERT_BACKUP_PIN_HASH", "\"${secret("CERT_BACKUP_PIN_HASH")}\"")
         // HMAC-SHA256 shared secret for signing sensitive API mutations. Must match
         // REQUEST_SIGNING_KEY on the edge function server. Empty disables signing.
-        buildConfigField("String", "REQUEST_SIGNING_KEY", "\"${project.findProperty("REQUEST_SIGNING_KEY") ?: ""}\"")
+        buildConfigField("String", "REQUEST_SIGNING_KEY", "\"${secret("REQUEST_SIGNING_KEY")}\"")
         // US-197: lets runtime code skip FCM work entirely rather than relying on a
         // caught exception when Firebase was never configured.
         buildConfigField("Boolean", "FCM_ENABLED", googleServicesJson.exists().toString())
         // US-199: crash reporting. An empty DSN disables Sentry cleanly.
-        buildConfigField("String", "SENTRY_DSN", "\"${project.findProperty("SENTRY_DSN") ?: ""}\"")
+        buildConfigField("String", "SENTRY_DSN", "\"${secret("SENTRY_DSN")}\"")
 
         javaCompileOptions {
             annotationProcessorOptions {
@@ -68,17 +93,10 @@ android {
 
     buildTypes {
         release {
-            // US-190: a release build with no Maps key produces an app whose map
-            // screen is permanently blank, which is worse than failing here.
-            // Debug builds only warn so a contributor can work without the key.
-            val mapsKey = (project.findProperty("MAPS_API_KEY") ?: "") as String
-            if (mapsKey.isBlank() && !project.hasProperty("allowMissingMapsKey")) {
-                throw GradleException(
-                    "MAPS_API_KEY is not set. Add it to android/local.properties (see " +
-                        "local.properties.example) or run scripts/generate-secrets.sh --android. " +
-                        "Pass -PallowMissingMapsKey to bypass for a non-shippable build."
-                )
-            }
+            // The Maps key guard is NOT here — it is attached to the release tasks
+            // further down this file. A `release { }` block is evaluated on every
+            // Gradle invocation, so throwing from it broke `lintDebug` and
+            // `assembleDebug` as well.
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
@@ -89,7 +107,7 @@ android {
         debug {
             isDebuggable = true
             applicationIdSuffix = ".debug"
-            if (((project.findProperty("MAPS_API_KEY") ?: "") as String).isBlank()) {
+            if (secret("MAPS_API_KEY").isBlank()) {
                 logger.warn(
                     "MAPS_API_KEY is not set — the map screen will render blank in this " +
                         "debug build. See android/local.properties.example."
@@ -132,6 +150,34 @@ android {
 
     ksp {
         arg("room.schemaLocation", "$projectDir/schemas")
+    }
+}
+
+// US-190: a release build with no Maps key ships an app whose map screen is
+// permanently blank, so it must fail. The check has to be attached to the release
+// tasks rather than written inside `buildTypes { release { } }`: that block is
+// evaluated during configuration on *every* invocation, so the throw fired for
+// `lintDebug` and `assembleDebug` too and took the whole Android CI job down with it.
+//
+// Reading the properties out here, into plain values, keeps the task action free of
+// any reference to `project` — a requirement for the configuration cache.
+val mapsKeyForReleaseGuard = secret("MAPS_API_KEY")
+val mapsKeyGuardBypassed = project.hasProperty("allowMissingMapsKey")
+
+// `preReleaseBuild` runs before anything else in a release build, so this fails fast
+// rather than after a full minified package has been produced. The two lifecycle
+// tasks are belt-and-braces in case a future AGP renames it.
+tasks.matching {
+    it.name in setOf("preReleaseBuild", "assembleRelease", "bundleRelease")
+}.configureEach {
+    doFirst {
+        if (mapsKeyForReleaseGuard.isBlank() && !mapsKeyGuardBypassed) {
+            throw GradleException(
+                "MAPS_API_KEY is not set. Add it to android/local.properties (see " +
+                    "local.properties.example) or run scripts/generate-secrets.sh --android. " +
+                    "Pass -PallowMissingMapsKey to bypass for a non-shippable build."
+            )
+        }
     }
 }
 

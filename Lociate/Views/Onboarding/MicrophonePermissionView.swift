@@ -18,6 +18,8 @@ struct MicrophonePermissionView: View {
                 .fontWeight(.bold)
                 .multilineTextAlignment(.center)
 
+            // Long-form user copy. A localization key has to be a single literal, so wrapping this would break key extraction.
+            // swiftlint:disable:next line_length
             Text(String(localized: "Lociate is voice-first — tap to record, and your note is pinned to where you are. Microphone access is the core of the experience."))
                 .font(Theme.Typography.body)
                 .foregroundStyle(Theme.textSecondary)

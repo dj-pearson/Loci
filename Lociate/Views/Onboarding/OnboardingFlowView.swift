@@ -47,6 +47,8 @@ struct OnboardingFlowView: View {
                 OnboardingPageView(
                     systemImage: "waveform.circle.fill",
                     headline: String(localized: "Drop Your First Locus"),
+                    // Long-form user copy. A localization key has to be a single literal, so wrapping this would break key extraction.
+                    // swiftlint:disable:next line_length
                     bodyText: String(localized: "Tap the microphone button on the map to record your first voice note. It will be pinned right where you are."),
                     ctaTitle: String(localized: "Let's Go!")
                 ) {
