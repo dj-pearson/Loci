@@ -1,19 +1,36 @@
 name: CI — Build & Lint
 
+# US-193: this repository's default branch is `master`. The previous triggers
+# (push to develop/feature/*, PRs into main) matched no branch that exists here,
+# so no workflow had ever gated a change.
 on:
   push:
     branches:
-      - develop
+      - master
+      - 'claude/*'
       - 'feature/*'
   pull_request:
     branches:
-      - main
+      - master
 
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  xcode-project:
+    name: Xcode Project Up To Date
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # US-185: the project file drifted so far by hand that 72 of 104 Swift
+      # sources had no target membership and the app could not compile. This
+      # fails the build if project.pbxproj no longer matches the source tree.
+      - name: Verify generated project matches the source tree
+        run: python3 scripts/generate-xcodeproj.py --check
+
   swiftlint:
     name: SwiftLint
     runs-on: macos-14
@@ -30,10 +47,29 @@ jobs:
   build:
     name: Build (iOS Simulator)
     runs-on: macos-14
-    needs: swiftlint
+    needs: [swiftlint, xcode-project]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Generate BuildSecrets.swift
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          REVENUECAT_API_KEY: ${{ secrets.REVENUECAT_API_KEY }}
+          TELEMETRYDECK_APP_ID: ${{ secrets.TELEMETRYDECK_APP_ID }}
+          CERT_PIN_HASH: ${{ secrets.CERT_PIN_HASH }}
+          CERT_BACKUP_PIN_HASH: ${{ secrets.CERT_BACKUP_PIN_HASH }}
+          REQUEST_SIGNING_KEY: ${{ secrets.REQUEST_SIGNING_KEY }}
+        run: |
+          # Placeholders keep a fork PR (which cannot read secrets) building; they
+          # are never shipped because release.yml requires the real values.
+          export SUPABASE_URL="${SUPABASE_URL:-http://localhost:54321}"
+          export SUPABASE_ANON_KEY="${SUPABASE_ANON_KEY:-ci-placeholder-anon-key}"
+          export REVENUECAT_API_KEY="${REVENUECAT_API_KEY:-appl_ci_placeholder}"
+          export TELEMETRYDECK_APP_ID="${TELEMETRYDECK_APP_ID:-ci-placeholder}"
+          export CERT_PIN_HASH="${CERT_PIN_HASH:-}"
+          bash scripts/generate-secrets.sh --ios
 
       - name: Select Xcode
         run: sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
@@ -72,6 +108,25 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Generate BuildSecrets.swift
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          REVENUECAT_API_KEY: ${{ secrets.REVENUECAT_API_KEY }}
+          TELEMETRYDECK_APP_ID: ${{ secrets.TELEMETRYDECK_APP_ID }}
+          CERT_PIN_HASH: ${{ secrets.CERT_PIN_HASH }}
+          CERT_BACKUP_PIN_HASH: ${{ secrets.CERT_BACKUP_PIN_HASH }}
+          REQUEST_SIGNING_KEY: ${{ secrets.REQUEST_SIGNING_KEY }}
+        run: |
+          # Placeholders keep a fork PR (which cannot read secrets) building; they
+          # are never shipped because release.yml requires the real values.
+          export SUPABASE_URL="${SUPABASE_URL:-http://localhost:54321}"
+          export SUPABASE_ANON_KEY="${SUPABASE_ANON_KEY:-ci-placeholder-anon-key}"
+          export REVENUECAT_API_KEY="${REVENUECAT_API_KEY:-appl_ci_placeholder}"
+          export TELEMETRYDECK_APP_ID="${TELEMETRYDECK_APP_ID:-ci-placeholder}"
+          export CERT_PIN_HASH="${CERT_PIN_HASH:-}"
+          bash scripts/generate-secrets.sh --ios
+
       - name: Select Xcode
         run: sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
 
@@ -109,6 +164,72 @@ jobs:
           name: test-results
           path: build/test-results.xcresult
           retention-days: 14
+
+  edge-functions:
+    name: Edge Functions — Typecheck & Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: edge-functions/package-lock.json
+
+      - name: Install Dependencies
+        working-directory: edge-functions
+        run: npm ci
+
+      - name: Typecheck
+        working-directory: edge-functions
+        run: npm run typecheck
+
+      - name: Test
+        working-directory: edge-functions
+        run: npm test
+
+      - name: Build
+        working-directory: edge-functions
+        run: npm run build
+
+  backend:
+    name: Backend — Migrations & RLS Isolation
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        # PostGIS is required: 002_create_loci.sql declares a GEOGRAPHY column.
+        image: postgis/postgis:16-3.4
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install psql client
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends postgresql-client
+
+      # US-207: applies every migration to a scratch database, then asserts that
+      # one household cannot read, write, or delete another's loci, profiles,
+      # membership, or audio objects.
+      - name: Apply migrations and run the RLS isolation suite
+        env:
+          PGHOST: localhost
+          PGPORT: '5432'
+          PGUSER: postgres
+          PGPASSWORD: postgres
+        run: bash scripts/run-backend-tests.sh
 
   web-build:
     name: Build Marketing Site

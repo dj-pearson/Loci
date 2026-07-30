@@ -145,6 +145,34 @@ Confirm all of the following are set under Repo → Settings → Secrets and var
 
 ---
 
+---
+
+## 7b. Branch protection — required checks (**ℹ️ Manual**)
+
+Until this is configured, CI runs but nothing enforces it. Repo → Settings →
+Branches → add a rule for `master`:
+
+- [ ] Require a pull request before merging
+- [ ] Require status checks to pass, with these checks selected (all from `ci.yml`
+      and `android-ci.yml`, which trigger on `pull_request` into `master`):
+  - [ ] `Xcode Project Up To Date` — fails if `project.pbxproj` drifts from the
+        source tree (this drift is what made the app uncompilable; see US-185)
+  - [ ] `SwiftLint`
+  - [ ] `Build (iOS Simulator)`
+  - [ ] `Unit Tests`
+  - [ ] `Edge Functions — Typecheck & Test`
+  - [ ] `Backend — Migrations & RLS Isolation` — the cross-tenant isolation proof
+  - [ ] `Secret Scan`
+  - [ ] `Build Marketing Site`
+  - [ ] `Lint & Static Analysis` (Android)
+  - [ ] `Build & Test` (Android)
+- [ ] Require branches to be up to date before merging
+- [ ] Do not allow bypassing the above settings
+
+> Workflow triggers previously referenced `develop` and `main`, neither of which
+> exists in this repository — its default branch is `master` — so no workflow had
+> ever gated a change. Fixed in US-193.
+
 ## 8. Local dev quickstart (for new contributors)
 
 ```bash

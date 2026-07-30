@@ -3304,8 +3304,8 @@
         "No workflow references a nonexistent branch name"
       ],
       "priority": 193,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed. ci.yml and android-ci.yml now trigger on pull_request into master and on pushes to master, claude/*, and feature/*; deploy.yml fires on master. The previous triggers named develop and main, neither of which exists in this repository, so no workflow had ever gated a change and the TestFlight deploy could never fire. Added four jobs: 'Xcode Project Up To Date' (runs generate-xcodeproj.py --check, failing on the project drift that made the app uncompilable), 'Edge Functions — Typecheck & Test' (npm ci + typecheck + test + build), 'Backend — Migrations & RLS Isolation' (postgis/postgis:16-3.4 service container running scripts/run-backend-tests.sh), and 'Secret Scan' (added under US-210). Also fixed a further blocker: the iOS build and test jobs never generated BuildSecrets.swift, so even a correct project file could not have compiled in CI — both jobs now run generate-secrets.sh --ios, falling back to placeholders so fork PRs without secret access still build. Required-check list and branch-protection steps documented in LAUNCH_CHECKLIST.md §7b. All six workflow files verified as parseable YAML."
     },
     {
       "id": "US-194",
