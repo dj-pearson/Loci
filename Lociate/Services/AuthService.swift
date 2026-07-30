@@ -338,6 +338,17 @@ final class AuthService {
         errorMessage = message
     }
 
+    /// Surfaces a client-side validation failure through the same channel as server
+    /// errors, so a view has one place to read from.
+    ///
+    /// `errorMessage` is deliberately `private(set)` — only this service decides what
+    /// its error state is. SignInView was assigning to it directly, which does not
+    /// compile; this is the narrow, intentional way in.
+    @MainActor
+    func reportValidationError(_ message: String) {
+        setError(message)
+    }
+
     private func isValidEmail(_ email: String) -> Bool {
         let regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
         return email.wholeMatch(of: regex) != nil

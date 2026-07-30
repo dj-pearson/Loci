@@ -166,7 +166,7 @@ final class AnalyticsService {
         guard isConfigured else { return }
         // Only the hash is ever sent — never the raw Supabase user id, and never
         // an email address.
-        TelemetryDeck.updateDefaultUser(to: hashed)
+        TelemetryDeck.updateDefaultUserID(to: hashed)
     }
 
     func clearUser() {
@@ -178,6 +178,6 @@ final class AnalyticsService {
         }
 
         guard isConfigured else { return }
-        TelemetryDeck.updateDefaultUser(to: nil)
+        TelemetryDeck.updateDefaultUserID(to: nil)
     }
 }

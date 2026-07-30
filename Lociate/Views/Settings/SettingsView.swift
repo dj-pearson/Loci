@@ -605,7 +605,8 @@ struct SettingsView: View {
         // Call server-side cascade deletion
         do {
             let supabase = SupabaseClientProvider.shared
-            try await supabase.functions.invoke("account/delete", options: .init(method: "POST"))
+            // FunctionInvokeOptions.Method is an enum, not a String.
+            try await supabase.functions.invoke("account/delete", options: .init(method: .post))
         } catch {
             // Continue with local cleanup even if server fails
         }

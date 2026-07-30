@@ -550,13 +550,13 @@ struct SignUpView: View {
     private func signUp() async {
         // US-144: Validate password strength before submitting
         guard passwordMeetsMinimum else {
-            authService.errorMessage = AuthError.passwordTooWeak.localizedDescription
+            await authService.reportValidationError(AuthError.passwordTooWeak.localizedDescription)
             HapticManager.delete()
             showError = true
             return
         }
         guard passwordsMatch else {
-            authService.errorMessage = AuthError.passwordsDoNotMatch.localizedDescription
+            await authService.reportValidationError(AuthError.passwordsDoNotMatch.localizedDescription)
             HapticManager.delete()
             showError = true
             return
