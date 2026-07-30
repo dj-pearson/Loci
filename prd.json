@@ -3533,8 +3533,8 @@
         "Runs as a CI job on every pull request and fails the build on any leak"
       ],
       "priority": 207,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed. Added backend/tests/00_bootstrap.sql (recreates the Supabase-provided surface the migrations depend on — auth.users, auth.uid(), storage.buckets/objects, storage.foldername(), and the anon/authenticated/service_role roles — so the migrations apply verbatim, since a policy that only passes against a modified schema proves nothing), backend/tests/10_rls_isolation_test.sql, and scripts/run-backend-tests.sh. 26 assertions, all executed against real PostgreSQL 16 + PostGIS 3.4 and all passing: cross-household SELECT/UPDATE/DELETE denial on loci, private loci invisible to co-members, shared loci read-only to co-members, forged-ownership INSERT rejected by WITH CHECK, profile isolation (a user cannot write another's apns_token and thereby redirect their push), household and membership isolation including self-enrolment, cross-tenant storage object reads and writes, and the 008 free-tier cap (10 allowed, 11th rejected, premium lifts it, archived rows do not count). Every assertion runs as the `authenticated` role — as the table owner they would pass no matter how broken the policies were. This suite immediately found a production-blocking defect, tracked and fixed as US-218: RLS infinite recursion that made every authenticated read of loci fail. Two initial assertions were also hardened after review: they looked up fixture ids through public.users, which RLS hides, so the probes matched zero rows and reported false passes; they now read from a temp fixture table so WITH CHECK is genuinely exercised."
     },
     {
       "id": "US-208",
@@ -3692,6 +3692,22 @@
       "priority": 217,
       "passes": false,
       "notes": ""
+    },
+    {
+      "id": "US-218",
+      "title": "Fix RLS infinite recursion that broke every authenticated read of loci",
+      "description": "As a user, I need to be able to read my own notes. The household_members SELECT policy filtered household_members by a subquery over household_members, so PostgreSQL aborted with \"infinite recursion detected in policy\". Because loci_select_shared, households_select_member, and the shared-audio storage policy all subquery that table, the fault was not confined to household queries — every authenticated SELECT on public.loci failed. The app's core read path did not work against the deployed schema.",
+      "acceptanceCriteria": [
+        "SECURITY DEFINER helper functions resolve the caller's household ids, owned household ids, and co-member user ids without re-entering household_members' own policy",
+        "household_members select/insert/delete, households_select_member, loci_select_shared, and storage_audio_select_shared are recreated against the helpers",
+        "Helper functions pin search_path and are executable only by authenticated and service_role, not PUBLIC",
+        "Migration is idempotent (CREATE OR REPLACE plus DROP POLICY IF EXISTS) so it is safe on an already-provisioned database",
+        "The US-207 isolation suite passes with the migration applied and fails with the recursion error without it",
+        "Tenant isolation is unchanged — no policy is loosened to work around the recursion"
+      ],
+      "priority": 218,
+      "passes": true,
+      "notes": "Completed. Added backend/migrations/010_fix_rls_recursion.sql with current_user_household_ids(), current_user_owned_household_ids(), and current_user_household_peer_ids() — all SECURITY DEFINER with a pinned search_path, REVOKEd from PUBLIC and granted only to authenticated/service_role — and recreated the six affected policies against them. Verified against real PostgreSQL 16 + PostGIS 3.4: with the migration all 26 isolation assertions pass; with it removed the suite fails with 'infinite recursion detected in policy for relation household_members' (negative control run both ways). Confirmed the blast radius before fixing: SELECT count(*) as an authenticated user failed on public.loci, public.households, and public.household_members alike. No policy was loosened — the isolation assertions cover the same boundaries as before."
     }
   ]
 }
