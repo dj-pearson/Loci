@@ -3321,8 +3321,8 @@
         "Unit test with a fake SyncRepository proves no row is marked SYNCED when upload throws"
       ],
       "priority": 194,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed. SyncWorker now injects SyncRepository and calls uploadUnsynced() instead of looping over the pending rows and marking each one SYNCED — the old stub meant a paying user's notes never left the device while the app reported them backed up. Found and fixed two further defects that would have made the upload fail even once it was wired: SyncRepository uploaded to bucket \"audio\", which does not exist (005_storage_bucket.sql creates loci-audio), and used a loci/<id>/<file> object layout whose first path segment is not the user id, so the storage RLS INSERT policy would have denied every write. Path is now <userId>/<locusId>.m4a, byte-identical to the iOS AudioSyncService layout so household members across platforms resolve the same object. Audio upload sets upsert = true for idempotent retries; the row is upserted only after the audio is durable; sync status advances to SYNCED only after both succeed. A per-locus failure no longer marks the row CONFLICTED (a merge state, wrong for a network blip) and no longer aborts the batch. Retry policy is extracted as a pure SyncDecision.from(outcome, runAttemptCount) so it is unit-testable on the JVM without a Context; 9 tests cover clean pass, partial failure, thrown pass, the attempt cap, non-retryable failure, and the bucket and path contract against the iOS convention. Tests could not be executed here — the environment's network policy blocks dl.google.com so AGP is unresolvable in this container."
     },
     {
       "id": "US-195",

@@ -11,7 +11,8 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import app.lociate.android.data.local.dao.LocusDao
+import app.lociate.android.data.remote.api.SyncRepository
+import app.lociate.android.data.remote.api.SyncUploadResult
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import timber.log.Timber
@@ -21,43 +22,41 @@ import java.util.concurrent.TimeUnit
  * WorkManager-based background sync worker.
  * Uploads unsynced loci to Supabase when network is available.
  * Compatible with Doze mode — uses WorkManager instead of AlarmManager.
+ *
+ * US-194: this used to fetch the unsynced rows and mark every one of them
+ * SYNCED without uploading anything, so a paying user's notes never left the
+ * device while the app reported them backed up. The upload now goes through
+ * [SyncRepository], which only advances the sync status once both the audio
+ * object and the row have landed.
  */
 @HiltWorker
 class SyncWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
-    private val locusDao: LocusDao
+    private val syncRepository: SyncRepository
 ) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result {
-        return try {
-            val unsyncedLoci = locusDao.getUnsynced()
-
-            if (unsyncedLoci.isEmpty()) {
-                Timber.d("No unsynced loci to sync")
-                return Result.success()
-            }
-
-            Timber.d("Syncing ${unsyncedLoci.size} loci...")
-
-            // TODO: Implement actual Supabase upload in US-161
-            // For each unsynced locus:
-            // 1. Upload audio file to Supabase Storage
-            // 2. Insert/update locus record via PostgREST
-            // 3. Update local sync status to SYNCED
-
-            for (locus in unsyncedLoci) {
-                // Placeholder: mark as synced after upload
-                locusDao.updateSyncStatus(locus.id, "SYNCED")
-            }
-
-            Timber.d("Sync completed: ${unsyncedLoci.size} loci synced")
-            Result.success()
+        val outcome: SyncUploadResult? = try {
+            val result = syncRepository.uploadUnsynced()
+            result.exceptionOrNull()?.let { Timber.e(it, "Sync upload returned a failure") }
+            result.getOrNull()
         } catch (e: Exception) {
             Timber.e(e, "Sync failed")
-            if (runAttemptCount < 3) {
+            null
+        }
+
+        return when (SyncDecision.from(outcome, runAttemptCount)) {
+            SyncDecision.SUCCESS -> {
+                Timber.d("Sync completed")
+                Result.success()
+            }
+            SyncDecision.RETRY -> {
+                Timber.w("Sync incomplete — scheduling a retry (attempt $runAttemptCount)")
                 Result.retry()
-            } else {
+            }
+            SyncDecision.FAILURE -> {
+                Timber.e("Sync failed after $runAttemptCount attempts — giving up")
                 Result.failure()
             }
         }
@@ -66,6 +65,7 @@ class SyncWorker @AssistedInject constructor(
     companion object {
         private const val SYNC_WORK_NAME = "loci_periodic_sync"
         private const val SYNC_ONCE_TAG = "loci_sync_once"
+        const val MAX_ATTEMPTS = 3
 
         private val networkConstraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
