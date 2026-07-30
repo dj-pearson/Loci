@@ -389,7 +389,7 @@ first real run — three of them my own new gates failing on my own code.
 - [x] US-222: two password literals removed, four scanner false positives scoped
 - [x] US-223: the iOS build and the Kotlin compile ran for the first time, and failed
 - [x] US-224: xcodebuild ran, and a floating dependency needed Swift 6
-- [x] US-225: the Android app built; 3 of 84 unit tests then failed
+- [x] US-225: the Android app built; unit tests now 91/91 — Android CI fully green
 - [x] US-226: the app's own Swift compiled for the first time, and had 3 errors
 
 ### All 226 stories pass. Remaining launch work is manual (portals, secrets,
