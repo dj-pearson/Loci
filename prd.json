@@ -3388,8 +3388,8 @@
         "Analytics respects the existing opt-out setting"
       ],
       "priority": 198,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed. Uncommented `import TelemetryDeck` and enabled the three call sites that were dead: TelemetryDeck.initialize in configure(), TelemetryDeck.signal in track(), and updateDefaultUser in setUser/clearUser. Analytics emitted nothing in production before this — the full event taxonomy existed but every SDK call was commented out. Added an isConfigured guard so a build with an empty app ID never calls into an uninitialized SDK; DEBUG builds keep the console-only path and send no production signals; the existing opt-out check still short-circuits every event. The user identifier remains a SHA-256 hash and no coordinates, transcriptions, audio paths, or emails are passed as parameters. Confirmed the widget target does not include AnalyticsService, so the extension does not link TelemetryDeck."
     },
     {
       "id": "US-199",
@@ -3499,8 +3499,8 @@
         "All tests are members of the LociateTests target and run in ci.yml"
       ],
       "priority": 205,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed. Added 5 test files to LociateTests (was 1 file for 104 sources). TierEnforcementTests (18 cases): the free 10-locus cap, archived and shared loci correctly excluded from it — matching the server trigger in 008 so client and server cannot disagree — every per-tier feature gate, the published pricing-table numbers, and the blockedFeature reason mapping including the no-context overload. GeofenceSelectionTests (9 cases): the 20-region iOS cap is never exceeded, the nearest loci win even when insertion order is reversed, ordering is by ascending distance, and the monitored set actually rotates when the user moves — without which a locus at the new location never fires. Plus Haversine accuracy, symmetry, and zero-distance. RequestSigningServiceTests (9 cases): the canonical string is rebuilt by an independent reference implementation in the test, so a change on either side fails; verified byte-for-byte against the edge middleware and the Android interceptor (all three build METHOD\\nPATH\\nTIMESTAMP\\nSHA256(BODY)), plus the 64-lowercase-hex format the server's Buffer.from/timingSafeEqual path requires, empty-body hashing, and timestamp skew. AudioEncryptionServiceTests (12 cases): round trip, plaintext absent from ciphertext, fresh nonce per seal, tampered and truncated ciphertext rejected, never-encrypted input failing loudly, in-place file encryption, the isFileEncrypted header heuristic, and decrypted-plaintext temp cleanup. NavigationRouterDeepLinkTests (10 cases) landed with US-203. One test was corrected during review: it called releaseTempFile before cleanupTempFiles, and since releaseTempFile deletes the file itself, it would have passed without exercising cleanup at all. Tests cannot be executed here (Linux container, no Xcode toolchain); they run in the ci.yml 'Unit Tests' job now that the test target and shared scheme exist."
     },
     {
       "id": "US-206",

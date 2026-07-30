@@ -1,7 +1,7 @@
 import CryptoKit
 import Foundation
 import os.log
-// import TelemetryDeck
+import TelemetryDeck
 
 // MARK: - Analytics Event
 
@@ -60,13 +60,20 @@ final class AnalyticsService {
         }
 
         if isDebug {
+            // Debug builds stay console-only so development traffic never pollutes
+            // production dashboards.
             logger.info("TelemetryDeck configured in debug mode (console-only)")
+            isConfigured = true
         } else {
-            // Uncomment when TelemetryDeck SPM package is added:
-            // TelemetryDeck.initialize(config: .init(appID: Self.appID))
+            TelemetryDeck.initialize(config: .init(appID: Self.appID))
+            isConfigured = true
             logger.info("TelemetryDeck configured for production")
         }
     }
+
+    /// Guards every signal: without it a build whose app ID is empty would call
+    /// into an uninitialized SDK on the first tracked event.
+    private(set) var isConfigured = false
 
     // MARK: - Event Tracking
 
@@ -79,8 +86,8 @@ final class AnalyticsService {
             return
         }
 
-        // Uncomment when TelemetryDeck SPM package is added:
-        // TelemetryDeck.signal(event.rawValue, parameters: parameters)
+        guard isConfigured else { return }
+        TelemetryDeck.signal(event.rawValue, parameters: parameters)
     }
 
     // MARK: - Convenience Methods
@@ -148,14 +155,22 @@ final class AnalyticsService {
 
         if isDebug {
             logger.debug("📊 [Analytics] User set: \(hashed.prefix(12))...")
+            return
         }
-        // TelemetryDeck.updateDefaultUser(to: hashed)
+
+        guard isConfigured else { return }
+        // Only the hash is ever sent — never the raw Supabase user id, and never
+        // an email address.
+        TelemetryDeck.updateDefaultUser(to: hashed)
     }
 
     func clearUser() {
         if isDebug {
             logger.debug("📊 [Analytics] User cleared")
+            return
         }
-        // TelemetryDeck.updateDefaultUser(to: nil)
+
+        guard isConfigured else { return }
+        TelemetryDeck.updateDefaultUser(to: nil)
     }
 }

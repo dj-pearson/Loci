@@ -31,6 +31,14 @@ jobs:
       - name: Verify generated project matches the source tree
         run: python3 scripts/generate-xcodeproj.py --check
 
+      - name: Install icon rasterization deps
+        run: pip install --quiet cairosvg pillow
+
+      # US-201: the committed PNGs must still match design/*.svg, or the store
+      # icon silently drifts from the brand mark.
+      - name: Verify generated app icons match the source artwork
+        run: python3 scripts/generate-app-icons.py --check
+
   swiftlint:
     name: SwiftLint
     runs-on: macos-14
