@@ -94,7 +94,7 @@ final class CertificatePinningDelegate: NSObject, URLSessionDelegate {
 
         // No pin matched — reject connection
         #if DEBUG
-        logger.error("Certificate pinning failed for \(host): no matching public key hash found in chain of \(certificateCount) certificates")
+        logger.error("Certificate pinning failed for \(host): no matching public key hash found in chain of \(chain.count) certificates")
         logCertificateChain(serverTrust, host: host)
         #endif
 
