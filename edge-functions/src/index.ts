@@ -12,8 +12,32 @@ import health from './routes/health.js';
 import accountDelete from './routes/account-delete.js';
 import authVerify from './routes/auth-verify.js';
 import { requestSigningMiddleware } from './middleware/request-signing.js';
+import {
+  errorFields,
+  log,
+  requestLogger,
+  runScheduledJob,
+  type RequestLogEnv,
+} from './lib/logger.js';
 
-const app = new Hono();
+const app = new Hono<RequestLogEnv>();
+
+// US-215: structured request logging first, so every downstream line — including
+// rejections from the rate limiter and the signing middleware — carries the same
+// correlation id.
+app.use('*', requestLogger);
+
+// US-215: an unhandled route error previously returned Hono's default 500 with no
+// log line at all, so a recurring fault was invisible.
+app.onError((error, c) => {
+  log.error('unhandled route error', {
+    requestId: c.get('requestId'),
+    route: new URL(c.req.url).pathname,
+    method: c.req.method,
+    ...errorFields(error),
+  });
+  return c.json({ error: 'Internal server error' }, 500);
+});
 
 // Global rate limiting (60 req/min per user)
 app.use('/api/*', rateLimitDefault);
@@ -39,32 +63,27 @@ app.route('/api/auth', authVerify);
 
 // Cron: nightly AI analysis at 2 AM
 cron.schedule('0 2 * * *', async () => {
-  console.log('[cron] Starting nightly loci analysis...');
-  const result = await processUserClusters();
-  console.log(`[cron] Analysis complete: ${result.processed} processed, ${result.errors} errors`);
+  await runScheduledJob('analyze-loci', () => processUserClusters());
 });
 
 // Cron: weekly digest every Sunday at 10 AM
 cron.schedule('0 10 * * 0', async () => {
-  console.log('[cron] Starting weekly push digest...');
-  const result = await generateDigests();
-  console.log(
-    `[cron] Digest complete: ${result.sent} sent, ${result.skipped} skipped, ` +
-      `${result.invalidated} dead tokens cleared`
-  );
+  await runScheduledJob('push-digest', () => generateDigests());
 });
 
 // US-146: Cron: daily cleanup of old login attempts at 3 AM
 cron.schedule('0 3 * * *', async () => {
-  console.log('[cron] Cleaning up old login attempts...');
-  try {
+  await runScheduledJob('cleanup-login-attempts', async () => {
     const { getSupabaseAdmin } = await import('./middleware/auth.js');
     const supabase = getSupabaseAdmin();
-    const { data, error } = await supabase.rpc('cleanup_login_attempts', { p_retention_days: 30 });
-    console.log(`[cron] Login attempts cleanup complete: ${error ? 'error: ' + error.message : data + ' records deleted'}`);
-  } catch (err) {
-    console.error('[cron] Login attempts cleanup failed:', err);
-  }
+    const { data, error } = await supabase.rpc('cleanup_login_attempts', {
+      p_retention_days: 30,
+    });
+    // Throwing rather than logging makes runScheduledJob record it as a failed
+    // run instead of a successful one with an error buried in the message.
+    if (error) throw new Error(error.message);
+    return { recordsDeleted: data };
+  });
 });
 
 // Health check — no auth required, rate-limited to 10 req/min per IP
@@ -73,7 +92,25 @@ app.route('/api/health', health);
 
 const port = parseInt(process.env.PORT || '3000', 10);
 
-console.log(`Lociate edge functions starting on port ${port}`);
+log.info('starting', {
+  port,
+  nodeVersion: process.version,
+  version: process.env.EDGE_FUNCTION_VERSION ?? '1.0.0',
+  redisConfigured: Boolean(process.env.REDIS_URL),
+  apnsConfigured: Boolean(process.env.APNS_KEY_P8),
+});
+
+// US-215: an unhandled rejection or uncaught exception would otherwise kill the
+// process with only Node's default stderr dump, losing the structured context.
+process.on('unhandledRejection', (reason) => {
+  log.error('unhandled rejection', errorFields(reason));
+});
+process.on('uncaughtException', (error) => {
+  log.error('uncaught exception', errorFields(error));
+  // Re-raise: a process in an unknown state should be replaced by the orchestrator,
+  // not left running.
+  process.exit(1);
+});
 
 serve({ fetch: app.fetch, port });
 

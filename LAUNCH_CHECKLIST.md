@@ -79,7 +79,7 @@ story in `prd.json` (US-185 onward) with the full finding in its `notes`.
 This section is generated — run `python3 scripts/sync-launch-checklist.py` after
 changing a story's status.
 
-### Resolved (24)
+### Resolved (25)
 
 - [x] **US-185** — iOS: restore Xcode project source membership for all 104 Swift files
 - [x] **US-186** — iOS: add SPM package dependencies (supabase-swift, RevenueCat, TelemetryDeck)
@@ -103,10 +103,11 @@ changing a story's status.
 - [x] **US-207** — Backend: automated RLS cross-tenant isolation test
 - [x] **US-210** — Remove the stale Loci/ directory and harden secret hygiene
 - [x] **US-214** — Backend: idempotent migration runner with applied-version tracking
+- [x] **US-215** — Operability: deep health checks, container healthcheck, and structured logs
 - [x] **US-217** — Reconcile launch documentation with the audited state of the repository
 - [x] **US-218** — Fix RLS infinite recursion that broke every authenticated read of loci
 
-### Still open (10) — resolve or explicitly defer before launch
+### Still open (9) — resolve or explicitly defer before launch
 
 - [ ] **US-197** — Android: add FCM push so Android has parity with iOS notifications
 - [ ] **US-199** — Add crash and error reporting across clients and edge functions
@@ -116,7 +117,6 @@ changing a story's status.
 - [ ] **US-211** — iOS: localization catalog and migration of hardcoded strings
 - [ ] **US-212** — Android: biometric app lock for parity with iOS
 - [ ] **US-213** — Android: Glance widget for parity with the iOS Premium widget
-- [ ] **US-215** — Operability: deep health checks, container healthcheck, and structured logs
 - [ ] **US-216** — Android: AI categorization and security audit log parity
 
 > **What this audit found.** The previous version of this section listed two open
@@ -169,6 +169,35 @@ See LAUNCH_RUNBOOK.md §8–9 for the full Coolify walkthrough. Checklist summar
 - [ ] RevenueCat webhook endpoint registered in RevenueCat dashboard → `https://<edge-fns>/webhooks/revenuecat`
 
 ---
+
+---
+
+## 5b. Observability (US-215)
+
+- [ ] **⚠️** Uptime monitor pointed at `https://<EDGE_DOMAIN>/api/health` — expects
+      HTTP **200**. The endpoint returns **503** when Postgres, Storage, Auth, or
+      Redis is unreachable, so a plain "is it up" check on the root domain would
+      miss a degraded backend entirely.
+      - Check interval: 60s, alert after 2 consecutive failures
+      - Suggested free options: Better Stack, Healthchecks.io, UptimeRobot
+- [ ] Alert routed somewhere a human sees out of hours (not just email)
+- [ ] Coolify log drain configured, or `docker logs` retention raised — every log
+      line is single-line JSON with `level`, `msg`, `time`, `service`, and a
+      `requestId` that is echoed to clients in `X-Request-Id`, so a user-reported
+      failure can be traced to its exact request
+- [ ] `LOG_LEVEL` set (`info` in production; `debug` only while diagnosing)
+- [ ] Confirm the container healthcheck passes after deploy:
+      `docker compose -f docker-compose.prod.yml ps` shows edge-functions as
+      `healthy`
+- [ ] Confirm cron outcomes appear in logs — `{"msg":"cron completed","job":"..."}`
+      for `analyze-loci` (02:00), `push-digest` (Sun 10:00), and
+      `cleanup-login-attempts` (03:00)
+
+> The compose healthcheck previously ran `curl -f http://localhost:3000/health`,
+> which failed on two counts: `node:20-alpine` ships no curl, and the route is
+> `/api/health`. The container was permanently unhealthy, so with `restart: always`
+> it restart-looped and Traefik never routed to it. Now `node healthcheck.mjs`,
+> declared in both the Dockerfile and compose.
 
 ## 6. Third-party dashboards (**ℹ️ Manual**)
 
