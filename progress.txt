@@ -1,10 +1,10 @@
 # Lociate - Ralph Progress Tracker
 ## Project: Lociate — Your Spatial Memory
-## Branch: ralph/loci-mvp
+## Branch: claude/production-gaps-deep-dive-yoov53
 ## Started: 2026-03-25
-## Status: IN PROGRESS
-## Total Stories: 184
-## Completed: 184/184
+## Status: IN PROGRESS — production readiness audit (US-185..US-218)
+## Total Stories: 218
+## Completed: 206/218 (US-185..US-218 = 2026-07 production readiness audit)
 
 ---
 
@@ -324,6 +324,71 @@ Note: "loci" (lowercase, plural) remains the internal domain term for saved pins
 - Reduce Motion alternatives for all animations (US-104)
 
 ---
+
+---
+
+## Phase 15: Production Readiness Audit (US-185 → US-218)
+
+A deep-dive audit against "can this actually ship" found that the 184/184 figure
+above described stories written, not a shippable product. Neither app could build
+and the backend's core read path did not work. See LAUNCH_CHECKLIST.md §4 for the
+full findings and prd.json notes for per-story detail.
+
+### Build integrity — resolved
+- [x] US-185: Xcode project source membership (72 of 104 files had no target)
+- [x] US-186: SPM package dependencies (zero declared; sources imported Supabase)
+- [x] US-187: widget extension target + the missing @main WidgetBundle
+- [x] US-188: unit-test target + committed shared scheme
+- [x] US-189: Gradle wrapper + the dependencyResolutionManagement typo
+- [x] US-190: MAPS_API_KEY manifest placeholder
+- [x] US-191: Android launcher icons
+- [x] US-192: androidTest source set + HiltTestRunner
+- [x] US-193: CI triggers (every workflow named branches this repo lacks)
+
+### Broken features — resolved
+- [x] US-194: Android sync uploaded nothing while reporting success
+- [x] US-195: iOS never registered for APNs
+- [x] US-196: server-side APNs sender was a console.log
+- [x] US-198: TelemetryDeck was entirely commented out
+- [x] US-218: RLS recursion broke every authenticated read of loci
+
+### Store submission — resolved
+- [x] US-200: PrivacyInfo.xcprivacy (app + widget)
+- [x] US-201: PNG app icons (catalog held only an SVG)
+- [x] US-202: production aps-environment for Release
+- [x] US-203: deep links (unregistered scheme, mismatched hosts, TEAM_ID placeholder)
+
+### Verification — resolved
+- [x] US-205: iOS unit tests for tier enforcement, geofencing, signing, encryption
+- [x] US-206: edge-function vitest suite (npm test previously always failed)
+- [x] US-207: RLS cross-tenant isolation suite
+- [x] US-210: secret hygiene + gitleaks CI
+
+### Still open
+- [ ] US-197: Android FCM push
+- [ ] US-199: crash reporting (iOS, Android, edge)
+- [ ] US-204: store listing metadata
+- [ ] US-208: Android unit tests (sync, geofencing, billing, Room)
+- [ ] US-209: Android instrumented smoke test
+- [ ] US-211: iOS localization catalog
+- [ ] US-212: Android biometric lock (tier-table parity)
+- [ ] US-213: Android Glance widget (tier-table parity)
+- [ ] US-214: tracked migration runner
+- [ ] US-215: operability (deep health checks, structured logs)
+- [ ] US-216: Android AI categorization + audit log (tier-table parity)
+- [ ] US-217: launch documentation reconciliation
+
+### Notes for future iterations
+19. **The Xcode project is generated.** Run `python3 scripts/generate-xcodeproj.py`
+    after adding or removing a Swift file; CI fails on drift.
+20. **App icons are generated** from `design/*.svg` via
+    `scripts/generate-app-icons.py`; CI fails on drift.
+21. **Backend tests are runnable locally**: `scripts/run-backend-tests.sh` against
+    any Postgres with PostGIS. It applies every migration to a scratch database and
+    asserts cross-tenant isolation.
+22. **Migrations are applied with `scripts/apply-migrations.sh`**, never by looping
+    psql over the files — the ledger in `public.schema_migrations` is what makes a
+    partial apply detectable.
 
 ## Notes for Ralph Iterations
 

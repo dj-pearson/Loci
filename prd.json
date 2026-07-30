@@ -3642,8 +3642,8 @@
         "DEPLOYMENT.md and LAUNCH_CHECKLIST.md §5 replace the manual-apply instruction"
       ],
       "priority": 214,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed. Added scripts/apply-migrations.sh with a public.schema_migrations ledger recording filename, checksum, applied_at, and applied_by. Each migration and its ledger row commit in a single transaction, so a failure rolls back both and the ledger can never claim a migration that did not fully apply. A checksum mismatch on an already-applied file aborts with remediation rather than stacking later migrations onto an unknown schema. Modes: default apply, --dry-run, --status, and --baseline for a database provisioned before the runner existed (records without executing). Verified end to end against real PostgreSQL 16 + PostGIS: fresh apply of all 10 migrations, re-run is a clean no-op, drift on an edited 004 aborts with exit 1, baseline then apply reports up to date, and an intentionally failing migration left neither a ledger row nor its partial CREATE TABLE behind. docker-compose.prod.yml's manual psql-loop instruction and LAUNCH_CHECKLIST §5 both replaced."
     },
     {
       "id": "US-215",
@@ -3690,8 +3690,8 @@
         "No checklist item claims done for something this audit found broken"
       ],
       "priority": 217,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed. Rewrote LAUNCH_CHECKLIST.md §4 from the two-item list it was into the full audit ledger: 22 resolved items and 12 still open, each keyed to its US number, with a summary of what the audit actually found — iOS could not compile, Android could not configure, every authenticated read of loci failed, CI had never run, Android sync discarded data, and push was unwired end to end. Hardened the §10 go/no-go gate: it now requires green CI on master with branch protection configured (§7b), a schema_migrations status through 010, and a real-device end-to-end pass, and it names the tier-parity caveat — the pricing table advertises a widget, AI categorization, and biometric lock that Android does not yet have (US-212/213/216), so either ship them or adjust the Play listing and paywall copy. progress.txt totals corrected to 206/218 with a Phase 15 section and four new iteration notes covering the generated Xcode project, generated icons, the runnable backend suite, and the migration runner. README gained a Building and Verifying section with the real prerequisites — project regeneration, BuildSecrets generation, local.properties, the Gradle wrapper, and the association-file env vars — none of which were documented. No checklist item now claims done for something this audit found broken."
     },
     {
       "id": "US-218",

@@ -23,10 +23,22 @@
 #   ANTHROPIC_API_KEY, REVENUECAT_WEBHOOK_SECRET, REQUEST_SIGNING_KEY
 #
 # Migrations are NOT run automatically (./migrations is not bind-mounted).
-# Apply them on first deploy via:
-#   docker compose -f docker-compose.prod.yml exec -T postgres \
-#     psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" < migrations/001_create_users.sql
-#   # (repeat for each migration in order, or use a migration tool)
+# Apply them with the tracked runner (US-214) — it records every applied file with
+# its checksum in public.schema_migrations, applies only what is pending, and
+# refuses to continue if an already-applied file has changed:
+#
+#   PGHOST=<host> PGPORT=5432 PGUSER=postgres PGPASSWORD=... PGDATABASE=lociate \
+#     scripts/apply-migrations.sh --dry-run   # review what would run
+#   PGHOST=... scripts/apply-migrations.sh    # apply
+#   PGHOST=... scripts/apply-migrations.sh --status
+#
+# Re-running is safe. On a database provisioned before the runner existed, record
+# the existing schema once with `--baseline` (records without executing) and then
+# apply normally from there.
+#
+# Do NOT loop psql over the files by hand: that was the previous instruction and it
+# left no record of what had been applied, so a partial or double apply was
+# undetectable.
 
 services:
   postgres:

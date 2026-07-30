@@ -39,6 +39,11 @@ jobs:
       - name: Verify generated app icons match the source artwork
         run: python3 scripts/generate-app-icons.py --check
 
+      # US-217: §4 of the launch checklist is derived from prd.json. Letting it
+      # drift is how the gate came to green-light an unshippable build.
+      - name: Verify launch checklist matches prd.json
+        run: python3 scripts/sync-launch-checklist.py --check
+
   swiftlint:
     name: SwiftLint
     runs-on: macos-14
