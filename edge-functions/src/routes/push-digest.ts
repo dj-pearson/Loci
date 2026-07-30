@@ -1,29 +1,40 @@
 import { Hono } from 'hono';
 import { getSupabaseAdmin } from '../middleware/auth.js';
+import { sendApnsPush, type SendApnsOptions } from '../lib/apns.js';
 
 const pushDigest = new Hono();
 
-interface UserDigest {
-  userId: string;
-  apnsToken: string;
-  displayName: string;
-  lociCreatedThisWeek: number;
-  totalLoci: number;
-  mostVisitedLocation: string | null;
+export interface DigestResult {
+  sent: number;
+  skipped: number;
+  /** Tokens APNs rejected as permanently dead, cleared from users.apns_token. */
+  invalidated: number;
 }
 
-async function sendApnsPush(token: string, title: string, body: string): Promise<boolean> {
-  // APNs HTTP/2 push — in production, use a proper APNs library
-  // For now, use the Supabase edge function or a push service
-  console.log(`[push] Would send to ${token.slice(0, 8)}...: ${title} — ${body}`);
-  // Placeholder: actual APNs integration requires certificates and HTTP/2
-  return true;
+/**
+ * US-196: clearing the token is not optional bookkeeping. A dead token left in
+ * place is retried on every weekly run forever, and `sent` counts stay inflated.
+ */
+async function clearApnsToken(
+  supabase: ReturnType<typeof getSupabaseAdmin>,
+  userId: string
+): Promise<void> {
+  const { error } = await supabase
+    .from('users')
+    .update({ apns_token: null })
+    .eq('id', userId);
+  if (error) {
+    console.error(`[push] failed to clear dead apns_token for ${userId}: ${error.message}`);
+  }
 }
 
-async function generateDigests(): Promise<{ sent: number; skipped: number }> {
+async function generateDigests(
+  apnsOptions: SendApnsOptions = {}
+): Promise<DigestResult> {
   const supabase = getSupabaseAdmin();
   let sent = 0;
   let skipped = 0;
+  let invalidated = 0;
 
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
   const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
@@ -35,7 +46,10 @@ async function generateDigests(): Promise<{ sent: number; skipped: number }> {
     .not('apns_token', 'is', null);
 
   if (usersError || !users?.length) {
-    return { sent: 0, skipped: 0 };
+    if (usersError) {
+      console.error(`[push] failed to load users: ${usersError.message}`);
+    }
+    return { sent: 0, skipped: 0, invalidated: 0 };
   }
 
   for (const user of users) {
@@ -108,15 +122,40 @@ async function generateDigests(): Promise<{ sent: number; skipped: number }> {
 
     const title = `Your Weekly Loci Digest`;
 
-    const success = await sendApnsPush(user.apns_token, title, body);
-    if (success) {
+    const result = await sendApnsPush(
+      user.apns_token,
+      {
+        title,
+        body,
+        threadId: 'weekly-digest',
+        // One digest per user per week — collapse so a retried run replaces
+        // rather than stacks notifications.
+        collapseId: 'weekly-digest',
+      },
+      apnsOptions
+    );
+
+    if (result.ok) {
       sent++;
-    } else {
-      skipped++;
+      continue;
     }
+
+    if (result.invalidToken) {
+      await clearApnsToken(supabase, user.id);
+      invalidated++;
+      continue;
+    }
+
+    if (!result.skipped) {
+      console.error(
+        `[push] digest delivery failed for ${user.id}: ` +
+          `status=${result.status ?? 'n/a'} reason=${result.reason ?? 'unknown'}`
+      );
+    }
+    skipped++;
   }
 
-  return { sent, skipped };
+  return { sent, skipped, invalidated };
 }
 
 // Manual trigger endpoint

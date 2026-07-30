@@ -3355,8 +3355,8 @@
         "Vitest covers token-invalidation and retry paths against a mocked HTTP client"
       ],
       "priority": 196,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed. New src/lib/apns.ts replaces the console.log stub: ES256 provider JWT minted from APNS_KEY_P8/APNS_KEY_ID/APNS_TEAM_ID (signed with dsaEncoding 'ieee-p1363' so the signature is the JOSE r||s form Apple requires, not Node's default DER) and cached for 50 minutes; HTTP/2 POST to /3/device/<token> with apns-topic and apns-push-type: alert; APNS_HOST selects the sandbox gateway unless NODE_ENV=production. 410 Gone and 400 BadDeviceToken/Unregistered/DeviceTokenNotForTopic are reported as invalidToken so push-digest clears users.apns_token instead of retrying a dead token every week; 429/5xx and transport errors retry with 250/500/1000ms backoff; missing credentials degrade to a logged no-op rather than crashing the sidecar. Digest counts are now real ({sent, skipped, invalidated}). Transport is injectable, so 16 vitest cases cover the JWT shape, caching, header contract, every invalidation path, retry/backoff, and the unconfigured no-op — no live APNs connection needed. Escaped-newline PEMs are restored for single-line secret stores. APNs env vars documented in .env.example."
     },
     {
       "id": "US-197",
@@ -3517,8 +3517,8 @@
         "`npm test` and `npm run typecheck` both pass locally and in ci.yml"
       ],
       "priority": 206,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed. Added vitest.config.ts, tsconfig.test.json, package-lock.json, and 68 tests across 7 files — `npm test` previously ran `vitest run` against zero test files and therefore always failed. Coverage: webhook signature (valid, tampered body, absent header, unset secret, wrong-length and wrong-value hex), replay window in both directions, entitlement-to-tier mapping including cancellation grace, request-signing middleware (canonical string byte-identical to the iOS/Android implementations, clock skew both ways, malformed hex returning 401 rather than 500, unconfigured skip), rate limiting (headers, 429 + Retry-After, per-IP isolation, multi-hop x-forwarded-for, window reset, Redis-failure fallback, documented per-endpoint limits), health (per-dependency status, 503 on each failure, no secret leakage), APNs, and account deletion. `npm run typecheck` now covers the tests too. Fixed two real defects the account-delete tests exposed: every step was a bare await with no error check, so a failed delete still returned {success:true} — telling a user their data was erased when it was not; and storage list() was unpaginated, so any user with more than 100 recordings kept every object past the first page. Deletion now reports failedStep with a 500, paginates storage removal, and treats an already-deleted auth user as success so repeat calls stay idempotent."
     },
     {
       "id": "US-207",

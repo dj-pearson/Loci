@@ -1,0 +1,12 @@
+{
+  // Typechecks the test suite without letting it into the build output — the
+  // base config deliberately limits rootDir/include to src/ so `npm run build`
+  // emits only shippable code.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "rootDir": ".",
+    "types": ["node", "vitest/globals"]
+  },
+  "include": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts"]
+}

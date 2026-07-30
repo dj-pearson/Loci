@@ -48,7 +48,10 @@ cron.schedule('0 2 * * *', async () => {
 cron.schedule('0 10 * * 0', async () => {
   console.log('[cron] Starting weekly push digest...');
   const result = await generateDigests();
-  console.log(`[cron] Digest complete: ${result.sent} sent, ${result.skipped} skipped`);
+  console.log(
+    `[cron] Digest complete: ${result.sent} sent, ${result.skipped} skipped, ` +
+      `${result.invalidated} dead tokens cleared`
+  );
 });
 
 // US-146: Cron: daily cleanup of old login attempts at 3 AM

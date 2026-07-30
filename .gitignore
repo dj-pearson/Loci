@@ -35,6 +35,7 @@ fastlane/test_output/
 # Node.js (edge functions + web)
 node_modules/
 dist/
+coverage/
 .astro/
 .wrangler/
 
