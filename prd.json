@@ -3796,6 +3796,19 @@
       "priority": "critical",
       "passes": true,
       "notes": "Root cause is that no Package.resolved is committed, so SPM resolves to the newest version in range on every single build — a new swift-issue-reporting release requiring Swift 6 arrived and broke a build that had never been green to begin with. Two things were wrong and both are fixed. (a) All five iOS jobs pinned `runs-on: macos-14` plus `xcode-select -s /Applications/Xcode_15.4.app`, which is Swift 5.10. They now use macos-15, whose default is Xcode 16.x, and instead of a hardcoded path there is a step that prints the toolchain and fails with a single actionable message if the Swift major version is below 6 — so a future image change cannot reproduce the ninety-error wall. The project keeps SWIFT_VERSION = 5.0, so app code still compiles in Swift 5 language mode under the newer compiler; only the dependencies get the toolchain they now require. (b) Both xcodebuild invocations hardcoded `name=iPhone 15`, which would have broken on any image whose Xcode dropped that device type. Building now uses `generic/platform=iOS Simulator` (no bootable device is needed to compile) and the test job discovers an available iPhone from `simctl list devices available`, failing loudly if there is none. The parsing was verified against realistic simctl output including iPad and Vision Pro entries, which it correctly ignores. STILL OUTSTANDING: Package.resolved is not committed. The build now uploads it as an artifact so it can be downloaded and committed; until that happens every iOS build is resolving dependency versions afresh and is not reproducible. This is the single highest-value remaining fix and it needs one successful CI run to produce the file."
+    },
+    {
+      "id": "US-225",
+      "title": "The Android app built for the first time; 3 of 84 unit tests then failed",
+      "description": "With the Gradle configuration failure gone, `assembleDebug` succeeded — the first successful Android build in this repository's history — and `testDebugUnitTest` ran 84 tests, of which 3 failed. Neither failure was a real regression; both were defects that no one had been able to see because the job had never got this far.",
+      "acceptanceCriteria": [
+        "DeepLinkAppLinkTest runs its assertions instead of failing at initialization",
+        "Both isValidEmail tests pass on a plain JVM test with no Robolectric",
+        "isValidEmail keeps exactly the behaviour of android.util.Patterns.EMAIL_ADDRESS"
+      ],
+      "priority": "high",
+      "passes": true,
+      "notes": "DeepLinkAppLinkTest failed with initializationError — IllegalArgumentException from DefaultSdkPicker — before a single assertion ran. Robolectric emulates targetSdk when no SDK is configured, targetSdk here is 35, and Robolectric 4.13 has no android-all jar that high; the throwing branch was confirmed by reading DefaultSdkPicker.java at the reported line in the robolectric-4.13 tag. app/src/test/resources/robolectric.properties now pins sdk=34, which takes the explicitly-enumerated branch instead of deriving from targetSdk. The other two failures were NullPointerExceptions in InputSanitizerTest, because InputSanitizer.isValidEmail called android.util.Patterns.EMAIL_ADDRESS — a framework constant that is null in a plain JVM unit test. Nothing about validating an email needs the Android framework, so the AOSP expression is now inlined verbatim as a Kotlin Regex; that fixes the tests and also removes a framework dependency from a pure validation function. Behaviour equivalence was checked against nine inputs including all five the tests assert, plus a subdomain address, a TLD-less address, a double @ and an embedded space. DeepLinkValidatorTest also imports android.net.Uri but mocks it with mockk, so it was unaffected and needed no change."
     }
   ]
 }

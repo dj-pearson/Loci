@@ -389,8 +389,9 @@ first real run — three of them my own new gates failing on my own code.
 - [x] US-222: two password literals removed, four scanner false positives scoped
 - [x] US-223: the iOS build and the Kotlin compile ran for the first time, and failed
 - [x] US-224: xcodebuild ran, and a floating dependency needed Swift 6
+- [x] US-225: the Android app built; 3 of 84 unit tests then failed
 
-### All 224 stories pass. Remaining launch work is manual (portals, secrets,
+### All 225 stories pass. Remaining launch work is manual (portals, secrets,
 ### screenshots, real-device verification) — see LAUNCH_CHECKLIST.md.
 
 ### Notes for future iterations
@@ -437,11 +438,17 @@ first real run — three of them my own new gates failing on my own code.
     release requiring Swift 6 broke the build. The CI build job uploads the resolved
     file as the `package-resolved` artifact; download it and commit it to
     `Lociate/Lociate.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/`.
-32. **Do not hardcode an Xcode version or a simulator device name.** Build with
+32. **Robolectric emulates `targetSdk`.** With targetSdk 35 and Robolectric 4.13,
+    every Robolectric test dies at initialization. `app/src/test/resources/`
+    `robolectric.properties` pins `sdk=34`; raise it when Robolectric is upgraded.
+33. **Never call an `android.*` framework class from code a JVM unit test exercises.**
+    `android.util.Patterns.EMAIL_ADDRESS` is null off-device, so two tests failed with
+    NPEs rather than assertions. Prefer pure Kotlin for validation logic.
+34. **Do not hardcode an Xcode version or a simulator device name.** Build with
     `generic/platform=iOS Simulator`; for tests, discover a device from
     `xcrun simctl list devices available`. The iOS jobs assert Swift >= 6 rather than
     pinning an Xcode path.
-33. **A gitignored generated source still has to be in the pbxproj.** The generator
+35. **A gitignored generated source still has to be in the pbxproj.** The generator
     walks the filesystem, so `ALWAYS_APP_SOURCES` in `scripts/generate-xcodeproj.py`
     is what puts `BuildSecrets.swift` in the target. Add to that list, not the walk,
     for anything generated at build time.
