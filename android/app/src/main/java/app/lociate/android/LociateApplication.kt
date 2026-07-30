@@ -3,7 +3,9 @@ package app.lociate.android
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import app.lociate.android.service.GeofenceRegistrationWorker
 import app.lociate.android.service.PushRegistrationService
+import app.lociate.android.service.SyncWorker
 import app.lociate.android.util.CrashReporting
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
@@ -44,6 +46,15 @@ class LociateApplication : Application() {
         } else {
             Timber.i("FCM disabled in this build — no google-services.json")
         }
+
+        // US-219: proximity notifications are the whole point of the app, and
+        // nothing registered geofences anywhere. Registering on every cold start
+        // re-asserts them after a reboot, a force-stop, or a permission change.
+        GeofenceRegistrationWorker.enqueue(this)
+
+        // US-194: the sync worker was never scheduled either, so even a working
+        // upload would only have run on an explicit pull-to-refresh.
+        SyncWorker.schedulePeriodicSync(this)
     }
 
     private fun createNotificationChannels() {

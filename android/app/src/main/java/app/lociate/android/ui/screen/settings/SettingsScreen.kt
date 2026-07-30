@@ -20,6 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Fingerprint
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
@@ -49,6 +50,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.hilt.navigation.compose.hiltViewModel
+import app.lociate.android.R
 import app.lociate.android.ui.theme.DesignTokens
 import app.lociate.android.ui.theme.LociateGradients
 import app.lociate.android.ui.theme.premiumCard
@@ -60,7 +66,11 @@ fun SettingsScreen(
     onCreateHouseholdClick: () -> Unit = {},
     onJoinHouseholdClick: () -> Unit = {},
     onHouseholdMembersClick: () -> Unit = {},
-    onUpgradeClick: () -> Unit = {}
+    onUpgradeClick: () -> Unit = {},
+    onSecurityActivityClick: () -> Unit = {},
+    // US-212: injected so the biometric toggle reflects and persists real state.
+    // It was previously local `remember` state that did nothing at all.
+    viewModel: SettingsViewModel = hiltViewModel()
 ) {
     Column(
         modifier = Modifier
@@ -134,13 +144,30 @@ fun SettingsScreen(
 
         // Security Section
         SettingsSection(title = "Security") {
-            var biometricEnabled by remember { mutableStateOf(false) }
-            SettingsToggle(
-                icon = Icons.Default.Fingerprint,
-                title = "Biometric Lock",
-                subtitle = "Require fingerprint or face to open",
-                checked = biometricEnabled,
-                onCheckedChange = { biometricEnabled = it }
+            val security by viewModel.securityState.collectAsState()
+
+            // Only shown when the device can actually authenticate — a toggle that
+            // silently does nothing is worse than no toggle.
+            if (security.isBiometricSupported) {
+                SettingsToggle(
+                    icon = Icons.Default.Fingerprint,
+                    title = stringResource(R.string.biometric_lock),
+                    subtitle = if (security.isBiometricEnrolled) {
+                        stringResource(R.string.biometric_lock_description)
+                    } else {
+                        stringResource(R.string.biometric_not_enrolled)
+                    },
+                    checked = security.isBiometricEnabled,
+                    onCheckedChange = viewModel::setBiometricLockEnabled
+                )
+            }
+
+            // US-216: audit-trail visibility, matching the iOS SecurityAuditLogView.
+            SettingsItem(
+                icon = Icons.Default.History,
+                title = stringResource(R.string.security_audit_log),
+                subtitle = stringResource(R.string.security_audit_log_subtitle),
+                onClick = onSecurityActivityClick
             )
         }
 

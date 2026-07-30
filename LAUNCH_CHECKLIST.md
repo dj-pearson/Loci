@@ -87,7 +87,7 @@ story in `prd.json` (US-185 onward) with the full finding in its `notes`.
 This section is generated — run `python3 scripts/sync-launch-checklist.py` after
 changing a story's status.
 
-### Resolved (27)
+### Resolved (33)
 
 - [x] **US-185** — iOS: restore Xcode project source membership for all 104 Swift files
 - [x] **US-186** — iOS: add SPM package dependencies (supabase-swift, RevenueCat, TelemetryDeck)
@@ -111,21 +111,22 @@ changing a story's status.
 - [x] **US-205** — iOS: unit tests for the critical services
 - [x] **US-206** — Edge functions: create the vitest suite the test script already assumes
 - [x] **US-207** — Backend: automated RLS cross-tenant isolation test
+- [x] **US-208** — Android: unit tests for sync, geofencing, billing, and persistence
+- [x] **US-209** — Android: instrumented smoke test for the core record-to-list flow
 - [x] **US-210** — Remove the stale Loci/ directory and harden secret hygiene
+- [x] **US-212** — Android: biometric app lock for parity with iOS
+- [x] **US-213** — Android: Glance widget for parity with the iOS Premium widget
 - [x] **US-214** — Backend: idempotent migration runner with applied-version tracking
 - [x] **US-215** — Operability: deep health checks, container healthcheck, and structured logs
+- [x] **US-216** — Android: AI categorization and security audit log parity
 - [x] **US-217** — Reconcile launch documentation with the audited state of the repository
 - [x] **US-218** — Fix RLS infinite recursion that broke every authenticated read of loci
+- [x] **US-219** — Android: nothing ever registered geofences, so proximity notifications never worked
 
-### Still open (7) — resolve or explicitly defer before launch
+### Still open (2) — resolve or explicitly defer before launch
 
 - [ ] **US-204** — Complete App Store and Play Store listing metadata
-- [ ] **US-208** — Android: unit tests for sync, geofencing, billing, and persistence
-- [ ] **US-209** — Android: instrumented smoke test for the core record-to-list flow
 - [ ] **US-211** — iOS: localization catalog and migration of hardcoded strings
-- [ ] **US-212** — Android: biometric app lock for parity with iOS
-- [ ] **US-213** — Android: Glance widget for parity with the iOS Premium widget
-- [ ] **US-216** — Android: AI categorization and security audit log parity
 
 > **What this audit found.** The previous version of this section listed two open
 > gaps and implied everything else was shippable. In fact neither app could build

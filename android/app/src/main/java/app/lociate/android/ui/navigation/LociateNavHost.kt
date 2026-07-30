@@ -34,6 +34,7 @@ import app.lociate.android.ui.screen.onboarding.OnboardingScreen
 import app.lociate.android.ui.screen.paywall.PaywallScreen
 import app.lociate.android.ui.screen.record.RecordingScreen
 import app.lociate.android.ui.screen.search.SearchScreen
+import app.lociate.android.ui.screen.settings.SecurityAuditLogScreen
 import app.lociate.android.ui.screen.settings.SettingsScreen
 
 sealed class Screen(val route: String) {
@@ -51,6 +52,8 @@ sealed class Screen(val route: String) {
     data object JoinHousehold : Screen("household/join")
     data object HouseholdMembers : Screen("household/members")
     data object Paywall : Screen("paywall")
+    /** US-216: read-only security audit log, matching the iOS view. */
+    data object SecurityAuditLog : Screen("security/audit-log")
 }
 
 data class BottomNavItem(
@@ -148,8 +151,15 @@ fun LociateNavHost(
                     onCreateHouseholdClick = { navController.navigate(Screen.CreateHousehold.route) },
                     onJoinHouseholdClick = { navController.navigate(Screen.JoinHousehold.route) },
                     onHouseholdMembersClick = { navController.navigate(Screen.HouseholdMembers.route) },
-                    onUpgradeClick = { navController.navigate(Screen.Paywall.route) }
+                    onUpgradeClick = { navController.navigate(Screen.Paywall.route) },
+                    onSecurityActivityClick = {
+                        navController.navigate(Screen.SecurityAuditLog.route)
+                    }
                 )
+            }
+
+            composable(Screen.SecurityAuditLog.route) {
+                SecurityAuditLogScreen()
             }
 
             composable(Screen.Recording.route) {

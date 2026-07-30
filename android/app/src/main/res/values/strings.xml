@@ -55,6 +55,12 @@
     <string name="data_section">Data &amp; Privacy</string>
     <string name="about_section">About</string>
     <string name="biometric_lock">Biometric Lock</string>
+    <string name="biometric_lock_description">Require Face Unlock, fingerprint, or your device passcode to open Lociate.</string>
+    <string name="biometric_prompt_title">Unlock Lociate</string>
+    <string name="biometric_prompt_subtitle">Authenticate to access your notes</string>
+    <string name="biometric_unlock">Unlock</string>
+    <string name="biometric_locked_message">Lociate is locked</string>
+    <string name="biometric_not_enrolled">Set up Face Unlock, a fingerprint, or a screen lock in system settings to use this.</string>
     <string name="quiet_hours">Quiet Hours</string>
     <string name="export_data">Export Data</string>
     <string name="delete_account">Delete Account</string>
@@ -70,6 +76,18 @@
     <string name="error_generic">Something went wrong. Please try again.</string>
     <string name="error_network">No internet connection. Your data is saved locally.</string>
     <string name="error_location_unavailable">Location unavailable. Please check your settings.</string>
+
+    <!-- Security audit log (US-216) -->
+    <string name="security_audit_log">Security Activity</string>
+    <string name="security_audit_log_subtitle">Recent sign-ins and unlocks on this device</string>
+    <string name="security_audit_log_empty">No security activity recorded yet.</string>
+
+    <!-- Widget (US-213) -->
+    <string name="widget_description">See your nearest voice notes at a glance.</string>
+    <string name="widget_title">Nearby Loci</string>
+    <string name="widget_empty">No nearby loci</string>
+    <string name="widget_locked_title">Upgrade to Premium</string>
+    <string name="widget_locked_body">See nearby loci on your home screen</string>
 
     <!-- Categories -->
     <string name="category_general">General</string>

@@ -2,6 +2,8 @@ package app.lociate.android.data.remote.api
 
 import app.lociate.android.data.remote.SupabaseClientProvider
 import app.lociate.android.service.PushRegistrationService
+import app.lociate.android.service.SecurityAuditEvent
+import app.lociate.android.service.SecurityAuditLogger
 import app.lociate.android.util.InputSanitizer
 import app.lociate.android.util.LoginAttemptTracker
 import app.lociate.android.util.SecurePreferences
@@ -26,7 +28,9 @@ class AuthRepository @Inject constructor(
     private val supabaseProvider: SupabaseClientProvider,
     private val securePreferences: SecurePreferences,
     private val loginAttemptTracker: LoginAttemptTracker,
-    private val pushRegistrationService: PushRegistrationService
+    private val pushRegistrationService: PushRegistrationService,
+    // US-216: audit trail parity with iOS (US-149).
+    private val securityAuditLogger: SecurityAuditLogger
 ) {
     private val _authState = MutableStateFlow<AuthState>(AuthState.Unauthenticated)
     val authState: StateFlow<AuthState> = _authState.asStateFlow()
@@ -69,6 +73,7 @@ class AuthRepository @Inject constructor(
             // US-197: a token obtained before the user had a session is queued
             // rather than dropped; bind it to this account now.
             pushRegistrationService.onSignIn()
+            securityAuditLogger.log(SecurityAuditEvent.SIGN_IN_SUCCESS, sanitizedEmail)
 
             Timber.d("Sign in successful for user: $userId")
             Result.success(userId)
@@ -104,6 +109,7 @@ class AuthRepository @Inject constructor(
             _authState.value = AuthState.Authenticated(userId, sanitizedEmail)
 
             pushRegistrationService.onSignIn()
+            securityAuditLogger.log(SecurityAuditEvent.SIGN_UP, sanitizedEmail)
 
             Timber.d("Sign up successful for user: $userId")
             Result.success(userId)
@@ -117,6 +123,8 @@ class AuthRepository @Inject constructor(
     }
 
     suspend fun signOut() {
+        securityAuditLogger.log(SecurityAuditEvent.SIGN_OUT)
+
         // US-197: clear the FCM token *before* dropping the session — afterwards
         // there is no authenticated row to update, and a stale token keeps
         // delivering the previous account's notifications to this device.

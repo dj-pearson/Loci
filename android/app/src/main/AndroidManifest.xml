@@ -133,6 +133,20 @@
             android:foregroundServiceType="microphone"
             android:exported="false" />
 
+        <!-- US-213: Glance home-screen widget. The tier table advertised a widget
+             on both platforms but only iOS had one. -->
+        <receiver
+            android:name=".widget.NearbyLociWidgetReceiver"
+            android:exported="false"
+            android:label="@string/widget_title">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/nearby_loci_widget_info" />
+        </receiver>
+
         <!-- Google Maps API Key -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"

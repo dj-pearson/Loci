@@ -32,7 +32,15 @@ class GeofenceService @Inject constructor(
         )
     }
 
-    fun registerGeofences(loci: List<Locus>) {
+    /**
+     * @param fromLatitude / [fromLongitude] the device's current position. Required
+     *   for nearest-first selection — see [GeofenceSelection].
+     */
+    fun registerGeofences(
+        loci: List<Locus>,
+        fromLatitude: Double? = null,
+        fromLongitude: Double? = null
+    ) {
         if (ContextCompat.checkSelfPermission(
                 context, Manifest.permission.ACCESS_FINE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
@@ -41,10 +49,15 @@ class GeofenceService @Inject constructor(
             return
         }
 
-        // Android supports up to 100 geofences (vs iOS 20)
-        val nearest = loci
-            .filter { !it.isArchived }
-            .take(AppConstants.MAX_GEOFENCES)
+        // US-208: nearest-first. This used to `.take(MAX_GEOFENCES)` from an
+        // unsorted list, so a user with more than 100 loci had an arbitrary subset
+        // monitored — notifications for loci across town, silence for the one they
+        // were standing next to.
+        val nearest = GeofenceSelection.select(
+            loci = loci,
+            fromLatitude = fromLatitude,
+            fromLongitude = fromLongitude
+        )
 
         if (nearest.isEmpty()) return
 

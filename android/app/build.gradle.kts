@@ -116,6 +116,14 @@ android {
         unitTests.isIncludeAndroidResources = true
     }
 
+    // US-208: MigrationTestHelper reads the exported schema JSON from the assets of
+    // the androidTest APK, so the schemas directory has to be on that source set.
+    sourceSets {
+        getByName("androidTest") {
+            assets.srcDirs("$projectDir/schemas")
+        }
+    }
+
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -163,6 +171,9 @@ dependencies {
     implementation(libs.datastore)
     implementation(libs.security.crypto)
     implementation(libs.biometric)
+    // US-212: BiometricPrompt needs a FragmentActivity host, so MainActivity
+    // extends FragmentActivity rather than ComponentActivity.
+    implementation(libs.fragment.ktx)
 
     // Location
     implementation(libs.play.services.location)
@@ -203,6 +214,11 @@ dependencies {
 
     // Google Play Billing
     implementation("com.android.billingclient:billing-ktx:6.1.0")
+
+    // US-213: Glance home-screen widget. The tier table advertises a widget on
+    // both platforms, but only iOS had one.
+    implementation(libs.glance.appwidget)
+    implementation(libs.glance.material3)
 
     // Image Loading
     implementation(libs.coil.compose)

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- US-213: Glance widget metadata. Sizing mirrors the iOS systemSmall and
+     systemMedium families so the two platforms present the same shapes. -->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="110dp"
+    android:minHeight="110dp"
+    android:targetCellWidth="2"
+    android:targetCellHeight="2"
+    android:maxResizeWidth="250dp"
+    android:maxResizeHeight="110dp"
+    android:resizeMode="horizontal|vertical"
+    android:widgetCategory="home_screen"
+    android:description="@string/widget_description"
+    android:previewLayout="@layout/widget_preview"
+    android:initialLayout="@layout/widget_loading"
+    android:updatePeriodMillis="3600000" />
