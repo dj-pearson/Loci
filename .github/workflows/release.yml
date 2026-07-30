@@ -20,14 +20,29 @@ concurrency:
 jobs:
   release:
     name: Build & Submit to App Store
-    runs-on: macos-14
+    runs-on: macos-15
     timeout-minutes: 60
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Select Xcode
-        run: sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
+      # No hardcoded Xcode path. supabase-swift pulls in swift-issue-reporting, which
+      # uses `internal import` — that requires Swift 6. Xcode 15.4 is Swift 5.10 and
+      # failed with ~90 "Access level on imports require
+      # '-enable-experimental-feature AccessLevelOnImport'" errors. The macos-15 image
+      # default is Xcode 16.x; this asserts it instead of trusting it silently, so a
+      # future image change produces one clear message rather than a wall of them.
+      - name: Verify the Swift toolchain
+        run: |
+          xcodebuild -version
+          swift --version
+          major=$(swift --version 2>&1 | sed -n 's/.*Swift version \([0-9]*\).*/\1/p' | head -1)
+          if [ "${major:-0}" -lt 6 ]; then
+            echo "::error::Swift ${major:-unknown} is too old — swift-issue-reporting requires Swift 6."
+            echo "Xcodes present on this runner:"
+            ls -d /Applications/Xcode*.app || true
+            exit 1
+          fi
 
       - name: Cache SPM Dependencies
         uses: actions/cache@v4

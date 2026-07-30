@@ -388,8 +388,9 @@ first real run — three of them my own new gates failing on my own code.
 - [x] US-221: Android CI failed at configuration time; local.properties was never read
 - [x] US-222: two password literals removed, four scanner false positives scoped
 - [x] US-223: the iOS build and the Kotlin compile ran for the first time, and failed
+- [x] US-224: xcodebuild ran, and a floating dependency needed Swift 6
 
-### All 223 stories pass. Remaining launch work is manual (portals, secrets,
+### All 224 stories pass. Remaining launch work is manual (portals, secrets,
 ### screenshots, real-device verification) — see LAUNCH_CHECKLIST.md.
 
 ### Notes for future iterations
@@ -431,7 +432,16 @@ first real run — three of them my own new gates failing on my own code.
     `sed -i` without an argument, `date -d`, `grep -P`, `stat -c`, or `base64 -w`.
     `scripts/generate-secrets.sh` is the only script a macos-* job runs — keep it
     portable. Both incompatibilities in it were found one CI round at a time.
-31. **A gitignored generated source still has to be in the pbxproj.** The generator
+31. **Commit `Package.resolved`.** It is NOT committed, so every iOS build resolves
+    SPM versions afresh and is not reproducible — that is how a swift-issue-reporting
+    release requiring Swift 6 broke the build. The CI build job uploads the resolved
+    file as the `package-resolved` artifact; download it and commit it to
+    `Lociate/Lociate.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/`.
+32. **Do not hardcode an Xcode version or a simulator device name.** Build with
+    `generic/platform=iOS Simulator`; for tests, discover a device from
+    `xcrun simctl list devices available`. The iOS jobs assert Swift >= 6 rather than
+    pinning an Xcode path.
+33. **A gitignored generated source still has to be in the pbxproj.** The generator
     walks the filesystem, so `ALWAYS_APP_SOURCES` in `scripts/generate-xcodeproj.py`
     is what puts `BuildSecrets.swift` in the target. Add to that list, not the walk,
     for anything generated at build time.
