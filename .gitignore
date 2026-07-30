@@ -45,8 +45,11 @@ dist/
 *.key
 *.pem
 
-# Build-time generated secrets (use BuildSecrets.swift.example as template)
-Lociate/Configuration/BuildSecrets.swift
+# Build-time generated secrets (use BuildSecrets.swift.example as template).
+# Path-independent on purpose: the old `Loci/Configuration/BuildSecrets.swift`
+# slipped past a single hardcoded path after the Loci -> Lociate rename and got
+# committed (US-210).
+**/Configuration/BuildSecrets.swift
 
 # Android local config (use android/local.properties.example as template)
 android/local.properties

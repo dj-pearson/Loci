@@ -3578,8 +3578,8 @@
         "git log confirms the removed file only ever held placeholder values — documented in the story notes"
       ],
       "priority": 210,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed. Deleted the stale Loci/ directory and untracked Loci/Configuration/BuildSecrets.swift. Audited every revision of that file: it only ever held placeholders (localhost URL, 'your-local-anon-key', 'appl_REPLACE_WITH_KEY') plus the public Let's Encrypt ISRG Root X1 intermediate pin — no real credential was ever committed, so no history rewrite is needed. .gitignore now matches **/Configuration/BuildSecrets.swift instead of one hardcoded path, which is what let the pre-rename copy slip through. generate-secrets.sh gained assert_untracked(), refusing to write to any path git tracks or that .gitignore does not cover; verified both branches (tracked -> exit 1 with remediation, untracked -> generates). Added a secret-scan CI job (gitleaks + an explicit git ls-files assertion covering BuildSecrets.swift, local.properties, google-services.json, and key/keystore extensions) with .gitleaks.toml allowlisting the documented placeholders."
     },
     {
       "id": "US-211",

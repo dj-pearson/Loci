@@ -131,3 +131,35 @@ jobs:
       - name: Build
         working-directory: web
         run: npm run build
+
+  secret-scan:
+    name: Secret Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # gitleaks needs history to scan commits, not just the working tree.
+          fetch-depth: 0
+
+      - name: Run gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_CONFIG: .gitleaks.toml
+
+      # US-210: a generated secret file must never be tracked. The pre-rename
+      # Loci/Configuration/BuildSecrets.swift was committed exactly this way.
+      - name: Assert no generated secret files are tracked
+        run: |
+          tracked=$(git ls-files \
+            '**/Configuration/BuildSecrets.swift' \
+            '**/local.properties' \
+            '**/google-services.json' \
+            '**/*.p8' '**/*.p12' '**/*.jks' '**/*.keystore' || true)
+          if [ -n "$tracked" ]; then
+            echo "::error::Generated secret files are tracked by git:"
+            echo "$tracked"
+            exit 1
+          fi
+          echo "No generated secret files tracked."

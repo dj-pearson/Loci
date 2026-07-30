@@ -68,6 +68,33 @@ android_required=(
     "MAPS_API_KEY"
 )
 
+# US-210: refuse to write a secret file to a path git is tracking. The previous
+# `Loci/Configuration/BuildSecrets.swift` was committed because .gitignore named
+# one hardcoded path and the rename moved the real one — this guard makes that
+# class of mistake fail loudly instead of leaking credentials into a commit.
+assert_untracked() {
+    local target=$1
+    local rel
+    rel="$(realpath --relative-to="$REPO_ROOT" "$target")"
+
+    if ! git -C "$REPO_ROOT" rev-parse --git-dir >/dev/null 2>&1; then
+        return 0  # not a git checkout (e.g. a release tarball); nothing to guard
+    fi
+
+    if git -C "$REPO_ROOT" ls-files --error-unmatch "$rel" >/dev/null 2>&1; then
+        echo "ERROR: refusing to write secrets to '$rel' — that path is tracked by git." >&2
+        echo "Remove it from the index (git rm --cached '$rel') and confirm it is" >&2
+        echo "covered by .gitignore before running this script again." >&2
+        exit 1
+    fi
+
+    if ! git -C "$REPO_ROOT" check-ignore -q "$rel"; then
+        echo "ERROR: '$rel' is not matched by .gitignore." >&2
+        echo "Writing real secrets there risks committing them. Add a matching rule first." >&2
+        exit 1
+    fi
+}
+
 check_vars() {
     local -n vars=$1
     local missing=()
@@ -83,6 +110,7 @@ check_vars() {
 }
 
 generate_ios() {
+    assert_untracked "$IOS_OUTPUT"
     local cert_backup="${CERT_BACKUP_PIN_HASH:-C5+lpZ7tcVwmwQIMcRtPbsQtWLABXhQzejna0wHFr8M=}"
     cat > "$IOS_OUTPUT" << SWIFT
 // AUTO-GENERATED FILE — DO NOT EDIT MANUALLY
@@ -119,6 +147,8 @@ SWIFT
 }
 
 generate_android() {
+    assert_untracked "$ANDROID_OUTPUT"
+
     # Preserve an existing sdk.dir if the file already exists (Android Studio
     # writes it on first sync; CI doesn't need it because ANDROID_HOME is set).
     local sdk_line=""
