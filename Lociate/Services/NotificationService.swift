@@ -96,7 +96,7 @@ final class NotificationService: NSObject, UNUserNotificationCenterDelegate {
     // MARK: - Queued Notifications
 
     /// Notifications suppressed during quiet hours, keyed by locus ID.
-    private var queuedNotifications: [UUID: Locus] = []
+    private var queuedNotifications: [UUID: Locus] = [:]
     private var quietHoursEndTimer: Timer?
 
     /// Delivers any queued notifications that were suppressed during quiet hours.
