@@ -13,7 +13,7 @@ struct SecurityAuditLogView: View {
                 ContentUnavailableView(
                     "No Security Events",
                     systemImage: "shield.checkered",
-                    description: Text("Authentication events will appear here.")
+                    description: Text(String(localized: "Authentication events will appear here."))
                 )
             } else {
                 ForEach(entries, id: \.id) { entry in
@@ -39,7 +39,7 @@ struct SecurityAuditLogView: View {
                 }
             }
         }
-        .navigationTitle("Security Log")
+        .navigationTitle(String(localized: "Security Log"))
         .onAppear {
             entries = SecurityAuditLogger.shared.recentEntries(modelContext: modelContext)
         }

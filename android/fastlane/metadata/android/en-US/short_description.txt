@@ -1,0 +1,1 @@
+Record a voice note. Lociate pins it to that spot and reminds you when back.

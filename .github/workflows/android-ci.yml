@@ -1,12 +1,14 @@
 name: Android CI — Build, Lint & Test
 
+# US-193: PRs target `master` here, not `main`. The path filter is kept off the
+# pull_request trigger for the required-check note in LAUNCH_CHECKLIST.md — a
+# required check that is skipped by a path filter blocks the merge queue.
 on:
   push:
-    branches: [develop, 'feature/*', 'claude/*']
-    paths: ['android/**']
+    branches: [master, 'claude/*', 'feature/*']
+    paths: ['android/**', '.github/workflows/android-ci.yml']
   pull_request:
-    branches: [main]
-    paths: ['android/**']
+    branches: [master]
 
 concurrency:
   group: android-ci-${{ github.ref }}

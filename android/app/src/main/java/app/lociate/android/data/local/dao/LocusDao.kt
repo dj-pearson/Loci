@@ -51,6 +51,13 @@ interface LocusDao {
     @Query("SELECT * FROM loci WHERE sync_status != 'SYNCED'")
     suspend fun getUnsynced(): List<LocusEntity>
 
+    /**
+     * One-shot active loci. US-219: the geofence worker needs a snapshot, not a
+     * Flow — a worker that collected a Flow would never complete.
+     */
+    @Query("SELECT * FROM loci WHERE is_archived = 0")
+    suspend fun observeAllActiveOnce(): List<LocusEntity>
+
     @Query("SELECT COUNT(*) FROM loci WHERE is_archived = 0")
     fun observeActiveCount(): Flow<Int>
 

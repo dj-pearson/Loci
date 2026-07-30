@@ -1,45 +1,63 @@
 import { Hono } from 'hono';
 import { getSupabaseAdmin } from '../middleware/auth.js';
+import { dispatchPush, tokenColumnFor, type DispatchOptions } from '../lib/push.js';
+import { log } from '../lib/logger.js';
 
 const pushDigest = new Hono();
 
-interface UserDigest {
-  userId: string;
-  apnsToken: string;
-  displayName: string;
-  lociCreatedThisWeek: number;
-  totalLoci: number;
-  mostVisitedLocation: string | null;
+export interface DigestResult {
+  sent: number;
+  skipped: number;
+  /** Tokens the platform rejected as permanently dead, now cleared. */
+  invalidated: number;
 }
 
-async function sendApnsPush(token: string, title: string, body: string): Promise<boolean> {
-  // APNs HTTP/2 push — in production, use a proper APNs library
-  // For now, use the Supabase edge function or a push service
-  console.log(`[push] Would send to ${token.slice(0, 8)}...: ${title} — ${body}`);
-  // Placeholder: actual APNs integration requires certificates and HTTP/2
-  return true;
+/**
+ * US-196/US-197: clearing a dead token is not optional bookkeeping. Left in place
+ * it is retried on every weekly run forever, and `sent` counts stay inflated.
+ */
+async function clearToken(
+  supabase: ReturnType<typeof getSupabaseAdmin>,
+  userId: string,
+  platform: 'ios' | 'android'
+): Promise<void> {
+  const column = tokenColumnFor(platform);
+  const { error } = await supabase
+    .from('users')
+    .update({ [column]: null })
+    .eq('id', userId);
+  if (error) {
+    log.error('failed to clear dead push token', { userId, column, error: error.message });
+  }
 }
 
-async function generateDigests(): Promise<{ sent: number; skipped: number }> {
+async function generateDigests(
+  pushOptions: DispatchOptions = {}
+): Promise<DigestResult> {
   const supabase = getSupabaseAdmin();
   let sent = 0;
   let skipped = 0;
+  let invalidated = 0;
 
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
   const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
-  // Get active users with APNs tokens
+  // US-197: select both token columns and filter in code. A `.not('apns_token',
+  // 'is', null)` filter excluded every Android-only user, so they could never have
+  // received a digest even once FCM existed.
   const { data: users, error: usersError } = await supabase
     .from('users')
-    .select('id, display_name, apns_token')
-    .not('apns_token', 'is', null);
+    .select('id, display_name, apns_token, fcm_token');
 
   if (usersError || !users?.length) {
-    return { sent: 0, skipped: 0 };
+    if (usersError) {
+      log.error('failed to load users for digest', { error: usersError.message });
+    }
+    return { sent: 0, skipped: 0, invalidated: 0 };
   }
 
   for (const user of users) {
-    if (!user.apns_token) {
+    if (!user.apns_token && !user.fcm_token) {
       skipped++;
       continue;
     }
@@ -108,15 +126,39 @@ async function generateDigests(): Promise<{ sent: number; skipped: number }> {
 
     const title = `Your Weekly Loci Digest`;
 
-    const success = await sendApnsPush(user.apns_token, title, body);
-    if (success) {
+    const outcome = await dispatchPush(
+      {
+        userId: user.id,
+        apnsToken: user.apns_token,
+        fcmToken: user.fcm_token,
+      },
+      {
+        title,
+        body,
+        threadId: 'weekly-digest',
+        // One digest per user per week — collapse so a retried run replaces
+        // rather than stacks notifications.
+        collapseId: 'weekly-digest',
+      },
+      pushOptions
+    );
+
+    // Clear every dead token, even when another platform succeeded — a user with
+    // two devices should not keep a stale token on one of them.
+    for (const platform of outcome.invalid) {
+      await clearToken(supabase, user.id, platform);
+      invalidated++;
+    }
+
+    // Delivered to at least one device counts as sent.
+    if (outcome.delivered.length > 0) {
       sent++;
-    } else {
+    } else if (outcome.invalid.length === 0) {
       skipped++;
     }
   }
 
-  return { sent, skipped };
+  return { sent, skipped, invalidated };
 }
 
 // Manual trigger endpoint

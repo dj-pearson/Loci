@@ -10,8 +10,22 @@ import timber.log.Timber
  */
 object DeepLinkValidator {
 
-    private const val SCHEME = "loci"
+    /**
+     * US-203: the manifest declared `lociate://locus` while this validator only
+     * accepted `loci://locus`, so every deep link the app could actually receive
+     * was rejected. Both custom schemes are now accepted — `lociate` canonical,
+     * `loci` for parity with links already emitted by the iOS widget — alongside
+     * https App Links.
+     */
+    private val CUSTOM_SCHEMES = setOf("lociate", "loci")
+    private const val HTTPS_SCHEME = "https"
     private const val HOST_LOCUS = "locus"
+
+    /** Hosts permitted for https App Links; must match web/public/.well-known/assetlinks.json. */
+    private val APP_LINK_HOSTS = setOf("lociate.app", "www.lociate.app")
+
+    /** Path prefixes permitted for https App Links; must match the AASA paths. */
+    private val APP_LINK_PATH_PREFIXES = setOf("locus", "open")
 
     /**
      * Validates and extracts a locus ID from a deep-link intent.
@@ -34,19 +48,35 @@ object DeepLinkValidator {
      * Validates a deep-link URI and extracts the locus ID.
      */
     fun extractLocusIdFromUri(uri: Uri): String? {
-        // Only accept loci:// scheme
-        if (uri.scheme != SCHEME) {
-            Timber.w("Rejected deep-link with unknown scheme: ${uri.scheme}")
-            return null
+        val locusId = when (uri.scheme) {
+            in CUSTOM_SCHEMES -> {
+                if (uri.host != HOST_LOCUS) {
+                    Timber.w("Rejected deep-link with unknown host: ${uri.host}")
+                    return null
+                }
+                uri.lastPathSegment
+            }
+
+            HTTPS_SCHEME -> {
+                if (uri.host !in APP_LINK_HOSTS) {
+                    Timber.w("Rejected App Link with unknown host: ${uri.host}")
+                    return null
+                }
+                val segments = uri.pathSegments
+                if (segments.size < 2 || segments[0] !in APP_LINK_PATH_PREFIXES) {
+                    Timber.w("Rejected App Link with unexpected path: ${uri.path}")
+                    return null
+                }
+                segments[1]
+            }
+
+            else -> {
+                Timber.w("Rejected deep-link with unknown scheme: ${uri.scheme}")
+                return null
+            }
         }
 
-        // Only accept loci://locus/{id}
-        if (uri.host != HOST_LOCUS) {
-            Timber.w("Rejected deep-link with unknown host: ${uri.host}")
-            return null
-        }
-
-        val locusId = uri.lastPathSegment
+        // The UUID check is the injection guard: it runs on every accepted route.
         if (locusId == null || !isValidUuid(locusId)) {
             Timber.w("Rejected deep-link with invalid locus ID: $locusId")
             return null

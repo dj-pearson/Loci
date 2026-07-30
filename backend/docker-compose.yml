@@ -222,7 +222,10 @@ services:
       REDIS_URL: redis://redis:6379
       PORT: 3000
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:3000/health || exit 1"]
+      # US-215: was `curl -f http://localhost:3000/health`, which failed on two
+      # counts — node:20-alpine has no curl, and the route is /api/health. The
+      # container was permanently unhealthy, so Traefik never routed to it.
+      test: ["CMD", "node", "healthcheck.mjs"]
       interval: 10s
       timeout: 5s
       retries: 5

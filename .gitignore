@@ -32,9 +32,16 @@ fastlane/Preview.html
 fastlane/screenshots/
 fastlane/test_output/
 
+# Generated at build time from APPLE_TEAM_ID / ANDROID_SHA256_CERT_FP (US-203).
+# Committing these risks shipping the placeholder Team ID that broke universal
+# links; see web/scripts/generate-association-files.mjs.
+web/public/.well-known/apple-app-site-association
+web/public/.well-known/assetlinks.json
+
 # Node.js (edge functions + web)
 node_modules/
 dist/
+coverage/
 .astro/
 .wrangler/
 
@@ -45,11 +52,18 @@ dist/
 *.key
 *.pem
 
-# Build-time generated secrets (use BuildSecrets.swift.example as template)
-Lociate/Configuration/BuildSecrets.swift
+# Build-time generated secrets (use BuildSecrets.swift.example as template).
+# Path-independent on purpose: the old `Loci/Configuration/BuildSecrets.swift`
+# slipped past a single hardcoded path after the Loci -> Lociate rename and got
+# committed (US-210).
+**/Configuration/BuildSecrets.swift
 
 # Android local config (use android/local.properties.example as template)
 android/local.properties
+
+# Firebase config (US-197) — use google-services.json.example as the template
+android/google-services.json
+android/app/google-services.json
 
 # Android build output & upload keystore
 android/.gradle/

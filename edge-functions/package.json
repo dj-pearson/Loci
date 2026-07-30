@@ -11,10 +11,12 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "test": "vitest run",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.test.json",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@hono/node-server": "^1.8.0",
+    "@sentry/node": "^8.55.2",
     "@supabase/supabase-js": "^2.39.0",
     "hono": "^4.0.0",
     "ioredis": "^5.3.2",
@@ -23,6 +25,7 @@
   "devDependencies": {
     "@types/node": "^20.11.0",
     "@types/node-cron": "^3.0.11",
+    "@vitest/coverage-v8": "^1.6.1",
     "tsx": "^4.7.0",
     "typescript": "^5.3.0",
     "vitest": "^1.2.0"

@@ -1,9 +1,11 @@
 name: Deploy — TestFlight
 
+# US-193: this repository's default branch is `master`; the previous `main`
+# trigger meant TestFlight deploys never fired.
 on:
   push:
     branches:
-      - main
+      - master
 
 concurrency:
   group: deploy-testflight

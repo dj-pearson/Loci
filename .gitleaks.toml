@@ -1,0 +1,21 @@
+# gitleaks configuration for Lociate (US-210).
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Non-secret values that look like credentials"
+paths = [
+  # Template files carry deliberate placeholders.
+  '''Lociate/Configuration/BuildSecrets\.swift\.example''',
+  '''android/local\.properties\.example''',
+  '''backend/\.env\.example''',
+  '''edge-functions/\.env\.example''',
+]
+regexes = [
+  # Let's Encrypt ISRG Root X1 intermediate SPKI pin — a public CA fingerprint
+  # shipped as the default backup certificate pin, not a secret.
+  '''C5\+lpZ7tcVwmwQIMcRtPbsQtWLABXhQzejna0wHFr8M=''',
+  # Documented placeholders.
+  '''your-(local-)?anon-key''',
+  '''appl_REPLACE_WITH_KEY''',
+]

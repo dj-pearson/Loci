@@ -1,19 +1,62 @@
 name: CI — Build & Lint
 
+# US-193: this repository's default branch is `master`. The previous triggers
+# (push to develop/feature/*, PRs into main) matched no branch that exists here,
+# so no workflow had ever gated a change.
 on:
   push:
     branches:
-      - develop
+      - master
+      - 'claude/*'
       - 'feature/*'
   pull_request:
     branches:
-      - main
+      - master
 
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  xcode-project:
+    name: Xcode Project Up To Date
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # US-185: the project file drifted so far by hand that 72 of 104 Swift
+      # sources had no target membership and the app could not compile. This
+      # fails the build if project.pbxproj no longer matches the source tree.
+      - name: Verify generated project matches the source tree
+        run: python3 scripts/generate-xcodeproj.py --check
+
+      - name: Install icon rasterization deps
+        run: pip install --quiet cairosvg pillow
+
+      # US-201: the committed PNGs must still match design/*.svg, or the store
+      # icon silently drifts from the brand mark.
+      - name: Verify generated app icons match the source artwork
+        run: python3 scripts/generate-app-icons.py --check
+
+      # US-217: §4 of the launch checklist is derived from prd.json. Letting it
+      # drift is how the gate came to green-light an unshippable build.
+      - name: Verify launch checklist matches prd.json
+        run: python3 scripts/sync-launch-checklist.py --check
+
+      # US-211: the catalog is derived from the sources, so a key the code asks for
+      # but the catalog lacks would otherwise resolve silently to itself.
+      - name: Verify string catalogs match the sources
+        run: python3 scripts/generate-string-catalog.py --check
+
+      - name: Verify no user-facing literal bypasses localization
+        run: python3 scripts/check-localization.py
+
+      # US-204: App Store Connect and Play both reject an over-length field, and
+      # both do it after the build has been processed. Fail here instead.
+      - name: Validate store listing metadata
+        run: python3 scripts/check-store-metadata.py
+
   swiftlint:
     name: SwiftLint
     runs-on: macos-14
@@ -30,10 +73,29 @@ jobs:
   build:
     name: Build (iOS Simulator)
     runs-on: macos-14
-    needs: swiftlint
+    needs: [swiftlint, xcode-project]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Generate BuildSecrets.swift
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          REVENUECAT_API_KEY: ${{ secrets.REVENUECAT_API_KEY }}
+          TELEMETRYDECK_APP_ID: ${{ secrets.TELEMETRYDECK_APP_ID }}
+          CERT_PIN_HASH: ${{ secrets.CERT_PIN_HASH }}
+          CERT_BACKUP_PIN_HASH: ${{ secrets.CERT_BACKUP_PIN_HASH }}
+          REQUEST_SIGNING_KEY: ${{ secrets.REQUEST_SIGNING_KEY }}
+        run: |
+          # Placeholders keep a fork PR (which cannot read secrets) building; they
+          # are never shipped because release.yml requires the real values.
+          export SUPABASE_URL="${SUPABASE_URL:-http://localhost:54321}"
+          export SUPABASE_ANON_KEY="${SUPABASE_ANON_KEY:-ci-placeholder-anon-key}"
+          export REVENUECAT_API_KEY="${REVENUECAT_API_KEY:-appl_ci_placeholder}"
+          export TELEMETRYDECK_APP_ID="${TELEMETRYDECK_APP_ID:-ci-placeholder}"
+          export CERT_PIN_HASH="${CERT_PIN_HASH:-}"
+          bash scripts/generate-secrets.sh --ios
 
       - name: Select Xcode
         run: sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
@@ -71,6 +133,25 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Generate BuildSecrets.swift
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          REVENUECAT_API_KEY: ${{ secrets.REVENUECAT_API_KEY }}
+          TELEMETRYDECK_APP_ID: ${{ secrets.TELEMETRYDECK_APP_ID }}
+          CERT_PIN_HASH: ${{ secrets.CERT_PIN_HASH }}
+          CERT_BACKUP_PIN_HASH: ${{ secrets.CERT_BACKUP_PIN_HASH }}
+          REQUEST_SIGNING_KEY: ${{ secrets.REQUEST_SIGNING_KEY }}
+        run: |
+          # Placeholders keep a fork PR (which cannot read secrets) building; they
+          # are never shipped because release.yml requires the real values.
+          export SUPABASE_URL="${SUPABASE_URL:-http://localhost:54321}"
+          export SUPABASE_ANON_KEY="${SUPABASE_ANON_KEY:-ci-placeholder-anon-key}"
+          export REVENUECAT_API_KEY="${REVENUECAT_API_KEY:-appl_ci_placeholder}"
+          export TELEMETRYDECK_APP_ID="${TELEMETRYDECK_APP_ID:-ci-placeholder}"
+          export CERT_PIN_HASH="${CERT_PIN_HASH:-}"
+          bash scripts/generate-secrets.sh --ios
 
       - name: Select Xcode
         run: sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
@@ -110,6 +191,72 @@ jobs:
           path: build/test-results.xcresult
           retention-days: 14
 
+  edge-functions:
+    name: Edge Functions — Typecheck & Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: edge-functions/package-lock.json
+
+      - name: Install Dependencies
+        working-directory: edge-functions
+        run: npm ci
+
+      - name: Typecheck
+        working-directory: edge-functions
+        run: npm run typecheck
+
+      - name: Test
+        working-directory: edge-functions
+        run: npm test
+
+      - name: Build
+        working-directory: edge-functions
+        run: npm run build
+
+  backend:
+    name: Backend — Migrations & RLS Isolation
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        # PostGIS is required: 002_create_loci.sql declares a GEOGRAPHY column.
+        image: postgis/postgis:16-3.4
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install psql client
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends postgresql-client
+
+      # US-207: applies every migration to a scratch database, then asserts that
+      # one household cannot read, write, or delete another's loci, profiles,
+      # membership, or audio objects.
+      - name: Apply migrations and run the RLS isolation suite
+        env:
+          PGHOST: localhost
+          PGPORT: '5432'
+          PGUSER: postgres
+          PGPASSWORD: postgres
+        run: bash scripts/run-backend-tests.sh
+
   web-build:
     name: Build Marketing Site
     runs-on: ubuntu-latest
@@ -131,3 +278,35 @@ jobs:
       - name: Build
         working-directory: web
         run: npm run build
+
+  secret-scan:
+    name: Secret Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # gitleaks needs history to scan commits, not just the working tree.
+          fetch-depth: 0
+
+      - name: Run gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_CONFIG: .gitleaks.toml
+
+      # US-210: a generated secret file must never be tracked. The pre-rename
+      # Loci/Configuration/BuildSecrets.swift was committed exactly this way.
+      - name: Assert no generated secret files are tracked
+        run: |
+          tracked=$(git ls-files \
+            '**/Configuration/BuildSecrets.swift' \
+            '**/local.properties' \
+            '**/google-services.json' \
+            '**/*.p8' '**/*.p12' '**/*.jks' '**/*.keystore' || true)
+          if [ -n "$tracked" ]; then
+            echo "::error::Generated secret files are tracked by git:"
+            echo "$tracked"
+            exit 1
+          fi
+          echo "No generated secret files tracked."

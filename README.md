@@ -46,6 +46,98 @@ Lociate/
 
 ---
 
+## Building and Verifying
+
+### iOS
+
+The Xcode project is **generated**, not hand-edited — it had previously drifted to
+the point where 72 of 104 Swift files belonged to no target and the app could not
+compile (US-185). After adding or removing a Swift file:
+
+```bash
+python3 scripts/generate-xcodeproj.py           # regenerate project.pbxproj + scheme
+python3 scripts/generate-xcodeproj.py --check    # what CI enforces
+```
+
+Before the first build you need `BuildSecrets.swift`, which is gitignored:
+
+```bash
+cp Lociate/Configuration/BuildSecrets.swift.example \
+   Lociate/Configuration/BuildSecrets.swift
+# or generate it from environment variables, as CI does:
+SUPABASE_URL=... SUPABASE_ANON_KEY=... REVENUECAT_API_KEY=... \
+  TELEMETRYDECK_APP_ID=... CERT_PIN_HASH=... bash scripts/generate-secrets.sh --ios
+```
+
+SPM dependencies (supabase-swift, RevenueCat, TelemetryDeck) resolve on first
+build; `xcodebuild -resolvePackageDependencies` does it explicitly.
+
+```bash
+xcodebuild -project Lociate/Lociate.xcodeproj -scheme Lociate \
+  -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 15' build
+xcodebuild -project Lociate/Lociate.xcodeproj -scheme Lociate \
+  -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 15' test
+```
+
+App icons are generated from `design/*.svg` (requires `pip install cairosvg pillow`):
+
+```bash
+python3 scripts/generate-app-icons.py
+```
+
+### Android
+
+```bash
+cp android/local.properties.example android/local.properties   # then fill in
+cd android && ./gradlew assembleDebug
+./gradlew testDebugUnitTest
+```
+
+A release build fails deliberately when `MAPS_API_KEY` is unset — a blank map
+screen in a shipped app is worse than a failed build. Pass
+`-PallowMissingMapsKey` only for a throwaway build.
+
+### Edge functions
+
+```bash
+cd edge-functions
+npm ci
+npm run typecheck
+npm test
+npm run build
+```
+
+### Backend
+
+Migrations are applied by a tracked runner that records each file's checksum, so a
+partial or double apply is detectable:
+
+```bash
+PGHOST=... PGUSER=... PGDATABASE=... scripts/apply-migrations.sh --dry-run
+PGHOST=... PGUSER=... PGDATABASE=... scripts/apply-migrations.sh
+PGHOST=... PGUSER=... PGDATABASE=... scripts/apply-migrations.sh --status
+```
+
+The RLS isolation suite applies every migration to a scratch database and asserts
+that one household cannot reach another's data. It needs PostgreSQL with PostGIS:
+
+```bash
+PGHOST=... PGUSER=postgres bash scripts/run-backend-tests.sh
+```
+
+### Marketing site
+
+```bash
+cd web && npm ci && npm run build
+```
+
+The build generates `.well-known/apple-app-site-association` and `assetlinks.json`
+from `APPLE_TEAM_ID` and `ANDROID_SHA256_CERT_FP`, and fails in production if
+either is unset — the previously committed file contained a literal `TEAM_ID`
+placeholder, which silently broke every universal link.
+
+---
+
 ## Ralph Autonomous Build System
 
 This project uses [Ralph](https://ghuntley.com/ralph/) by Snarktank for autonomous iterative development. Ralph runs Claude Code CLI in a loop, completing one user story per iteration. The `prd.json` and `progress.txt` files serve as memory between iterations.

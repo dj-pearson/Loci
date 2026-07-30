@@ -1,10 +1,10 @@
 # Lociate - Ralph Progress Tracker
 ## Project: Lociate — Your Spatial Memory
-## Branch: ralph/loci-mvp
+## Branch: claude/production-gaps-deep-dive-yoov53
 ## Started: 2026-03-25
-## Status: IN PROGRESS
-## Total Stories: 184
-## Completed: 184/184
+## Status: AUDIT COMPLETE — all 219 stories pass; remaining launch work is manual (see LAUNCH_CHECKLIST.md)
+## Total Stories: 219
+## Completed: 219/219 (US-185..US-219 = 2026-07 production readiness audit)
 
 ---
 
@@ -324,6 +324,86 @@ Note: "loci" (lowercase, plural) remains the internal domain term for saved pins
 - Reduce Motion alternatives for all animations (US-104)
 
 ---
+
+---
+
+## Phase 15: Production Readiness Audit (US-185 → US-218)
+
+A deep-dive audit against "can this actually ship" found that the 184/184 figure
+above described stories written, not a shippable product. Neither app could build
+and the backend's core read path did not work. See LAUNCH_CHECKLIST.md §4 for the
+full findings and prd.json notes for per-story detail.
+
+### Build integrity — resolved
+- [x] US-185: Xcode project source membership (72 of 104 files had no target)
+- [x] US-186: SPM package dependencies (zero declared; sources imported Supabase)
+- [x] US-187: widget extension target + the missing @main WidgetBundle
+- [x] US-188: unit-test target + committed shared scheme
+- [x] US-189: Gradle wrapper + the dependencyResolutionManagement typo
+- [x] US-190: MAPS_API_KEY manifest placeholder
+- [x] US-191: Android launcher icons
+- [x] US-192: androidTest source set + HiltTestRunner
+- [x] US-193: CI triggers (every workflow named branches this repo lacks)
+
+### Broken features — resolved
+- [x] US-194: Android sync uploaded nothing while reporting success
+- [x] US-195: iOS never registered for APNs
+- [x] US-196: server-side APNs sender was a console.log
+- [x] US-198: TelemetryDeck was entirely commented out
+- [x] US-218: RLS recursion broke every authenticated read of loci
+
+### Store submission — resolved
+- [x] US-200: PrivacyInfo.xcprivacy (app + widget)
+- [x] US-201: PNG app icons (catalog held only an SVG)
+- [x] US-202: production aps-environment for Release
+- [x] US-203: deep links (unregistered scheme, mismatched hosts, TEAM_ID placeholder)
+
+### Verification — resolved
+- [x] US-205: iOS unit tests for tier enforcement, geofencing, signing, encryption
+- [x] US-206: edge-function vitest suite (npm test previously always failed)
+- [x] US-207: RLS cross-tenant isolation suite
+- [x] US-210: secret hygiene + gitleaks CI
+
+### Parity, operability, and store readiness — resolved
+- [x] US-197: Android FCM push (+ the digest query that excluded Android-only users)
+- [x] US-199: crash reporting on iOS, Android, and edge, with PII scrubbing
+- [x] US-204: store listing metadata + a limit validator in CI
+- [x] US-208: Android unit tests (found the destructive-migration data-loss bug)
+- [x] US-209: Android instrumented record-to-list smoke test
+- [x] US-211: iOS string catalogs, generated from source, with a lint gate
+- [x] US-212: Android biometric lock
+- [x] US-213: Android Glance widget
+- [x] US-214: tracked migration runner
+- [x] US-215: operability — the container healthcheck could never have passed
+- [x] US-216: Android AI categorization + security audit log
+- [x] US-217: launch documentation reconciliation
+- [x] US-219: nothing ever registered geofences on Android
+
+### All 219 stories pass. Remaining launch work is manual (portals, secrets,
+### screenshots, real-device verification) — see LAUNCH_CHECKLIST.md.
+
+### Notes for future iterations
+19. **The Xcode project is generated.** Run `python3 scripts/generate-xcodeproj.py`
+    after adding or removing a Swift file; CI fails on drift.
+20. **App icons are generated** from `design/*.svg` via
+    `scripts/generate-app-icons.py`; CI fails on drift.
+21. **Backend tests are runnable locally**: `scripts/run-backend-tests.sh` against
+    any Postgres with PostGIS. It applies every migration to a scratch database and
+    asserts cross-tenant isolation.
+22. **Migrations are applied with `scripts/apply-migrations.sh`**, never by looping
+    psql over the files — the ledger in `public.schema_migrations` is what makes a
+    partial apply detectable.
+23. **String catalogs are generated**: `scripts/generate-string-catalog.py` after
+    adding a `String(localized:)` key, and `scripts/check-localization.py` rejects a
+    raw user-facing literal. Both gate CI.
+24. **Store metadata is length-validated**: `scripts/check-store-metadata.py`. Apple
+    and Google reject over-length fields only after processing a build.
+25. **Never use `fallbackToDestructiveMigration()`** on Android. It drops every
+    table on a schema change, destroying voice notes that had not synced. Add a
+    migration to `LociateDatabaseMigrations` instead.
+26. **Wiring is the failure mode, not logic.** This audit found three separate
+    pieces of correct code that nothing ever called: geofence registration, periodic
+    sync, and APNs registration. When adding a service, grep for its caller.
 
 ## Notes for Ralph Iterations
 

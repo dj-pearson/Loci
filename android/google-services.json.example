@@ -1,0 +1,27 @@
+{
+  "_comment": [
+    "US-197: template only. Download the real google-services.json from the",
+    "Firebase console (Project settings -> Your apps -> Android app) and place it",
+    "at android/google-services.json. That path is gitignored.",
+    "",
+    "Without it the build still succeeds — app/build.gradle.kts applies the Google",
+    "Services plugin conditionally and sets BuildConfig.FCM_ENABLED=false, so",
+    "remote push is skipped. Local geofence notifications are unaffected."
+  ],
+  "project_info": {
+    "project_number": "000000000000",
+    "project_id": "lociate-example",
+    "storage_bucket": "lociate-example.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:000000000000:android:0000000000000000000000",
+        "android_client_info": { "package_name": "app.lociate.android" }
+      },
+      "api_key": [{ "current_key": "REPLACE_WITH_FIREBASE_API_KEY" }],
+      "services": { "appinvite_service": { "other_platform_oauth_client": [] } }
+    }
+  ],
+  "configuration_version": "1"
+}

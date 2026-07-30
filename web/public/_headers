@@ -1,0 +1,9 @@
+# US-203: iOS and Android both refuse an association file served with the wrong
+# content type, and Apple will not follow a redirect to fetch it.
+/.well-known/apple-app-site-association
+  Content-Type: application/json
+  Cache-Control: public, max-age=3600
+
+/.well-known/assetlinks.json
+  Content-Type: application/json
+  Cache-Control: public, max-age=3600

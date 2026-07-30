@@ -57,13 +57,29 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <!-- Deep link for notifications -->
+            <!-- Custom-scheme deep links from notifications and the widget.
+                 US-203: `loci` is registered alongside `lociate` so links already
+                 emitted by the iOS widget resolve on Android too. -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
-                <data
-                    android:host="locus"
-                    android:scheme="lociate" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="lociate" android:host="locus" />
+                <data android:scheme="loci" android:host="locus" />
+            </intent-filter>
+
+            <!-- https App Links. autoVerify requires
+                 https://lociate.app/.well-known/assetlinks.json to list this
+                 package and its Play App Signing SHA-256 fingerprint. Paths mirror
+                 the iOS AASA file so both platforms accept the same URLs. -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" android:host="lociate.app" android:pathPrefix="/locus" />
+                <data android:scheme="https" android:host="lociate.app" android:pathPrefix="/open" />
+                <data android:scheme="https" android:host="www.lociate.app" android:pathPrefix="/locus" />
+                <data android:scheme="https" android:host="www.lociate.app" android:pathPrefix="/open" />
             </intent-filter>
         </activity>
 
@@ -85,6 +101,26 @@
             </intent-filter>
         </receiver>
 
+        <!-- US-197: Firebase Cloud Messaging receiver. Android previously had no
+             push transport at all, so household shares and the weekly digest
+             reached iOS devices only. -->
+        <service
+            android:name=".service.LociateMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <!-- Fall back to the geofence channel and brand mark if a payload ever
+             arrives as a notification message rather than data-only. -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="geofence_notifications" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_notification" />
+
         <!-- Location Foreground Service -->
         <service
             android:name=".service.LocationForegroundService"
@@ -96,6 +132,20 @@
             android:name=".service.RecordingForegroundService"
             android:foregroundServiceType="microphone"
             android:exported="false" />
+
+        <!-- US-213: Glance home-screen widget. The tier table advertised a widget
+             on both platforms but only iOS had one. -->
+        <receiver
+            android:name=".widget.NearbyLociWidgetReceiver"
+            android:exported="false"
+            android:label="@string/widget_title">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/nearby_loci_widget_info" />
+        </receiver>
 
         <!-- Google Maps API Key -->
         <meta-data

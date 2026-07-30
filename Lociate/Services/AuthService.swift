@@ -55,6 +55,12 @@ final class AuthService {
                         break
                     }
                 }
+
+                // US-195: a device token obtained before the user had a session
+                // is queued rather than dropped; bind it to the account now.
+                if event == .signedIn, session != nil {
+                    await PushRegistrationService.shared.handleSignIn()
+                }
             }
         }
     }
@@ -242,6 +248,11 @@ final class AuthService {
         let email = try? supabaseEmail
         auditLogger.log(event: .signOut, email: email, modelContext: auditModelContext)
 
+        // US-195: clear the device's APNs token *before* dropping the session —
+        // afterwards there is no authenticated row to update, and a stale token
+        // would keep delivering another account's digests to this device.
+        await PushRegistrationService.shared.handleSignOut()
+
         try await supabase.auth.signOut()
         // US-145: Clear all session data on sign out
         sessionManager.clearSession()
@@ -258,6 +269,10 @@ final class AuthService {
 
         // Call server-side deletion RPC
         try await supabase.rpc("delete_user_account").execute()
+
+        // US-195: the users row (and its apns_token) is already gone, so only the
+        // local token state needs dropping.
+        PushRegistrationService.shared.handleAccountDeleted()
 
         // Sign out locally
         try await signOut()

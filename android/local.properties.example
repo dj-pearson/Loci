@@ -64,3 +64,6 @@ CERT_BACKUP_PIN_HASH=
 # REQUEST_SIGNING_KEY on the edge-function server and BuildSecrets.requestSigningKey
 # on iOS. Generate with: openssl rand -hex 32
 REQUEST_SIGNING_KEY=
+
+# Crash reporting (US-199). Empty disables Sentry entirely.
+SENTRY_DSN=

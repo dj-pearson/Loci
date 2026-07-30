@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- US-191: Lociate brand mark (location pin + audio waves), matching
+     Lociate/Assets.xcassets/AppIcon.appiconset/AppIcon.svg. Drawn on a 108dp
+     adaptive-icon canvas; artwork is kept inside the centre 72dp safe zone so
+     no launcher mask crops the pin. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <group android:scaleX="0.0703"
+        android:scaleY="0.0703"
+        android:translateX="18"
+        android:translateY="18">
+
+        <!-- Pin body -->
+        <path
+            android:fillColor="#FFFFFF"
+            android:fillAlpha="0.95"
+            android:pathData="M512,180C408,180 324,264 324,368C324,520 512,780 512,780C512,780 700,520 700,368C700,264 616,180 512,180Z" />
+
+        <!-- Pin aperture -->
+        <path
+            android:fillColor="#2563EB"
+            android:pathData="M512,280a88,88 0 1,0 0.1,0z" />
+
+        <!-- Audio waves, left -->
+        <path
+            android:strokeColor="#FFFFFF"
+            android:strokeAlpha="0.7"
+            android:strokeWidth="18"
+            android:strokeLineCap="round"
+            android:pathData="M380,320C362,345 352,356 352,368C352,380 362,391 380,416" />
+        <path
+            android:strokeColor="#FFFFFF"
+            android:strokeAlpha="0.45"
+            android:strokeWidth="18"
+            android:strokeLineCap="round"
+            android:pathData="M340,290C310,325 296,348 296,368C296,388 310,411 340,446" />
+
+        <!-- Audio waves, right -->
+        <path
+            android:strokeColor="#FFFFFF"
+            android:strokeAlpha="0.7"
+            android:strokeWidth="18"
+            android:strokeLineCap="round"
+            android:pathData="M644,320C662,345 672,356 672,368C672,380 662,391 644,416" />
+        <path
+            android:strokeColor="#FFFFFF"
+            android:strokeAlpha="0.45"
+            android:strokeWidth="18"
+            android:strokeLineCap="round"
+            android:pathData="M684,290C714,325 728,348 728,368C728,388 714,411 684,446" />
+    </group>
+</vector>

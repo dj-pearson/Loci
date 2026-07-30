@@ -7,6 +7,20 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
+// US-197: the Google Services plugin hard-fails when google-services.json is
+// missing, and that file is gitignored. Applying it conditionally keeps the build
+// working for a contributor without Firebase credentials — FCM then degrades to a
+// logged no-op at runtime (see PushRegistrationService.registerForPush).
+val googleServicesJson = file("google-services.json")
+if (googleServicesJson.exists()) {
+    apply(plugin = "com.google.gms.google-services")
+} else {
+    logger.lifecycle(
+        "google-services.json not found — Firebase Cloud Messaging is disabled in " +
+            "this build. See android/google-services.json.example."
+    )
+}
+
 android {
     namespace = "app.lociate.android"
     compileSdk = 35
@@ -25,12 +39,22 @@ android {
         buildConfigField("String", "SUPABASE_URL", "\"${project.findProperty("SUPABASE_URL") ?: "https://your-supabase-url.com"}\"")
         buildConfigField("String", "SUPABASE_ANON_KEY", "\"${project.findProperty("SUPABASE_ANON_KEY") ?: "your-anon-key"}\"")
         buildConfigField("String", "MAPS_API_KEY", "\"${project.findProperty("MAPS_API_KEY") ?: ""}\"")
+        // US-190: AndroidManifest.xml substitutes ${MAPS_API_KEY} into the
+        // com.google.android.geo.API_KEY meta-data. Without this placeholder the
+        // manifest merger fails and no variant can be assembled — the buildConfigField
+        // above is only readable at runtime, it does not feed the manifest.
+        manifestPlaceholders["MAPS_API_KEY"] = (project.findProperty("MAPS_API_KEY") ?: "") as String
         // Certificate pinning (SPKI SHA-256 hashes, base64). Empty values disable pinning.
         buildConfigField("String", "CERT_PIN_HASH", "\"${project.findProperty("CERT_PIN_HASH") ?: ""}\"")
         buildConfigField("String", "CERT_BACKUP_PIN_HASH", "\"${project.findProperty("CERT_BACKUP_PIN_HASH") ?: ""}\"")
         // HMAC-SHA256 shared secret for signing sensitive API mutations. Must match
         // REQUEST_SIGNING_KEY on the edge function server. Empty disables signing.
         buildConfigField("String", "REQUEST_SIGNING_KEY", "\"${project.findProperty("REQUEST_SIGNING_KEY") ?: ""}\"")
+        // US-197: lets runtime code skip FCM work entirely rather than relying on a
+        // caught exception when Firebase was never configured.
+        buildConfigField("Boolean", "FCM_ENABLED", googleServicesJson.exists().toString())
+        // US-199: crash reporting. An empty DSN disables Sentry cleanly.
+        buildConfigField("String", "SENTRY_DSN", "\"${project.findProperty("SENTRY_DSN") ?: ""}\"")
 
         javaCompileOptions {
             annotationProcessorOptions {
@@ -44,6 +68,17 @@ android {
 
     buildTypes {
         release {
+            // US-190: a release build with no Maps key produces an app whose map
+            // screen is permanently blank, which is worse than failing here.
+            // Debug builds only warn so a contributor can work without the key.
+            val mapsKey = (project.findProperty("MAPS_API_KEY") ?: "") as String
+            if (mapsKey.isBlank() && !project.hasProperty("allowMissingMapsKey")) {
+                throw GradleException(
+                    "MAPS_API_KEY is not set. Add it to android/local.properties (see " +
+                        "local.properties.example) or run scripts/generate-secrets.sh --android. " +
+                        "Pass -PallowMissingMapsKey to bypass for a non-shippable build."
+                )
+            }
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
@@ -54,6 +89,12 @@ android {
         debug {
             isDebuggable = true
             applicationIdSuffix = ".debug"
+            if (((project.findProperty("MAPS_API_KEY") ?: "") as String).isBlank()) {
+                logger.warn(
+                    "MAPS_API_KEY is not set — the map screen will render blank in this " +
+                        "debug build. See android/local.properties.example."
+                )
+            }
         }
     }
 
@@ -69,6 +110,18 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
+    }
+
+    testOptions {
+        unitTests.isIncludeAndroidResources = true
+    }
+
+    // US-208: MigrationTestHelper reads the exported schema JSON from the assets of
+    // the androidTest APK, so the schemas directory has to be on that source set.
+    sourceSets {
+        getByName("androidTest") {
+            assets.srcDirs("$projectDir/schemas")
+        }
     }
 
     packaging {
@@ -118,6 +171,9 @@ dependencies {
     implementation(libs.datastore)
     implementation(libs.security.crypto)
     implementation(libs.biometric)
+    // US-212: BiometricPrompt needs a FragmentActivity host, so MainActivity
+    // extends FragmentActivity rather than ComponentActivity.
+    implementation(libs.fragment.ktx)
 
     // Location
     implementation(libs.play.services.location)
@@ -159,11 +215,26 @@ dependencies {
     // Google Play Billing
     implementation("com.android.billingclient:billing-ktx:6.1.0")
 
+    // US-213: Glance home-screen widget. The tier table advertises a widget on
+    // both platforms, but only iOS had one.
+    implementation(libs.glance.appwidget)
+    implementation(libs.glance.material3)
+
     // Image Loading
     implementation(libs.coil.compose)
 
     // Logging
     implementation(libs.timber)
+
+    // US-197: Firebase Cloud Messaging. The dependency compiles without
+    // google-services.json; only the generated config resources are missing, which
+    // PushRegistrationService handles.
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.messaging)
+
+    // US-199: crash reporting. SDK only — the Sentry Gradle plugin would need
+    // SENTRY_AUTH_TOKEN at build time, which no contributor should require.
+    implementation(libs.sentry.android)
 
     // Unit Testing
     testImplementation(libs.junit)
@@ -173,12 +244,22 @@ dependencies {
     testImplementation(libs.coroutines.test)
     testImplementation(libs.core.testing)
     testImplementation(libs.room.testing)
+    // US-203: DeepLinkValidator uses android.net.Uri, which needs a real Android
+    // runtime. Robolectric provides one on the JVM so the URI contract is covered
+    // by fast unit tests rather than only by instrumented ones.
+    testImplementation(libs.robolectric)
 
-    // Android Testing
+    // Android Testing — US-192: hilt-android-testing supplies HiltTestApplication,
+    // which the custom runner in app/src/androidTest returns from newApplication().
+    // Without it the runner cannot exist and connectedAndroidTest fails to configure.
     androidTestImplementation(libs.espresso)
     androidTestImplementation(libs.test.runner)
+    androidTestImplementation(libs.test.rules)
+    androidTestImplementation(libs.test.core)
+    androidTestImplementation(libs.test.ext.junit)
     androidTestImplementation(libs.compose.ui.test.junit4)
     androidTestImplementation(libs.truth)
     androidTestImplementation(libs.hilt.android)
+    androidTestImplementation(libs.hilt.android.testing)
     kspAndroidTest(libs.hilt.compiler)
 }

@@ -1,0 +1,10 @@
+First release.
+
+Record a voice note and Lociate pins it to the exact spot. When you come back, it
+finds you.
+
+• Voice notes pinned to GPS coordinates, transcribed on-device
+• Proximity notifications when you return to a saved place
+• Map and list views with category filters and search
+• Family sharing for up to 6 household members
+• Works completely offline; cloud sync is optional

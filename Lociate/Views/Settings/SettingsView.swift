@@ -454,7 +454,7 @@ struct SettingsView: View {
                 HStack {
                     Label(String(localized: "Household"), systemImage: "house")
                     Spacer()
-                    Text("\(householdMembers.count) members")
+                    Text(String(localized: "household_member_count", count: householdMembers.count))
                         .foregroundStyle(.secondary)
                 }
 

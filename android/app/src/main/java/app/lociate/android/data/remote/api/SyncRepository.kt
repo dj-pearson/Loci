@@ -6,6 +6,7 @@ import app.lociate.android.data.local.dao.LocusDao
 import app.lociate.android.data.remote.SupabaseClientProvider
 import app.lociate.android.data.remote.dto.LocusDto
 import app.lociate.android.domain.model.SyncStatus
+import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.storage.storage
 import kotlinx.coroutines.Dispatchers
@@ -15,6 +16,19 @@ import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 
+/**
+ * Outcome of an upload pass, so [app.lociate.android.service.SyncWorker] can
+ * choose between success, retry, and failure instead of guessing.
+ */
+data class SyncUploadResult(
+    val uploaded: Int,
+    val failed: Int,
+    /** True when at least one locus failed and is worth retrying. */
+    val retryable: Boolean
+) {
+    val attempted: Int get() = uploaded + failed
+}
+
 @Singleton
 class SyncRepository @Inject constructor(
     private val supabaseProvider: SupabaseClientProvider,
@@ -22,43 +36,77 @@ class SyncRepository @Inject constructor(
 ) {
     private val postgrest get() = supabaseProvider.client.postgrest
     private val storage get() = supabaseProvider.client.storage
+    private val auth get() = supabaseProvider.client.auth
 
     /**
      * Upload all unsynced loci to the Supabase backend.
+     *
+     * A locus is only marked [SyncStatus.SYNCED] once both the audio object and
+     * the row have landed. A failure leaves the row unsynced so the next pass
+     * retries it — marking it [SyncStatus.CONFLICTED] on a network blip (as this
+     * used to) is wrong: a conflict is a merge problem, not a transport problem,
+     * and `getUnsynced()` would keep returning it with no way to tell the two
+     * apart.
      */
-    suspend fun uploadUnsynced(): Result<Int> = withContext(Dispatchers.IO) {
+    suspend fun uploadUnsynced(): Result<SyncUploadResult> = withContext(Dispatchers.IO) {
         try {
             val unsynced = locusDao.getUnsynced()
-            if (unsynced.isEmpty()) return@withContext Result.success(0)
+            if (unsynced.isEmpty()) {
+                return@withContext Result.success(SyncUploadResult(0, 0, retryable = false))
+            }
 
-            var successCount = 0
+            val userId = auth.currentSessionOrNull()?.user?.id
+            if (userId == null) {
+                // Not signed in. Sync is additive, so this is not an error —
+                // leave everything pending for after the next sign-in.
+                Timber.d("Skipping sync upload — no authenticated session")
+                return@withContext Result.success(SyncUploadResult(0, 0, retryable = false))
+            }
+
+            var uploaded = 0
+            var failed = 0
+            var retryable = false
+
             for (entity in unsynced) {
                 try {
                     val locus = entity.toDomain()
 
-                    // 1. Upload audio file to Supabase Storage
+                    // 1. Audio object. Bucket and path must match what iOS writes
+                    //    and what the storage RLS policy in 005_storage_bucket.sql
+                    //    enforces — the first path segment has to be the user id,
+                    //    or INSERT is denied outright.
                     val audioFile = File(locus.audioFilePath)
                     if (audioFile.exists()) {
-                        val bucket = storage.from("audio")
-                        val storagePath = "loci/${locus.id}/${audioFile.name}"
-                        bucket.upload(storagePath, audioFile.readBytes())
+                        storage.from(AUDIO_BUCKET).upload(
+                            path = remoteAudioPath(userId, locus.id.toString()),
+                            data = audioFile.readBytes()
+                        ) {
+                            // Idempotent: a retry after a partial pass overwrites
+                            // instead of failing with "object already exists".
+                            upsert = true
+                        }
+                    } else {
+                        Timber.w("Audio file missing for locus ${entity.id}; uploading row only")
                     }
 
-                    // 2. Upsert locus record via PostgREST
-                    val dto = LocusDto.fromDomain(locus)
-                    postgrest.from("loci").upsert(dto)
+                    // 2. Row — only after the audio is durable, so a household
+                    //    member never sees a locus whose audio 404s.
+                    postgrest.from("loci").upsert(LocusDto.fromDomain(locus))
 
-                    // 3. Mark as synced locally
+                    // 3. Local status, only now that both steps succeeded.
                     locusDao.updateSyncStatus(entity.id, SyncStatus.SYNCED.name)
-                    successCount++
+                    uploaded++
                 } catch (e: Exception) {
-                    Timber.e(e, "Failed to sync locus: ${entity.id}")
-                    locusDao.updateSyncStatus(entity.id, SyncStatus.CONFLICTED.name)
+                    // A per-locus failure must not abort the batch: one unreadable
+                    // file should not block every other pending note.
+                    Timber.e(e, "Failed to sync locus ${entity.id}")
+                    failed++
+                    retryable = true
                 }
             }
 
-            Timber.d("Sync completed: $successCount/${unsynced.size} loci uploaded")
-            Result.success(successCount)
+            Timber.d("Sync upload: $uploaded ok, $failed failed of ${unsynced.size}")
+            Result.success(SyncUploadResult(uploaded, failed, retryable))
         } catch (e: Exception) {
             Timber.e(e, "Sync upload failed")
             Result.failure(e)
@@ -97,5 +145,20 @@ class SyncRepository @Inject constructor(
             Timber.e(e, "Download merge failed")
             Result.failure(e)
         }
+    }
+
+    companion object {
+        /**
+         * Created by backend/migrations/005_storage_bucket.sql. The previous
+         * value ("audio") named a bucket that does not exist, so every Android
+         * audio upload failed even once the worker started calling this at all.
+         */
+        const val AUDIO_BUCKET = "loci-audio"
+
+        /**
+         * Matches the iOS `AudioSyncService` layout exactly — a household member
+         * on the other platform has to resolve the same object.
+         */
+        fun remoteAudioPath(userId: String, locusId: String): String = "$userId/$locusId.m4a"
     }
 }

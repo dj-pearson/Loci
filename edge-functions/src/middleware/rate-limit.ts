@@ -268,3 +268,20 @@ export const rateLimitAuth = createRateLimiter({
 });
 
 export { createRateLimiter };
+
+/**
+ * US-215: exposed so `/api/health` can report Redis status. The health endpoint
+ * previously checked database, storage, and auth but not Redis — yet Redis backs
+ * auth rate-limit persistence, so losing it silently degrades brute-force
+ * protection to per-instance in-memory counters.
+ *
+ * Returns null when Redis is not configured or has already failed over, which the
+ * health route reports as `skipped` rather than `unhealthy`: an intentional
+ * single-instance deployment with no Redis is a valid configuration.
+ */
+export function getRedisClientForHealthCheck(): Redis | null {
+  if (!process.env.REDIS_URL || redisConnectionFailed) return null;
+  // Ensure the shared client exists; getStore() is the only thing that creates it.
+  getStore();
+  return sharedRedisClient;
+}

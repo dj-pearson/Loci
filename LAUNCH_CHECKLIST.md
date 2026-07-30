@@ -52,6 +52,69 @@ This file is the **skimmable summary**. If an item is in `LAUNCH_RUNBOOK.md`, th
 
 ---
 
+---
+
+## 2b. Store listing assets (**ℹ️ Manual**, US-204)
+
+Text metadata is committed and length-validated by
+`scripts/check-store-metadata.py` (run it before every submission). Screenshots
+cannot be generated in CI and are the remaining manual work.
+
+### Blocking before submission
+
+- [ ] **⚠️** Replace the placeholder in
+      `Lociate/fastlane/metadata/en-US/review_information/demo_password.txt` —
+      the check warns about this, and shipping it leaves the reviewer at a dead end
+- [ ] **⚠️** Demo account created and seeded with several loci **and one household**,
+      so Family sharing is reviewable without the reviewer creating a second account
+- [ ] **⚠️** App Store screenshots: 6.7" (1290×2796) and 6.5" (1284×2778), 3–10 each.
+      iPad 12.9" only if the iPad listing is enabled.
+- [ ] **⚠️** Play Store: feature graphic 1024×500, phone screenshots 2–8
+      (min 320px on the short edge), 512×512 icon — generated at
+      `Lociate/fastlane/metadata/store-assets/play-store-icon-512.png`
+
+### Screenshot capture procedure
+
+Repeatable so a rebuild does not mean re-improvising:
+
+```bash
+# 1. Boot the required simulators
+xcrun simctl boot "iPhone 15 Pro Max"     # 6.7"
+xcrun simctl boot "iPhone 14 Plus"        # 6.5"
+
+# 2. Seed demo content so every screen has something to show. The seed uses the
+#    same fixtures as backend/migrations/seed.sql.
+xcodebuild -project Lociate/Lociate.xcodeproj -scheme Lociate \
+  -destination 'platform=iOS Simulator,name=iPhone 15 Pro Max' \
+  -testPlan Screenshots test
+
+# 3. Capture, in this order — the listing tells a story
+xcrun simctl io booted screenshot 01-map.png        # map with colour-coded pins
+xcrun simctl io booted screenshot 02-recording.png  # recording in progress
+xcrun simctl io booted screenshot 03-detail.png     # locus detail + transcription
+xcrun simctl io booted screenshot 04-list.png       # list with category filters
+xcrun simctl io booted screenshot 05-family.png     # household members
+```
+
+- [ ] Screenshots contain no real personal data — use the demo account only
+- [ ] Status bar shows a clean time and full battery (`xcrun simctl status_bar`)
+- [ ] Notification screenshot shows a proximity alert, since that is the feature the
+      description leads with
+
+### Data safety / privacy answers
+
+- [ ] Play Data safety form answered to match `Lociate/PrivacyInfo.xcprivacy` and
+      App Store privacy answers. All three must agree — Apple and Google both
+      compare declarations against observed behaviour:
+      - Location (precise): collected, linked, **not** shared, app functionality
+      - Audio: collected, linked, not shared, app functionality
+      - Email + name: collected, linked, not shared, account management
+      - App activity: collected, **not** linked, analytics
+      - Crash logs: collected, not linked, diagnostics
+- [ ] Data deletion URL provided (Play requires one): `https://lociate.app/support`
+- [ ] "Data is encrypted in transit" — yes; "users can request deletion" — yes
+      (Settings → Delete Account, backed by the `account/delete` edge function)
+
 ## 3. Android — Google ecosystem (**ℹ️ Manual**)
 
 - [ ] **⚠️** Google Play Developer account created ($25 one-time)
@@ -66,22 +129,95 @@ This file is the **skimmable summary**. If an item is in `LAUNCH_RUNBOOK.md`, th
 - [ ] **⚠️** Google Play service account JSON created (for API uploads from CI) → GH secret `GOOGLE_PLAY_SERVICE_ACCOUNT_JSON`
 - [ ] **⚠️** Google Maps SDK for Android API key created in Google Cloud Console, restricted to package name + SHA-1 fingerprint → GH secret `MAPS_API_KEY`
 - [ ] **⚠️** Google Play Billing products configured matching iOS SKUs (`app.lociate.premium.monthly`, `app.lociate.family.monthly`)
+- [ ] **⚠️** Firebase project created and the Android app registered with package
+      `app.lociate.android` (US-197). Download `google-services.json` to
+      `android/google-services.json` — gitignored; see
+      `android/google-services.json.example`. Without it the build still succeeds
+      and `BuildConfig.FCM_ENABLED` is false, so remote push is skipped.
+- [ ] **⚠️** Firebase service-account key generated (Project settings → Service
+      accounts) and pasted into `backend/.env` as `FCM_SERVICE_ACCOUNT_JSON` —
+      the edge functions need it to send via FCM HTTP v1
 - [ ] App signing by Google Play enabled (Play App Signing)
 - [ ] 🔶 Internal testing track populated with tester emails
 
 ---
 
-## 4. Known gaps / hardening items still to resolve
+## 4. Known gaps / hardening items
 
-These are open items discovered in the codebase audit — resolved items are checked, open items remain.
+Open items from the 2026-07 production-readiness audit. Each maps to a
+story in `prd.json` (US-185 onward) with the full finding in its `notes`.
 
-- [x] **android-release.yml env-var flow** — workflow now runs `scripts/generate-secrets.sh --android` before `./gradlew bundleRelease` so `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `MAPS_API_KEY`, `CERT_PIN_HASH`, `CERT_BACKUP_PIN_HASH`, `REQUEST_SIGNING_KEY` are written to `local.properties` and read via `project.findProperty()`.
-- [x] **Android cert pins wired through BuildConfig** — `CertificatePinning.kt` reads `BuildConfig.CERT_PIN_HASH` / `CERT_BACKUP_PIN_HASH`; empty values produce a no-op pinner (matches iOS behaviour). Pinner is attached to the Supabase Ktor-OkHttp engine (see below) so every outbound Supabase request is pinned.
-- [x] **Android `REQUEST_SIGNING_KEY` plumbed** — `BuildConfig.REQUEST_SIGNING_KEY` is populated from `local.properties`; `RequestSigningInterceptor.kt` mirrors iOS's `HMAC-SHA256(METHOD\nPATH\nTIMESTAMP\nBODY_SHA256)` algorithm and is installed on the Supabase Ktor-OkHttp engine.
-- [x] **`backend/docker-compose.prod.yml`** — committed. Differs from dev: no port publishing for internal services, required vars fail loudly (`${VAR:?required}` syntax), `restart: always`, Traefik labels on Kong + edge-functions keyed off `KONG_DOMAIN` / `EDGE_DOMAIN`, migrations no longer bind-mounted (apply manually on first deploy — see the header of the compose file).
-- [x] **Ktor engine switch to OkHttp** — `ktor-client-android` swapped for `ktor-client-okhttp:3.0.3`, explicit `okhttp:4.12.0` added, `SupabaseClientProvider` now configures the engine via `httpEngine = OkHttp.create { preconfigured = OkHttpClient.Builder().certificatePinner(...).addInterceptor(RequestSigningInterceptor()).build() }`. This activates the pinner and signer above.
-- [ ] **Test coverage** — critical services (`SyncService`, `GeofenceManager`, `AuthService`, tier enforcement) need at minimum unit tests before external beta. Edge functions need smoke tests for `sync-subscription` webhook signature + `account-delete` idempotency.
-- [ ] **RLS cross-tenant isolation test** — no automated proof that a user in household A cannot read loci from household B. Add a pgTAP or integration test before any external users.
+This section is generated — run `python3 scripts/sync-launch-checklist.py` after
+changing a story's status.
+
+### Resolved (35)
+
+- [x] **US-185** — iOS: restore Xcode project source membership for all 104 Swift files
+- [x] **US-186** — iOS: add SPM package dependencies (supabase-swift, RevenueCat, TelemetryDeck)
+- [x] **US-187** — iOS: add the widget extension target so the Premium widget actually ships
+- [x] **US-188** — iOS: add unit-test target and shared xcscheme so tests and CI can run
+- [x] **US-189** — Android: commit the Gradle wrapper so `./gradlew` exists
+- [x] **US-190** — Android: define the MAPS_API_KEY manifest placeholder
+- [x] **US-191** — Android: generate launcher icon resources
+- [x] **US-192** — Android: add androidTest source set and the missing HiltTestRunner
+- [x] **US-193** — CI: fix workflow triggers so pipelines actually run on this repository
+- [x] **US-194** — Android: implement real sync upload in SyncWorker (currently silent data loss)
+- [x] **US-195** — iOS: register for remote notifications and persist the APNs token
+- [x] **US-196** — Edge functions: implement real APNs HTTP/2 delivery
+- [x] **US-197** — Android: add FCM push so Android has parity with iOS notifications
+- [x] **US-198** — iOS: activate TelemetryDeck instead of the commented-out no-op
+- [x] **US-199** — Add crash and error reporting across clients and edge functions
+- [x] **US-200** — iOS: add PrivacyInfo.xcprivacy privacy manifest
+- [x] **US-201** — iOS: ship a real App Store icon set
+- [x] **US-202** — iOS: use production aps-environment for Release builds
+- [x] **US-203** — Fix deep-link association files for both platforms
+- [x] **US-204** — Complete App Store and Play Store listing metadata
+- [x] **US-205** — iOS: unit tests for the critical services
+- [x] **US-206** — Edge functions: create the vitest suite the test script already assumes
+- [x] **US-207** — Backend: automated RLS cross-tenant isolation test
+- [x] **US-208** — Android: unit tests for sync, geofencing, billing, and persistence
+- [x] **US-209** — Android: instrumented smoke test for the core record-to-list flow
+- [x] **US-210** — Remove the stale Loci/ directory and harden secret hygiene
+- [x] **US-211** — iOS: localization catalog and migration of hardcoded strings
+- [x] **US-212** — Android: biometric app lock for parity with iOS
+- [x] **US-213** — Android: Glance widget for parity with the iOS Premium widget
+- [x] **US-214** — Backend: idempotent migration runner with applied-version tracking
+- [x] **US-215** — Operability: deep health checks, container healthcheck, and structured logs
+- [x] **US-216** — Android: AI categorization and security audit log parity
+- [x] **US-217** — Reconcile launch documentation with the audited state of the repository
+- [x] **US-218** — Fix RLS infinite recursion that broke every authenticated read of loci
+- [x] **US-219** — Android: nothing ever registered geofences, so proximity notifications never worked
+
+### Still open (0)
+
+All audit items resolved.
+
+> **What this audit found.** The previous version of this section listed two open
+> gaps and implied everything else was shippable. In fact neither app could build
+> and the backend's core read path did not work:
+>
+> - **iOS could not compile.** 72 of 104 Swift files had no target membership, and
+>   the project declared zero SPM packages while sources imported `Supabase` and
+>   `RevenueCat`. There was no widget target, no test target, and no shared scheme —
+>   so every `xcodebuild -scheme Lociate` call in CI and Fastlane had nothing to
+>   resolve. (US-185–188)
+> - **Android could not configure.** `settings.gradle.kts` used `dependencyResolution`
+>   instead of `dependencyResolutionManagement`, so Gradle could not evaluate the
+>   settings file at all. There was no Gradle wrapper, no launcher icons, and the
+>   `MAPS_API_KEY` manifest placeholder was undefined. (US-189–192)
+> - **Every authenticated read of `loci` failed.** The `household_members` SELECT
+>   policy filtered that table by a subquery over itself, and `loci_select_shared`
+>   depends on it — PostgreSQL aborted with "infinite recursion detected in policy".
+>   (US-218)
+> - **CI had never run.** Every workflow triggered on `develop`/`main`; this
+>   repository's default branch is `master`. (US-193)
+> - **Android sync discarded data.** `SyncWorker` marked every pending locus SYNCED
+>   without uploading anything. (US-194)
+> - **Push was unwired end to end.** Nothing on iOS ever called
+>   `registerForRemoteNotifications()`, and the server-side sender was a
+>   `console.log`. (US-195, US-196)
+>
+> Treat "the checklist says done" as a claim to verify, not evidence.
 
 ---
 
@@ -91,7 +227,8 @@ See LAUNCH_RUNBOOK.md §8–9 for the full Coolify walkthrough. Checklist summar
 
 - [ ] **⚠️** Coolify VPS provisioned (Contabo or equivalent), DNS pointed at it
 - [ ] **⚠️** Supabase stack deployed (Postgres + GoTrue + PostgREST + Storage + Kong)
-- [ ] **⚠️** All migrations applied (`backend/migrations/001_*` through `009_*`)
+- [ ] **⚠️** All migrations applied via `scripts/apply-migrations.sh` (US-214 — tracks each file's checksum in `public.schema_migrations`, applies only what is pending, and is safe to re-run). Use `--dry-run` first, and `--baseline` on a database provisioned before the runner existed.
+- [ ] **⚠️** `010_fix_rls_recursion.sql` applied — without it every authenticated read of `loci` fails with "infinite recursion detected in policy" (US-218)
 - [ ] **⚠️** PostGIS extension enabled (`CREATE EXTENSION postgis;`)
 - [ ] **⚠️** Audio storage bucket created (`005_storage_bucket.sql` handles this on fresh DB)
 - [ ] **⚠️** Edge functions sidecar deployed with `backend/.env` populated:
@@ -100,17 +237,54 @@ See LAUNCH_RUNBOOK.md §8–9 for the full Coolify walkthrough. Checklist summar
   - `REVENUECAT_WEBHOOK_SECRET`
   - `APPLE_SECRET` (Sign In With Apple client secret JWT)
   - `REQUEST_SIGNING_KEY` (shared with mobile)
+  - `APNS_KEY_P8`, `APNS_KEY_ID`, `APNS_TEAM_ID`, `APNS_TOPIC` (US-196)
+  - `FCM_SERVICE_ACCOUNT_JSON` (US-197)
+  - `SENTRY_DSN`, `LOG_LEVEL` (US-199, US-215)
 - [ ] **⚠️** TLS cert issued (Let's Encrypt via Coolify) — needed before extracting pins in §9
 - [ ] 🔶 Redis container healthy (used by `auth-rate-limit` middleware persistence)
 - [ ] RevenueCat webhook endpoint registered in RevenueCat dashboard → `https://<edge-fns>/webhooks/revenuecat`
 
 ---
 
+---
+
+## 5b. Observability (US-215)
+
+- [ ] **⚠️** Uptime monitor pointed at `https://<EDGE_DOMAIN>/api/health` — expects
+      HTTP **200**. The endpoint returns **503** when Postgres, Storage, Auth, or
+      Redis is unreachable, so a plain "is it up" check on the root domain would
+      miss a degraded backend entirely.
+      - Check interval: 60s, alert after 2 consecutive failures
+      - Suggested free options: Better Stack, Healthchecks.io, UptimeRobot
+- [ ] Alert routed somewhere a human sees out of hours (not just email)
+- [ ] Coolify log drain configured, or `docker logs` retention raised — every log
+      line is single-line JSON with `level`, `msg`, `time`, `service`, and a
+      `requestId` that is echoed to clients in `X-Request-Id`, so a user-reported
+      failure can be traced to its exact request
+- [ ] `LOG_LEVEL` set (`info` in production; `debug` only while diagnosing)
+- [ ] Confirm the container healthcheck passes after deploy:
+      `docker compose -f docker-compose.prod.yml ps` shows edge-functions as
+      `healthy`
+- [ ] Confirm cron outcomes appear in logs — `{"msg":"cron completed","job":"..."}`
+      for `analyze-loci` (02:00), `push-digest` (Sun 10:00), and
+      `cleanup-login-attempts` (03:00)
+
+> The compose healthcheck previously ran `curl -f http://localhost:3000/health`,
+> which failed on two counts: `node:20-alpine` ships no curl, and the route is
+> `/api/health`. The container was permanently unhealthy, so with `restart: always`
+> it restart-looped and Traefik never routed to it. Now `node healthcheck.mjs`,
+> declared in both the Dockerfile and compose.
+
 ## 6. Third-party dashboards (**ℹ️ Manual**)
 
 - [ ] **RevenueCat** — project created, Apple + Google entitlements + offerings configured; **Apple API key** copied into GH secret `REVENUECAT_API_KEY`. (LAUNCH_RUNBOOK.md §5)
 - [ ] **TelemetryDeck** — app created; App ID → GH secret `TELEMETRYDECK_APP_ID`. (LAUNCH_RUNBOOK.md §6)
 - [ ] **Anthropic** — API key for `analyze-loci` edge function → `backend/.env` `ANTHROPIC_API_KEY`
+- [ ] **Sentry** (US-199) — project created for each surface; DSNs into
+      `SENTRY_DSN` (GH secret for iOS/Android builds, `backend/.env` for edge).
+      An empty DSN disables reporting cleanly, so this is feature-gated, not a
+      blocker — but shipping without it means a launch-day crash loop is invisible
+      until store reviews arrive.
 - [ ] **Cloudflare Pages** — `web/` project connected to repo for marketing site auto-deploy
 
 ---
@@ -128,6 +302,7 @@ Confirm all of the following are set under Repo → Settings → Secrets and var
 - [ ] `TELEMETRYDECK_APP_ID`
 - [ ] `CERT_PIN_HASH` (optionally `CERT_BACKUP_PIN_HASH`)
 - [ ] `REQUEST_SIGNING_KEY`
+- [ ] `SENTRY_DSN` (optional — empty disables crash reporting)
 
 **Android (android-release.yml)**
 - [ ] `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`
@@ -136,14 +311,49 @@ Confirm all of the following are set under Repo → Settings → Secrets and var
 - [ ] `MAPS_API_KEY`
 - [ ] `CERT_PIN_HASH`, `CERT_BACKUP_PIN_HASH` (shared with iOS; optional — empty disables pinning)
 - [ ] `REQUEST_SIGNING_KEY` (shared with iOS + edge fns; optional — empty disables signing)
+- [ ] `SENTRY_DSN` (shared with iOS; optional)
+- [ ] `GOOGLE_SERVICES_JSON` — base64 of `google-services.json`, decoded in CI to
+      `android/google-services.json` (US-197)
 
 **Backend / infra**
 - [ ] `ANTHROPIC_API_KEY`
 - [ ] `REVENUECAT_WEBHOOK_SECRET`
 - [ ] `APPLE_SECRET`
+- [ ] `APNS_KEY_P8`, `APNS_KEY_ID`, `APNS_TEAM_ID` (US-196 — without these the
+      weekly digest and household-share pushes silently deliver nothing)
+- [ ] `FCM_SERVICE_ACCOUNT_JSON` (US-197 — same, for Android)
+- [ ] `SENTRY_DSN` (US-199)
 - [ ] Any Coolify deploy tokens used by `deploy.yml`
 
 ---
+
+---
+
+## 7b. Branch protection — required checks (**ℹ️ Manual**)
+
+Until this is configured, CI runs but nothing enforces it. Repo → Settings →
+Branches → add a rule for `master`:
+
+- [ ] Require a pull request before merging
+- [ ] Require status checks to pass, with these checks selected (all from `ci.yml`
+      and `android-ci.yml`, which trigger on `pull_request` into `master`):
+  - [ ] `Xcode Project Up To Date` — fails if `project.pbxproj` drifts from the
+        source tree (this drift is what made the app uncompilable; see US-185)
+  - [ ] `SwiftLint`
+  - [ ] `Build (iOS Simulator)`
+  - [ ] `Unit Tests`
+  - [ ] `Edge Functions — Typecheck & Test`
+  - [ ] `Backend — Migrations & RLS Isolation` — the cross-tenant isolation proof
+  - [ ] `Secret Scan`
+  - [ ] `Build Marketing Site`
+  - [ ] `Lint & Static Analysis` (Android)
+  - [ ] `Build & Test` (Android)
+- [ ] Require branches to be up to date before merging
+- [ ] Do not allow bypassing the above settings
+
+> Workflow triggers previously referenced `develop` and `main`, neither of which
+> exists in this repository — its default branch is `master` — so no workflow had
+> ever gated a change. Fixed in US-193.
 
 ## 8. Local dev quickstart (for new contributors)
 
@@ -189,6 +399,56 @@ Use that value for `CERT_PIN_HASH`. For the backup pin, re-run against the inter
 
 ---
 
+---
+
+## 9b. Deep links — verification (**ℹ️ Manual**, US-203)
+
+The AASA file previously contained the literal placeholder `TEAM_ID`, and no
+`assetlinks.json` existed at all, so universal links were broken on iOS and absent
+on Android. Both files are now generated at build time by
+`web/scripts/generate-association-files.mjs`.
+
+- [ ] **⚠️** `APPLE_TEAM_ID` set in the Cloudflare Pages project (build fails
+      without it in production, by design)
+- [ ] **⚠️** `ANDROID_SHA256_CERT_FP` set to the **Play App Signing** SHA-256
+      fingerprint — not the local upload keystore, since Play re-signs the bundle
+      (Play Console → Setup → App signing)
+- [ ] Verify both files are served as `application/json` with no redirect:
+      ```
+      curl -sI https://lociate.app/.well-known/apple-app-site-association | grep -i content-type
+      curl -sI https://lociate.app/.well-known/assetlinks.json | grep -i content-type
+      ```
+      (`web/public/_headers` sets this; Cloudflare Pages honours it.)
+- [ ] iOS: confirm Apple's CDN has picked up the file —
+      `curl -s "https://app-site-association.cdn-apple.com/a/v1/lociate.app"`
+- [ ] iOS: on device, tapping `https://lociate.app/locus/<uuid>` opens the app
+      rather than Safari
+- [ ] Android: `adb shell pm get-app-links app.lociate.android` reports
+      `verified` for both hosts
+- [ ] Custom scheme still works from the widget:
+      `xcrun simctl openurl booted "lociate://locus/<uuid>"` and
+      `adb shell am start -a android.intent.action.VIEW -d "lociate://locus/<uuid>"`
+- [ ] Associated Domains capability enabled on the App ID (§2) — without it iOS
+      never fetches the AASA file
+
 ## 10. Go/no-go gate
 
-Before flipping the App Store / Play Store listings to **Ready for Review**, every box in §1, §2, §3, §5, §6, §7 must be ticked, and all items in §4 must be either resolved or explicitly deferred with a tracked issue.
+Before flipping the App Store / Play Store listings to **Ready for Review**:
+
+1. Every box in §1, §2, §3, §5, §6, §7, §7b, §9b is ticked.
+2. **CI is green on `master`** — not merely configured. Branch protection (§7b) must
+   list the checks as required; until then CI runs but nothing enforces it. Prior to
+   US-193 no workflow had ever executed against this repository, so a green badge is
+   only meaningful after the trigger fix.
+3. Every item in §4 is resolved or explicitly deferred with a tracked issue, and the
+   deferral is recorded in `prd.json`.
+4. `scripts/apply-migrations.sh --status` on the production database lists every
+   migration through `010_fix_rls_recursion.sql`. Without 010, every authenticated
+   read of `loci` fails.
+5. A real device has been verified end to end on both platforms: record → save →
+   leave → return → proximity notification → open from the notification.
+
+**Tier-parity caveat.** The pricing table in `CLAUDE.md` advertises the widget, AI
+categorization, and biometric lock. On Android those are US-212, US-213, and US-216,
+all still open — so either ship them, or adjust the Play Store listing and the
+Android paywall copy so Android users are not sold features the build does not have.
