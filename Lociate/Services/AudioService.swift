@@ -199,7 +199,9 @@ final class AudioService {
 
     // MARK: - Error Types
 
-    enum AudioError: Equatable {
+    // Must conform to Error — every `throw AudioError.…` in this file failed to
+    // compile without it.
+    enum AudioError: Error, Equatable {
         case microphonePermissionDenied
         case sessionConfigurationFailed(String)
         case recorderCreationFailed(String)

@@ -123,7 +123,12 @@ enum CrashReportingService {
     // MARK: - Scrubbing
 
     private static func scrub(_ event: Event) -> Event? {
-        event.message?.formatted = event.message?.formatted.map(scrubText)
+        // SentryMessage.formatted is readonly, and `.map` on a String maps over its
+        // Characters — the previous one-liner was wrong three different ways. Replace
+        // the whole message instead.
+        if let formatted = event.message?.formatted {
+            event.message = SentryMessage(formatted: scrubText(formatted))
+        }
 
         // Exception *values* are the interpolated message; the type and stack frames
         // carry no user data.

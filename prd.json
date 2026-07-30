@@ -3836,6 +3836,21 @@
       "priority": "critical",
       "passes": true,
       "notes": "isOwner bound `userId` from the async session and then never used it — the return statement tested only whether ANY member held the owner role, which is true of every valid household. So every family member saw the owner-only controls in HouseholdMembersView: remove-member, generate-invite-code, delete-household. The server's RLS policies (migration 010) would still have rejected the mutations, so this was a misleading UI rather than a data breach, but it was wrong. HouseholdViewModel now caches the signed-in user's internal users.id in an observable `signedInUserId`, populated by the existing `currentUserId()` helper so no call site changed, and isOwner looks for that user's own membership row with the owner role. Nil until the first async call resolves, which makes it fail closed — controls stay hidden rather than appearing to everyone. The two AuthService sites use supabase-swift's `nonisolated public var currentUser: User?`, a synchronous accessor over the cached session, verified against AuthClient.swift: `supabaseEmail` was declared `get throws` over the async property and is now a plain optional getter, with `try?` removed from its four call sites (two internal, plus AccountView and ReAuthView). Also recorded: `syncLocalProfile(modelContext:)` has no callers anywhere in the app — another instance of note 26's wiring failure, left in place but documented rather than silently deleted."
+    },
+    {
+      "id": "US-228",
+      "title": "The Services layer's first compile: 12 errors across 6 files",
+      "description": "The fourth type-check wave reached the Services layer and produced 12 errors in 6 files. As with every wave before it, none were regressions — all were code written against assumed APIs and never compiled.",
+      "acceptanceCriteria": [
+        "Every thrown type conforms to Error",
+        "The certificate chain is read without subscripting a CFArray",
+        "Crash-report scrubbing rewrites the Sentry message rather than assigning to a read-only property",
+        "CLMonitor's async identifiers are awaited and its non-throwing event stream is iterated without `try`",
+        "Analytics calls use the argument label the method actually declares"
+      ],
+      "priority": "critical",
+      "passes": true,
+      "notes": "Six distinct defects. (1) AudioService.AudioError was declared `: Equatable` only, so all four `throw AudioError.…` statements failed — it now conforms to Error. A repo-wide sweep of every type that appears in a `throw` confirms no other thrown type is missing the conformance. (2) CertificatePinningDelegate subscripted the CFArray from SecTrustCopyCertificateChain, which Swift cannot do; the chain is now bridged once to [SecCertificate], which also drops the deprecated SecTrustGetCertificateCount and the index loop. The same file already used the correct `as? [SecCertificate]` idiom 56 lines further down — it had both the right and the wrong form. (3) CrashReportingService did `event.message?.formatted = event.message?.formatted.map(scrubText)`, wrong three ways at once: SentryMessage.formatted is readonly (verified in SentryMessage.h), `.map` over a String maps its Characters not the whole string, and the result type was [String]?. It now builds a replacement SentryMessage(formatted:). (4) GeofenceManager iterated CLMonitor.identifiers without await — it is an async property — and used `for try await` over monitor.events, which does not throw, so the enclosing Task could not be inferred as the declared Task<Void, Never>. (5,6) IntegrityCheckService and SecurityAuditLogger both called AnalyticsService.track(_:properties:) but the method declares `parameters:`. No remaining call passes `properties:`."
     }
   ]
 }

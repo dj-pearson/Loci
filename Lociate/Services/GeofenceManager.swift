@@ -59,7 +59,7 @@ final class GeofenceManager {
         self.monitor = monitor
 
         // Restore tracked identifiers from existing monitor state
-        for identifier in monitor.identifiers {
+        for identifier in await monitor.identifiers {
             monitoredRegionIds.insert(identifier)
         }
 
@@ -72,7 +72,7 @@ final class GeofenceManager {
     private func startEventMonitoring(_ monitor: CLMonitor) {
         eventTask?.cancel()
         eventTask = Task {
-            for try await event in monitor.events {
+            for await event in monitor.events {
                 guard !Task.isCancelled else { break }
 
                 // Only act on entry events (state becomes satisfied)
