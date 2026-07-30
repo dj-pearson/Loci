@@ -14,8 +14,11 @@
 #   SUPABASE_ANON_KEY        — Production Supabase anonymous key
 #   REVENUECAT_API_KEY       — RevenueCat Apple API key
 #   TELEMETRYDECK_APP_ID     — TelemetryDeck app identifier
-#   CERT_PIN_HASH            — Primary certificate pin (SPKI SHA-256, base64)
-#   CERT_BACKUP_PIN_HASH     — Backup certificate pin (optional, defaults to Let's Encrypt)
+#
+# iOS optional environment variables (emitted empty if unset):
+#   CERT_PIN_HASH            — Primary certificate pin (SPKI SHA-256, base64). Empty
+#                              disables pinning; the release workflows require it.
+#   CERT_BACKUP_PIN_HASH     — Backup certificate pin (defaults to Let's Encrypt)
 #   REQUEST_SIGNING_KEY      — HMAC-SHA256 secret for request signing (optional)
 #   SENTRY_DSN               — Crash reporting DSN (optional; empty disables it)
 #
@@ -56,12 +59,17 @@ esac
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+# CERT_PIN_HASH is deliberately NOT here. An empty pin hash has a defined meaning —
+# certificate pinning off — which is why `BuildSecretsValidator` classes it as
+# non-critical and the Android list omits it. Requiring it made the CI iOS build
+# unable to pass at all, because ci.yml exports it empty on purpose. Whether a
+# *shipped* build may have pinning off is a release question, and release.yml and
+# testflight.yml now assert it explicitly.
 ios_required=(
     "SUPABASE_URL"
     "SUPABASE_ANON_KEY"
     "REVENUECAT_API_KEY"
     "TELEMETRYDECK_APP_ID"
-    "CERT_PIN_HASH"
 )
 
 android_required=(
@@ -97,16 +105,24 @@ assert_untracked() {
     fi
 }
 
+# Takes the variable NAMES as positional arguments and echoes the ones that are
+# empty or unset.
+#
+# This used to take the name of an array and dereference it with `local -n`, which
+# is bash 4.3+. macOS ships bash 3.2 and that is what the `macos-14` runner's
+# `/bin/bash` is, so the nameref failed there with "local: -n: invalid option" and
+# `check_vars` then reported an empty list of missing variables — making the iOS
+# build fail with a message that named nothing. Plain "$@" works on both.
 check_vars() {
-    local -n vars=$1
-    local missing=()
-    for var in "${vars[@]}"; do
+    local missing=""
+    local var
+    for var in "$@"; do
         if [ -z "${!var:-}" ]; then
-            missing+=("$var")
+            missing="${missing:+$missing }$var"
         fi
     done
-    if [ ${#missing[@]} -ne 0 ]; then
-        echo "${missing[@]}"
+    if [ -n "$missing" ]; then
+        echo "$missing"
         return 1
     fi
 }
@@ -201,25 +217,25 @@ fail_missing() {
 did_generate=false
 
 if [ "$MODE" = "ios" ] || [ "$MODE" = "all" ]; then
-    missing=$(check_vars ios_required) || fail_missing "iOS" $missing
+    missing=$(check_vars "${ios_required[@]}") || fail_missing "iOS" $missing
     generate_ios
     did_generate=true
 fi
 
 if [ "$MODE" = "android" ] || [ "$MODE" = "all" ]; then
-    missing=$(check_vars android_required) || fail_missing "Android" $missing
+    missing=$(check_vars "${android_required[@]}") || fail_missing "Android" $missing
     generate_android
     did_generate=true
 fi
 
 if [ "$MODE" = "auto" ]; then
-    if ios_missing=$(check_vars ios_required); then
+    if ios_missing=$(check_vars "${ios_required[@]}"); then
         generate_ios
         did_generate=true
     else
         echo "Skipping iOS (missing: $ios_missing)" >&2
     fi
-    if android_missing=$(check_vars android_required); then
+    if android_missing=$(check_vars "${android_required[@]}"); then
         generate_android
         did_generate=true
     else

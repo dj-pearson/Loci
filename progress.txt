@@ -387,8 +387,9 @@ first real run — three of them my own new gates failing on my own code.
 - [x] US-220: SwiftLint's first run — 93 violations, which also skipped Build + Tests
 - [x] US-221: Android CI failed at configuration time; local.properties was never read
 - [x] US-222: two password literals removed, four scanner false positives scoped
+- [x] US-223: the iOS build and the Kotlin compile ran for the first time, and failed
 
-### All 222 stories pass. Remaining launch work is manual (portals, secrets,
+### All 223 stories pass. Remaining launch work is manual (portals, secrets,
 ### screenshots, real-device verification) — see LAUNCH_CHECKLIST.md.
 
 ### Notes for future iterations
@@ -425,6 +426,12 @@ first real run — three of them my own new gates failing on my own code.
 29. **`swiftlint`'s `included: .` resolves relative to the config file**, so
     `Lociate/.swiftlint.yml` lints the 110 files under `Lociate/` and never the 6 in
     `LociateTests/`. Those tests are currently unlinted.
+30. **macOS runners have bash 3.2.** No `local -n`, no `declare -A`, no `${v,,}`.
+    Anything under `scripts/` that a macos-* job runs must be 3.2-clean.
+31. **A gitignored generated source still has to be in the pbxproj.** The generator
+    walks the filesystem, so `ALWAYS_APP_SOURCES` in `scripts/generate-xcodeproj.py`
+    is what puts `BuildSecrets.swift` in the target. Add to that list, not the walk,
+    for anything generated at build time.
 
 ## Notes for Ralph Iterations
 

@@ -48,8 +48,18 @@ jobs:
           CERT_PIN_HASH: ${{ secrets.CERT_PIN_HASH }}
           CERT_BACKUP_PIN_HASH: ${{ secrets.CERT_BACKUP_PIN_HASH }}
         run: |
+          # A shipped build must have certificate pinning on. generate-secrets.sh
+          # treats CERT_PIN_HASH as optional so a fork PR can still build, so the
+          # requirement is asserted here, where it actually matters.
+          if [ -z "${CERT_PIN_HASH:-}" ]; then
+            echo "::error::CERT_PIN_HASH is not set. A release build must not ship with certificate pinning disabled."
+            exit 1
+          fi
           chmod +x scripts/generate-secrets.sh
-          ./scripts/generate-secrets.sh
+          # --ios, not bare: in auto mode a missing iOS secret is only a skipped
+          # platform, which would leave BuildSecrets.swift ungenerated and fail much
+          # later with a confusing compile error.
+          ./scripts/generate-secrets.sh --ios
 
       - name: Install Fastlane
         run: |
