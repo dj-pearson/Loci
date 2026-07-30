@@ -21,10 +21,10 @@ struct ReAuthView: View {
                 .font(.system(size: 48))
                 .foregroundStyle(Theme.primary)
 
-            Text("Confirm Your Identity")
+            Text(String(localized: "Confirm Your Identity"))
                 .font(Theme.Typography.title)
 
-            Text("To \(operation.rawValue), please verify your identity.")
+            Text(String(localized: "To \(operation.rawValue), please verify your identity."))
                 .font(Theme.Typography.body)
                 .foregroundStyle(Theme.textSecondary)
                 .multilineTextAlignment(.center)
@@ -48,7 +48,7 @@ struct ReAuthView: View {
                             ProgressView()
                                 .frame(maxWidth: .infinity, minHeight: 44)
                         } else {
-                            Text("Verify")
+                            Text(String(localized: "Verify"))
                                 .font(Theme.Typography.headline)
                                 .frame(maxWidth: .infinity, minHeight: 44)
                         }
@@ -61,20 +61,20 @@ struct ReAuthView: View {
                 Button {
                     Task { await authenticateWithBiometrics() }
                 } label: {
-                    Label("Verify with Biometrics", systemImage: "faceid")
+                    Label(String(localized: "Verify with Biometrics"), systemImage: "faceid")
                         .font(Theme.Typography.headline)
                         .frame(maxWidth: .infinity, minHeight: 44)
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(Theme.primary)
 
-                Button("Use Password Instead") {
+                Button(String(localized: "Use Password Instead")) {
                     showPasswordField = true
                 }
                 .font(Theme.Typography.caption)
             }
 
-            Button("Cancel", role: .cancel) {
+            Button(String(localized: "Cancel"), role: .cancel) {
                 onResult(false)
                 dismiss()
             }

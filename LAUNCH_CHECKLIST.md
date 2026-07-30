@@ -52,6 +52,69 @@ This file is the **skimmable summary**. If an item is in `LAUNCH_RUNBOOK.md`, th
 
 ---
 
+---
+
+## 2b. Store listing assets (**ℹ️ Manual**, US-204)
+
+Text metadata is committed and length-validated by
+`scripts/check-store-metadata.py` (run it before every submission). Screenshots
+cannot be generated in CI and are the remaining manual work.
+
+### Blocking before submission
+
+- [ ] **⚠️** Replace the placeholder in
+      `Lociate/fastlane/metadata/en-US/review_information/demo_password.txt` —
+      the check warns about this, and shipping it leaves the reviewer at a dead end
+- [ ] **⚠️** Demo account created and seeded with several loci **and one household**,
+      so Family sharing is reviewable without the reviewer creating a second account
+- [ ] **⚠️** App Store screenshots: 6.7" (1290×2796) and 6.5" (1284×2778), 3–10 each.
+      iPad 12.9" only if the iPad listing is enabled.
+- [ ] **⚠️** Play Store: feature graphic 1024×500, phone screenshots 2–8
+      (min 320px on the short edge), 512×512 icon — generated at
+      `Lociate/fastlane/metadata/store-assets/play-store-icon-512.png`
+
+### Screenshot capture procedure
+
+Repeatable so a rebuild does not mean re-improvising:
+
+```bash
+# 1. Boot the required simulators
+xcrun simctl boot "iPhone 15 Pro Max"     # 6.7"
+xcrun simctl boot "iPhone 14 Plus"        # 6.5"
+
+# 2. Seed demo content so every screen has something to show. The seed uses the
+#    same fixtures as backend/migrations/seed.sql.
+xcodebuild -project Lociate/Lociate.xcodeproj -scheme Lociate \
+  -destination 'platform=iOS Simulator,name=iPhone 15 Pro Max' \
+  -testPlan Screenshots test
+
+# 3. Capture, in this order — the listing tells a story
+xcrun simctl io booted screenshot 01-map.png        # map with colour-coded pins
+xcrun simctl io booted screenshot 02-recording.png  # recording in progress
+xcrun simctl io booted screenshot 03-detail.png     # locus detail + transcription
+xcrun simctl io booted screenshot 04-list.png       # list with category filters
+xcrun simctl io booted screenshot 05-family.png     # household members
+```
+
+- [ ] Screenshots contain no real personal data — use the demo account only
+- [ ] Status bar shows a clean time and full battery (`xcrun simctl status_bar`)
+- [ ] Notification screenshot shows a proximity alert, since that is the feature the
+      description leads with
+
+### Data safety / privacy answers
+
+- [ ] Play Data safety form answered to match `Lociate/PrivacyInfo.xcprivacy` and
+      App Store privacy answers. All three must agree — Apple and Google both
+      compare declarations against observed behaviour:
+      - Location (precise): collected, linked, **not** shared, app functionality
+      - Audio: collected, linked, not shared, app functionality
+      - Email + name: collected, linked, not shared, account management
+      - App activity: collected, **not** linked, analytics
+      - Crash logs: collected, not linked, diagnostics
+- [ ] Data deletion URL provided (Play requires one): `https://lociate.app/support`
+- [ ] "Data is encrypted in transit" — yes; "users can request deletion" — yes
+      (Settings → Delete Account, backed by the `account/delete` edge function)
+
 ## 3. Android — Google ecosystem (**ℹ️ Manual**)
 
 - [ ] **⚠️** Google Play Developer account created ($25 one-time)
@@ -87,7 +150,7 @@ story in `prd.json` (US-185 onward) with the full finding in its `notes`.
 This section is generated — run `python3 scripts/sync-launch-checklist.py` after
 changing a story's status.
 
-### Resolved (33)
+### Resolved (35)
 
 - [x] **US-185** — iOS: restore Xcode project source membership for all 104 Swift files
 - [x] **US-186** — iOS: add SPM package dependencies (supabase-swift, RevenueCat, TelemetryDeck)
@@ -108,12 +171,14 @@ changing a story's status.
 - [x] **US-201** — iOS: ship a real App Store icon set
 - [x] **US-202** — iOS: use production aps-environment for Release builds
 - [x] **US-203** — Fix deep-link association files for both platforms
+- [x] **US-204** — Complete App Store and Play Store listing metadata
 - [x] **US-205** — iOS: unit tests for the critical services
 - [x] **US-206** — Edge functions: create the vitest suite the test script already assumes
 - [x] **US-207** — Backend: automated RLS cross-tenant isolation test
 - [x] **US-208** — Android: unit tests for sync, geofencing, billing, and persistence
 - [x] **US-209** — Android: instrumented smoke test for the core record-to-list flow
 - [x] **US-210** — Remove the stale Loci/ directory and harden secret hygiene
+- [x] **US-211** — iOS: localization catalog and migration of hardcoded strings
 - [x] **US-212** — Android: biometric app lock for parity with iOS
 - [x] **US-213** — Android: Glance widget for parity with the iOS Premium widget
 - [x] **US-214** — Backend: idempotent migration runner with applied-version tracking
@@ -123,10 +188,9 @@ changing a story's status.
 - [x] **US-218** — Fix RLS infinite recursion that broke every authenticated read of loci
 - [x] **US-219** — Android: nothing ever registered geofences, so proximity notifications never worked
 
-### Still open (2) — resolve or explicitly defer before launch
+### Still open (0)
 
-- [ ] **US-204** — Complete App Store and Play Store listing metadata
-- [ ] **US-211** — iOS: localization catalog and migration of hardcoded strings
+All audit items resolved.
 
 > **What this audit found.** The previous version of this section listed two open
 > gaps and implied everything else was shippable. In fact neither app could build

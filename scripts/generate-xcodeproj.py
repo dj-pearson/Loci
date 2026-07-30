@@ -155,7 +155,12 @@ def collect() -> dict:
         n for n in sorted(os.listdir(APP_DIR)) if n.endswith(".swift")
     ]
 
-    for name in ("Assets.xcassets", "PrivacyInfo.xcprivacy", "Localizable.xcstrings"):
+    for name in (
+        "Assets.xcassets",
+        "PrivacyInfo.xcprivacy",
+        "Localizable.xcstrings",
+        "InfoPlist.xcstrings",
+    ):
         if os.path.exists(os.path.join(APP_DIR, name)):
             resources.append(name)
 

@@ -12,7 +12,7 @@ struct IntegrityWarningBanner: View {
                 HStack {
                     Image(systemName: "exclamationmark.shield.fill")
                         .foregroundStyle(.white)
-                    Text("Device Security Warning")
+                    Text(String(localized: "Device Security Warning"))
                         .font(Theme.Typography.headline)
                         .foregroundStyle(.white)
                     Spacer()
@@ -24,7 +24,7 @@ struct IntegrityWarningBanner: View {
                     }
                 }
 
-                Text("This device may have been modified. Some security features may be reduced.")
+                Text(String(localized: "This device may have been modified. Some security features may be reduced."))
                     .font(Theme.Typography.caption)
                     .foregroundStyle(.white.opacity(0.9))
             }

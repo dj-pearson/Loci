@@ -1,0 +1,1468 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "\"Great coffee spot, try the oat milk latte\"": {
+      "extractionState": "manual"
+    },
+    "/mo": {
+      "extractionState": "manual"
+    },
+    "/yr": {
+      "extractionState": "manual"
+    },
+    "7-day free trial": {
+      "extractionState": "manual"
+    },
+    "A parking tip? A restaurant rec? Something you want to remember next time?": {
+      "extractionState": "manual"
+    },
+    "AI Categorization": {
+      "extractionState": "manual"
+    },
+    "AI categorization": {
+      "extractionState": "manual"
+    },
+    "AI categorization is a Premium feature. Upgrade to automatically organize your loci.": {
+      "extractionState": "manual"
+    },
+    "About": {
+      "extractionState": "manual"
+    },
+    "Account": {
+      "extractionState": "manual"
+    },
+    "Account temporarily locked": {
+      "extractionState": "manual"
+    },
+    "Account temporarily locked. Try again in \\(formattedTime(remaining)) or reset your password.": {
+      "extractionState": "manual"
+    },
+    "Add Note": {
+      "extractionState": "manual"
+    },
+    "All": {
+      "extractionState": "manual"
+    },
+    "Already have an account?": {
+      "extractionState": "manual"
+    },
+    "An error occurred.": {
+      "extractionState": "manual"
+    },
+    "App preferences and account": {
+      "extractionState": "manual"
+    },
+    "Archive": {
+      "extractionState": "manual"
+    },
+    "Archived Audio Deleted": {
+      "extractionState": "manual"
+    },
+    "Archived Loci": {
+      "extractionState": "manual"
+    },
+    "Are you sure you want to remove \\(member.displayName) from the family?": {
+      "extractionState": "manual"
+    },
+    "Audio Files": {
+      "extractionState": "manual"
+    },
+    "Audio Storage": {
+      "extractionState": "manual"
+    },
+    "Audio engine error: \\(message)": {
+      "extractionState": "manual"
+    },
+    "Audio level indicator": {
+      "extractionState": "manual"
+    },
+    "Audio waveform": {
+      "extractionState": "manual"
+    },
+    "Authenticate to access your notes": {
+      "extractionState": "manual"
+    },
+    "Authentication events will appear here.": {
+      "extractionState": "manual"
+    },
+    "Authentication failed: \\(underlying.localizedDescription)": {
+      "extractionState": "manual"
+    },
+    "Biometric Lock": {
+      "extractionState": "manual"
+    },
+    "Biometric authentication is not available on this device.": {
+      "extractionState": "manual"
+    },
+    "Biometrics": {
+      "extractionState": "manual"
+    },
+    "Browse voice notes in a list": {
+      "extractionState": "manual"
+    },
+    "Build": {
+      "extractionState": "manual"
+    },
+    "Cancel": {
+      "extractionState": "manual"
+    },
+    "Category": {
+      "extractionState": "manual"
+    },
+    "Center on current location": {
+      "extractionState": "manual"
+    },
+    "Change or Cancel Plan": {
+      "extractionState": "manual"
+    },
+    "Choose Your Plan": {
+      "extractionState": "manual"
+    },
+    "Clear": {
+      "extractionState": "manual"
+    },
+    "Clear Cache": {
+      "extractionState": "manual"
+    },
+    "Close": {
+      "extractionState": "manual"
+    },
+    "Cloud Sync": {
+      "extractionState": "manual"
+    },
+    "Cloud sync": {
+      "extractionState": "manual"
+    },
+    "Cloud sync & backup": {
+      "extractionState": "manual"
+    },
+    "Cloud sync requires a Premium subscription. Upgrade to back up and sync across devices.": {
+      "extractionState": "manual"
+    },
+    "Code expires in 48 hours": {
+      "extractionState": "manual"
+    },
+    "Confirm Password": {
+      "extractionState": "manual"
+    },
+    "Confirm Your Identity": {
+      "extractionState": "manual"
+    },
+    "Continue": {
+      "extractionState": "manual"
+    },
+    "Copy Transcription": {
+      "extractionState": "manual"
+    },
+    "Could not start recording. Check microphone access.": {
+      "extractionState": "manual"
+    },
+    "Create Account": {
+      "extractionState": "manual"
+    },
+    "Create Family": {
+      "extractionState": "manual"
+    },
+    "Create a household and share voice notes with your family. Leave tips, reminders, and memories for each other.": {
+      "extractionState": "manual"
+    },
+    "Current Plan": {
+      "extractionState": "manual"
+    },
+    "Current Tier": {
+      "extractionState": "manual"
+    },
+    "Data": {
+      "extractionState": "manual"
+    },
+    "Data Management": {
+      "extractionState": "manual"
+    },
+    "Database (est.)": {
+      "extractionState": "manual"
+    },
+    "Delete": {
+      "extractionState": "manual"
+    },
+    "Delete Account": {
+      "extractionState": "manual"
+    },
+    "Delete All Archived": {
+      "extractionState": "manual"
+    },
+    "Delete All Archived Audio": {
+      "extractionState": "manual"
+    },
+    "Delete Archived Audio": {
+      "extractionState": "manual"
+    },
+    "Delete Everything": {
+      "extractionState": "manual"
+    },
+    "Delete Family": {
+      "extractionState": "manual"
+    },
+    "Delete Voice Note": {
+      "extractionState": "manual"
+    },
+    "Delete Voice Notes": {
+      "extractionState": "manual"
+    },
+    "Delete \\(archivedLoci.count) Archived Loci": {
+      "extractionState": "manual"
+    },
+    "Delete \\(selectedLocusIDs.count)": {
+      "extractionState": "manual"
+    },
+    "Deleting Account...": {
+      "extractionState": "manual"
+    },
+    "Deselect All": {
+      "extractionState": "manual"
+    },
+    "Determining location": {
+      "extractionState": "manual"
+    },
+    "Device Security Warning": {
+      "extractionState": "manual"
+    },
+    "Device storage full. Archive old loci to free space.": {
+      "extractionState": "manual"
+    },
+    "Device storage is running low. Consider deleting archived audio to free space.": {
+      "extractionState": "manual"
+    },
+    "Discard": {
+      "extractionState": "manual"
+    },
+    "Dismiss error": {
+      "extractionState": "manual"
+    },
+    "Display Name": {
+      "extractionState": "manual"
+    },
+    "Display name": {
+      "extractionState": "manual"
+    },
+    "Don't have an account?": {
+      "extractionState": "manual"
+    },
+    "Done": {
+      "extractionState": "manual"
+    },
+    "Double tap for details": {
+      "extractionState": "manual"
+    },
+    "Double tap to pause": {
+      "extractionState": "manual"
+    },
+    "Double tap to play": {
+      "extractionState": "manual"
+    },
+    "Double tap to start recording": {
+      "extractionState": "manual"
+    },
+    "Double tap to stop recording": {
+      "extractionState": "manual"
+    },
+    "Double tap to zoom in": {
+      "extractionState": "manual"
+    },
+    "Drop Your First Locus": {
+      "extractionState": "manual"
+    },
+    "Earlier": {
+      "extractionState": "manual"
+    },
+    "Edit": {
+      "extractionState": "manual"
+    },
+    "Edit Display Name": {
+      "extractionState": "manual"
+    },
+    "Edit Voice Note": {
+      "extractionState": "manual"
+    },
+    "Email": {
+      "extractionState": "manual"
+    },
+    "Enable Location": {
+      "extractionState": "manual"
+    },
+    "Enable Microphone": {
+      "extractionState": "manual"
+    },
+    "Enable Notifications": {
+      "extractionState": "manual"
+    },
+    "Enable notifications to be reminded when you return to a saved location.": {
+      "extractionState": "manual"
+    },
+    "Enable notifications to get reminders when you're near your loci.": {
+      "extractionState": "manual"
+    },
+    "End": {
+      "extractionState": "manual"
+    },
+    "Enter the 6-character code from your family member": {
+      "extractionState": "manual"
+    },
+    "Enter your email to receive a password reset link.": {
+      "extractionState": "manual"
+    },
+    "Error": {
+      "extractionState": "manual"
+    },
+    "Everything in Premium": {
+      "extractionState": "manual"
+    },
+    "Export": {
+      "extractionState": "manual"
+    },
+    "Export Data": {
+      "extractionState": "manual"
+    },
+    "Export My Data": {
+      "extractionState": "manual"
+    },
+    "Export coming in a future update.": {
+      "extractionState": "manual"
+    },
+    "Exporting Data...": {
+      "extractionState": "manual"
+    },
+    "Face ID": {
+      "extractionState": "manual"
+    },
+    "Failed to configure audio session: \\(message)": {
+      "extractionState": "manual"
+    },
+    "Failed to create audio recorder: \\(message)": {
+      "extractionState": "manual"
+    },
+    "Failed to create household. Please try again.": {
+      "extractionState": "manual"
+    },
+    "Failed to delete household. Please try again.": {
+      "extractionState": "manual"
+    },
+    "Failed to generate invite code. Please try again.": {
+      "extractionState": "manual"
+    },
+    "Failed to join household. Please check the code and try again.": {
+      "extractionState": "manual"
+    },
+    "Failed to leave household. Please try again.": {
+      "extractionState": "manual"
+    },
+    "Failed to remove member. Please try again.": {
+      "extractionState": "manual"
+    },
+    "Failed to save changes. Please try again.": {
+      "extractionState": "manual"
+    },
+    "Failed to save voice note. Please try again.": {
+      "extractionState": "manual"
+    },
+    "Failed to start recording. Please try again.": {
+      "extractionState": "manual"
+    },
+    "Fair": {
+      "extractionState": "manual"
+    },
+    "Family": {
+      "extractionState": "manual"
+    },
+    "Family Created!": {
+      "extractionState": "manual"
+    },
+    "Family Name": {
+      "extractionState": "manual"
+    },
+    "Family Sharing": {
+      "extractionState": "manual"
+    },
+    "Family member management": {
+      "extractionState": "manual"
+    },
+    "Family sharing": {
+      "extractionState": "manual"
+    },
+    "Family sharing (up to 6)": {
+      "extractionState": "manual"
+    },
+    "Family sharing disabled on this device.": {
+      "extractionState": "manual"
+    },
+    "Family sharing requires a Family plan. Upgrade to share loci with up to 6 family members.": {
+      "extractionState": "manual"
+    },
+    "Feature": {
+      "extractionState": "manual"
+    },
+    "Feature Comparison": {
+      "extractionState": "manual"
+    },
+    "Find voice notes by keyword, category, or location name.": {
+      "extractionState": "manual"
+    },
+    "Food": {
+      "extractionState": "manual"
+    },
+    "Forgot Password?": {
+      "extractionState": "manual"
+    },
+    "Free": {
+      "extractionState": "manual"
+    },
+    "Free trial": {
+      "extractionState": "manual"
+    },
+    "Full-Text Search": {
+      "extractionState": "manual"
+    },
+    "Full-text search": {
+      "extractionState": "manual"
+    },
+    "Full-text search requires a Premium subscription. Upgrade to search all your voice notes.": {
+      "extractionState": "manual"
+    },
+    "General": {
+      "extractionState": "manual"
+    },
+    "Generate Invite Code": {
+      "extractionState": "manual"
+    },
+    "Get Started": {
+      "extractionState": "manual"
+    },
+    "Give your family group a name": {
+      "extractionState": "manual"
+    },
+    "Good": {
+      "extractionState": "manual"
+    },
+    "Guest": {
+      "extractionState": "manual"
+    },
+    "Having trouble? Try resetting your password.": {
+      "extractionState": "manual"
+    },
+    "Health": {
+      "extractionState": "manual"
+    },
+    "Help": {
+      "extractionState": "manual"
+    },
+    "Home": {
+      "extractionState": "manual"
+    },
+    "Home Screen Widget": {
+      "extractionState": "manual"
+    },
+    "Home screen widget": {
+      "extractionState": "manual"
+    },
+    "Household": {
+      "extractionState": "manual"
+    },
+    "Hybrid": {
+      "extractionState": "manual"
+    },
+    "I'll do this later": {
+      "extractionState": "manual"
+    },
+    "If this email is available, you will receive a confirmation.": {
+      "extractionState": "manual"
+    },
+    "If this email is registered, a password reset link has been sent.": {
+      "extractionState": "manual"
+    },
+    "Incorrect password. Please try again.": {
+      "extractionState": "manual"
+    },
+    "Invalid Apple ID credential. Please try again.": {
+      "extractionState": "manual"
+    },
+    "Invalid email or password.": {
+      "extractionState": "manual"
+    },
+    "Invite Code": {
+      "extractionState": "manual"
+    },
+    "Invite Family": {
+      "extractionState": "manual"
+    },
+    "Invite codes are case-insensitive and expire after 48 hours.": {
+      "extractionState": "manual"
+    },
+    "Join Family": {
+      "extractionState": "manual"
+    },
+    "Join my family on Lociate": {
+      "extractionState": "manual"
+    },
+    "Join my family on Lociate! Use invite code: \\(code)": {
+      "extractionState": "manual"
+    },
+    "Last Sync": {
+      "extractionState": "manual"
+    },
+    "Launch promo pricing — limited time!": {
+      "extractionState": "manual"
+    },
+    "Leave": {
+      "extractionState": "manual"
+    },
+    "Leave Family": {
+      "extractionState": "manual"
+    },
+    "Legal": {
+      "extractionState": "manual"
+    },
+    "Let's Go!": {
+      "extractionState": "manual"
+    },
+    "Lifetime Family": {
+      "extractionState": "manual"
+    },
+    "Lifetime Individual": {
+      "extractionState": "manual"
+    },
+    "List": {
+      "extractionState": "manual"
+    },
+    "Listening...": {
+      "extractionState": "manual"
+    },
+    "Loading map": {
+      "extractionState": "manual"
+    },
+    "Loading more...": {
+      "extractionState": "manual"
+    },
+    "Loading voice note": {
+      "extractionState": "manual"
+    },
+    "Loading voice note details": {
+      "extractionState": "manual"
+    },
+    "Locating...": {
+      "extractionState": "manual"
+    },
+    "Location access has been denied. Please enable it in Settings to use Lociate.": {
+      "extractionState": "manual"
+    },
+    "Location access is required to pin voice notes. Enable it in Settings.": {
+      "extractionState": "manual"
+    },
+    "Location access is required to pin voice notes. Please enable it in Settings.": {
+      "extractionState": "manual"
+    },
+    "Location access is restricted on this device.": {
+      "extractionState": "manual"
+    },
+    "Location: \\($0)": {
+      "extractionState": "manual"
+    },
+    "Location: \\(locationName ?? String(localized: ": {
+      "extractionState": "manual"
+    },
+    "Loci": {
+      "extractionState": "manual"
+    },
+    "Loci Limit Reached": {
+      "extractionState": "manual"
+    },
+    "Loci limit": {
+      "extractionState": "manual"
+    },
+    "Lociate is Locked": {
+      "extractionState": "manual"
+    },
+    "Lociate is voice-first — tap to record, and your note is pinned to where you are. Microphone access is the core of the experience.": {
+      "extractionState": "manual"
+    },
+    "Lociate needs Always Allow location to notify you when you return to a saved location.": {
+      "extractionState": "manual"
+    },
+    "Lociate sends a notification when you return to a place where you left a voice note — so your memories find you.": {
+      "extractionState": "manual"
+    },
+    "Lociate uses notifications to alert you when you return to a saved location. Enable notifications to receive proximity alerts.": {
+      "extractionState": "manual"
+    },
+    "Locus Not Found": {
+      "extractionState": "manual"
+    },
+    "Look around. What's worth remembering about this spot?": {
+      "extractionState": "manual"
+    },
+    "Low battery impact — less than 2% daily usage": {
+      "extractionState": "manual"
+    },
+    "Made by Pearson Media LLC": {
+      "extractionState": "manual"
+    },
+    "Manage": {
+      "extractionState": "manual"
+    },
+    "Manage Members": {
+      "extractionState": "manual"
+    },
+    "Manage Storage": {
+      "extractionState": "manual"
+    },
+    "Manage Subscription": {
+      "extractionState": "manual"
+    },
+    "Map": {
+      "extractionState": "manual"
+    },
+    "Map style": {
+      "extractionState": "manual"
+    },
+    "Maybe Later": {
+      "extractionState": "manual"
+    },
+    "Member": {
+      "extractionState": "manual"
+    },
+    "Members": {
+      "extractionState": "manual"
+    },
+    "Microphone access has been denied. Please enable it in Settings to record voice notes.": {
+      "extractionState": "manual"
+    },
+    "Microphone access is required to record voice notes. Please enable it in Settings.": {
+      "extractionState": "manual"
+    },
+    "Monthly": {
+      "extractionState": "manual"
+    },
+    "Multiple failed attempts. Please wait \\(formattedTime(remaining)).": {
+      "extractionState": "manual"
+    },
+    "Nearby Loci": {
+      "extractionState": "manual"
+    },
+    "Nearest": {
+      "extractionState": "manual"
+    },
+    "Network error. Please check your connection and try again.": {
+      "extractionState": "manual"
+    },
+    "New Voice Note": {
+      "extractionState": "manual"
+    },
+    "Newest": {
+      "extractionState": "manual"
+    },
+    "Next": {
+      "extractionState": "manual"
+    },
+    "No Loci": {
+      "extractionState": "manual"
+    },
+    "No Loci Yet": {
+      "extractionState": "manual"
+    },
+    "No Results": {
+      "extractionState": "manual"
+    },
+    "No Results Found": {
+      "extractionState": "manual"
+    },
+    "No household found.": {
+      "extractionState": "manual"
+    },
+    "No internet connection. Your loci are saved locally.": {
+      "extractionState": "manual"
+    },
+    "No nearby loci": {
+      "extractionState": "manual"
+    },
+    "No transcription available": {
+      "extractionState": "manual"
+    },
+    "No voice notes match \"\\(debouncedSearchText)\"": {
+      "extractionState": "manual"
+    },
+    "Not Now": {
+      "extractionState": "manual"
+    },
+    "Not selected": {
+      "extractionState": "manual"
+    },
+    "Notes Find You": {
+      "extractionState": "manual"
+    },
+    "Notifications": {
+      "extractionState": "manual"
+    },
+    "Notifications Disabled": {
+      "extractionState": "manual"
+    },
+    "OK": {
+      "extractionState": "manual"
+    },
+    "Offline — notes saved locally": {
+      "extractionState": "manual"
+    },
+    "Oldest": {
+      "extractionState": "manual"
+    },
+    "Only the household owner can perform this action.": {
+      "extractionState": "manual"
+    },
+    "Open Settings": {
+      "extractionState": "manual"
+    },
+    "Opens account settings": {
+      "extractionState": "manual"
+    },
+    "Opens storage management": {
+      "extractionState": "manual"
+    },
+    "Opens the Settings app": {
+      "extractionState": "manual"
+    },
+    "Opens your Apple ID subscriptions in the App Store": {
+      "extractionState": "manual"
+    },
+    "Optic ID": {
+      "extractionState": "manual"
+    },
+    "Outdoor": {
+      "extractionState": "manual"
+    },
+    "Owner": {
+      "extractionState": "manual"
+    },
+    "Parking": {
+      "extractionState": "manual"
+    },
+    "Password": {
+      "extractionState": "manual"
+    },
+    "Password does not meet security requirements.": {
+      "extractionState": "manual"
+    },
+    "Password must be at least 8 characters.": {
+      "extractionState": "manual"
+    },
+    "Passwords do not match": {
+      "extractionState": "manual"
+    },
+    "Passwords do not match.": {
+      "extractionState": "manual"
+    },
+    "Pause Preview": {
+      "extractionState": "manual"
+    },
+    "Pause audio preview": {
+      "extractionState": "manual"
+    },
+    "Pause recording": {
+      "extractionState": "manual"
+    },
+    "Permanently Delete All Archived": {
+      "extractionState": "manual"
+    },
+    "Pin more memories, sync everywhere, and share with family.": {
+      "extractionState": "manual"
+    },
+    "Pinned at": {
+      "extractionState": "manual"
+    },
+    "Play Preview": {
+      "extractionState": "manual"
+    },
+    "Play audio preview": {
+      "extractionState": "manual"
+    },
+    "Play recording, \\(formatTime(playerService.duration))": {
+      "extractionState": "manual"
+    },
+    "Playback position": {
+      "extractionState": "manual"
+    },
+    "Please enter a valid email address.": {
+      "extractionState": "manual"
+    },
+    "Please enter a valid household name.": {
+      "extractionState": "manual"
+    },
+    "Please enter a valid invite code.": {
+      "extractionState": "manual"
+    },
+    "Please wait \\(formattedTime(remaining)) before trying again.": {
+      "extractionState": "manual"
+    },
+    "Prefer a one-time purchase?": {
+      "extractionState": "manual"
+    },
+    "Premium": {
+      "extractionState": "manual"
+    },
+    "Premium for up to 6 household members.": {
+      "extractionState": "manual"
+    },
+    "Preparing...": {
+      "extractionState": "manual"
+    },
+    "Preview": {
+      "extractionState": "manual"
+    },
+    "Privacy": {
+      "extractionState": "manual"
+    },
+    "Privacy Policy": {
+      "extractionState": "manual"
+    },
+    "Private and on-device — your location never leaves your phone": {
+      "extractionState": "manual"
+    },
+    "Profile": {
+      "extractionState": "manual"
+    },
+    "Proximity Alerts": {
+      "extractionState": "manual"
+    },
+    "Proximity Notifications": {
+      "extractionState": "manual"
+    },
+    "Proximity alerts are off": {
+      "extractionState": "manual"
+    },
+    "Proximity notifications will be suppressed during quiet hours.": {
+      "extractionState": "manual"
+    },
+    "Quiet Hours": {
+      "extractionState": "manual"
+    },
+    "Quiet Hours End": {
+      "extractionState": "manual"
+    },
+    "Quiet Hours Start": {
+      "extractionState": "manual"
+    },
+    "Quiet hours are active": {
+      "extractionState": "manual"
+    },
+    "Quiet hours are inactive": {
+      "extractionState": "manual"
+    },
+    "Rate on App Store": {
+      "extractionState": "manual"
+    },
+    "Re-record Audio": {
+      "extractionState": "manual"
+    },
+    "Recent Searches": {
+      "extractionState": "manual"
+    },
+    "Record Again": {
+      "extractionState": "manual"
+    },
+    "Record Now": {
+      "extractionState": "manual"
+    },
+    "Record Voice Notes": {
+      "extractionState": "manual"
+    },
+    "Record a Voice Note": {
+      "extractionState": "manual"
+    },
+    "Record a voice note to pin it here.": {
+      "extractionState": "manual"
+    },
+    "Record a voice note to pin it to your current location.": {
+      "extractionState": "manual"
+    },
+    "Record voice note": {
+      "extractionState": "manual"
+    },
+    "Record voice notes and pin them to your current location. Your memories live where they happened.": {
+      "extractionState": "manual"
+    },
+    "Recording Complete": {
+      "extractionState": "manual"
+    },
+    "Recording Error": {
+      "extractionState": "manual"
+    },
+    "Recording duration: \\(formattedDuration)": {
+      "extractionState": "manual"
+    },
+    "Recording failed: \\(message)": {
+      "extractionState": "manual"
+    },
+    "Recording started": {
+      "extractionState": "manual"
+    },
+    "Recording stopped": {
+      "extractionState": "manual"
+    },
+    "Regenerate Code": {
+      "extractionState": "manual"
+    },
+    "Remove": {
+      "extractionState": "manual"
+    },
+    "Remove Member": {
+      "extractionState": "manual"
+    },
+    "Replace Recording": {
+      "extractionState": "manual"
+    },
+    "Replaces the existing recording and transcription.": {
+      "extractionState": "manual"
+    },
+    "Require \\(biometricService.biometricType.displayName)": {
+      "extractionState": "manual"
+    },
+    "Reset Password": {
+      "extractionState": "manual"
+    },
+    "Restore Failed": {
+      "extractionState": "manual"
+    },
+    "Restore Purchases": {
+      "extractionState": "manual"
+    },
+    "Restoring...": {
+      "extractionState": "manual"
+    },
+    "Retries the operation": {
+      "extractionState": "manual"
+    },
+    "Retry": {
+      "extractionState": "manual"
+    },
+    "Satellite": {
+      "extractionState": "manual"
+    },
+    "Save": {
+      "extractionState": "manual"
+    },
+    "Save 37%": {
+      "extractionState": "manual"
+    },
+    "Save \\(Int(savings.rounded()))%": {
+      "extractionState": "manual"
+    },
+    "Search": {
+      "extractionState": "manual"
+    },
+    "Search Your Loci": {
+      "extractionState": "manual"
+    },
+    "Search loci...": {
+      "extractionState": "manual"
+    },
+    "Search voice notes...": {
+      "extractionState": "manual"
+    },
+    "Security": {
+      "extractionState": "manual"
+    },
+    "Security Log": {
+      "extractionState": "manual"
+    },
+    "See nearby loci on your home screen": {
+      "extractionState": "manual"
+    },
+    "See your nearest voice notes at a glance.": {
+      "extractionState": "manual"
+    },
+    "Select": {
+      "extractionState": "manual"
+    },
+    "Select All": {
+      "extractionState": "manual"
+    },
+    "Selected": {
+      "extractionState": "manual"
+    },
+    "Send Password Reset Email": {
+      "extractionState": "manual"
+    },
+    "Send Reset Link": {
+      "extractionState": "manual"
+    },
+    "Settings": {
+      "extractionState": "manual"
+    },
+    "Share": {
+      "extractionState": "manual"
+    },
+    "Share Invite Code": {
+      "extractionState": "manual"
+    },
+    "Share this code with your family members so they can join.": {
+      "extractionState": "manual"
+    },
+    "Share this voice note with \\(householdName)": {
+      "extractionState": "manual"
+    },
+    "Share voice note": {
+      "extractionState": "manual"
+    },
+    "Share with Family": {
+      "extractionState": "manual"
+    },
+    "Shared by \\(creatorName)": {
+      "extractionState": "manual"
+    },
+    "Shared by \\(name)": {
+      "extractionState": "manual"
+    },
+    "Shared household loci": {
+      "extractionState": "manual"
+    },
+    "Shared with family": {
+      "extractionState": "manual"
+    },
+    "Shopping": {
+      "extractionState": "manual"
+    },
+    "Shows volume level during recording": {
+      "extractionState": "manual"
+    },
+    "Sign In": {
+      "extractionState": "manual"
+    },
+    "Sign Out": {
+      "extractionState": "manual"
+    },
+    "Sign Up": {
+      "extractionState": "manual"
+    },
+    "Sign in to Lociate": {
+      "extractionState": "manual"
+    },
+    "Skip": {
+      "extractionState": "manual"
+    },
+    "Sort": {
+      "extractionState": "manual"
+    },
+    "Speech recognition failed: \\(message)": {
+      "extractionState": "manual"
+    },
+    "Speech recognition is not available on this device.": {
+      "extractionState": "manual"
+    },
+    "Speech recognition permission has been denied. Please enable it in Settings.": {
+      "extractionState": "manual"
+    },
+    "Standard": {
+      "extractionState": "manual"
+    },
+    "Start": {
+      "extractionState": "manual"
+    },
+    "Start Free Trial": {
+      "extractionState": "manual"
+    },
+    "Stay in the Loop": {
+      "extractionState": "manual"
+    },
+    "Stop recording": {
+      "extractionState": "manual"
+    },
+    "Storage": {
+      "extractionState": "manual"
+    },
+    "Storage Used": {
+      "extractionState": "manual"
+    },
+    "Strong": {
+      "extractionState": "manual"
+    },
+    "Subscribe": {
+      "extractionState": "manual"
+    },
+    "Subscription": {
+      "extractionState": "manual"
+    },
+    "Subscription Support": {
+      "extractionState": "manual"
+    },
+    "Support": {
+      "extractionState": "manual"
+    },
+    "Support & Feedback": {
+      "extractionState": "manual"
+    },
+    "Sync failed. Will retry automatically.": {
+      "extractionState": "manual"
+    },
+    "Sync your notes across devices and share with family.": {
+      "extractionState": "manual"
+    },
+    "Tap the microphone button on the map to record your first voice note. It will be pinned right where you are.": {
+      "extractionState": "manual"
+    },
+    "Tap to record a voice note": {
+      "extractionState": "manual"
+    },
+    "Tap to start recording": {
+      "extractionState": "manual"
+    },
+    "Terms of Service": {
+      "extractionState": "manual"
+    },
+    "The home screen widget is a Premium feature. Upgrade to see nearby loci at a glance.": {
+      "extractionState": "manual"
+    },
+    "The household owner cannot leave. Delete the household instead.": {
+      "extractionState": "manual"
+    },
+    "This Week": {
+      "extractionState": "manual"
+    },
+    "This device may have been modified. Some security features may be reduced.": {
+      "extractionState": "manual"
+    },
+    "This household is full (maximum 6 members).": {
+      "extractionState": "manual"
+    },
+    "This invite code has expired.": {
+      "extractionState": "manual"
+    },
+    "This note may have been deleted.": {
+      "extractionState": "manual"
+    },
+    "This permanently deletes your account, voice notes, and audio. This cannot be undone.": {
+      "extractionState": "manual"
+    },
+    "This will permanently delete \\(selectedLocusIDs.count) voice notes and their audio.": {
+      "extractionState": "manual"
+    },
+    "This will permanently delete all archived voice notes and their audio files. This cannot be undone.": {
+      "extractionState": "manual"
+    },
+    "This will permanently delete audio files for all archived loci. The text transcriptions will be preserved.": {
+      "extractionState": "manual"
+    },
+    "This will permanently delete the voice note and its audio recording.": {
+      "extractionState": "manual"
+    },
+    "This will permanently delete your account, all voice notes, audio recordings, and household memberships. This action cannot be undone.": {
+      "extractionState": "manual"
+    },
+    "This will permanently remove the family group and all members. This cannot be undone.": {
+      "extractionState": "manual"
+    },
+    "This will remove orphaned audio files that are no longer associated with any locus.": {
+      "extractionState": "manual"
+    },
+    "This will replace the current audio recording. This cannot be undone.": {
+      "extractionState": "manual"
+    },
+    "Tip": {
+      "extractionState": "manual"
+    },
+    "To \\(operation.rawValue), please verify your identity.": {
+      "extractionState": "manual"
+    },
+    "Today": {
+      "extractionState": "manual"
+    },
+    "Too many attempts. Please wait before trying again.": {
+      "extractionState": "manual"
+    },
+    "Too many failed attempts. Try again in \\(formattedTime(remaining)).": {
+      "extractionState": "manual"
+    },
+    "Total Loci": {
+      "extractionState": "manual"
+    },
+    "Touch ID": {
+      "extractionState": "manual"
+    },
+    "Transcription": {
+      "extractionState": "manual"
+    },
+    "Travel": {
+      "extractionState": "manual"
+    },
+    "Try again in \\(authService.loginAttemptTracker.formattedTime(authService.loginAttemptTracker.remainingLockoutSeconds))": {
+      "extractionState": "manual"
+    },
+    "Try broadening your search or using different keywords.": {
+      "extractionState": "manual"
+    },
+    "Unable to determine your location. Please try again.": {
+      "extractionState": "manual"
+    },
+    "Unable to determine your location. The voice note was saved but may not have an accurate position.": {
+      "extractionState": "manual"
+    },
+    "Unable to save. Please try again.": {
+      "extractionState": "manual"
+    },
+    "Unable to verify. Please sign in again.": {
+      "extractionState": "manual"
+    },
+    "Undo": {
+      "extractionState": "manual"
+    },
+    "Unknown Location": {
+      "extractionState": "manual"
+    },
+    "Unknown location": {
+      "extractionState": "manual"
+    },
+    "Unlimited loci": {
+      "extractionState": "manual"
+    },
+    "Unlimited loci, AI categorization, cloud sync, widget.": {
+      "extractionState": "manual"
+    },
+    "Unlock Lociate to access your notes": {
+      "extractionState": "manual"
+    },
+    "Unlock the Full Lociate Experience": {
+      "extractionState": "manual"
+    },
+    "Unlock with \\(biometricService.biometricType.displayName)": {
+      "extractionState": "manual"
+    },
+    "Unshare": {
+      "extractionState": "manual"
+    },
+    "Unshare with Family": {
+      "extractionState": "manual"
+    },
+    "Up to 10 loci. Upgrade for sync, AI, and sharing.": {
+      "extractionState": "manual"
+    },
+    "Upgrade": {
+      "extractionState": "manual"
+    },
+    "Upgrade to Family": {
+      "extractionState": "manual"
+    },
+    "Upgrade to Premium": {
+      "extractionState": "manual"
+    },
+    "Use Passcode": {
+      "extractionState": "manual"
+    },
+    "Use Password Instead": {
+      "extractionState": "manual"
+    },
+    "Use This Recording": {
+      "extractionState": "manual"
+    },
+    "User": {
+      "extractionState": "manual"
+    },
+    "Verify": {
+      "extractionState": "manual"
+    },
+    "Verify with Biometrics": {
+      "extractionState": "manual"
+    },
+    "Version": {
+      "extractionState": "manual"
+    },
+    "View": {
+      "extractionState": "manual"
+    },
+    "View Details": {
+      "extractionState": "manual"
+    },
+    "View voice notes on a map": {
+      "extractionState": "manual"
+    },
+    "Voice Note": {
+      "extractionState": "manual"
+    },
+    "Voice note archived": {
+      "extractionState": "manual"
+    },
+    "Voice notes map": {
+      "extractionState": "manual"
+    },
+    "Warning": {
+      "extractionState": "manual"
+    },
+    "Weak": {
+      "extractionState": "manual"
+    },
+    "Welcome!": {
+      "extractionState": "manual"
+    },
+    "When enabled, Lociate notifies you when you return to a place where you left a voice note.": {
+      "extractionState": "manual"
+    },
+    "When you return to a saved location, Lociate notifies you automatically. Never forget what you wanted to remember.": {
+      "extractionState": "manual"
+    },
+    "Widget": {
+      "extractionState": "manual"
+    },
+    "Works in the background — even when the app is closed": {
+      "extractionState": "manual"
+    },
+    "Yearly": {
+      "extractionState": "manual"
+    },
+    "You are already a member of this household.": {
+      "extractionState": "manual"
+    },
+    "You can invite up to 5 other family members to share voice notes at your favorite places.": {
+      "extractionState": "manual"
+    },
+    "You have been signed out.": {
+      "extractionState": "manual"
+    },
+    "You left a note here": {
+      "extractionState": "manual"
+    },
+    "You must be signed in to manage households.": {
+      "extractionState": "manual"
+    },
+    "You will no longer see shared notes from this family.": {
+      "extractionState": "manual"
+    },
+    "You'll be notified when you return here.": {
+      "extractionState": "manual"
+    },
+    "You're In!": {
+      "extractionState": "manual"
+    },
+    "You've reached the free limit of \\(AppConstants.maxFreeLocis) loci. Upgrade to Premium for unlimited voice notes.": {
+      "extractionState": "manual"
+    },
+    "Your Spatial Memory": {
+      "extractionState": "manual"
+    },
+    "Your first locus!": {
+      "extractionState": "manual"
+    },
+    "Your local data will be kept, but cloud sync will stop.": {
+      "extractionState": "manual"
+    },
+    "Your session could not be refreshed. Please sign in again.": {
+      "extractionState": "manual"
+    },
+    "Your session expired due to inactivity. Please sign in again.": {
+      "extractionState": "manual"
+    },
+    "Your voice notes will appear here once you start recording.": {
+      "extractionState": "manual"
+    },
+    "\\(accountDisplayName), \\(viewModel.subscriptionTier.displayName) tier": {
+      "extractionState": "manual"
+    },
+    "\\(bulkArchivedLoci.count) voice notes archived": {
+      "extractionState": "manual"
+    },
+    "\\(category.displayName) note at \\(location)": {
+      "extractionState": "manual"
+    },
+    "\\(category.displayName) note\\(isShared ? String(localized: ": {
+      "extractionState": "manual"
+    },
+    "\\(cluster.loci.count) notes clustered": {
+      "extractionState": "manual"
+    },
+    "\\(creatorName) left a note here:": {
+      "extractionState": "manual"
+    },
+    "\\(days)-day free trial": {
+      "extractionState": "manual"
+    },
+    "\\(days)-month free trial": {
+      "extractionState": "manual"
+    },
+    "\\(days)-week free trial": {
+      "extractionState": "manual"
+    },
+    "\\(deletedArchivedCount) audio file(s) deleted.": {
+      "extractionState": "manual"
+    },
+    "\\(formatTime(playerService.currentTime)) of \\(formatTime(playerService.duration))": {
+      "extractionState": "manual"
+    },
+    "\\(locus.latitude, specifier: ": {
+      "extractionState": "manual"
+    },
+    "\\(percentage) percent": {
+      "extractionState": "manual"
+    },
+    "\\(results.count) results": {
+      "extractionState": "manual"
+    },
+    "\\(results.count) results for \"\\(query)\"": {
+      "extractionState": "manual"
+    },
+    "\\(selectedLocusIDs.count) selected": {
+      "extractionState": "manual"
+    },
+    "\\(viewModel.memberCount) member(s) in this family": {
+      "extractionState": "manual"
+    },
+    "\\(viewModel.memberCount) of \\(AppConstants.maxHouseholdMembers) members": {
+      "extractionState": "manual"
+    },
+    "failed_attempt_count": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld failed attempt"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld failed attempts"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "household_member_count": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld member"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld members"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "now": {
+      "extractionState": "manual"
+    },
+    "or": {
+      "extractionState": "manual"
+    }
+  },
+  "version": "1.0"
+}

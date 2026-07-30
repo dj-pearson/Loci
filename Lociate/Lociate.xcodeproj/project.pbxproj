@@ -104,6 +104,7 @@
 		BBE6577C4175BD0E5DB8FCC3 /* HapticManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C6C99098BE6242658629BD4 /* HapticManager.swift */; };
 		EBD5AC23662BDE0E9E393379 /* HaversineDistance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74AA0DB14A76838F448081EA /* HaversineDistance.swift */; };
 		8015A1078DE4B6D3CF474F28 /* InputSanitizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1D342896D67E915621060E4 /* InputSanitizer.swift */; };
+		912FACEE03AC5091EDF5231A /* LocalizedPlural.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA0B1B925736620BE517AB3 /* LocalizedPlural.swift */; };
 		F8360F2520F178EFF9BEDCED /* ModelContainerConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5627DEB75746B6F3BC6CEC70 /* ModelContainerConfiguration.swift */; };
 		FB648CAC3D1371C2A31BCFB9 /* PaginatedLocusQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = E971FE4042AA45FD505DB4D8 /* PaginatedLocusQuery.swift */; };
 		0289F7FFCB34C1DD692EFDD2 /* PasswordValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 534C43623A9D4416421A99EB /* PasswordValidator.swift */; };
@@ -114,6 +115,8 @@
 		E14D94BBC4634587EB8462EE /* BuildSecretsValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F751967C0937091F2C540078 /* BuildSecretsValidator.swift */; };
 		C39842A510383BDAF71CF70F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F7B3F88BF5F008E5ED8D5DE3 /* Assets.xcassets */; };
 		07979619E1D11F5A73205FDA /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = F934461232F3ABBBBD26C893 /* PrivacyInfo.xcprivacy */; };
+		866A9699A490A2E87B57C52E /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 887F64B44CF303979CFCD66B /* Localizable.xcstrings */; };
+		82E349BFCF3EB2417FB9E3B8 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = A553BB56C6DAE4DD4E772F99 /* InfoPlist.xcstrings */; };
 		5ECE67B759770B83F354E756 /* LociateWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70BCD4382FB356E1BF3356D2 /* LociateWidgetBundle.swift */; };
 		87F057D44DA6BB2EEA6926B0 /* NearbyLociTimelineProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02AFF759939BF7653EF93CC2 /* NearbyLociTimelineProvider.swift */; };
 		AAA2427D159451E755860CD2 /* NearbyLociWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8396E0FAB3C8E414F7A98B0A /* NearbyLociWidget.swift */; };
@@ -182,6 +185,8 @@
 		F7B3F88BF5F008E5ED8D5DE3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F751967C0937091F2C540078 /* BuildSecretsValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuildSecretsValidator.swift; sourceTree = "<group>"; };
 		8BDBCDDF8E0AEDA8192AA1E7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A553BB56C6DAE4DD4E772F99 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
+		887F64B44CF303979CFCD66B /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		43C55C7B8AFEB13F70EDD474 /* Lociate.Debug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Lociate.Debug.entitlements; sourceTree = "<group>"; };
 		2F006FE9F076A54E38C16D1A /* Lociate.Release.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Lociate.Release.entitlements; sourceTree = "<group>"; };
 		D2001471A48AC71D0604A04A /* LociateApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LociateApp.swift; sourceTree = "<group>"; };
@@ -229,6 +234,7 @@
 		3C6C99098BE6242658629BD4 /* HapticManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticManager.swift; sourceTree = "<group>"; };
 		74AA0DB14A76838F448081EA /* HaversineDistance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HaversineDistance.swift; sourceTree = "<group>"; };
 		D1D342896D67E915621060E4 /* InputSanitizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputSanitizer.swift; sourceTree = "<group>"; };
+		ACA0B1B925736620BE517AB3 /* LocalizedPlural.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizedPlural.swift; sourceTree = "<group>"; };
 		5627DEB75746B6F3BC6CEC70 /* ModelContainerConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelContainerConfiguration.swift; sourceTree = "<group>"; };
 		E971FE4042AA45FD505DB4D8 /* PaginatedLocusQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaginatedLocusQuery.swift; sourceTree = "<group>"; };
 		534C43623A9D4416421A99EB /* PasswordValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordValidator.swift; sourceTree = "<group>"; };
@@ -402,6 +408,7 @@
 				3C6C99098BE6242658629BD4 /* HapticManager.swift */,
 				74AA0DB14A76838F448081EA /* HaversineDistance.swift */,
 				D1D342896D67E915621060E4 /* InputSanitizer.swift */,
+				ACA0B1B925736620BE517AB3 /* LocalizedPlural.swift */,
 				5627DEB75746B6F3BC6CEC70 /* ModelContainerConfiguration.swift */,
 				E971FE4042AA45FD505DB4D8 /* PaginatedLocusQuery.swift */,
 				534C43623A9D4416421A99EB /* PasswordValidator.swift */,
@@ -585,6 +592,8 @@
 				0405E54ACD08FB788661928B /* Widget */,
 				F7B3F88BF5F008E5ED8D5DE3 /* Assets.xcassets */,
 				F934461232F3ABBBBD26C893 /* PrivacyInfo.xcprivacy */,
+				887F64B44CF303979CFCD66B /* Localizable.xcstrings */,
+				A553BB56C6DAE4DD4E772F99 /* InfoPlist.xcstrings */,
 				8BDBCDDF8E0AEDA8192AA1E7 /* Info.plist */,
 				43C55C7B8AFEB13F70EDD474 /* Lociate.Debug.entitlements */,
 				2F006FE9F076A54E38C16D1A /* Lociate.Release.entitlements */,
@@ -729,6 +738,8 @@
 			files = (
 				C39842A510383BDAF71CF70F /* Assets.xcassets in Resources */,
 				07979619E1D11F5A73205FDA /* PrivacyInfo.xcprivacy in Resources */,
+				866A9699A490A2E87B57C52E /* Localizable.xcstrings in Resources */,
+				82E349BFCF3EB2417FB9E3B8 /* InfoPlist.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -844,6 +855,7 @@
 				BBE6577C4175BD0E5DB8FCC3 /* HapticManager.swift in Sources */,
 				EBD5AC23662BDE0E9E393379 /* HaversineDistance.swift in Sources */,
 				8015A1078DE4B6D3CF474F28 /* InputSanitizer.swift in Sources */,
+				912FACEE03AC5091EDF5231A /* LocalizedPlural.swift in Sources */,
 				F8360F2520F178EFF9BEDCED /* ModelContainerConfiguration.swift in Sources */,
 				FB648CAC3D1371C2A31BCFB9 /* PaginatedLocusQuery.swift in Sources */,
 				0289F7FFCB34C1DD692EFDD2 /* PasswordValidator.swift in Sources */,

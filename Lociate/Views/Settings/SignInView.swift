@@ -34,10 +34,10 @@ struct SignInView: View {
                             .font(.system(size: 64))
                             .foregroundStyle(Theme.primary)
 
-                        Text("Sign in to Lociate")
+                        Text(String(localized: "Sign in to Lociate"))
                             .font(Theme.Typography.largeTitle)
 
-                        Text("Sync your notes across devices and share with family.")
+                        Text(String(localized: "Sync your notes across devices and share with family."))
                             .font(Theme.Typography.body)
                             .foregroundStyle(Theme.textSecondary)
                             .multilineTextAlignment(.center)
@@ -109,10 +109,10 @@ struct SignInView: View {
                                 Image(systemName: "lock.fill")
                                     .foregroundStyle(Theme.error)
                                 VStack(alignment: .leading, spacing: 2) {
-                                    Text("Account temporarily locked")
+                                    Text(String(localized: "Account temporarily locked"))
                                         .font(Theme.Typography.caption)
                                         .foregroundStyle(Theme.error)
-                                    Text("Try again in \(authService.loginAttemptTracker.formattedTime(authService.loginAttemptTracker.remainingLockoutSeconds))")
+                                    Text(String(localized: "Try again in \(authService.loginAttemptTracker.formattedTime(authService.loginAttemptTracker.remainingLockoutSeconds))"))
                                         .font(Theme.Typography.caption)
                                         .foregroundStyle(Theme.textSecondary)
                                 }
@@ -128,7 +128,7 @@ struct SignInView: View {
                             HStack(spacing: Theme.Spacing.sm) {
                                 Image(systemName: "exclamationmark.triangle.fill")
                                     .foregroundStyle(Theme.warning)
-                                Text("\(authService.loginAttemptTracker.failedAttemptCount) failed attempt(s)")
+                                Text(String(localized: "failed_attempt_count", count: authService.loginAttemptTracker.failedAttemptCount))
                                     .font(Theme.Typography.caption)
                                     .foregroundStyle(Theme.warning)
                                 Spacer()
@@ -148,7 +148,7 @@ struct SignInView: View {
                                     .frame(maxWidth: .infinity)
                                     .frame(height: 44)
                             } else {
-                                Text("Sign In")
+                                Text(String(localized: "Sign In"))
                                     .font(Theme.Typography.headline)
                                     .frame(maxWidth: .infinity)
                                     .frame(height: 44)
@@ -169,13 +169,13 @@ struct SignInView: View {
 
                         // US-143: Password reset suggestion after many failures
                         if authService.loginAttemptTracker.shouldSuggestPasswordReset {
-                            Text("Having trouble? Try resetting your password.")
+                            Text(String(localized: "Having trouble? Try resetting your password."))
                                 .font(Theme.Typography.caption)
                                 .foregroundStyle(Theme.primary)
                         }
 
                         HStack {
-                            Text("Don't have an account?")
+                            Text(String(localized: "Don't have an account?"))
                                 .foregroundStyle(Theme.textSecondary)
                             Button(String(localized: "Sign Up")) {
                                 showSignUp = true
@@ -206,7 +206,7 @@ struct SignInView: View {
                 }
                 Button(String(localized: "Cancel"), role: .cancel) {}
             } message: {
-                Text("Enter your email to receive a password reset link.")
+                Text(String(localized: "Enter your email to receive a password reset link."))
             }
             .alert(String(localized: "Error"), isPresented: $showError) {
                 Button(String(localized: "OK")) {}
@@ -237,7 +237,7 @@ struct SignInView: View {
             Rectangle()
                 .frame(height: 1)
                 .foregroundStyle(Theme.textSecondary.opacity(0.3))
-            Text("or")
+            Text(String(localized: "or"))
                 .font(Theme.Typography.caption)
                 .foregroundStyle(Theme.textSecondary)
             Rectangle()
@@ -377,7 +377,7 @@ struct SignUpView: View {
                             .font(.system(size: 48))
                             .foregroundStyle(Theme.primary)
 
-                        Text("Create Account")
+                        Text(String(localized: "Create Account"))
                             .font(Theme.Typography.title)
                     }
                     .padding(.top, Theme.Spacing.xl)
@@ -469,7 +469,7 @@ struct SignUpView: View {
                         .textFieldStyle(.roundedBorder)
 
                         if !confirmPassword.isEmpty && !passwordsMatch {
-                            Text("Passwords do not match")
+                            Text(String(localized: "Passwords do not match"))
                                 .font(Theme.Typography.caption)
                                 .foregroundStyle(Theme.error)
                                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -483,7 +483,7 @@ struct SignUpView: View {
                                     .frame(maxWidth: .infinity)
                                     .frame(height: 44)
                             } else {
-                                Text("Create Account")
+                                Text(String(localized: "Create Account"))
                                     .font(Theme.Typography.headline)
                                     .frame(maxWidth: .infinity)
                                     .frame(height: 44)
@@ -495,7 +495,7 @@ struct SignUpView: View {
                     }
 
                     HStack {
-                        Text("Already have an account?")
+                        Text(String(localized: "Already have an account?"))
                             .foregroundStyle(Theme.textSecondary)
                         Button(String(localized: "Sign In")) { dismiss() }
                             .disabled(authService.isLoading)

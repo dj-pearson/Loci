@@ -3482,8 +3482,8 @@
         "LAUNCH_CHECKLIST.md §2 and §3 updated with the new tickboxes"
       ],
       "priority": 204,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed. The listing had 7 text files and none of the URLs, review information, or release notes — all of which block Ready for Review. Added support_url, marketing_url, privacy_url, copyright, release_notes, and a review_information/ tree with contact details, demo credentials, and reviewer notes. The notes explain *why* Always location authorization is required (the proximity notification is the feature, and it has to fire with the app backgrounded) and give a step-by-step simulator procedure for exercising the core loop — background location is the single most common rejection reason for an app like this. Created a separate Play metadata tree, since Play's field limits are tighter and differ per field. Added scripts/check-store-metadata.py, wired into CI: it validates all 20 fields against each platform's character limit, asserts the required files exist and are non-empty, and warns on placeholder values. It immediately caught two real violations in my own first draft — an 82-character Play short description (limit 80) and a 37-character Play title (limit 30) — which App Store Connect and Play both reject only *after* processing the build. It also warns that demo_password.txt still holds REPLACE_BEFORE_SUBMISSION, which is deliberately left as a placeholder rather than invented. Screenshots cannot be produced in CI; LAUNCH_CHECKLIST §2b documents the exact sizes, a repeatable capture procedure, and the Play data-safety answers cross-referenced against PrivacyInfo.xcprivacy so all three declarations agree."
     },
     {
       "id": "US-205",
@@ -3594,8 +3594,8 @@
         "Existing en copy is preserved verbatim so no wording changes ship with the refactor"
       ],
       "priority": 211,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed. 610 call sites already used String(localized:), but no string catalog existed — so every key silently resolved to itself: the app looked fine in English, could not be translated at all, and a typo'd key was invisible. Added Localizable.xcstrings (474 keys) and InfoPlist.xcstrings (display name plus the four permission prompts, which iOS reads from a separate table), both generated from the sources by scripts/generate-string-catalog.py so the catalog cannot drift from what the code asks for. For the source language no en unit is emitted — Xcode resolves the key as the value — which keeps the existing English copy verbatim with no wording changes shipping alongside the refactor. Migrated 22 raw literals, deliberately leaving punctuation, bare interpolated counts, and the brand name alone. Replaced the two count-bearing strings: 'failed attempt(s)' and 'N members' cannot be localized, because Polish and Arabic have more plural categories than English's two, so the '(s)' trick produces wrong grammar in every such language — they now use catalog plural variations via a new String(localized:count:). Added scripts/check-localization.py, in CI, which flags literals passed to the SwiftUI initializers that render text while allowing punctuation, bare interpolations, the brand name, and SF Symbol identifiers; it found 6 sites my manual pass had missed. The generator also refuses to emit a declared plural key that no source file uses — it caught a speculative 'locus_count' entry I had added, which I removed rather than ship dead."
     },
     {
       "id": "US-212",

@@ -44,6 +44,19 @@ jobs:
       - name: Verify launch checklist matches prd.json
         run: python3 scripts/sync-launch-checklist.py --check
 
+      # US-211: the catalog is derived from the sources, so a key the code asks for
+      # but the catalog lacks would otherwise resolve silently to itself.
+      - name: Verify string catalogs match the sources
+        run: python3 scripts/generate-string-catalog.py --check
+
+      - name: Verify no user-facing literal bypasses localization
+        run: python3 scripts/check-localization.py
+
+      # US-204: App Store Connect and Play both reject an over-length field, and
+      # both do it after the build has been processed. Fail here instead.
+      - name: Validate store listing metadata
+        run: python3 scripts/check-store-metadata.py
+
   swiftlint:
     name: SwiftLint
     runs-on: macos-14

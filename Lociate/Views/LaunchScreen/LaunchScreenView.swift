@@ -17,7 +17,7 @@ struct LaunchScreenView: View {
                     .font(.system(size: 36, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
 
-                Text("Your Spatial Memory")
+                Text(String(localized: "Your Spatial Memory"))
                     .font(.system(size: 16, weight: .medium))
                     .foregroundStyle(.white.opacity(0.8))
             }

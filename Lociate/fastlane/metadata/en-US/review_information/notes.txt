@@ -1,0 +1,34 @@
+REVIEW NOTES
+
+Background location — why it is required
+Lociate's core function is notifying the user when they physically return to a place
+where they previously left a voice note. This requires "Always" location
+authorization: the geofence must fire while the app is not in the foreground, which
+is the entire feature. The app requests "When In Use" first during onboarding and
+only escalates to "Always" on the screen that explains proximity notifications. It
+never uploads location for advertising or analytics.
+
+How to exercise the core loop in the simulator
+1. Launch, complete onboarding, grant location, microphone, and notifications.
+2. Tap the record button, speak, and stop. The note saves with the current
+   coordinate and an on-device transcription (Apple Speech; no network).
+3. In Xcode, Debug > Simulate Location, choose a location several kilometres away.
+4. Simulate the original location again. A proximity notification arrives within a
+   minute; tapping it opens the note.
+
+Subscriptions
+Premium and Family are auto-renewing subscriptions with a 7-day free trial. The
+paywall is reachable from Settings > Upgrade, and every gated feature shows an
+upgrade prompt at the point of use. Free tier allows 10 loci; the limit is enforced
+both on device and server-side.
+
+Demo account
+The demo account above is pre-seeded with loci and one household so Family sharing
+can be reviewed without creating a second account. Sign in via Settings > Sign In.
+The account password must be set before submission — see the placeholder in
+demo_password.txt.
+
+Privacy
+Transcription is on-device via Apple Speech. Audio is encrypted at rest. No
+tracking, no IDFA, no ad networks. Analytics are anonymous product-interaction
+signals via TelemetryDeck with a SHA-256-hashed user identifier.
