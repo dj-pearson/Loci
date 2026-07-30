@@ -21,8 +21,18 @@ final class NetworkMonitor {
     init() {
         monitor.pathUpdateHandler = { [weak self] path in
             Task { @MainActor in
-                self?.isConnected = path.status == .satisfied
-                self?.connectionType = self?.resolveConnectionType(path) ?? .unknown
+                guard let self else { return }
+                let wasConnected = self.isConnected
+                let isNowConnected = path.status == .satisfied
+                self.isConnected = isNowConnected
+                self.connectionType = self.resolveConnectionType(path)
+
+                // US-195: an APNs token that arrived while offline is queued
+                // locally; flush it on the connectivity edge so it is not lost
+                // until the next foreground.
+                if !wasConnected, isNowConnected {
+                    Task { await PushRegistrationService.shared.syncPendingToken() }
+                }
             }
         }
         monitor.start(queue: queue)

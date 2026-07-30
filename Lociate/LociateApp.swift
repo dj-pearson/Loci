@@ -5,6 +5,10 @@ import SwiftUI
 struct LociateApp: App {
     let modelContainer: ModelContainer
 
+    // US-195: required for the APNs device-token callbacks — SwiftUI exposes no
+    // equivalent hook, so without this adaptor no push token is ever received.
+    @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
+
     @State private var navigationRouter = NavigationRouter()
     @State private var notificationService = NotificationService()
     @State private var locationService = LocationService()
@@ -67,7 +71,15 @@ struct LociateApp: App {
                 switch newPhase {
                 case .active:
                     biometricService.lockIfNeeded()
-                    Task { await notificationService.checkAuthorizationStatus() }
+                    Task {
+                        await notificationService.checkAuthorizationStatus()
+                        // US-195: register once permission exists, and flush any
+                        // token that could not be persisted earlier (offline, or
+                        // obtained before the user signed in).
+                        PushRegistrationService.shared
+                            .registerIfAuthorized(isAuthorized: notificationService.isAuthorized)
+                        await PushRegistrationService.shared.syncPendingToken()
+                    }
                     notificationService.deliverQueuedNotifications()
                 case .background:
                     biometricService.recordBackgroundTransition()

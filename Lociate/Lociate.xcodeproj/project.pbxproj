@@ -69,6 +69,7 @@
 		2F8D9075C3CEB28938BDE611 /* SignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4200B726AB7FACF513FDE35 /* SignInView.swift */; };
 		1A483650E8873D9811F31EEF /* AICategoryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ACEEB91FDA26166DCAD7332 /* AICategoryService.swift */; };
 		573BD1BEAB9D3007CCC9399A /* AnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B0BB189510128685CE4A56B /* AnalyticsService.swift */; };
+		6B19107FA1A9284420AFC595 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BF5F59C2571B006111984E0 /* AppDelegate.swift */; };
 		E3E4C88614D1FDFB0D1E4853 /* AudioCacheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C604264CD7E41DEFD4696422 /* AudioCacheManager.swift */; };
 		E94AD2BFB3E3FCFB6C11CC94 /* AudioEncryptionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CD582A40A7C96F414E3623F /* AudioEncryptionService.swift */; };
 		D9AAFCBC7CE7E5A0DA5743D4 /* AudioPlayerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F4086336BDE6A0076E49D10 /* AudioPlayerService.swift */; };
@@ -85,6 +86,7 @@
 		E5434F69E069432A55684C2B /* LoginAttemptTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7F36ABB1203FD05F6E5975B /* LoginAttemptTracker.swift */; };
 		B0439AD6EB84B93699E82B01 /* NetworkMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07A2643647C3E1008D52B59C /* NetworkMonitor.swift */; };
 		8B6A30BA1496579C9DB8B19D /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06C4002179052FC3B706BD7E /* NotificationService.swift */; };
+		1C33681E8F53C599130AB98C /* PushRegistrationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6342C3843A30467F885FB18B /* PushRegistrationService.swift */; };
 		BAC75503FAFF4B79B1CF8DAC /* RequestSigningService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0755E01EA1C63C64A31665C3 /* RequestSigningService.swift */; };
 		4D7B462DB98234FA3CD6F90B /* RevenueCatConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DCDB4A0AD99136100A30845 /* RevenueCatConfiguration.swift */; };
 		EDF7358AD2D397207A45F172 /* ReverseGeocodingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90C45980155BDC36C85AFE2B /* ReverseGeocodingService.swift */; };
@@ -182,6 +184,7 @@
 		F7D70F86F129CCF7F20C707B /* UserProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfile.swift; sourceTree = "<group>"; };
 		6ACEEB91FDA26166DCAD7332 /* AICategoryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AICategoryService.swift; sourceTree = "<group>"; };
 		9B0BB189510128685CE4A56B /* AnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsService.swift; sourceTree = "<group>"; };
+		9BF5F59C2571B006111984E0 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C604264CD7E41DEFD4696422 /* AudioCacheManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioCacheManager.swift; sourceTree = "<group>"; };
 		6CD582A40A7C96F414E3623F /* AudioEncryptionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioEncryptionService.swift; sourceTree = "<group>"; };
 		5F4086336BDE6A0076E49D10 /* AudioPlayerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPlayerService.swift; sourceTree = "<group>"; };
@@ -198,6 +201,7 @@
 		D7F36ABB1203FD05F6E5975B /* LoginAttemptTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginAttemptTracker.swift; sourceTree = "<group>"; };
 		07A2643647C3E1008D52B59C /* NetworkMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkMonitor.swift; sourceTree = "<group>"; };
 		06C4002179052FC3B706BD7E /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
+		6342C3843A30467F885FB18B /* PushRegistrationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushRegistrationService.swift; sourceTree = "<group>"; };
 		0755E01EA1C63C64A31665C3 /* RequestSigningService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestSigningService.swift; sourceTree = "<group>"; };
 		1DCDB4A0AD99136100A30845 /* RevenueCatConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RevenueCatConfiguration.swift; sourceTree = "<group>"; };
 		90C45980155BDC36C85AFE2B /* ReverseGeocodingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReverseGeocodingService.swift; sourceTree = "<group>"; };
@@ -338,6 +342,7 @@
 			children = (
 				6ACEEB91FDA26166DCAD7332 /* AICategoryService.swift */,
 				9B0BB189510128685CE4A56B /* AnalyticsService.swift */,
+				9BF5F59C2571B006111984E0 /* AppDelegate.swift */,
 				C604264CD7E41DEFD4696422 /* AudioCacheManager.swift */,
 				6CD582A40A7C96F414E3623F /* AudioEncryptionService.swift */,
 				5F4086336BDE6A0076E49D10 /* AudioPlayerService.swift */,
@@ -354,6 +359,7 @@
 				D7F36ABB1203FD05F6E5975B /* LoginAttemptTracker.swift */,
 				07A2643647C3E1008D52B59C /* NetworkMonitor.swift */,
 				06C4002179052FC3B706BD7E /* NotificationService.swift */,
+				6342C3843A30467F885FB18B /* PushRegistrationService.swift */,
 				0755E01EA1C63C64A31665C3 /* RequestSigningService.swift */,
 				1DCDB4A0AD99136100A30845 /* RevenueCatConfiguration.swift */,
 				90C45980155BDC36C85AFE2B /* ReverseGeocodingService.swift */,
@@ -765,6 +771,7 @@
 				2F8D9075C3CEB28938BDE611 /* SignInView.swift in Sources */,
 				1A483650E8873D9811F31EEF /* AICategoryService.swift in Sources */,
 				573BD1BEAB9D3007CCC9399A /* AnalyticsService.swift in Sources */,
+				6B19107FA1A9284420AFC595 /* AppDelegate.swift in Sources */,
 				E3E4C88614D1FDFB0D1E4853 /* AudioCacheManager.swift in Sources */,
 				E94AD2BFB3E3FCFB6C11CC94 /* AudioEncryptionService.swift in Sources */,
 				D9AAFCBC7CE7E5A0DA5743D4 /* AudioPlayerService.swift in Sources */,
@@ -781,6 +788,7 @@
 				E5434F69E069432A55684C2B /* LoginAttemptTracker.swift in Sources */,
 				B0439AD6EB84B93699E82B01 /* NetworkMonitor.swift in Sources */,
 				8B6A30BA1496579C9DB8B19D /* NotificationService.swift in Sources */,
+				1C33681E8F53C599130AB98C /* PushRegistrationService.swift in Sources */,
 				BAC75503FAFF4B79B1CF8DAC /* RequestSigningService.swift in Sources */,
 				4D7B462DB98234FA3CD6F90B /* RevenueCatConfiguration.swift in Sources */,
 				EDF7358AD2D397207A45F172 /* ReverseGeocodingService.swift in Sources */,

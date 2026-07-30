@@ -3337,8 +3337,8 @@
         "Works offline: token upsert is queued and retried when connectivity returns"
       ],
       "priority": 195,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed. Added AppDelegate (bridged via @UIApplicationDelegateAdaptor — SwiftUI exposes no hook for the APNs device-token callbacks, which is why nothing ever received a token) implementing didRegisterForRemoteNotificationsWithDeviceToken and didFailToRegisterForRemoteNotificationsWithError, plus PushRegistrationService. registerForRemoteNotifications() is called only after notification authorization is confirmed, on scene .active. The token is hex-encoded and written to users.apns_token, keyed on auth_id; a token identical to the last synced one is not re-sent. Offline or signed-out tokens are queued in UserDefaults and flushed on three edges: sign-in (authStateChanges .signedIn), the NetworkMonitor disconnected->connected transition, and scene activation. Sign-out clears the column server-side before dropping the session (afterwards there is no authenticated row to update, and a stale token keeps delivering another account's digests to the device); account deletion drops only local state since the row is already gone. Registration failure is logged and never propagates — local geofence notifications are unaffected. Xcode project regenerated so all three new files are target members. Compilation is not verifiable here (Linux container, no Xcode toolchain)."
     },
     {
       "id": "US-196",
