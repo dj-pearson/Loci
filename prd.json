@@ -3822,6 +3822,20 @@
       "priority": "critical",
       "passes": true,
       "notes": "NotificationService.queuedNotifications is [UUID: Locus] but was initialised with `[]` — 'use [:] to get an empty dictionary literal'. This reported twice because the @Observable macro expands the stored property and the expansion carries the same error. UndoSnackbar used ModelContext in LocusActions.archive and .delete without importing SwiftData; it imported only SwiftUI and UIKit. AudioWaveformView's \"High Amplitude\" preview called the memberwise initializer as (amplitude:maxHeight:barColor:) while the properties are declared amplitude, barCount, barColor, maxHeight — Swift requires declaration order. Each of the three classes was then swept across all 116 Swift files: no other dictionary-typed property is initialised with [] (the one grep hit, SearchService's [(locus:matchCount:)] = [], is an array of tuples and correct); no other file uses ModelContext, ModelContainer, FetchDescriptor, PersistentModel or ModelConfiguration without importing SwiftData; and an argument-order checker over 67 structs found only one candidate, PostRecordingSheet in RecordingView, which is a false positive where the crude paren matching swallowed a nested closure's argument labels — the real call is in declaration order. Worth noting these are the kind of defect that only a compiler finds, and no compiler had ever run on this code."
+    },
+    {
+      "id": "US-227",
+      "title": "Three synchronous reads of an async session, one hiding a privilege-display bug",
+      "description": "The third type-check wave left a single error: HouseholdViewModel.isOwner read `try? supabase.auth.session.user.id` from a synchronous computed property, and `session` is an `async` property. Sweeping for the same pattern found two more in AuthService that the compiler had not reached yet. One of the three was concealing a real behavioural bug.",
+      "acceptanceCriteria": [
+        "No synchronous code reads supabase.auth.session",
+        "isOwner is true only for the signed-in user, and fails closed when the user is unknown",
+        "supabaseEmail and syncLocalProfile use the synchronous currentUser accessor",
+        "Callers no longer apply `try?` to a getter that cannot throw"
+      ],
+      "priority": "critical",
+      "passes": true,
+      "notes": "isOwner bound `userId` from the async session and then never used it — the return statement tested only whether ANY member held the owner role, which is true of every valid household. So every family member saw the owner-only controls in HouseholdMembersView: remove-member, generate-invite-code, delete-household. The server's RLS policies (migration 010) would still have rejected the mutations, so this was a misleading UI rather than a data breach, but it was wrong. HouseholdViewModel now caches the signed-in user's internal users.id in an observable `signedInUserId`, populated by the existing `currentUserId()` helper so no call site changed, and isOwner looks for that user's own membership row with the owner role. Nil until the first async call resolves, which makes it fail closed — controls stay hidden rather than appearing to everyone. The two AuthService sites use supabase-swift's `nonisolated public var currentUser: User?`, a synchronous accessor over the cached session, verified against AuthClient.swift: `supabaseEmail` was declared `get throws` over the async property and is now a plain optional getter, with `try?` removed from its four call sites (two internal, plus AccountView and ReAuthView). Also recorded: `syncLocalProfile(modelContext:)` has no callers anywhere in the app — another instance of note 26's wiring failure, left in place but documented rather than silently deleted."
     }
   ]
 }

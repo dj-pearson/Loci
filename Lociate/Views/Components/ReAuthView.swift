@@ -117,7 +117,7 @@ struct ReAuthView: View {
 
         do {
             // Re-authenticate via Supabase to verify password
-            guard let email = try? authService.supabaseEmail else {
+            guard let email = authService.supabaseEmail else {
                 errorMessage = String(localized: "Unable to verify. Please sign in again.")
                 return
             }

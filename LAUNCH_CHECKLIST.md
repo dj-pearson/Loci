@@ -150,7 +150,7 @@ story in `prd.json` (US-185 onward) with the full finding in its `notes`.
 This section is generated — run `python3 scripts/sync-launch-checklist.py` after
 changing a story's status.
 
-### Resolved (42)
+### Resolved (43)
 
 - [x] **US-185** — iOS: restore Xcode project source membership for all 104 Swift files
 - [x] **US-186** — iOS: add SPM package dependencies (supabase-swift, RevenueCat, TelemetryDeck)
@@ -194,6 +194,7 @@ changing a story's status.
 - [x] **US-224** — The iOS build reached xcodebuild and failed on a floating dependency that needs Swift 6
 - [x] **US-225** — The Android app built for the first time; 3 of 84 unit tests then failed
 - [x] **US-226** — The app's own Swift code compiled for the first time and had 3 errors
+- [x] **US-227** — Three synchronous reads of an async session, one hiding a privilege-display bug
 
 ### Still open (0)
 

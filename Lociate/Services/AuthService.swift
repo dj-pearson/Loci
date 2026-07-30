@@ -245,7 +245,7 @@ final class AuthService {
 
     func signOut() async throws {
         // US-149: Audit log sign-out
-        let email = try? supabaseEmail
+        let email = supabaseEmail
         auditLogger.log(event: .signOut, email: email, modelContext: auditModelContext)
 
         // US-195: clear the device's APNs token *before* dropping the session —
@@ -264,7 +264,7 @@ final class AuthService {
 
     func deleteAccount(modelContext: ModelContext) async throws {
         // US-149: Audit log account deletion
-        let email = try? supabaseEmail
+        let email = supabaseEmail
         auditLogger.log(event: .accountDeleted, email: email, modelContext: auditModelContext)
 
         // Call server-side deletion RPC
@@ -287,10 +287,13 @@ final class AuthService {
     // MARK: - Session Helpers
 
     /// The current authenticated user's email (for re-auth flows, US-145).
+    ///
+    /// Reads `currentUser`, which is a synchronous non-isolated accessor over the
+    /// cached session. The previous `get throws { try supabase.auth.session… }` did not
+    /// compile: `session` is an `async` property, so it cannot be reached from a
+    /// synchronous getter. Nothing here throws any more, so callers no longer use `try?`.
     var supabaseEmail: String? {
-        get throws {
-            try supabase.auth.session.user.email
-        }
+        supabase.auth.currentUser?.email
     }
 
     // MARK: - Helpers
@@ -312,8 +315,14 @@ final class AuthService {
     }
 
     /// Syncs the local UserProfile with SwiftData after auth.
+    ///
+    /// NOTE: this function currently has no callers anywhere in the app.
+    ///
+    /// Uses the synchronous `currentUser` accessor; the previous
+    /// `try? supabase.auth.session.user.id` did not compile because `session` is async
+    /// and this function is not.
     func syncLocalProfile(modelContext: ModelContext) {
-        guard let authId = try? supabase.auth.session.user.id else { return }
+        guard let authId = supabase.auth.currentUser?.id else { return }
 
         let authIdString = authId.uuidString
         let descriptor = FetchDescriptor<UserProfile>(

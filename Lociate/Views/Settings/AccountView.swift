@@ -234,7 +234,7 @@ struct AccountView: View {
     }
 
     private func loadEmail() async {
-        currentEmail = try? authService.supabaseEmail
+        currentEmail = authService.supabaseEmail
     }
 
     private func requestPasswordReset() async {

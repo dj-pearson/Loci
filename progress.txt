@@ -391,8 +391,9 @@ first real run — three of them my own new gates failing on my own code.
 - [x] US-224: xcodebuild ran, and a floating dependency needed Swift 6
 - [x] US-225: the Android app built; unit tests now 91/91 — Android CI fully green
 - [x] US-226: the app's own Swift compiled for the first time, and had 3 errors
+- [x] US-227: sync reads of an async session, one hiding a privilege-display bug
 
-### All 226 stories pass. Remaining launch work is manual (portals, secrets,
+### All 227 stories pass. Remaining launch work is manual (portals, secrets,
 ### screenshots, real-device verification) — see LAUNCH_CHECKLIST.md.
 
 ### Notes for future iterations

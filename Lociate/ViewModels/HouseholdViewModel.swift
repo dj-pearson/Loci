@@ -12,6 +12,13 @@ final class HouseholdViewModel {
     private(set) var isLoading = false
     private(set) var errorMessage: String?
 
+    /// The signed-in user's internal `users.id`, cached by `currentUserId()`.
+    ///
+    /// `isOwner` needs it and cannot await `supabase.auth.session`, which is an async
+    /// property. Nil until the first async call resolves, which makes `isOwner` fail
+    /// closed — owner-only controls stay hidden rather than appearing to everyone.
+    private(set) var signedInUserId: UUID?
+
     private let supabase = SupabaseClientProvider.shared
 
     // MARK: - Create Household
@@ -459,12 +466,24 @@ final class HouseholdViewModel {
 
     // MARK: - Computed Properties
 
+    /// Whether the *signed-in user* owns the current household.
+    ///
+    /// This gates the owner-only controls in HouseholdMembersView: removing members,
+    /// generating an invite code, deleting the household.
+    ///
+    /// It previously bound `try? supabase.auth.session.user.id` — which does not
+    /// compile, because `session` is an async property — and then never used the
+    /// binding, testing only whether *any* member held the owner role. That is true
+    /// for every valid household, so every member saw the owner's controls. The
+    /// server's RLS policies would still have rejected the mutations, but the UI was
+    /// wrong. Now it looks for the signed-in user's own membership row.
     var isOwner: Bool {
-        guard let household = currentHousehold,
-              let userId = try? supabase.auth.session.user.id else { return false }
-        // Compare owner_id with the internal user ID (not auth ID)
-        // For local check, we compare against members with owner role
-        return members.contains { $0.role == .owner && $0.householdId == household.id }
+        guard let household = currentHousehold, let signedInUserId else { return false }
+        return members.contains {
+            $0.householdId == household.id
+                && $0.userId == signedInUserId
+                && $0.role == .owner
+        }
     }
 
     var hasHousehold: Bool {
@@ -487,7 +506,13 @@ final class HouseholdViewModel {
             .eq("auth_id", value: authId)
             .execute()
             .value
-        return result?.first?.id
+        let id = result?.first?.id
+        // Cache it so `isOwner` — which is synchronous and cannot await a session —
+        // has something to compare against.
+        if let uuid = id.flatMap(UUID.init(uuidString:)) {
+            await MainActor.run { self.signedInUserId = uuid }
+        }
+        return id
     }
 
     private func currentDisplayName(modelContext: ModelContext) async -> String? {
