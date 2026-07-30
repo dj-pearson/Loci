@@ -124,6 +124,9 @@ struct ContentView: View {
     @Environment(LocationService.self) private var locationService
     @Environment(NotificationService.self) private var notificationService
     @Environment(BiometricLockService.self) private var biometricService
+    // Needed by the deferred launch task, which calls start() once RevenueCat is
+    // configured. LociateApp owns the instance and injects it above.
+    @Environment(SubscriptionService.self) private var subscriptionService
     @Query(filter: #Predicate<Locus> { !$0.isArchived }) private var loci: [Locus]
     @Query private var householdMembers: [HouseholdMember]
 
@@ -155,6 +158,9 @@ struct ContentView: View {
         // RevenueCat, Analytics, and integrity checks never block startup.
         .task(priority: .utility) {
             RevenueCatConfiguration.configure()
+            // Must follow configure() — SubscriptionService.init deliberately does not
+            // touch Purchases.shared, because that traps before configuration.
+            subscriptionService.start()
             AnalyticsService.shared.configure()
             AnalyticsService.shared.trackAppLaunch()
             IntegrityCheckService.shared.performChecks()

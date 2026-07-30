@@ -3851,6 +3851,19 @@
       "priority": "critical",
       "passes": true,
       "notes": "Six distinct defects. (1) AudioService.AudioError was declared `: Equatable` only, so all four `throw AudioError.…` statements failed — it now conforms to Error. A repo-wide sweep of every type that appears in a `throw` confirms no other thrown type is missing the conformance. (2) CertificatePinningDelegate subscripted the CFArray from SecTrustCopyCertificateChain, which Swift cannot do; the chain is now bridged once to [SecCertificate], which also drops the deprecated SecTrustGetCertificateCount and the index loop. The same file already used the correct `as? [SecCertificate]` idiom 56 lines further down — it had both the right and the wrong form. (3) CrashReportingService did `event.message?.formatted = event.message?.formatted.map(scrubText)`, wrong three ways at once: SentryMessage.formatted is readonly (verified in SentryMessage.h), `.map` over a String maps its Characters not the whole string, and the result type was [String]?. It now builds a replacement SentryMessage(formatted:). (4) GeofenceManager iterated CLMonitor.identifiers without await — it is an async property — and used `for try await` over monitor.events, which does not throw, so the enclosing Task could not be inferred as the declared Task<Void, Never>. (5,6) IntegrityCheckService and SecurityAuditLogger both called AnalyticsService.track(_:properties:) but the method declares `parameters:`. No remaining call passes `properties:`."
+    },
+    {
+      "id": "US-229",
+      "title": "The iOS build went green, and the unit tests immediately found a launch crash",
+      "description": "Build (iOS Simulator) passed for the first time in the project's history. Unit Tests then aborted with `Fatal error: Purchases has not been configured` — not a test-only problem. The unit test bundle is hosted by the app, so launching the host reproduced a crash that would happen on every real launch too.",
+      "acceptanceCriteria": [
+        "SubscriptionService.init does not touch Purchases.shared",
+        "The RevenueCat delegate is attached only after Purchases.configure has run",
+        "No other service reaches an unconfigured SDK from its initializer"
+      ],
+      "priority": "critical",
+      "passes": true,
+      "notes": "LociateApp creates `@State private var subscriptionService = SubscriptionService()` as a stored-property initializer, which runs while the App value is being constructed. SubscriptionService.init did `Purchases.shared.delegate = self`, and Purchases.shared traps with a fatalError until Purchases.configure has been called. US-177 had moved RevenueCatConfiguration.configure() into a deferred `.task` on ContentView to keep SDK network I/O off the launch path — which is correct for launch performance, but it put configuration AFTER the property initializer that depended on it. The result was a guaranteed launch crash that nothing had ever executed to discover. The Purchases access moved out of init into a new `start()`, called from the same deferred task immediately after configure(). ContentView needed an @Environment(SubscriptionService.self) declaration to reach the instance LociateApp owns and injects. A sweep of every initializer in the app for Purchases.shared, SentrySDK, TelemetryDeck and TelemetryManager found no other service reaching an unconfigured SDK from init. Worth recording the general shape: deferring initialization for launch performance is safe only if nothing constructed earlier depends on it, and a stored-property initializer always runs before the init body and long before any .task."
     }
   ]
 }
