@@ -426,8 +426,11 @@ first real run — three of them my own new gates failing on my own code.
 29. **`swiftlint`'s `included: .` resolves relative to the config file**, so
     `Lociate/.swiftlint.yml` lints the 110 files under `Lociate/` and never the 6 in
     `LociateTests/`. Those tests are currently unlinted.
-30. **macOS runners have bash 3.2.** No `local -n`, no `declare -A`, no `${v,,}`.
-    Anything under `scripts/` that a macos-* job runs must be 3.2-clean.
+30. **macOS runners have bash 3.2 AND BSD userland.** No `local -n`, no
+    `declare -A`, no `${v,,}`; and no `realpath --relative-to`, `readlink -f`,
+    `sed -i` without an argument, `date -d`, `grep -P`, `stat -c`, or `base64 -w`.
+    `scripts/generate-secrets.sh` is the only script a macos-* job runs — keep it
+    portable. Both incompatibilities in it were found one CI round at a time.
 31. **A gitignored generated source still has to be in the pbxproj.** The generator
     walks the filesystem, so `ALWAYS_APP_SOURCES` in `scripts/generate-xcodeproj.py`
     is what puts `BuildSecrets.swift` in the target. Add to that list, not the walk,

@@ -85,7 +85,11 @@ android_required=(
 assert_untracked() {
     local target=$1
     local rel
-    rel="$(realpath --relative-to="$REPO_ROOT" "$target")"
+    # `realpath --relative-to` is GNU-only; macOS ships BSD realpath, which rejects it
+    # with "illegal option -- -" and — under `set -e` — killed this script on every
+    # macos-14 job. Both callers build their path as "$REPO_ROOT/...", so stripping
+    # that prefix is exact and needs no external tool.
+    rel="${target#"$REPO_ROOT"/}"
 
     if ! git -C "$REPO_ROOT" rev-parse --git-dir >/dev/null 2>&1; then
         return 0  # not a git checkout (e.g. a release tarball); nothing to guard
@@ -153,7 +157,7 @@ enum BuildSecrets {
 
     // MARK: - Certificate Pinning
 
-    static let certificatePinHash = "${CERT_PIN_HASH}"
+    static let certificatePinHash = "${CERT_PIN_HASH:-}"
     static let certificateBackupPinHash = "${cert_backup}"
 
     // MARK: - Request Signing
