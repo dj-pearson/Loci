@@ -132,9 +132,17 @@ final class RecordViewModel {
         UIAccessibility.post(notification: .announcement, argument: String(localized: "Recording started"))
     }
 
+    /// What a finished recording produced: the audio file, its transcription, and where
+    /// it was captured.
+    struct RecordingResult {
+        let url: URL
+        let transcription: String
+        let coordinate: CLLocationCoordinate2D
+    }
+
     /// Stops recording and returns the audio URL, transcription text, and captured coordinate.
     /// Returns `nil` if recording was not active or location is unavailable.
-    func stopRecording() async -> (url: URL, transcription: String, coordinate: CLLocationCoordinate2D)? {
+    func stopRecording() async -> RecordingResult? {
         guard isRecording else { return nil }
 
         UIAccessibility.post(notification: .announcement, argument: String(localized: "Recording stopped"))
@@ -162,10 +170,14 @@ final class RecordViewModel {
         // Capture coordinate
         guard let coordinate = currentLocation?.coordinate else {
             errorMessage = String(localized: "Unable to determine your location. The voice note was saved but may not have an accurate position.")
-            return (url: url, transcription: finalTranscription, coordinate: CLLocationCoordinate2D(latitude: 0, longitude: 0))
+            return RecordingResult(
+                url: url,
+                transcription: finalTranscription,
+                coordinate: CLLocationCoordinate2D(latitude: 0, longitude: 0)
+            )
         }
 
-        return (url: url, transcription: finalTranscription, coordinate: coordinate)
+        return RecordingResult(url: url, transcription: finalTranscription, coordinate: coordinate)
     }
 
     /// Cancels an in-progress recording and deletes the audio file.

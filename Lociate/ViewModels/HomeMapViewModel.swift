@@ -103,15 +103,28 @@ final class HomeMapViewModel {
         }
     }
 
+    /// The latitude/longitude box used for viewport filtering.
+    struct ViewportBounds {
+        let minLat: Double
+        let maxLat: Double
+        let minLon: Double
+        let maxLon: Double
+
+        func contains(latitude: Double, longitude: Double) -> Bool {
+            latitude >= minLat && latitude <= maxLat
+                && longitude >= minLon && longitude <= maxLon
+        }
+    }
+
     /// Returns the padded region used for viewport filtering.
     /// Adds a 10% margin around the debounced region for smooth scrolling.
-    private func paddedRegion() -> (minLat: Double, maxLat: Double, minLon: Double, maxLon: Double) {
+    private func paddedRegion() -> ViewportBounds {
         let center = debouncedMapRegion.center
         let span = debouncedMapRegion.span
         let latPad = span.latitudeDelta * Self.viewportPaddingFactor
         let lonPad = span.longitudeDelta * Self.viewportPaddingFactor
 
-        return (
+        return ViewportBounds(
             minLat: center.latitude - span.latitudeDelta / 2 - latPad,
             maxLat: center.latitude + span.latitudeDelta / 2 + latPad,
             minLon: center.longitude - span.longitudeDelta / 2 - lonPad,
@@ -125,8 +138,7 @@ final class HomeMapViewModel {
         let bounds = paddedRegion()
 
         return filtered.filter { locus in
-            locus.latitude >= bounds.minLat && locus.latitude <= bounds.maxLat
-                && locus.longitude >= bounds.minLon && locus.longitude <= bounds.maxLon
+            bounds.contains(latitude: locus.latitude, longitude: locus.longitude)
         }
     }
 

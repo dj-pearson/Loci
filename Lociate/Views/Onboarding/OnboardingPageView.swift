@@ -75,7 +75,7 @@ struct OnboardingPageView: View {
             Button(action: {
                 HapticManager.tabSelection()
                 onCTA()
-            }) {
+            }, label: {
                 Text(ctaTitle)
                     .font(.headline)
                     .frame(maxWidth: .infinity)
@@ -86,7 +86,7 @@ struct OnboardingPageView: View {
                     )
                     .foregroundStyle(.white)
                     .elevation(.level3)
-            }
+            })
             .buttonStyle(.plain)
             .padding(.horizontal, DesignSystem.Space.xl)
             .padding(.bottom, DesignSystem.Space.xl)

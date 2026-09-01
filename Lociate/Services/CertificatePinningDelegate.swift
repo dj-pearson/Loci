@@ -74,14 +74,15 @@ final class CertificatePinningDelegate: NSObject, URLSessionDelegate {
             return
         }
 
-        // Check certificate chain for pinned public key hash
-        let certificateCount = SecTrustGetCertificateCount(serverTrust)
+        // Check certificate chain for pinned public key hash.
+        //
+        // SecTrustCopyCertificateChain returns a CFArray, which Swift cannot subscript
+        // — the previous `…?[index] as? SecCertificate` did not compile. Bridging the
+        // whole chain to [SecCertificate] once also drops the deprecated
+        // SecTrustGetCertificateCount and the index arithmetic.
+        let chain = SecTrustCopyCertificateChain(serverTrust) as? [SecCertificate] ?? []
 
-        for index in 0..<certificateCount {
-            guard let certificate = SecTrustCopyCertificateChain(serverTrust)?[index] as? SecCertificate else {
-                continue
-            }
-
+        for certificate in chain {
             if let publicKeyHash = publicKeyHashForCertificate(certificate),
                CertificatePinningConfig.pinnedPublicKeyHashes.contains(publicKeyHash) {
                 // Pin matched — allow connection
@@ -93,7 +94,7 @@ final class CertificatePinningDelegate: NSObject, URLSessionDelegate {
 
         // No pin matched — reject connection
         #if DEBUG
-        logger.error("Certificate pinning failed for \(host): no matching public key hash found in chain of \(certificateCount) certificates")
+        logger.error("Certificate pinning failed for \(host): no matching public key hash found in chain of \(chain.count) certificates")
         logCertificateChain(serverTrust, host: host)
         #endif
 

@@ -6,6 +6,7 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
 /**
  * US-203: the manifest declared `lociate://locus` while the validator only
@@ -13,6 +14,11 @@ import org.robolectric.RobolectricTestRunner
  * These pin the scheme, host, and path contract shared with iOS.
  */
 @RunWith(RobolectricTestRunner::class)
+// A plain Application, not LociateApplication. These tests need nothing from the app
+// but the framework's Uri parser, and LociateApplication.onCreate enqueues the
+// WorkManager jobs added in US-219 — which throws IllegalStateException from
+// WorkManagerImpl because WorkManager is not initialized in a JVM test.
+@Config(application = android.app.Application::class)
 class DeepLinkAppLinkTest {
 
     private val validId = "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"

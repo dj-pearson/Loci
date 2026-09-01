@@ -112,7 +112,7 @@ struct SignInView: View {
                                     Text(String(localized: "Account temporarily locked"))
                                         .font(Theme.Typography.caption)
                                         .foregroundStyle(Theme.error)
-                                    Text(String(localized: "Try again in \(authService.loginAttemptTracker.formattedTime(authService.loginAttemptTracker.remainingLockoutSeconds))"))
+                                    Text(lockoutRemainingText)
                                         .font(Theme.Typography.caption)
                                         .foregroundStyle(Theme.textSecondary)
                                 }
@@ -230,6 +230,13 @@ struct SignInView: View {
                 }
             }
         }
+    }
+
+    /// "Try again in 4:32" — hoisted out of the view body, where the doubly-qualified
+    /// tracker reference made the line unreadable.
+    private var lockoutRemainingText: String {
+        let tracker = authService.loginAttemptTracker
+        return String(localized: "Try again in \(tracker.formattedTime(tracker.remainingLockoutSeconds))")
     }
 
     private var dividerRow: some View {
@@ -543,13 +550,13 @@ struct SignUpView: View {
     private func signUp() async {
         // US-144: Validate password strength before submitting
         guard passwordMeetsMinimum else {
-            authService.errorMessage = AuthError.passwordTooWeak.localizedDescription
+            await authService.reportValidationError(AuthError.passwordTooWeak.localizedDescription)
             HapticManager.delete()
             showError = true
             return
         }
         guard passwordsMatch else {
-            authService.errorMessage = AuthError.passwordsDoNotMatch.localizedDescription
+            await authService.reportValidationError(AuthError.passwordsDoNotMatch.localizedDescription)
             HapticManager.delete()
             showError = true
             return

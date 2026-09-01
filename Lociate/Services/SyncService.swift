@@ -34,18 +34,18 @@ final class SyncService {
             do {
                 let payload = LocusUploadPayload(
                     id: locus.id.uuidString,
-                    user_id: userId,
-                    household_id: locus.householdId?.uuidString,
+                    userId: userId,
+                    householdId: locus.householdId?.uuidString,
                     location: "SRID=4326;POINT(\(locus.longitude) \(locus.latitude))",
-                    location_name: locus.locationName,
-                    audio_url: locus.audioFileURL,
+                    locationName: locus.locationName,
+                    audioURL: locus.audioFileURL,
                     transcription: locus.transcription,
                     category: locus.categoryRawValue,
-                    is_shared: locus.isShared,
-                    created_by_name: locus.createdByName,
-                    is_archived: locus.isArchived,
-                    created_at: locus.createdAt.ISO8601Format(),
-                    updated_at: locus.updatedAt.ISO8601Format()
+                    isShared: locus.isShared,
+                    createdByName: locus.createdByName,
+                    isArchived: locus.isArchived,
+                    createdAt: locus.createdAt.ISO8601Format(),
+                    updatedAt: locus.updatedAt.ISO8601Format()
                 )
 
                 try await RetryHelper.withRetry(shouldRetry: RetryHelper.isTransientError) {
@@ -125,14 +125,14 @@ final class SyncService {
 
         if let existing = try? modelContext.fetch(descriptor).first {
             // Last-write-wins: update only if remote is newer
-            let remoteDate = ISO8601DateFormatter().date(from: remote.updated_at) ?? Date.distantPast
+            let remoteDate = ISO8601DateFormatter().date(from: remote.updatedAt) ?? Date.distantPast
             if remoteDate > existing.updatedAt {
-                existing.locationName = remote.location_name
+                existing.locationName = remote.locationName
                 existing.transcription = remote.transcription
                 existing.categoryRawValue = remote.category
-                existing.isShared = remote.is_shared
-                existing.createdByName = remote.created_by_name
-                existing.isArchived = remote.is_archived
+                existing.isShared = remote.isShared
+                existing.createdByName = remote.createdByName
+                existing.isArchived = remote.isArchived
                 existing.updatedAt = remoteDate
                 existing.syncStatus = .synced
             }
@@ -143,16 +143,16 @@ final class SyncService {
                 id: remoteId,
                 latitude: coords.latitude,
                 longitude: coords.longitude,
-                locationName: remote.location_name,
-                audioFileURL: remote.audio_url ?? "",
+                locationName: remote.locationName,
+                audioFileURL: remote.audioURL ?? "",
                 transcription: remote.transcription,
                 category: LocusCategory(rawValue: remote.category) ?? .general,
-                isShared: remote.is_shared,
-                createdByName: remote.created_by_name,
-                householdId: remote.household_id.flatMap(UUID.init(uuidString:)),
-                createdAt: ISO8601DateFormatter().date(from: remote.created_at) ?? Date(),
-                updatedAt: ISO8601DateFormatter().date(from: remote.updated_at) ?? Date(),
-                isArchived: remote.is_archived,
+                isShared: remote.isShared,
+                createdByName: remote.createdByName,
+                householdId: remote.householdId.flatMap(UUID.init(uuidString:)),
+                createdAt: ISO8601DateFormatter().date(from: remote.createdAt) ?? Date(),
+                updatedAt: ISO8601DateFormatter().date(from: remote.updatedAt) ?? Date(),
+                isArchived: remote.isArchived,
                 syncStatus: .synced
             )
             modelContext.insert(locus)
@@ -190,36 +190,60 @@ final class SyncService {
 
 // MARK: - Upload Payload
 
+/// Column names for both payloads below. The `loci` table is snake_case; Swift is
+/// camelCase. Sharing one enum keeps the two directions from drifting apart — a
+/// mismatch between the upload and download spelling of a column is silent, because
+/// PostgREST simply ignores a key it does not recognise.
+enum LocusColumnKeys: String, CodingKey {
+    case id
+    case userId = "user_id"
+    case householdId = "household_id"
+    case location
+    case locationName = "location_name"
+    case audioURL = "audio_url"
+    case transcription
+    case category
+    case isShared = "is_shared"
+    case createdByName = "created_by_name"
+    case isArchived = "is_archived"
+    case createdAt = "created_at"
+    case updatedAt = "updated_at"
+}
+
 private struct LocusUploadPayload: Encodable {
     let id: String
-    let user_id: String
-    let household_id: String?
+    let userId: String
+    let householdId: String?
     let location: String
-    let location_name: String?
-    let audio_url: String
+    let locationName: String?
+    let audioURL: String
     let transcription: String
     let category: String
-    let is_shared: Bool
-    let created_by_name: String?
-    let is_archived: Bool
-    let created_at: String
-    let updated_at: String
+    let isShared: Bool
+    let createdByName: String?
+    let isArchived: Bool
+    let createdAt: String
+    let updatedAt: String
+
+    typealias CodingKeys = LocusColumnKeys
 }
 
 // MARK: - Remote Payload
 
 struct LocusRemotePayload: Decodable {
     let id: String
-    let user_id: String
-    let household_id: String?
+    let userId: String
+    let householdId: String?
     let location: String
-    let location_name: String?
-    let audio_url: String?
+    let locationName: String?
+    let audioURL: String?
     let transcription: String
     let category: String
-    let is_shared: Bool
-    let created_by_name: String?
-    let is_archived: Bool
-    let created_at: String
-    let updated_at: String
+    let isShared: Bool
+    let createdByName: String?
+    let isArchived: Bool
+    let createdAt: String
+    let updatedAt: String
+
+    typealias CodingKeys = LocusColumnKeys
 }

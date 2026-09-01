@@ -72,7 +72,7 @@ jobs:
 
   build:
     name: Build (iOS Simulator)
-    runs-on: macos-14
+    runs-on: macos-15
     needs: [swiftlint, xcode-project]
     steps:
       - name: Checkout
@@ -97,8 +97,23 @@ jobs:
           export CERT_PIN_HASH="${CERT_PIN_HASH:-}"
           bash scripts/generate-secrets.sh --ios
 
-      - name: Select Xcode
-        run: sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
+      # No hardcoded Xcode path. supabase-swift pulls in swift-issue-reporting, which
+      # uses `internal import` — that requires Swift 6. Xcode 15.4 is Swift 5.10 and
+      # failed with ~90 "Access level on imports require
+      # '-enable-experimental-feature AccessLevelOnImport'" errors. The macos-15 image
+      # default is Xcode 16.x; this asserts it instead of trusting it silently, so a
+      # future image change produces one clear message rather than a wall of them.
+      - name: Verify the Swift toolchain
+        run: |
+          xcodebuild -version
+          swift --version
+          major=$(swift --version 2>&1 | sed -n 's/.*Swift version \([0-9]*\).*/\1/p' | head -1)
+          if [ "${major:-0}" -lt 6 ]; then
+            echo "::error::Swift ${major:-unknown} is too old — swift-issue-reporting requires Swift 6."
+            echo "Xcodes present on this runner:"
+            ls -d /Applications/Xcode*.app || true
+            exit 1
+          fi
 
       - name: Cache SPM Dependencies
         uses: actions/cache@v4
@@ -116,19 +131,35 @@ jobs:
             -scheme Lociate \
             -resolvePackageDependencies
 
+      # No Package.resolved is committed, so SPM picks the newest version in range on
+      # every run — which is exactly how a swift-issue-reporting release that needs
+      # Swift 6 arrived unannounced. Publishing the resolved graph makes it possible to
+      # commit it and pin the versions; until then this at least records what was built.
+      - name: Upload resolved package versions
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: package-resolved
+          path: Lociate/Lociate.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+          if-no-files-found: warn
+          retention-days: 14
+
+      # `generic/platform=iOS Simulator` rather than a named device: compiling needs
+      # no bootable simulator, and the previous `name=iPhone 15` would break on any
+      # runner image whose Xcode no longer ships that device type.
       - name: Build for Simulator
         run: |
           xcodebuild -project Lociate/Lociate.xcodeproj \
             -scheme Lociate \
             -sdk iphonesimulator \
-            -destination 'platform=iOS Simulator,name=iPhone 15' \
+            -destination 'generic/platform=iOS Simulator' \
             -configuration Debug \
             build \
             CODE_SIGNING_ALLOWED=NO
 
   test:
     name: Unit Tests
-    runs-on: macos-14
+    runs-on: macos-15
     needs: build
     steps:
       - name: Checkout
@@ -153,8 +184,23 @@ jobs:
           export CERT_PIN_HASH="${CERT_PIN_HASH:-}"
           bash scripts/generate-secrets.sh --ios
 
-      - name: Select Xcode
-        run: sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
+      # No hardcoded Xcode path. supabase-swift pulls in swift-issue-reporting, which
+      # uses `internal import` — that requires Swift 6. Xcode 15.4 is Swift 5.10 and
+      # failed with ~90 "Access level on imports require
+      # '-enable-experimental-feature AccessLevelOnImport'" errors. The macos-15 image
+      # default is Xcode 16.x; this asserts it instead of trusting it silently, so a
+      # future image change produces one clear message rather than a wall of them.
+      - name: Verify the Swift toolchain
+        run: |
+          xcodebuild -version
+          swift --version
+          major=$(swift --version 2>&1 | sed -n 's/.*Swift version \([0-9]*\).*/\1/p' | head -1)
+          if [ "${major:-0}" -lt 6 ]; then
+            echo "::error::Swift ${major:-unknown} is too old — swift-issue-reporting requires Swift 6."
+            echo "Xcodes present on this runner:"
+            ls -d /Applications/Xcode*.app || true
+            exit 1
+          fi
 
       - name: Cache SPM Dependencies
         uses: actions/cache@v4
@@ -172,12 +218,30 @@ jobs:
             -scheme Lociate \
             -resolvePackageDependencies
 
+      # Tests need a real bootable simulator, so pick whichever iPhone this image
+      # actually has instead of hardcoding one that a future Xcode may drop.
+      - name: Choose a simulator
+        run: |
+          # `simctl list devices available` prints "    iPhone 16 (UUID) (Shutdown)"
+          # under a "-- iOS 18.0 --" heading; take the first iPhone's name.
+          device=$(xcrun simctl list devices available \
+            | sed -n 's/^[[:space:]]*\(iPhone[^(]*\) (.*/\1/p' \
+            | sed 's/[[:space:]]*$//' \
+            | head -1)
+          if [ -z "$device" ]; then
+            echo "::error::No available iPhone simulator on this runner."
+            xcrun simctl list devices available
+            exit 1
+          fi
+          echo "Using simulator: $device"
+          echo "SIMULATOR_NAME=$device" >> "$GITHUB_ENV"
+
       - name: Run Unit Tests
         run: |
           xcodebuild -project Lociate/Lociate.xcodeproj \
             -scheme Lociate \
             -sdk iphonesimulator \
-            -destination 'platform=iOS Simulator,name=iPhone 15' \
+            -destination "platform=iOS Simulator,name=$SIMULATOR_NAME" \
             -configuration Debug \
             test \
             CODE_SIGNING_ALLOWED=NO \
@@ -229,7 +293,11 @@ jobs:
         # PostGIS is required: 002_create_loci.sql declares a GEOGRAPHY column.
         image: postgis/postgis:16-3.4
         env:
-          POSTGRES_PASSWORD: postgres
+          # No password anywhere in this job. The container is ephemeral, is
+          # reachable only from this runner, and is destroyed with the job — so a
+          # password literal buys nothing and trips every secret scanner. `trust`
+          # is the entrypoint's supported way to say "no authentication".
+          POSTGRES_HOST_AUTH_METHOD: trust
           POSTGRES_USER: postgres
           POSTGRES_DB: postgres
         ports:
@@ -254,7 +322,6 @@ jobs:
           PGHOST: localhost
           PGPORT: '5432'
           PGUSER: postgres
-          PGPASSWORD: postgres
         run: bash scripts/run-backend-tests.sh
 
   web-build:

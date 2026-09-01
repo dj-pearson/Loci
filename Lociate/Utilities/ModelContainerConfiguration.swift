@@ -1,7 +1,12 @@
 import Foundation
+import os.log
 import SwiftData
 
 enum ModelContainerConfiguration {
+    static let appGroupIdentifier = "group.app.lociate.ios"
+
+    private static let logger = Logger(subsystem: "app.lociate.ios", category: "ModelContainer")
+
     static let schema = Schema([
         Locus.self,
         Household.self,
@@ -11,12 +16,40 @@ enum ModelContainerConfiguration {
     ])
 
     static func production() throws -> ModelContainer {
-        let configuration = ModelConfiguration(
-            "Lociate",
-            schema: schema,
-            isStoredInMemoryOnly: false,
-            groupContainer: .identifier("group.app.lociate.ios")
-        )
+        // SwiftData *traps* rather than throwing when the App Group entitlement is
+        // missing — "Unable to find App Group Container in Entitlements" — so the
+        // `throws` on this function cannot catch it and the enclosing do/catch in
+        // LociateApp is no help. Availability has to be probed first.
+        //
+        // The entitlement is absent from any build that is not signed with it, which
+        // is exactly what CODE_SIGNING_ALLOWED=NO produces in CI; that aborted the
+        // unit tests before a single one ran.
+        let groupIsAvailable = FileManager.default.containerURL(
+            forSecurityApplicationGroupIdentifier: appGroupIdentifier
+        ) != nil
+
+        let configuration: ModelConfiguration
+        if groupIsAvailable {
+            configuration = ModelConfiguration(
+                "Lociate",
+                schema: schema,
+                isStoredInMemoryOnly: false,
+                groupContainer: .identifier(appGroupIdentifier)
+            )
+        } else {
+            // The widget reads this store through the App Group, so falling back to a
+            // local one means the widget cannot see the user's loci. That must never
+            // happen in a signed build — log it loudly rather than refusing to launch.
+            logger.error(
+                "App Group \(appGroupIdentifier, privacy: .public) is unavailable; using a local store. The widget will not see this data."
+            )
+            configuration = ModelConfiguration(
+                "Lociate",
+                schema: schema,
+                isStoredInMemoryOnly: false
+            )
+        }
+
         let container = try ModelContainer(for: schema, configurations: [configuration])
         // US-184: Exclude sensitive local data from iCloud/iTunes backups.
         // Voice notes, transcripts, and household invite codes should not
@@ -32,11 +65,9 @@ enum ModelContainerConfiguration {
         let fileManager = FileManager.default
         var directories: [URL] = []
 
-        if let documents = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first {
-            directories.append(documents)
-        }
+        directories.append(URL.documentsDirectory)
         if let group = fileManager.containerURL(
-            forSecurityApplicationGroupIdentifier: "group.app.lociate.ios"
+            forSecurityApplicationGroupIdentifier: appGroupIdentifier
         ) {
             directories.append(group)
         }

@@ -145,7 +145,9 @@ struct AudioWaveformView: View {
 }
 
 #Preview("High Amplitude") {
-    AudioWaveformView(amplitude: 0.9, maxHeight: 80, barColor: Theme.error)
+    // Declaration order is amplitude, barCount, barColor, maxHeight — the memberwise
+    // initializer requires arguments in that order.
+    AudioWaveformView(amplitude: 0.9, barColor: Theme.error, maxHeight: 80)
         .padding()
 }
 

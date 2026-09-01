@@ -24,7 +24,7 @@ final class AudioCacheManager {
         totalSize += directorySize(at: audioDir)
 
         // Audio files in documents root (locus_*.m4a from recordings)
-        let documentsDir = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
+        let documentsDir = URL.documentsDirectory
         if let contents = try? fileManager.contentsOfDirectory(
             at: documentsDir,
             includingPropertiesForKeys: [.fileSizeKey],
@@ -93,7 +93,7 @@ final class AudioCacheManager {
     // MARK: - Private Helpers
 
     private func audioDirectory() -> URL {
-        let documentsDir = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
+        let documentsDir = URL.documentsDirectory
         return documentsDir.appendingPathComponent("audio", isDirectory: true)
     }
 

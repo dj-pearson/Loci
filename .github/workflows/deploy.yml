@@ -14,14 +14,29 @@ concurrency:
 jobs:
   deploy:
     name: Archive & Upload to TestFlight
-    runs-on: macos-14
+    runs-on: macos-15
     timeout-minutes: 45
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Select Xcode
-        run: sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
+      # No hardcoded Xcode path. supabase-swift pulls in swift-issue-reporting, which
+      # uses `internal import` — that requires Swift 6. Xcode 15.4 is Swift 5.10 and
+      # failed with ~90 "Access level on imports require
+      # '-enable-experimental-feature AccessLevelOnImport'" errors. The macos-15 image
+      # default is Xcode 16.x; this asserts it instead of trusting it silently, so a
+      # future image change produces one clear message rather than a wall of them.
+      - name: Verify the Swift toolchain
+        run: |
+          xcodebuild -version
+          swift --version
+          major=$(swift --version 2>&1 | sed -n 's/.*Swift version \([0-9]*\).*/\1/p' | head -1)
+          if [ "${major:-0}" -lt 6 ]; then
+            echo "::error::Swift ${major:-unknown} is too old — swift-issue-reporting requires Swift 6."
+            echo "Xcodes present on this runner:"
+            ls -d /Applications/Xcode*.app || true
+            exit 1
+          fi
 
       - name: Cache SPM Dependencies
         uses: actions/cache@v4
@@ -42,8 +57,18 @@ jobs:
           CERT_PIN_HASH: ${{ secrets.CERT_PIN_HASH }}
           CERT_BACKUP_PIN_HASH: ${{ secrets.CERT_BACKUP_PIN_HASH }}
         run: |
+          # This job uploads to TestFlight, so it must not ship with certificate
+          # pinning disabled. generate-secrets.sh treats CERT_PIN_HASH as optional so
+          # a fork PR can still build; the requirement belongs here.
+          if [ -z "${CERT_PIN_HASH:-}" ]; then
+            echo "::error::CERT_PIN_HASH is not set. A TestFlight build must not ship with certificate pinning disabled."
+            exit 1
+          fi
           chmod +x scripts/generate-secrets.sh
-          ./scripts/generate-secrets.sh
+          # --ios, not bare: in auto mode a missing iOS secret is only a skipped
+          # platform, leaving BuildSecrets.swift ungenerated to fail later as a
+          # confusing compile error.
+          ./scripts/generate-secrets.sh --ios
 
       - name: Install Fastlane
         run: |

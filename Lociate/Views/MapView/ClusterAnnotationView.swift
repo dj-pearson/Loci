@@ -50,15 +50,15 @@ struct LocusCluster: Identifiable {
     }
 
     var boundingRegion: MKCoordinateRegion {
-        guard !loci.isEmpty else {
-            return MKCoordinateRegion()
-        }
         let lats = loci.map(\.latitude)
         let lons = loci.map(\.longitude)
-        let minLat = lats.min()!
-        let maxLat = lats.max()!
-        let minLon = lons.min()!
-        let maxLon = lons.max()!
+        // A single `guard` over the four extremes replaces the `loci.isEmpty` check:
+        // min()/max() return nil for exactly the empty case, so the compiler enforces
+        // what the old force unwraps only assumed.
+        guard let minLat = lats.min(), let maxLat = lats.max(),
+              let minLon = lons.min(), let maxLon = lons.max() else {
+            return MKCoordinateRegion()
+        }
 
         let center = CLLocationCoordinate2D(
             latitude: (minLat + maxLat) / 2,

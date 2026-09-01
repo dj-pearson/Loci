@@ -1,3 +1,4 @@
+import Foundation
 import SwiftData
 import SwiftUI
 
@@ -123,7 +124,7 @@ struct DataManagementView: View {
     // MARK: - Helpers
 
     private var audioFileCount: Int {
-        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        let documentsURL = URL.documentsDirectory
         let contents = try? FileManager.default.contentsOfDirectory(at: documentsURL, includingPropertiesForKeys: nil)
         return contents?.filter { $0.pathExtension == AppConstants.Audio.fileExtension }.count ?? 0
     }
@@ -142,7 +143,7 @@ struct DataManagementView: View {
 
     private func deleteAllArchived() {
         let fileManager = FileManager.default
-        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        let documentsURL = URL.documentsDirectory
 
         for locus in archivedLoci {
             let audioURL = documentsURL.appendingPathComponent(locus.audioFileURL)

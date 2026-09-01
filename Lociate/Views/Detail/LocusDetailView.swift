@@ -94,9 +94,9 @@ struct LocusDetailView: View {
                 shareDecryptedAudioURL = nil
             }
             shareItems = []
-        }) {
+        }, content: {
             LocusShareSheet(items: shareItems)
-        }
+        })
         .sheet(isPresented: $showEditSheet) {
             EditLocusSheet(viewModel: viewModel)
         }

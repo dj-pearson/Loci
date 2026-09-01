@@ -17,7 +17,10 @@ struct NotificationPreferencesView: View {
             }
 
             if viewModel.notificationsEnabled {
-                Section(String(localized: "Quiet Hours")) {
+                // SwiftUI has no Section(_ title:, content:, footer:) overload — a
+                // title-string Section cannot also take a footer, so the header goes
+                // through the `header:` closure instead.
+                Section {
                     DatePicker(
                         String(localized: "Start"),
                         selection: Binding(
@@ -35,6 +38,8 @@ struct NotificationPreferencesView: View {
                         ),
                         displayedComponents: .hourAndMinute
                     )
+                } header: {
+                    Text(String(localized: "Quiet Hours"))
                 } footer: {
                     Text(String(localized: "Proximity notifications will be suppressed during quiet hours."))
                 }

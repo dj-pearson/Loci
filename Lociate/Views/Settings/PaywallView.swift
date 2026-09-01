@@ -155,7 +155,7 @@ struct PaywallView: View {
 
         return VStack(spacing: Theme.Spacing.md) {
             // Premium Card
-            tierCard(
+            tierCard(TierPresentation(
                 title: String(localized: "Premium"),
                 icon: "star.fill",
                 color: Theme.primary,
@@ -172,10 +172,10 @@ struct PaywallView: View {
                 trialBadge: premiumMonthlyPkg?.storeProduct.introductoryDiscount != nil
                     || premiumYearlyPkg?.storeProduct.introductoryDiscount != nil,
                 package: isYearly ? premiumYearlyPkg : premiumMonthlyPkg
-            )
+            ))
 
             // Family Card
-            tierCard(
+            tierCard(TierPresentation(
                 title: String(localized: "Family"),
                 icon: "person.3.fill",
                 color: Theme.secondary,
@@ -191,100 +191,116 @@ struct PaywallView: View {
                 trialBadge: familyMonthlyPkg?.storeProduct.introductoryDiscount != nil
                     || familyYearlyPkg?.storeProduct.introductoryDiscount != nil,
                 package: isYearly ? familyYearlyPkg : familyMonthlyPkg
-            )
+            ))
         }
     }
 
-    private func tierCard(
-        title: String,
-        icon: String,
-        color: Color,
-        monthlyPrice: String,
-        yearlyPrice: String,
-        yearlyMonthlyPrice: String,
-        features: [String],
-        trialBadge: Bool,
-        package: Package?
-    ) -> some View {
+    /// Everything one tier card renders. Passed as a single value because nine
+    /// positional arguments described one thing, and a mis-ordered pair of the six
+    /// `String` parameters would have type-checked silently.
+    private struct TierPresentation {
+        let title: String
+        let icon: String
+        let color: Color
+        let monthlyPrice: String
+        let yearlyPrice: String
+        let yearlyMonthlyPrice: String
+        let features: [String]
+        let trialBadge: Bool
+        let package: Package?
+    }
+
+    private func tierCard(_ tier: TierPresentation) -> some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
-            HStack {
-                Image(systemName: icon)
-                    .foregroundStyle(color)
-                Text(title)
-                    .font(Theme.Typography.headline)
-                    .fontWeight(.bold)
-                Spacer()
-                if trialBadge {
-                    Text(trialBadgeText(for: package))
-                        .font(.caption2)
-                        .fontWeight(.semibold)
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(color, in: Capsule())
-                }
-            }
-
-            // Pricing
-            HStack(alignment: .firstTextBaseline, spacing: Theme.Spacing.xs) {
-                if isYearly {
-                    Text(yearlyMonthlyPrice)
-                        .font(.title)
-                        .fontWeight(.bold)
-                        .foregroundStyle(color)
-                    Text(String(localized: "/mo"))
-                        .font(Theme.Typography.caption)
-                        .foregroundStyle(Theme.textSecondary)
-                    Text("(\(yearlyPrice)" + String(localized: "/yr") + ")")
-                        .font(Theme.Typography.caption)
-                        .foregroundStyle(Theme.textSecondary)
-                } else {
-                    Text(monthlyPrice)
-                        .font(.title)
-                        .fontWeight(.bold)
-                        .foregroundStyle(color)
-                    Text(String(localized: "/mo"))
-                        .font(Theme.Typography.caption)
-                        .foregroundStyle(Theme.textSecondary)
-                }
-            }
-
+            tierCardHeader(tier)
+            tierCardPricing(tier)
             Divider()
-
-            ForEach(features, id: \.self) { feature in
-                HStack(spacing: Theme.Spacing.sm) {
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundStyle(color)
-                        .font(.caption)
-                    Text(feature)
-                        .font(Theme.Typography.body)
-                }
-            }
-
-            Button {
-                Task { await purchasePackage(package) }
-            } label: {
-                Group {
-                    if subscriptionService.isLoading {
-                        ProgressView()
-                            .tint(.white)
-                    } else {
-                        Text(trialBadge
-                             ? String(localized: "Start Free Trial")
-                             : String(localized: "Subscribe"))
-                    }
-                }
-                .font(Theme.Typography.headline)
-                .foregroundStyle(.white)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, Theme.Spacing.sm)
-                .background(color, in: RoundedRectangle(cornerRadius: Theme.CornerRadius.small))
-            }
-            .disabled(subscriptionService.isLoading || package == nil)
-            .padding(.top, Theme.Spacing.xs)
+            tierCardFeatures(tier)
+            tierCardSubscribeButton(tier)
         }
         .padding(Theme.Spacing.md)
         .background(Theme.surface, in: RoundedRectangle(cornerRadius: Theme.CornerRadius.large))
+    }
+
+    private func tierCardHeader(_ tier: TierPresentation) -> some View {
+        HStack {
+            Image(systemName: tier.icon)
+                .foregroundStyle(tier.color)
+            Text(tier.title)
+                .font(Theme.Typography.headline)
+                .fontWeight(.bold)
+            Spacer()
+            if tier.trialBadge {
+                Text(trialBadgeText(for: tier.package))
+                    .font(.caption2)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(tier.color, in: Capsule())
+            }
+        }
+    }
+
+    private func tierCardPricing(_ tier: TierPresentation) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: Theme.Spacing.xs) {
+            if isYearly {
+                Text(tier.yearlyMonthlyPrice)
+                    .font(.title)
+                    .fontWeight(.bold)
+                    .foregroundStyle(tier.color)
+                Text(String(localized: "/mo"))
+                    .font(Theme.Typography.caption)
+                    .foregroundStyle(Theme.textSecondary)
+                Text("(\(tier.yearlyPrice)" + String(localized: "/yr") + ")")
+                    .font(Theme.Typography.caption)
+                    .foregroundStyle(Theme.textSecondary)
+            } else {
+                Text(tier.monthlyPrice)
+                    .font(.title)
+                    .fontWeight(.bold)
+                    .foregroundStyle(tier.color)
+                Text(String(localized: "/mo"))
+                    .font(Theme.Typography.caption)
+                    .foregroundStyle(Theme.textSecondary)
+            }
+        }
+    }
+
+    private func tierCardFeatures(_ tier: TierPresentation) -> some View {
+        ForEach(tier.features, id: \.self) { feature in
+            HStack(spacing: Theme.Spacing.sm) {
+                Image(systemName: "checkmark.circle.fill")
+                    .foregroundStyle(tier.color)
+                    .font(.caption)
+                Text(feature)
+                    .font(Theme.Typography.body)
+            }
+        }
+    }
+
+    private func tierCardSubscribeButton(_ tier: TierPresentation) -> some View {
+        Button {
+            Task { await purchasePackage(tier.package) }
+        } label: {
+            Group {
+                if subscriptionService.isLoading {
+                    ProgressView()
+                        .tint(.white)
+                } else {
+                    Text(tier.trialBadge
+                         ? String(localized: "Start Free Trial")
+                         : String(localized: "Subscribe"))
+                }
+            }
+            .font(Theme.Typography.headline)
+            .foregroundStyle(.white)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, Theme.Spacing.sm)
+            .background(tier.color, in: RoundedRectangle(cornerRadius: Theme.CornerRadius.small))
+        }
+        .disabled(subscriptionService.isLoading || tier.package == nil)
+        .padding(.top, Theme.Spacing.xs)
     }
 
     // MARK: - Lifetime Section

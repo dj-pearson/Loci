@@ -14,7 +14,12 @@ final class BackgroundSyncManager {
     private var lastSyncTime: Date?
     private let minimumSyncInterval: TimeInterval = 15 * 60 // 15 minutes
 
-    init(syncService: SyncService, audioSyncService: AudioSyncService, authService: AuthService, audioCacheManager: AudioCacheManager = AudioCacheManager()) {
+    init(
+        syncService: SyncService,
+        audioSyncService: AudioSyncService,
+        authService: AuthService,
+        audioCacheManager: AudioCacheManager = AudioCacheManager()
+    ) {
         self.syncService = syncService
         self.audioSyncService = audioSyncService
         self.authService = authService

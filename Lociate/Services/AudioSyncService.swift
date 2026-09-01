@@ -80,7 +80,7 @@ final class AudioSyncService {
 
         guard let loci = try? modelContext.fetch(descriptor) else { return }
 
-        let documentsDir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        let documentsDir = URL.documentsDirectory
         let audioDir = documentsDir.appendingPathComponent("audio", isDirectory: true)
 
         // Ensure audio directory exists

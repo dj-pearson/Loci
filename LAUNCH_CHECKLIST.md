@@ -150,7 +150,7 @@ story in `prd.json` (US-185 onward) with the full finding in its `notes`.
 This section is generated — run `python3 scripts/sync-launch-checklist.py` after
 changing a story's status.
 
-### Resolved (35)
+### Resolved (46)
 
 - [x] **US-185** — iOS: restore Xcode project source membership for all 104 Swift files
 - [x] **US-186** — iOS: add SPM package dependencies (supabase-swift, RevenueCat, TelemetryDeck)
@@ -187,6 +187,17 @@ changing a story's status.
 - [x] **US-217** — Reconcile launch documentation with the audited state of the repository
 - [x] **US-218** — Fix RLS infinite recursion that broke every authenticated read of loci
 - [x] **US-219** — Android: nothing ever registered geofences, so proximity notifications never worked
+- [x] **US-220** — SwiftLint gated nothing until it ran, then failed with 93 violations
+- [x] **US-221** — Android CI failed at Gradle configuration time, and local.properties was never read
+- [x] **US-222** — Secret scanners flagged four false positives and two real password literals
+- [x] **US-223** — The iOS build and the Android Kotlin compile had never actually run
+- [x] **US-224** — The iOS build reached xcodebuild and failed on a floating dependency that needs Swift 6
+- [x] **US-225** — The Android app built for the first time; 3 of 84 unit tests then failed
+- [x] **US-226** — The app's own Swift code compiled for the first time and had 3 errors
+- [x] **US-227** — Three synchronous reads of an async session, one hiding a privilege-display bug
+- [x] **US-228** — The Services layer's first compile: 12 errors across 6 files
+- [x] **US-229** — The iOS build went green, and the unit tests immediately found a launch crash
+- [x] **US-230** — The iOS unit tests ran for the first time: 43 passed, 11 failed on Keychain access
 
 ### Still open (0)
 

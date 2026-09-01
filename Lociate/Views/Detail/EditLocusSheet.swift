@@ -157,7 +157,7 @@ struct EditLocusSheet: View {
             }
             .sheet(isPresented: $showReRecordSheet, onDismiss: {
                 reRecordViewModel = nil
-            }) {
+            }, content: {
                 if let vm = reRecordViewModel {
                     ReRecordView(
                         recordViewModel: vm,
@@ -172,7 +172,7 @@ struct EditLocusSheet: View {
                         }
                     )
                 }
-            }
+            })
 
             Text(String(localized: "Replaces the existing recording and transcription."))
                 .font(.caption)

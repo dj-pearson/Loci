@@ -29,8 +29,30 @@ enum AudioEncryptionService {
 
     private static let keychainKey = "app.lociate.ios.audioEncryptionKey"
 
+    #if DEBUG
+    /// Test seam: when set, `getOrCreateKey()` returns this instead of consulting the
+    /// Keychain.
+    ///
+    /// The Keychain is unreachable from an unsigned build — no code signature means no
+    /// `application-identifier` entitlement, so the default access group does not exist
+    /// and every `SecItem` call fails. CI builds the simulator target with
+    /// `CODE_SIGNING_ALLOWED=NO`, which made all eleven round-trip tests fail with
+    /// `keyGenerationFailed` before a single byte was encrypted.
+    ///
+    /// What those tests are actually for is the AES-GCM behaviour — round trip, tamper
+    /// detection, truncation, in-place rewrite, temp-file lifecycle — none of which
+    /// involves the Keychain. Compiled out of release builds entirely.
+    static var keyOverrideForTesting: SymmetricKey?
+    #endif
+
     /// Retrieves or generates the AES-256 encryption key stored in Keychain.
     private static func getOrCreateKey() throws -> SymmetricKey {
+        #if DEBUG
+        if let keyOverrideForTesting {
+            return keyOverrideForTesting
+        }
+        #endif
+
         // Try to load existing key from Keychain
         if let existingKeyData = try KeychainService.load(key: keychainKey) {
             return SymmetricKey(data: existingKeyData)
@@ -170,7 +192,7 @@ enum AudioEncryptionService {
     /// Encrypts all existing unencrypted audio files in the documents/audio directories.
     static func migrateUnencryptedFiles() {
         let fileManager = FileManager.default
-        let documentsDir = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
+        let documentsDir = URL.documentsDirectory
 
         let enumerator = fileManager.enumerator(
             at: documentsDir,

@@ -51,7 +51,7 @@ final class IntegrityCheckService {
             // Log to analytics (non-blocking)
             AnalyticsService.shared.track(
                 .appLaunch,
-                properties: [
+                parameters: [
                     "integrity_compromised": "true",
                     "issues": issues.map(\.rawValue).joined(separator: "|"),
                 ]

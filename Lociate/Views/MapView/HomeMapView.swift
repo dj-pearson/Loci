@@ -230,7 +230,7 @@ struct HomeMapView: View {
             // GPS-pinning behaviour.
             pinnedCoordinate = nil
             longPressHighlight = nil
-        }) {
+        }, content: {
             if let vm = recordViewModel {
                 RecordingView(
                     viewModel: vm,
@@ -246,7 +246,7 @@ struct HomeMapView: View {
                     vm.modelContext = modelContext
                 }
             }
-        }
+        })
         .onChange(of: showRecordingView) { _, show in
             if show {
                 recordViewModel = RecordViewModel(

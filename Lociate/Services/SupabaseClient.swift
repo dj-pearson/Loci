@@ -13,11 +13,27 @@ enum SupabaseConfig {
            let overrideURL = URL(string: override) {
             return overrideURL
         }
-        return URL(string: BuildSecrets.supabaseURL)!
+        return configuredURL()
     }()
     #else
-    static let url = URL(string: BuildSecrets.supabaseURL)!
+    static let url: URL = configuredURL()
     #endif
+
+    /// The base URL from the generated build secrets.
+    ///
+    /// An unparseable value here means the build was configured wrong, and every
+    /// network call in the app would fail — so this stops immediately with a message
+    /// naming the offending value, rather than force-unwrapping into an unlabelled
+    /// crash. `BuildSecretsValidator` is what catches it before launch.
+    private static func configuredURL() -> URL {
+        guard let url = URL(string: BuildSecrets.supabaseURL) else {
+            preconditionFailure(
+                "BuildSecrets.supabaseURL is not a valid URL: \"\(BuildSecrets.supabaseURL)\". " +
+                    "Re-run scripts/generate-secrets.sh --ios."
+            )
+        }
+        return url
+    }
 
     static let anonKey = BuildSecrets.supabaseAnonKey
 }

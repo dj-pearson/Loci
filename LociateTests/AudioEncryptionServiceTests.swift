@@ -12,12 +12,20 @@ final class AudioEncryptionServiceTests: XCTestCase {
     private var tempDirectory: URL!
 
     override func setUpWithError() throws {
+        // Pin the key rather than letting the service reach for the Keychain. An
+        // unsigned simulator build has no application-identifier entitlement, so every
+        // Keychain call fails and these tests would report keyGenerationFailed instead
+        // of exercising the cryptography they exist to cover.
+        AudioEncryptionService.keyOverrideForTesting = SymmetricKey(size: .bits256)
+
         tempDirectory = FileManager.default.temporaryDirectory
             .appendingPathComponent("audio-encryption-tests-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: tempDirectory, withIntermediateDirectories: true)
     }
 
     override func tearDownWithError() throws {
+        AudioEncryptionService.keyOverrideForTesting = nil
+
         if let tempDirectory, FileManager.default.fileExists(atPath: tempDirectory.path) {
             try FileManager.default.removeItem(at: tempDirectory)
         }

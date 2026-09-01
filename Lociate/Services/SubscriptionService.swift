@@ -12,8 +12,25 @@ final class SubscriptionService: NSObject, PurchasesDelegate {
 
     // MARK: - Initialization
 
+    /// Deliberately does NOT touch `Purchases.shared`.
+    ///
+    /// `Purchases.shared` traps with "Purchases has not been configured" until
+    /// `Purchases.configure` has run. LociateApp creates this service in a stored
+    /// property initializer, which runs while the App value is being constructed —
+    /// long before the deferred `.task` that calls `RevenueCatConfiguration.configure()`
+    /// (US-177 moved configuration off the launch path). Reaching for the SDK here was
+    /// therefore a guaranteed crash on launch, and it is what made the iOS unit tests
+    /// abort: the test host launches the app.
+    ///
+    /// Call `start()` once RevenueCat has been configured.
     override init() {
         super.init()
+    }
+
+    /// Attaches the delegate and loads entitlements. Safe to call more than once.
+    ///
+    /// Must run after `RevenueCatConfiguration.configure()`.
+    func start() {
         Purchases.shared.delegate = self
         Task {
             await checkEntitlements()

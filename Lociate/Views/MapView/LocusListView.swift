@@ -104,7 +104,10 @@ struct LocusListView: View {
         let calendar = Calendar.current
         let now = Date()
         let startOfToday = calendar.startOfDay(for: now)
-        let startOfWeek = calendar.date(byAdding: .day, value: -7, to: startOfToday)!
+        // Falling back to `startOfToday` would collapse the "This Week" bucket into
+        // "Today" rather than crash — but subtracting 7 days never fails in a Gregorian
+        // calendar, so the fallback is unreachable in practice.
+        let startOfWeek = calendar.date(byAdding: .day, value: -7, to: startOfToday) ?? startOfToday
 
         var today: [Locus] = []
         var thisWeek: [Locus] = []
@@ -478,7 +481,7 @@ struct LocusListView: View {
     // MARK: - Actions
 
     private func archiveLocus(_ locus: Locus) {
-        LocusActions.archive(locus, modelContext: modelContext) { undo in
+        LocusActions.archive(locus, modelContext: modelContext) { _ in
             archivedLocus = locus
             withAnimation {
                 showUndoSnackbar = true

@@ -70,10 +70,7 @@ final class AudioService {
     // MARK: - Recording URL Generation
 
     func generateRecordingURL() -> URL {
-        let documentsDirectory = FileManager.default.urls(
-            for: .documentDirectory,
-            in: .userDomainMask
-        ).first!
+        let documentsDirectory = URL.documentsDirectory
 
         let uuid = UUID().uuidString
         let timestamp = Int(Date().timeIntervalSince1970)
@@ -202,7 +199,9 @@ final class AudioService {
 
     // MARK: - Error Types
 
-    enum AudioError: Equatable {
+    // Must conform to Error — every `throw AudioError.…` in this file failed to
+    // compile without it.
+    enum AudioError: Error, Equatable {
         case microphonePermissionDenied
         case sessionConfigurationFailed(String)
         case recorderCreationFailed(String)

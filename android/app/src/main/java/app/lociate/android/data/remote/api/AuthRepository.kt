@@ -161,7 +161,10 @@ class AuthRepository @Inject constructor(
                 return false
             }
 
-            auth.retrieveUser()
+            // `retrieveUser` requires the JWT as an argument; the no-argument form for
+            // "refresh the user attached to the session we already have" is
+            // `retrieveUserForCurrentSession`.
+            auth.retrieveUserForCurrentSession()
             val session = auth.currentSessionOrNull()
             if (session != null) {
                 _authState.value = AuthState.Authenticated(

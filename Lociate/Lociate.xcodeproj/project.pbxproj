@@ -112,6 +112,7 @@
 		72C10A8CCE14CD70537B1D21 /* RetryHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D05CF18BB67034B78503D49 /* RetryHelper.swift */; };
 		698ABEEDC2EBAB0216D17570 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51E8FA62CAF0F9B3D4252095 /* Theme.swift */; };
 		843D8A7FC7CF99BD6D911914 /* TierEnforcement.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDCE8354DC3A4D23CF3FEC05 /* TierEnforcement.swift */; };
+		7E69F720C49F5C0A79EE551F /* BuildSecrets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B2CB9387B7A88140A4896B /* BuildSecrets.swift */; };
 		E14D94BBC4634587EB8462EE /* BuildSecretsValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F751967C0937091F2C540078 /* BuildSecretsValidator.swift */; };
 		C39842A510383BDAF71CF70F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F7B3F88BF5F008E5ED8D5DE3 /* Assets.xcassets */; };
 		07979619E1D11F5A73205FDA /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = F934461232F3ABBBBD26C893 /* PrivacyInfo.xcprivacy */; };
@@ -183,6 +184,7 @@
 		6F59C1DD3428ECAA1CF0F097 /* LociateTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LociateTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E3A736A9EFECDEEEDB4927DB /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text; path = .swiftlint.yml; sourceTree = "<group>"; };
 		F7B3F88BF5F008E5ED8D5DE3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		75B2CB9387B7A88140A4896B /* BuildSecrets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuildSecrets.swift; sourceTree = "<group>"; };
 		F751967C0937091F2C540078 /* BuildSecretsValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuildSecretsValidator.swift; sourceTree = "<group>"; };
 		8BDBCDDF8E0AEDA8192AA1E7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A553BB56C6DAE4DD4E772F99 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
@@ -343,6 +345,7 @@
 		ABB73975A67536854BD00150 /* Configuration */ = {
 			isa = PBXGroup;
 			children = (
+				75B2CB9387B7A88140A4896B /* BuildSecrets.swift */,
 				F751967C0937091F2C540078 /* BuildSecretsValidator.swift */,
 			);
 			path = Configuration;
@@ -863,6 +866,7 @@
 				72C10A8CCE14CD70537B1D21 /* RetryHelper.swift in Sources */,
 				698ABEEDC2EBAB0216D17570 /* Theme.swift in Sources */,
 				843D8A7FC7CF99BD6D911914 /* TierEnforcement.swift in Sources */,
+				7E69F720C49F5C0A79EE551F /* BuildSecrets.swift in Sources */,
 				E14D94BBC4634587EB8462EE /* BuildSecretsValidator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

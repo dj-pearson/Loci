@@ -6,21 +6,32 @@ struct WelcomeOnboardingView: View {
 
     @State private var currentPage = 0
 
-    private let pages: [(systemImage: String, headline: String, body: String)] = [
-        (
-            "mappin.and.ellipse",
-            String(localized: "Your Spatial Memory"),
-            String(localized: "Record voice notes and pin them to your current location. Your memories live where they happened.")
+    /// One page of the welcome carousel.
+    private struct WelcomePage {
+        let systemImage: String
+        let headline: String
+        let bodyText: String
+    }
+
+    private let pages: [WelcomePage] = [
+        WelcomePage(
+            systemImage: "mappin.and.ellipse",
+            headline: String(localized: "Your Spatial Memory"),
+            bodyText: String(localized: "Record voice notes and pin them to your current location. Your memories live where they happened.")
         ),
-        (
-            "bell.badge",
-            String(localized: "Notes Find You"),
-            String(localized: "When you return to a saved location, Lociate notifies you automatically. Never forget what you wanted to remember.")
+        WelcomePage(
+            systemImage: "bell.badge",
+            headline: String(localized: "Notes Find You"),
+            bodyText: String(
+                localized: "When you return to a saved location, Lociate notifies you automatically. Never forget what you wanted to remember."
+            )
         ),
-        (
-            "person.2.fill",
-            String(localized: "Share with Family"),
-            String(localized: "Create a household and share voice notes with your family. Leave tips, reminders, and memories for each other.")
+        WelcomePage(
+            systemImage: "person.2.fill",
+            headline: String(localized: "Share with Family"),
+            bodyText: String(
+                localized: "Create a household and share voice notes with your family. Leave tips, reminders, and memories for each other."
+            )
         ),
     ]
 
@@ -31,7 +42,7 @@ struct WelcomeOnboardingView: View {
                     OnboardingPageView(
                         systemImage: page.systemImage,
                         headline: page.headline,
-                        bodyText: page.body,
+                        bodyText: page.bodyText,
                         ctaTitle: index < pages.count - 1
                             ? String(localized: "Next")
                             : String(localized: "Get Started")

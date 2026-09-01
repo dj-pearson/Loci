@@ -1,5 +1,6 @@
 import CoreLocation
 import Foundation
+import os.log
 import UIKit
 
 extension Notification.Name {
@@ -15,6 +16,8 @@ final class GeofenceManager {
     // MARK: - Properties
 
     private(set) var monitoredRegionIds: Set<String> = []
+
+    private let logger = Logger(subsystem: "app.lociate.ios", category: "Geofence")
 
     private var monitor: CLMonitor?
     private var initTask: Task<Void, Never>?
@@ -59,7 +62,7 @@ final class GeofenceManager {
         self.monitor = monitor
 
         // Restore tracked identifiers from existing monitor state
-        for identifier in monitor.identifiers {
+        for identifier in await monitor.identifiers {
             monitoredRegionIds.insert(identifier)
         }
 
@@ -72,19 +75,30 @@ final class GeofenceManager {
     private func startEventMonitoring(_ monitor: CLMonitor) {
         eventTask?.cancel()
         eventTask = Task {
-            for try await event in monitor.events {
-                guard !Task.isCancelled else { break }
+            // `events` is an async property AND its iteration throws, so this needs
+            // both `await` on the access and `try` on the loop. The do/catch is what
+            // keeps the closure non-throwing, which `eventTask: Task<Void, Never>?`
+            // requires — and it means a stream failure gets logged instead of being
+            // swallowed by an unobserved Task.
+            do {
+                for try await event in await monitor.events {
+                    guard !Task.isCancelled else { break }
 
-                // Only act on entry events (state becomes satisfied)
-                guard case .satisfied = event.state else { continue }
+                    // Only act on entry events (state becomes satisfied)
+                    guard case .satisfied = event.state else { continue }
 
-                let identifier = event.identifier
-                guard let loci = lociProvider?(),
-                      let locus = loci.first(where: { $0.id.uuidString == identifier })
-                else { continue }
+                    let identifier = event.identifier
+                    guard let loci = lociProvider?(),
+                          let locus = loci.first(where: { $0.id.uuidString == identifier })
+                    else { continue }
 
-                AnalyticsService.shared.trackGeofenceTriggered()
-                onGeofenceEntry?(locus)
+                    AnalyticsService.shared.trackGeofenceTriggered()
+                    onGeofenceEntry?(locus)
+                }
+            } catch {
+                // A thrown error ends the stream, which means geofence entries stop
+                // arriving — worth a log rather than silence.
+                logger.error("Geofence event stream failed: \(error.localizedDescription)")
             }
         }
     }

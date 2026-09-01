@@ -41,7 +41,7 @@ final class SecurityAuditLogger {
         // 2. Log to TelemetryDeck for server-side analytics
         AnalyticsService.shared.track(
             AnalyticsEvent(rawValue: "security_\(event.rawValue)") ?? .appLaunch,
-            properties: [
+            parameters: [
                 "event_type": event.rawValue,
                 "email_hash": hashedEmail,
                 "device_info": AuditLogEntry.currentDeviceInfo,

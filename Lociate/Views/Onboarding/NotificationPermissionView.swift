@@ -18,6 +18,8 @@ struct NotificationPermissionView: View {
                 .fontWeight(.bold)
                 .multilineTextAlignment(.center)
 
+            // Long-form user copy. A localization key has to be a single literal, so wrapping this would break key extraction.
+            // swiftlint:disable:next line_length
             Text(String(localized: "Lociate sends a notification when you return to a place where you left a voice note — so your memories find you."))
                 .font(Theme.Typography.body)
                 .foregroundStyle(Theme.textSecondary)

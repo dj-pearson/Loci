@@ -8,6 +8,10 @@ import app.lociate.android.domain.model.HouseholdMember
 import app.lociate.android.domain.model.MemberRole
 import app.lociate.android.domain.model.SubscriptionTier
 import dagger.hilt.android.lifecycle.HiltViewModel
+// `auth` is an extension property on SupabaseClient. The import was missing, but the
+// compiler could not say so: `SupabaseClientProvider.client` did not resolve, so
+// every member access on it already had an error type.
+import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -29,7 +33,12 @@ data class HouseholdUiState(
 )
 
 @HiltViewModel
-class HouseholdViewModel @Inject constructor() : ViewModel() {
+class HouseholdViewModel @Inject constructor(
+    // SupabaseClientProvider is an injected @Singleton class, not an object, so
+    // static access to its `client` property never resolved. AuthRepository,
+    // SyncRepository and PushRegistrationService all inject it the same way.
+    private val supabaseProvider: SupabaseClientProvider
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HouseholdUiState())
     val uiState: StateFlow<HouseholdUiState> = _uiState.asStateFlow()
@@ -42,7 +51,7 @@ class HouseholdViewModel @Inject constructor() : ViewModel() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
             try {
-                val supabase = SupabaseClientProvider.client
+                val supabase = supabaseProvider.client
                 val user = supabase.auth.currentUserOrNull()
                 if (user == null) {
                     _uiState.update { it.copy(isLoading = false) }
@@ -90,7 +99,7 @@ class HouseholdViewModel @Inject constructor() : ViewModel() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
             try {
-                val supabase = SupabaseClientProvider.client
+                val supabase = supabaseProvider.client
                 val user = supabase.auth.currentUserOrNull() ?: return@launch
                 val inviteCode = UUID.randomUUID().toString().take(8).uppercase()
 
@@ -125,7 +134,7 @@ class HouseholdViewModel @Inject constructor() : ViewModel() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
             try {
-                val supabase = SupabaseClientProvider.client
+                val supabase = supabaseProvider.client
                 val user = supabase.auth.currentUserOrNull() ?: return@launch
 
                 val household = supabase.from("households")
@@ -158,7 +167,7 @@ class HouseholdViewModel @Inject constructor() : ViewModel() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
             try {
-                val supabase = SupabaseClientProvider.client
+                val supabase = supabaseProvider.client
                 supabase.from("household_members")
                     .delete { filter { eq("id", memberId.toString()) } }
                 loadHousehold()
@@ -172,7 +181,7 @@ class HouseholdViewModel @Inject constructor() : ViewModel() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
             try {
-                val supabase = SupabaseClientProvider.client
+                val supabase = supabaseProvider.client
                 val user = supabase.auth.currentUserOrNull() ?: return@launch
                 supabase.from("household_members")
                     .delete { filter { eq("user_id", user.id) } }

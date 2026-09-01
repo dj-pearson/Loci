@@ -68,7 +68,43 @@ struct NearbyLociWidgetEntryView: View {
                 .lineLimit(3)
                 .frame(maxHeight: .infinity, alignment: .top)
         }
-        .widgetURL(URL(string: "lociate://locus/\(locus.id.uuidString)"))
+        .widgetURL(Self.deepLink(for: locus))
+    }
+
+    // MARK: - Row
+
+    /// One locus row in the medium widget, shared by the linked and unlinked branches.
+    private func row(for locus: NearbyLocusData) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: locus.category.systemImageName)
+                .font(.caption)
+                .foregroundStyle(locus.category.color)
+                .frame(width: 20)
+
+            VStack(alignment: .leading, spacing: 1) {
+                Text(locus.locationName ?? locus.category.displayName)
+                    .font(.caption)
+                    .fontWeight(.medium)
+                    .foregroundStyle(.primary)
+                    .lineLimit(1)
+
+                Text(locus.transcription)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+            }
+
+            Spacer()
+
+            Text(locus.formattedDistance)
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    /// The `lociate://locus/{id}` deep link `NavigationRouter` resolves.
+    private static func deepLink(for locus: NearbyLocusData) -> URL? {
+        URL(string: "lociate://locus/\(locus.id.uuidString)")
     }
 
     // MARK: - Medium Widget
@@ -87,32 +123,13 @@ struct NearbyLociWidgetEntryView: View {
             .padding(.bottom, 2)
 
             ForEach(entry.loci.prefix(3)) { locus in
-                Link(destination: URL(string: "lociate://locus/\(locus.id.uuidString)")!) {
-                    HStack(spacing: 8) {
-                        Image(systemName: locus.category.systemImageName)
-                            .font(.caption)
-                            .foregroundStyle(locus.category.color)
-                            .frame(width: 20)
-
-                        VStack(alignment: .leading, spacing: 1) {
-                            Text(locus.locationName ?? locus.category.displayName)
-                                .font(.caption)
-                                .fontWeight(.medium)
-                                .foregroundStyle(.primary)
-                                .lineLimit(1)
-
-                            Text(locus.transcription)
-                                .font(.caption2)
-                                .foregroundStyle(.secondary)
-                                .lineLimit(1)
-                        }
-
-                        Spacer()
-
-                        Text(locus.formattedDistance)
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
-                    }
+                // The row renders either way; only the tap target depends on the URL
+                // parsing, so an unparseable one degrades to a non-tappable row rather
+                // than trapping.
+                if let destination = Self.deepLink(for: locus) {
+                    Link(destination: destination) { row(for: locus) }
+                } else {
+                    row(for: locus)
                 }
             }
 
