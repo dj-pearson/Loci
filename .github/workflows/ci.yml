@@ -59,7 +59,10 @@ jobs:
 
   swiftlint:
     name: SwiftLint
-    runs-on: macos-14
+    runs-on: ${{ vars.RUNNER_MACOS || 'macos-14' }}
+    # Only runs once a self-hosted macOS runner is registered and its label is
+    # set as the repo variable RUNNER_MACOS; skips cleanly until then.
+    if: vars.RUNNER_MACOS != ''
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -72,7 +75,10 @@ jobs:
 
   build:
     name: Build (iOS Simulator)
-    runs-on: macos-14
+    runs-on: ${{ vars.RUNNER_MACOS || 'macos-14' }}
+    # Only runs once a self-hosted macOS runner is registered and its label is
+    # set as the repo variable RUNNER_MACOS; skips cleanly until then.
+    if: vars.RUNNER_MACOS != ''
     needs: [swiftlint, xcode-project]
     steps:
       - name: Checkout
@@ -128,7 +134,10 @@ jobs:
 
   test:
     name: Unit Tests
-    runs-on: macos-14
+    runs-on: ${{ vars.RUNNER_MACOS || 'macos-14' }}
+    # Only runs once a self-hosted macOS runner is registered and its label is
+    # set as the repo variable RUNNER_MACOS; skips cleanly until then.
+    if: vars.RUNNER_MACOS != ''
     needs: build
     steps:
       - name: Checkout
