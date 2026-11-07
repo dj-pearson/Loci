@@ -3738,7 +3738,7 @@
         "An 'Invite your partner' prompt appears right after the owner's first shared locus is saved, not only in Settings",
         "Events household_invite_sent, household_invite_opened and household_joined fire on iOS (AnalyticsService.swift already declares householdJoined) and on Android, which needs an analytics seam because no Android analytics service exists today"
       ],
-      "priority": 220,
+      "priority": 1,
       "passes": false,
       "notes": "LEAP rank 1. Size: L. Regression of US-064/US-080/US-163, verified in code 2026-11-07: Kong strip_path vs Hono mount mismatch, Android PostgREST join. Competitive rationale: the indie location-note apps reviewed (WayPin, MemoMaps, EchoLock) list no household sharing on their App Store pages; Life360's circle invite is its growth loop but shares live location. Life360's former growth lead is reported (RevenueCat Sub Club podcast) as saying the buyer must be prompted to invite; not re-checked here. Sources: https://www.revenuecat.com/blog/growth/giordano-contestabile-life360-sub-club-podcast-2026 , https://apps.apple.com/bz/app/waypin/id6479329104 . Success metric: invite-to-join >= 40% within 7 days; >= 1.5 members per paid household at day 30."
     },
@@ -3757,7 +3757,7 @@
         "LAUNCH_CHECKLIST.md and BillingService.kt list every product id PaywallView references (premium/family monthly and yearly, lifetime_individual, lifetime_family)",
         "Event paywall_shown carries trigger (loci_limit|settings|deep_link|feature_gate); PaywallView and the pricing cards in web/src/pages/index.astro say Family covers up to 6 people"
       ],
-      "priority": 221,
+      "priority": 2,
       "passes": false,
       "notes": "LEAP rank 2. Size: M-L. Absorbs the draft's paywall story: its offering and trial work was already built (PaywallView has premiumYearly, lifetime and introductoryDiscount handling; RevenueCatConfiguration declares all six ids), so only the wiring and store SKUs remain, verified 2026-11-07. Note 008 already counts only loci where user_id = NEW.user_id, so shared notes authored by others never counted. Competitive rationale: Life360's stated freemium approach keeps the shared utility free and charges the payer (RevenueCat write-up, not re-fetched); the indie apps reviewed sell individual plans only ($1.99-$2.99/mo per their listings). Sources: https://www.plushcap.com/content/revenuecat/blog/revenuecat-freemium-at-scale-how-life360-built-trust-and-hit-18b , https://apps.apple.com/bz/app/waypin/id6479329104 . Success metric: Family >= 35% of paid subscriptions; paywall_shown(loci_limit) -> purchase or trial >= 12%."
     },
@@ -3773,7 +3773,7 @@
         "Existing accounts are backfilled with no trial (premium_trial_ends_at NULL), so nobody's tier changes on deploy",
         "Events trial_started, trial_day12_notified, trial_expired and trial_converted fire on both clients; paywall_shown gains trigger value trial_expired"
       ],
-      "priority": 222,
+      "priority": 3,
       "passes": false,
       "notes": "LEAP rank 3. Size: M. Replaces the draft's paywall/offerings story, which duplicated US-089, US-141 and US-170 (offerings, trial badges and lifetime already exist in PaywallView.swift). Depends on LEAP-002 effective_tier. Competitive rationale: the indie apps reviewed gate premium behind a purchase from the start; no claim is made that a reverse trial outperforms a store trial here, which is why the trial_* events exist. Sources: https://apps.apple.com/bz/app/waypin/id6479329104 , https://apps.apple.com/app/id6757409609 . Success metric: trial -> paid >= 8% at day 21; day-14 retention of trial users >= day-14 retention of pre-trial cohort."
     },
@@ -3791,7 +3791,7 @@
         "PrivacyInfo.xcprivacy, web/src/pages/privacy.astro and an in-app opt-in toggle disclose that transcriptions go to Anthropic; the job skips users who have not opted in, and a vitest asserts it",
         "Gated to effective_tier premium or family (LEAP-002)"
       ],
-      "priority": 223,
+      "priority": 4,
       "passes": false,
       "notes": "LEAP rank 4. Size: L. Repairs US-066 and turns it into a feature; defects verified in code 2026-11-07. Competitive rationale: Apple Reminders triggers a single reminder on arrive/leave and Things 3 has no location reminders; neither accumulates per-place knowledge. On-device-only apps (MemoMaps, EchoLock) do not sync between people, so they cannot summarise a household's notes. Sources: https://www.macstories.net/stories/ios-5-reminders/ , https://akiflow.com/blog/apple-reminders-vs-things-3 , https://apps.apple.com/app/id6757409609 . Success metric: >= 30% of premium arrivals at summarised places open the card; premium month-2 retention +10 pts for users with summaries."
     },
@@ -3808,7 +3808,7 @@
         "next_visit notes auto-archive after firing once; opening a notification writes a locus_receipts row",
         "The creator of a shared locus sees 'Heard by <name>, <time> ago' in detail and can opt in to a push when it is heard"
       ],
-      "priority": 224,
+      "priority": 5,
       "passes": false,
       "notes": "LEAP rank 5. Size: L. Absorbs the draft's ranking story: contextual-select was already built in US-065, so porting it is wiring, not a separate big move; the useful part (one notification per arrival) lives here. Competitive rationale: Apple Reminders stops at arrive/leave and Checkmark's after-arrival delay is the feature reviewers singled out; no household read receipt was found in the apps reviewed. Sources: https://www.macstories.net/reviews/checkmark-review/ , https://www.macstories.net/stories/ios-5-reminders/ . Success metric: >= 25% of new loci use a non-default trigger by month 2; notification open rate >= 35%; second household member 30-day retention +15 pts on households with receipts."
     },
@@ -3825,7 +3825,7 @@
         "The share sheet offers 'Send as place-note link' beside the existing raw share, with 24h / 7d / 30d expiry; the creator can see and revoke active links from LocusDetailView",
         "Events place_note_shared, place_note_opened_web and place_note_redeemed fire"
       ],
-      "priority": 225,
+      "priority": 6,
       "passes": false,
       "notes": "LEAP rank 6. Size: L. Ranked below the household stories because it needs an owner decision on rule 4. Competitive rationale: the direct apps reviewed are single-player (MemoMaps advertises no accounts and no cloud) and TagTrail's listing shows no sharing, so a private link is the one acquisition artifact that keeps Lociate's no-public-content stance. Sources: https://apps.apple.com/app/id6759820884 , https://apps.apple.com/mx/app/tagtrail/id6749494325 . Success metric: >= 20% of WAU send one place-note a month; web open -> install >= 10%."
     },
@@ -3841,7 +3841,7 @@
         "A unit test proves an intent capture produces the same Locus fields (category, encrypted audio path, sync state) as in-app capture",
         "locus_created carries capture_source (app|siri|shortcut|control|tile)"
       ],
-      "priority": 226,
+      "priority": 7,
       "passes": false,
       "notes": "LEAP rank 7. Size: M. Competitive rationale: Drop-A-Pin (2026) offers Lock Screen pin capture with no proximity alerts; MemoMaps offers one-tap voice with no voice retrieval; no app reviewed pairs voice capture with voice retrieval through Siri. Sources: https://mwm.ai/apps/drop-a-pin/6759992717 , https://apps.apple.com/app/id6759820884 . Success metric: >= 30% of loci created outside the in-app record button by month 3."
     },
@@ -3857,7 +3857,7 @@
         "Settings shows the stored visit history with a delete-all control",
         "Events visit_suggestion_shown and visit_suggestion_recorded fire; locus_created carries capture_source=visit_suggestion"
       ],
-      "priority": 227,
+      "priority": 8,
       "passes": false,
       "notes": "LEAP rank 8. Size: M. New story, replacing the draft's waitlist (folded into LEAP-011). Grounded in code: no CLVisit or activity-recognition use exists in Lociate/ or android/ (grep 2026-11-07). Competitive rationale: the geofence apps reviewed (GeoNudge, Remind There) fire only on places the user set up; none was found suggesting places from visits. Sources: https://apps.apple.com/us/app/geonudge/id6749579205 , https://apps.apple.com/app/id6747366518 . Success metric: users who enable suggestions create 2x the loci of those who don't by day 30; >= 20% of suggestions lead to a recording."
     },
@@ -3874,7 +3874,7 @@
         "The edge route requires auth, uses the existing Redis rate limiter, and a vitest asserts it refuses locus ids outside the caller's RLS scope",
         "ask_performed records answered or unanswered"
       ],
-      "priority": 228,
+      "priority": 9,
       "passes": false,
       "notes": "LEAP rank 9. Size: L. Competitive rationale: Apple Reminders and Things store text tasks and have no retrieval over spoken context; Life360 stores people's locations, not notes. General assistants recalling by place is the longer-term threat named in the research. Sources: https://akiflow.com/blog/apple-reminders-vs-things-3 , https://developer.apple.com/documentation/eventkit/managing-location-based-reminders.md . Success metric: >= 20% of premium WAU use Ask weekly; answered rate >= 70%."
     },
@@ -3891,7 +3891,7 @@
         "Android store listing metadata in android/fastlane/metadata/android/en-US leads with location reminders and voice and passes scripts/check-store-metadata.py",
         "import_completed carries source (keep|apple_reminders) and count"
       ],
-      "priority": 229,
+      "priority": 10,
       "passes": false,
       "notes": "LEAP rank 10. Size: M-L. Adds the iOS twin to the draft's Keep importer. Competitive rationale: Google removed Assistant location reminders in 2022 (PYMNTS, TechRadar) and a 2026 report says Keep reminders may move to Tasks; that report is speculative and the page copy must say 'may'. Sources: https://www.pymnts.com/news/2022/google-stops-location-based-reminders/ , https://www.androidheadlines.com/2026/01/google-keep-may-remove-reminders-feature-soon.html , https://developer.apple.com/documentation/eventkit/managing-location-based-reminders.md . Success metric: Android >= 40% of installs in the first 90 days; >= 25% of new users complete an import."
     },
@@ -3908,7 +3908,7 @@
         "A build-time check fails if a page lacks a description or schema; the unsourced testimonials are removed and a CI grep fails on 'Beta tester' or a testimonial block without a source attribute",
         "One config switch replaces waitlist CTAs with store badges at launch; an admin CSV export of confirmed signups sits behind a token"
       ],
-      "priority": 230,
+      "priority": 11,
       "passes": false,
       "notes": "LEAP rank 11. Size: L. Merges the draft's SEO story with its waitlist story, which was size S and mostly a broken-form fix, so it did not stand as a big move on its own. Competitive rationale: MemoMaps and EchoLock listings showed a 5.0 rating from 1 rating each when reviewed, so launching with a list is a real edge; the geofence category competes on generic 'location reminders' keywords. Sources: https://apps.apple.com/app/id6759820884 , https://apps.apple.com/app/id6757409609 , https://www.todoist.com/help/articles/introduction-to-reminders-9PezfU . Success metric: 2,000 confirmed signups before launch, >= 25% via referral; 5,000 organic sessions a month by month 6."
     },
@@ -3924,7 +3924,7 @@
         "A labelled fixture set of >= 100 transcripts measures category accuracy for old and new paths; the new path must win and the numbers are written to progress.txt",
         "Paywall copy describes exactly what the feature does; canUseAI gates titles and extraction, never manual category choice"
       ],
-      "priority": 231,
+      "priority": 12,
       "passes": false,
       "notes": "LEAP rank 12. Size: M. Kept rather than replaced: US-026/US-216 built keyword matching, and titles plus trigger extraction are new capability. Competitive rationale: MemoMaps and EchoLock market on-device processing; Lociate keeps CLAUDE.md's no-cloud-transcription rule and adds intelligence those listings do not describe. Sources: https://apps.apple.com/app/id6759820884 , https://apps.apple.com/app/id6757409609 . Success metric: category correction rate < 10%; feature_gate:ai paywall triggers >= 15% of upgrades."
     },
@@ -3940,7 +3940,7 @@
         "Viewer and guest seats do not count toward the 6-member cap; the member cap stays enforced in the accept route",
         "backend/tests/10_rls_isolation_test.sql and a vitest cover: viewer cannot insert, expired guest cannot read, guest cannot read non-guest-visible loci"
       ],
-      "priority": 232,
+      "priority": 13,
       "passes": false,
       "notes": "LEAP rank 13. Size: M. Depends on LEAP-001. Competitive rationale: Life360 was reported by The Markup (2021) to sell location data and has been called stalkerware in press coverage; Lociate circles share notes about places without tracking anyone. Sources: https://en.wikipedia.org/wiki/Life360 , https://apps.apple.com/us/app/life360-find-friends-family/id384830320 . Success metric: >= 15% of households use a non-family template or guest invite by month 4; guest -> creates own locus >= 10%."
     },
@@ -3956,7 +3956,7 @@
         "Settings shows the user's link, how many friends joined and months earned",
         "Events referral_link_shared, referral_redeemed and referral_rewarded fire on both clients"
       ],
-      "priority": 233,
+      "priority": 14,
       "passes": false,
       "notes": "LEAP rank 14. Size: M. New story, replacing the draft's standalone ranking story (folded into LEAP-005). Depends on LEAP-001 link handling and LEAP-003 trial column. Stays inside rule 4: an invite to install, no shared content. Competitive rationale: no referral program appeared on the indie listings reviewed; this is a growth bet measured by the events above, not a claim about competitors. Sources: https://apps.apple.com/bz/app/waypin/id6479329104 , https://apps.apple.com/app/id6759820884 . Success metric: >= 10% of new installs arrive via a referral link by month 3; referred users convert to paid at >= the organic rate."
     },
@@ -3973,7 +3973,7 @@
         "edge-functions/test/push-digest.test.ts covers active, lapsed and household-only users and asserts no transcription text appears for loci the recipient cannot read under RLS",
         "digest_sent and digest_opened carry the variant"
       ],
-      "priority": 234,
+      "priority": 15,
       "passes": false,
       "notes": "LEAP rank 15. Size: M. Reworks US-068. Competitive rationale: Life360's retention is described as driven by household activity alerts (Umbrex profile, RevenueCat podcast); Lociate can alert on household notes without tracking anyone. Whether indie rivals have any server-side engagement was not verified, so no claim is made. Sources: https://umbrex.com/resources/company-profiles/life360/ , https://www.revenuecat.com/blog/growth/giordano-contestabile-life360-sub-club-podcast-2026 . Success metric: digest open rate >= 20%; lapsed-user reactivation >= 8% per send."
     },
@@ -3989,7 +3989,7 @@
         "Free tier stays voice-only; media is gated to effective_tier premium or family",
         "Data export (US-131) includes media and account deletion (account-delete.ts) removes it from storage, each with a test"
       ],
-      "priority": 235,
+      "priority": 16,
       "passes": false,
       "notes": "LEAP rank 16. Size: M. Competitive rationale: TagTrail lists image tags but no sharing was found on its listing; adding visuals keeps Lociate the only app reviewed with voice + visual + household + proximity. Sources: https://apps.apple.com/mx/app/tagtrail/id6749494325 , https://apps.apple.com/app/id6759820884 . Success metric: >= 30% of shared loci include media; media-gate paywall triggers convert >= 10%."
     },
@@ -4005,7 +4005,7 @@
         "Arrival notes in a car are spoken via AVSpeechSynthesizer / TextToSpeech or play the recording, respecting quiet hours (US-054); no free-text entry in any car UI",
         "locus_created carries capture_source=car or motion; locus_triggered carries surface=car"
       ],
-      "priority": 236,
+      "priority": 17,
       "passes": false,
       "notes": "LEAP rank 17. Size: L. Reworked so the high-value part (motion-based parking capture) does not wait on an entitlement that a notes app may not get. Competitive rationale: the draft said Android Auto users were 'left with nothing'; that is not supported and was removed. What is sourced: Google ended Assistant location reminders in 2022, and no indie geofence app reviewed lists CarPlay. Sources: https://www.pymnts.com/news/2022/google-stops-location-based-reminders/ , https://www.techradar.com/news/google-slated-to-axe-location-based-reminders-from-assistant . Success metric: >= 20% of parking-category loci created by the autopilot or car surface within 3 months."
     },
@@ -4022,7 +4022,7 @@
         "web/src/pages/crews.astro describes the plan with a contact form posting to LEAP-011's Pages Function",
         "backend/tests covers cross-workspace isolation"
       ],
-      "priority": 237,
+      "priority": 18,
       "passes": false,
       "notes": "LEAP rank 18. Size: XL. Ranked lower than the draft did: the segment is unvalidated and needs sales effort the consumer stories do not. Competitive rationale: removed the draft's unsourced claim about field-service tools; what is sourced is that Life360 targets families and caps Place Alerts by tier (2 places on its Silver tier per its listing). Sources: https://apps.apple.com/us/app/life360-find-friends-family/id384830320 , https://umbrex.com/resources/company-profiles/life360/ . Success metric: 10 paying crews of >= 3 seats within 6 months of launch; ARPA >= $30/mo."
     },
@@ -4038,7 +4038,7 @@
         "Tier limits apply to watch captures exactly as on the phone (effective_tier)",
         "CI builds both watch targets; locus_created carries capture_source=watch"
       ],
-      "priority": 238,
+      "priority": 19,
       "passes": false,
       "notes": "LEAP rank 19. Size: L. Corrected the draft: there is no XcodeGen project config; the repo generates the project with scripts/generate-xcodeproj.py. Ranking dependency on the dropped ranker story removed. Competitive rationale: WayPin, MemoMaps, Drop-A-Pin and EchoLock listings show no watch app. Sources: https://mwm.ai/apps/drop-a-pin/6759992717 , https://apps.apple.com/bz/app/waypin/id6479329104 . Success metric: >= 15% of premium users capture from the watch monthly; watch users' 90-day retention +10 pts."
     },
@@ -4054,7 +4054,7 @@
         "web/src/pages/privacy-ledger.astro lists every data flow (what, where, who processes it: self-hosted Supabase, Anthropic opt-in, APNs/FCM, RevenueCat, TelemetryDeck) and a Settings screen mirrors it",
         "A recovery code is shown once when E2EE is enabled; the UI states before enabling that without it E2EE notes are unrecoverable"
       ],
-      "priority": 239,
+      "priority": 20,
       "passes": false,
       "notes": "LEAP rank 20. Size: XL. Competitive rationale: MemoMaps and EchoLock market on-device, no-account privacy; Life360 has a reported data-sale history; E2EE household sharing is a claim neither camp makes on the pages reviewed. Sources: https://apps.apple.com/app/id6759820884 , https://apps.apple.com/app/id6757409609 , https://en.wikipedia.org/wiki/Life360 . Success metric: >= 40% of Family households enable E2EE; privacy cited in >= 20% of positive reviews by month 6."
     }
