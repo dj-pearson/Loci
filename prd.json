@@ -3724,6 +3724,339 @@
       "priority": 219,
       "passes": true,
       "notes": "Completed. Found while wiring US-208's geofence tests: GeofenceService.registerGeofences had zero callers, so proximity-triggered notifications — the entire premise of the app — never fired on Android. BootReceiver's comment claimed re-registration happened 'on next app launch'; nothing on launch did it. SyncWorker.schedulePeriodicSync was also never called, so even the upload fixed in US-194 would only have run on an explicit pull-to-refresh. Added GeofenceRegistrationWorker (WorkManager, so registration survives process death and reboot — doing it only while a ViewModel is alive is how it went missing), enqueued from LociateApplication.onCreate, BootReceiver, and after each locus save. Also fixed the selection: it did `.take(MAX_GEOFENCES)` on an unsorted list, so a user with more than 100 loci monitored an arbitrary subset — notifications for loci across town, silence for the one they were standing beside. Extracted as a pure GeofenceSelection.select() with 9 unit tests. iOS was never affected because it has always sorted by distance."
+    },
+    {
+      "id": "LEAP-001",
+      "title": "Household invite becomes a link that installs, deep-links and joins on both platforms",
+      "description": "As a Family-plan owner, I want to send my partner one link that installs Lociate and drops them into our household, so Lociate's shared-place loop actually spreads. US-064, US-080 and US-163 are marked done but joining is broken on both platforms: iOS HouseholdViewModel.swift:148/165/484 calls functions.invoke(\"household-invite/{validate,accept,generate}\"), Kong (backend/kong.yml:147-153, strip_path) forwards that to /household-invite/*, and Hono mounts the router at /api/household/invite (edge-functions/src/index.ts), so every call 404s. Android HouseholdViewModel.kt:131-147 selects households by invite_code and inserts household_members straight through PostgREST, bypassing the expiry and 6-member cap in household-invite.ts. CreateHouseholdView.swift shares a bare code in text ('Use invite code: X') with no URL. This story makes the edge route the only join path and wraps it in a link loop.",
+      "acceptanceCriteria": [
+        "The edge sidecar answers the invite routes at the path the clients reach through Kong (either Hono also mounts /household-invite or both clients call the /api/household/invite path); a vitest in edge-functions/test/ sends generate, validate and accept through the stripped path and gets 200, not 404",
+        "Android HouseholdViewModel.joinHousehold no longer reads households or inserts household_members via PostgREST; it calls the same accept route, so expiry and MAX_HOUSEHOLD_MEMBERS apply on both platforms, covered by an Android unit test",
+        "The shared invite is the URL https://lociate.app/open/join/<code>; web/src/pages/open.astro (or a sibling open/join page) shows the code for manual entry and links to the right store by user agent",
+        "NavigationRouter.handleUniversalLink routes /open/join/<code> to JoinHouseholdView pre-filled (the /open/* path is already declared by web/scripts/generate-association-files.mjs); Android's App Link intent filter does the same, each with a unit test on the URL parser",
+        "Without the app installed, the code survives install via an onboarding 'Have an invite code?' paste prompt that reads the clipboard only after the user taps it",
+        "An 'Invite your partner' prompt appears right after the owner's first shared locus is saved, not only in Settings",
+        "Events household_invite_sent, household_invite_opened and household_joined fire on iOS (AnalyticsService.swift already declares householdJoined) and on Android, which needs an analytics seam because no Android analytics service exists today"
+      ],
+      "priority": 220,
+      "passes": false,
+      "notes": "LEAP rank 1. Size: L. Regression of US-064/US-080/US-163, verified in code 2026-11-07: Kong strip_path vs Hono mount mismatch, Android PostgREST join. Competitive rationale: the indie location-note apps reviewed (WayPin, MemoMaps, EchoLock) list no household sharing on their App Store pages; Life360's circle invite is its growth loop but shares live location. Life360's former growth lead is reported (RevenueCat Sub Club podcast) as saying the buyer must be prompted to invite; not re-checked here. Sources: https://www.revenuecat.com/blog/growth/giordano-contestabile-life360-sub-club-podcast-2026 , https://apps.apple.com/bz/app/waypin/id6479329104 . Success metric: invite-to-join >= 40% within 7 days; >= 1.5 members per paid household at day 30."
+    },
+    {
+      "id": "LEAP-002",
+      "title": "Family plan covers the household and the paywall appears at the 11th note",
+      "description": "As an invited household member, I want to join and use shared notes without paying while the owner's Family subscription lifts my limits, and as a free user hitting the 10-note limit I want an upgrade offer instead of a recording that silently doesn't start. Today sync-subscription.ts writes subscription_tier only to the buyer's users row, check_loci_tier_limit in 008_tier_enforcement.sql reads only the inserting user's own tier, and Android HouseholdViewModel.kt:120 refuses joining unless the joiner already pays. On iOS, RecordViewModel.swift:80 sets blockedFeature = .lociLimit and no view reads it; UpgradePromptView is never instantiated even though US-089 is marked done; NavigationRouter.showPaywall (line 96) has no consumer; TierEnforcement.canSync and canUseWidget have no callers. PaywallView already renders yearly, lifetime and trial badges (US-141/US-170), but LAUNCH_CHECKLIST.md:131 lists only the two monthly SKUs, so those packages never exist in the stores.",
+      "acceptanceCriteria": [
+        "A new numbered migration in backend/migrations/ adds effective_tier(user_id) returning the higher of the user's own tier and the tier of the owner of any household they belong to; applied with scripts/apply-migrations.sh",
+        "check_loci_tier_limit uses effective_tier; backend/tests/10_rls_isolation_test.sql gains cases: a free member of a Family household can insert an 11th locus, a free user in no household cannot, a member of a household whose owner downgraded to free cannot",
+        "iOS SubscriptionService and Android BillingService expose effectiveTier read from the server after sync, and TierEnforcement checks use it",
+        "The Android join gate at HouseholdViewModel.kt:120 is removed; any signed-in user can accept a valid invite",
+        "A vitest in edge-functions/test/sync-subscription.test.ts proves a CANCELLATION/EXPIRATION for the owner leaves members on free at the next effective_tier read, with no per-member writes",
+        "RecordView observes blockedFeature and presents UpgradePromptView, then PaywallView; the root view consumes NavigationRouter.showPaywall so lociate://paywall opens it; Android shows the equivalent sheet from its record flow",
+        "TierEnforcement.canSync gates SyncService.swift and canUseWidget gates NearbyLociTimelineProvider.swift, or both are deleted with the tier table in CLAUDE.md updated; no uncalled gate remains",
+        "LAUNCH_CHECKLIST.md and BillingService.kt list every product id PaywallView references (premium/family monthly and yearly, lifetime_individual, lifetime_family)",
+        "Event paywall_shown carries trigger (loci_limit|settings|deep_link|feature_gate); PaywallView and the pricing cards in web/src/pages/index.astro say Family covers up to 6 people"
+      ],
+      "priority": 221,
+      "passes": false,
+      "notes": "LEAP rank 2. Size: M-L. Absorbs the draft's paywall story: its offering and trial work was already built (PaywallView has premiumYearly, lifetime and introductoryDiscount handling; RevenueCatConfiguration declares all six ids), so only the wiring and store SKUs remain, verified 2026-11-07. Note 008 already counts only loci where user_id = NEW.user_id, so shared notes authored by others never counted. Competitive rationale: Life360's stated freemium approach keeps the shared utility free and charges the payer (RevenueCat write-up, not re-fetched); the indie apps reviewed sell individual plans only ($1.99-$2.99/mo per their listings). Sources: https://www.plushcap.com/content/revenuecat/blog/revenuecat-freemium-at-scale-how-life360-built-trust-and-hit-18b , https://apps.apple.com/bz/app/waypin/id6479329104 . Success metric: Family >= 35% of paid subscriptions; paywall_shown(loci_limit) -> purchase or trial >= 12%."
+    },
+    {
+      "id": "LEAP-003",
+      "title": "Reverse trial: every new Lociate account gets 14 days of Premium, then a clear drop to free",
+      "description": "As a new user, I want sync, the widget, AI titles and unlimited notes from day one, so I build the habit before I'm asked to pay, and then see exactly what I'd lose. Lociate's Premium value (sync, widget, notes past 10, place memory) shows up only after weeks of use, and an introductory store trial needs a purchase decision on day one. A server-side reverse trial gives everyone Premium immediately and converts at the moment of loss. It builds on LEAP-002's effective_tier, so the trial is one more input to the same function, not a second entitlement path.",
+      "acceptanceCriteria": [
+        "A new numbered migration adds users.premium_trial_ends_at, set to signup + 14 days on account creation; effective_tier returns at least premium while now() < premium_trial_ends_at",
+        "Notes created during the trial stay readable and keep their geofences after it ends; only creating note 11+ and the paid features are gated, proven by an RLS test that inserts 15 loci during trial and asserts reads still succeed after expiry",
+        "Both clients show a trial status in Settings and a day-12 local notification naming what stops (sync, widget, notes past 10) with a paywall deep link",
+        "On the first launch after expiry, a one-time sheet lists counts from the user's own data (for example '23 notes, 4 shared with your household') and opens PaywallView",
+        "Existing accounts are backfilled with no trial (premium_trial_ends_at NULL), so nobody's tier changes on deploy",
+        "Events trial_started, trial_day12_notified, trial_expired and trial_converted fire on both clients; paywall_shown gains trigger value trial_expired"
+      ],
+      "priority": 222,
+      "passes": false,
+      "notes": "LEAP rank 3. Size: M. Replaces the draft's paywall/offerings story, which duplicated US-089, US-141 and US-170 (offerings, trial badges and lifetime already exist in PaywallView.swift). Depends on LEAP-002 effective_tier. Competitive rationale: the indie apps reviewed gate premium behind a purchase from the start; no claim is made that a reverse trial outperforms a store trial here, which is why the trial_* events exist. Sources: https://apps.apple.com/bz/app/waypin/id6479329104 , https://apps.apple.com/app/id6757409609 . Success metric: trial -> paid >= 8% at day 21; day-14 retention of trial users >= day-14 retention of pre-trial cohort."
+    },
+    {
+      "id": "LEAP-004",
+      "title": "Place memory: 'What you know about this place' on arrival, built on a place_summaries table",
+      "description": "As a user returning somewhere I've talked about many times, I want one card that sums up everything my household and I have said there. US-066 built analyze-loci.ts, which calls Claude Haiku per cluster, but it .insert()s a new loci row with created_by_name 'AI Summary' every night (analyze-loci.ts:82-91, the variable is named upsertError), those rows fire geofences and take slots in the 20-region rotation, 007_loci_clusters_rpc.sql:33 filters category != 'general' to skip summaries and so drops every user note left in the default category, and POST /api/loci/analyze/run (analyze-loci.ts:114) and POST /api/digest/run have no auth middleware.",
+      "acceptanceCriteria": [
+        "A new numbered migration creates place_summaries(id, user_id or household_id, centroid GEOGRAPHY(POINT,4326), radius_m, source_loci_ids, source_hash, summary, model, generated_at) with RLS matching loci visibility and indexes on owner and centroid; summaries are never rows in loci",
+        "A cleanup step in the same migration deletes existing loci rows where created_by_name = 'AI Summary'",
+        "analyze-loci.ts upserts by cluster key and regenerates only when source_hash changes; a vitest in edge-functions/test/ proves two consecutive runs leave one summary per cluster and make one model call",
+        "loci_clusters stops filtering on category and reads only real loci",
+        "POST /api/loci/analyze/run and POST /api/digest/run reject calls without a cron secret or service-role token with 401, covered by vitest",
+        "On geofence entry where a summary exists, the notification and LocusDetailView show 'What you know about this place' with links to the source notes, on iOS and Android",
+        "PrivacyInfo.xcprivacy, web/src/pages/privacy.astro and an in-app opt-in toggle disclose that transcriptions go to Anthropic; the job skips users who have not opted in, and a vitest asserts it",
+        "Gated to effective_tier premium or family (LEAP-002)"
+      ],
+      "priority": 223,
+      "passes": false,
+      "notes": "LEAP rank 4. Size: L. Repairs US-066 and turns it into a feature; defects verified in code 2026-11-07. Competitive rationale: Apple Reminders triggers a single reminder on arrive/leave and Things 3 has no location reminders; neither accumulates per-place knowledge. On-device-only apps (MemoMaps, EchoLock) do not sync between people, so they cannot summarise a household's notes. Sources: https://www.macstories.net/stories/ios-5-reminders/ , https://akiflow.com/blog/apple-reminders-vs-things-3 , https://apps.apple.com/app/id6757409609 . Success metric: >= 30% of premium arrivals at summarised places open the card; premium month-2 retention +10 pts for users with summaries."
+    },
+    {
+      "id": "LEAP-005",
+      "title": "Smart triggers: leave, dwell, time windows, next visit only, one notification per arrival, and 'heard it' receipts",
+      "description": "As a user, I want a note to fire when I leave ('take the gym bag'), after a few minutes somewhere, only on weekday lunchtimes, or only on my next visit; when several notes are in range I want the one that matters, not a burst; and as a household member I want to know my partner heard the note I left. GeofenceManager.swift:78-79 acts only on .satisfied entry; Android GeofenceService.kt:73 registers GEOFENCE_TRANSITION_ENTER only and GeofenceBroadcastReceiver.kt:26 handles nothing else. edge-functions/src/routes/contextual-select.ts (US-065) scores recency, time of day and distance but no Swift or Kotlin file calls it and it uses the server clock (line 101).",
+      "acceptanceCriteria": [
+        "A new numbered migration adds to loci: trigger_on (enter|exit|dwell), dwell_seconds, active_days, active_start_minute, active_end_minute, fire_mode (every|next_visit), and creates locus_receipts(locus_id, user_id, heard_at) with RLS allowing household members of the locus",
+        "iOS GeofenceManager handles .unsatisfied (exit) and dwell timers; Android registers EXIT and DWELL transitions and GeofenceBroadcastReceiver handles them; GeofenceSelection unit tests cover the new modes",
+        "Time windows are evaluated in device local time; unit tests cover a window crossing midnight and a DST change on both platforms",
+        "A pure ContextualRanker on each platform ports the contextual-select weights using local time; when several loci trigger within 60 seconds only the top one notifies and the rest are summarised as 'and N more here'; contextual-select.ts is deleted so no dead route remains",
+        "Post-record sheet and LocusDetailView let the user choose trigger, window and fire mode; defaults reproduce today's enter-every-time behaviour",
+        "next_visit notes auto-archive after firing once; opening a notification writes a locus_receipts row",
+        "The creator of a shared locus sees 'Heard by <name>, <time> ago' in detail and can opt in to a push when it is heard"
+      ],
+      "priority": 224,
+      "passes": false,
+      "notes": "LEAP rank 5. Size: L. Absorbs the draft's ranking story: contextual-select was already built in US-065, so porting it is wiring, not a separate big move; the useful part (one notification per arrival) lives here. Competitive rationale: Apple Reminders stops at arrive/leave and Checkmark's after-arrival delay is the feature reviewers singled out; no household read receipt was found in the apps reviewed. Sources: https://www.macstories.net/reviews/checkmark-review/ , https://www.macstories.net/stories/ios-5-reminders/ . Success metric: >= 25% of new loci use a non-default trigger by month 2; notification open rate >= 35%; second household member 30-day retention +15 pts on households with receipts."
+    },
+    {
+      "id": "LEAP-006",
+      "title": "Send a place-note: an expiring, single-recipient link with a web player that converts to install",
+      "description": "As a user, I want to send one note ('spare key is under the blue pot', 'we parked on level 3') to someone who doesn't have Lociate, so they hear it now and can have it fire on arrival once they install. The share sheet from US-182 sends raw transcription and decrypted audio with no link and no mention of Lociate. This is outside CLAUDE.md rule 4 as written ('Sharing is opt-in within households only'), so it starts with the owner amending that rule to allow one named, unindexed, expiring recipient.",
+      "acceptanceCriteria": [
+        "CLAUDE.md rule 4 is amended by the owner to permit single-recipient expiring links; without that change this story does not start",
+        "A new numbered migration creates locus_shares(token, locus_id, created_by, expires_at, revoked_at, redeemed_by, redeemed_at) with RLS: only the creator reads or revokes their rows",
+        "POST /api/loci/share (auth required, caller must own or share the locus) returns an unguessable token; GET /api/loci/share/:token returns transcription, a short-lived signed audio URL and coordinates only while unexpired, unrevoked and unredeemed; vitests cover expired, revoked and other-user cases",
+        "Because web/ is a static Astro build, the player is one noindex page (for example web/src/pages/open/l.astro reading the token from the URL fragment) that fetches the GET route client-side; it shows audio, place name and an install CTA that deep-links back with the token",
+        "Redeeming in Lociate copies the locus into the recipient's own loci with sender attribution and registers its geofence, on iOS and Android",
+        "The share sheet offers 'Send as place-note link' beside the existing raw share, with 24h / 7d / 30d expiry; the creator can see and revoke active links from LocusDetailView",
+        "Events place_note_shared, place_note_opened_web and place_note_redeemed fire"
+      ],
+      "priority": 225,
+      "passes": false,
+      "notes": "LEAP rank 6. Size: L. Ranked below the household stories because it needs an owner decision on rule 4. Competitive rationale: the direct apps reviewed are single-player (MemoMaps advertises no accounts and no cloud) and TagTrail's listing shows no sharing, so a private link is the one acquisition artifact that keeps Lociate's no-public-content stance. Sources: https://apps.apple.com/app/id6759820884 , https://apps.apple.com/mx/app/tagtrail/id6749494325 . Success metric: >= 20% of WAU send one place-note a month; web open -> install >= 10%."
+    },
+    {
+      "id": "LEAP-007",
+      "title": "Siri, App Shortcuts, Action Button and Control Center capture; Android shortcuts and Quick Settings tile",
+      "description": "As a voice-first user, I want 'Remember this place in Lociate' or one press of the Action Button to start a note pinned where I stand, and 'What did I leave here in Lociate' to play it back, without opening Lociate. The only AppIntent in the codebase is Lociate/Widget/OpenLocusIntent.swift; there is no AppShortcutsProvider, and Android has no shortcuts.xml or TileService. App Shortcuts surface in Spotlight and the Shortcuts app without the user configuring anything.",
+      "acceptanceCriteria": [
+        "Lociate/Intents adds CaptureLocusIntent (records, transcribes on device, pins at current location, honours effective_tier limits) and WhatsHereIntent (reads or plays the nearest unarchived locus in range)",
+        "An AppShortcutsProvider registers both with phrases that include the app name",
+        "A Control Center control and a Lock Screen widget start capture on iOS 18+; the shortcut can be assigned to the Action Button",
+        "Android adds static shortcuts in res/xml/shortcuts.xml for capture and what's-here, plus a Quick Settings TileService for capture",
+        "A unit test proves an intent capture produces the same Locus fields (category, encrypted audio path, sync state) as in-app capture",
+        "locus_created carries capture_source (app|siri|shortcut|control|tile)"
+      ],
+      "priority": 226,
+      "passes": false,
+      "notes": "LEAP rank 7. Size: M. Competitive rationale: Drop-A-Pin (2026) offers Lock Screen pin capture with no proximity alerts; MemoMaps offers one-tap voice with no voice retrieval; no app reviewed pairs voice capture with voice retrieval through Siri. Sources: https://mwm.ai/apps/drop-a-pin/6759992717 , https://apps.apple.com/app/id6759820884 . Success metric: >= 30% of loci created outside the in-app record button by month 3."
+    },
+    {
+      "id": "LEAP-008",
+      "title": "Lociate notices the places you keep returning to and asks once whether to leave a note there",
+      "description": "As a new user, I don't yet know which places deserve a note; I want Lociate to notice that I've been to the hardware store four times this month and offer to pin a note there. Activation today depends on the user remembering to record (onboarding asks for one first locus, US-051), and a user who stops at three notes never reaches the 10-note paywall or the household loop. Visit detection runs on device and stores nothing on the server until the user records.",
+      "acceptanceCriteria": [
+        "iOS uses CLLocationManager visit monitoring (startMonitoringVisits; this is not region monitoring, so CLAUDE.md rule 7 still holds) and Android uses the Activity Recognition / Sleep-safe visit heuristics from fused location; detected visits are kept only in SwiftData/Room, never synced",
+        "A pure VisitClusterer groups visits within 100 m and flags a place after 3 visits in 30 days with no locus within its radius; unit tests cover the threshold, the radius and the existing-locus exclusion",
+        "When a place is flagged, one local notification on the next visit asks 'You come here often. Leave a note for next time?' and opens recording pinned to the cluster centroid",
+        "Each place is suggested at most once; 'Not this place' and a global Settings toggle stop suggestions, and the toggle defaults off until the user enables it during onboarding",
+        "Settings shows the stored visit history with a delete-all control",
+        "Events visit_suggestion_shown and visit_suggestion_recorded fire; locus_created carries capture_source=visit_suggestion"
+      ],
+      "priority": 227,
+      "passes": false,
+      "notes": "LEAP rank 8. Size: M. New story, replacing the draft's waitlist (folded into LEAP-011). Grounded in code: no CLVisit or activity-recognition use exists in Lociate/ or android/ (grep 2026-11-07). Competitive rationale: the geofence apps reviewed (GeoNudge, Remind There) fire only on places the user set up; none was found suggesting places from visits. Sources: https://apps.apple.com/us/app/geonudge/id6749579205 , https://apps.apple.com/app/id6747366518 . Success metric: users who enable suggestions create 2x the loci of those who don't by day 30; >= 20% of suggestions lead to a recording."
+    },
+    {
+      "id": "LEAP-009",
+      "title": "Ask your places: natural-language questions answered from your geotagged notes",
+      "description": "As a user, I want to ask 'Where did we park at the airport last time?' or 'What did the plumber say about the basement?' and get the answer with the place on a map. SearchService.swift (US-044) matches keywords over transcription and place name only. Lociate holds the one corpus that pairs a person's spoken notes with where they said them.",
+      "acceptanceCriteria": [
+        "An Ask entry point on the map and list, plus an AskIntent registered alongside LEAP-007's shortcuts, accepts spoken or typed questions",
+        "Retrieval runs on device over the user's and household's loci, combining text match, place name, category, time phrases ('last time', 'in March') and distance to a named place; unit tests cover each signal",
+        "On iOS devices where Apple Foundation Models is available the answer is composed on device; otherwise a premium-only POST /api/loci/ask sends only the top-k retrieved transcriptions to Claude Haiku, reusing the client set up in analyze-loci.ts",
+        "Every answer cites its source loci with tap-through to LocusDetailView and shows them on the map; with no match it says so instead of guessing",
+        "Android ships the same flow with the edge route composing the answer",
+        "The edge route requires auth, uses the existing Redis rate limiter, and a vitest asserts it refuses locus ids outside the caller's RLS scope",
+        "ask_performed records answered or unanswered"
+      ],
+      "priority": 228,
+      "passes": false,
+      "notes": "LEAP rank 9. Size: L. Competitive rationale: Apple Reminders and Things store text tasks and have no retrieval over spoken context; Life360 stores people's locations, not notes. General assistants recalling by place is the longer-term threat named in the research. Sources: https://akiflow.com/blog/apple-reminders-vs-things-3 , https://developer.apple.com/documentation/eventkit/managing-location-based-reminders.md . Success metric: >= 20% of premium WAU use Ask weekly; answered rate >= 70%."
+    },
+    {
+      "id": "LEAP-010",
+      "title": "Win the location-reminder refugees: Android store presence, Google Keep importer and Apple Reminders importer",
+      "description": "As an Android user who lost Google Assistant location reminders in 2022, or an iPhone user whose location reminders live in Apple Reminders, I want to bring what I have into Lociate in one step. Android reached feature parity in US-151..219, yet every CTA on the Astro site points at a placeholder App Store URL (support.astro:217 uses id0000000000) and there is no Google Play link anywhere. An importer turns a cold install into a populated map on the first day.",
+      "acceptanceCriteria": [
+        "Every CTA in web/src/pages (index.astro, features/*.astro, open.astro, support.astro) and BaseLayout.astro shows both App Store and Google Play badges from one config, with real store ids once assigned; the JSON-LD lists both download URLs",
+        "Android onboarding offers 'Import from Google Keep' that reads a Google Takeout Keep export (JSON) through the system file picker; a pure parser with unit tests over fixture files turns notes into drafts the user pins to a place on the map; location data is used only if present in the export",
+        "iOS onboarding offers 'Import location reminders' that reads EKReminders with a structuredLocation alarm through EventKit (permission requested only on tap) and creates loci with matching radius and enter/leave trigger (LEAP-005); a unit test covers the mapping",
+        "Nothing is uploaded until the user saves each imported note; imports respect effective_tier limits and explain the trial (LEAP-003) when they exceed 10",
+        "web/src/pages gains google-keep-location-reminders-alternative.astro and an Assistant equivalent explaining the shutdowns with cited sources",
+        "Android store listing metadata in android/fastlane/metadata/android/en-US leads with location reminders and voice and passes scripts/check-store-metadata.py",
+        "import_completed carries source (keep|apple_reminders) and count"
+      ],
+      "priority": 229,
+      "passes": false,
+      "notes": "LEAP rank 10. Size: M-L. Adds the iOS twin to the draft's Keep importer. Competitive rationale: Google removed Assistant location reminders in 2022 (PYMNTS, TechRadar) and a 2026 report says Keep reminders may move to Tasks; that report is speculative and the page copy must say 'may'. Sources: https://www.pymnts.com/news/2022/google-stops-location-based-reminders/ , https://www.androidheadlines.com/2026/01/google-keep-may-remove-reminders-feature-soon.html , https://developer.apple.com/documentation/eventkit/managing-location-based-reminders.md . Success metric: Android >= 40% of installs in the first 90 days; >= 25% of new users complete an import."
+    },
+    {
+      "id": "LEAP-011",
+      "title": "Web acquisition engine: referral waitlist, working contact form and programmatic use-case pages",
+      "description": "As a visitor before launch, I want to join a waitlist and move up by inviting my household, and as a searcher for 'remember where I parked at the airport' I want a page that shows how Lociate does it. Today support.astro:184 posts to https://lociate.app/api/contact and web/ has no functions/ directory, so the form (and the data-deletion route Play requires) does not work; index.astro:345-398 carries three testimonials attributed to an unnamed 'Beta tester' with no source; the site has three feature pages.",
+      "acceptanceCriteria": [
+        "web/functions/api/waitlist.ts and web/functions/api/contact.ts exist as Cloudflare Pages Functions with input validation, a honeypot and per-IP rate limiting; support.astro submits successfully and documents the data-deletion request path",
+        "Waitlist rows store email, platform preference, referral code, and consent basis, source and timestamp; an unknown consent basis is refused",
+        "Each signup gets lociate.app/?r=<code>; position improves per confirmed referral and shows on the confirmation page; double opt-in mail goes from a transactional sender, not an outreach identity",
+        "web/src/content/usecases is a content collection rendered by web/src/pages/use/[slug].astro (getStaticPaths) with HowTo and FAQPage JSON-LD; the launch set has >= 30 pages across parking, travel, home maintenance, caregiving, rentals and field service",
+        "Alternative pages for Apple Reminders, Google Keep, Todoist and Life360 Places carry a comparison table where every row links a source",
+        "A build-time check fails if a page lacks a description or schema; the unsourced testimonials are removed and a CI grep fails on 'Beta tester' or a testimonial block without a source attribute",
+        "One config switch replaces waitlist CTAs with store badges at launch; an admin CSV export of confirmed signups sits behind a token"
+      ],
+      "priority": 230,
+      "passes": false,
+      "notes": "LEAP rank 11. Size: L. Merges the draft's SEO story with its waitlist story, which was size S and mostly a broken-form fix, so it did not stand as a big move on its own. Competitive rationale: MemoMaps and EchoLock listings showed a 5.0 rating from 1 rating each when reviewed, so launching with a list is a real edge; the geofence category competes on generic 'location reminders' keywords. Sources: https://apps.apple.com/app/id6759820884 , https://apps.apple.com/app/id6757409609 , https://www.todoist.com/help/articles/introduction-to-reminders-9PezfU . Success metric: 2,000 confirmed signups before launch, >= 25% via referral; 5,000 organic sessions a month by month 6."
+    },
+    {
+      "id": "LEAP-012",
+      "title": "Real on-device AI: auto-titles, categorization and action extraction replace the keyword list",
+      "description": "As a Premium user, I want each note titled ('Gate code: 4412'), categorized correctly and, when it contains a date or 'when I leave', offered as a smarter trigger, without my audio leaving the phone. AICategoryService.swift:5-40 counts hard-coded keywords and needs two hits to leave .general, and it is sold as Premium AI (TierEnforcement.canUseAI). US-026 and US-216 built exactly that; this story replaces it with models.",
+      "acceptanceCriteria": [
+        "iOS uses Apple Foundation Models where available, falling back to a NaturalLanguage classifier, to produce category, a title of <= 40 characters and optional extracted date or exit phrase; a test asserts no network call",
+        "Android uses an on-device model where supported (ML Kit / Gemini Nano) with the existing keyword classifier as the final fallback",
+        "A new numbered migration adds loci.title; the title replaces the first transcription words in the list, map callout, notification and both widgets; Room gains a migration in LociateDatabaseMigrations",
+        "Extracted dates or 'when I leave' phrases prefill LEAP-005 trigger options for the user to confirm",
+        "A labelled fixture set of >= 100 transcripts measures category accuracy for old and new paths; the new path must win and the numbers are written to progress.txt",
+        "Paywall copy describes exactly what the feature does; canUseAI gates titles and extraction, never manual category choice"
+      ],
+      "priority": 231,
+      "passes": false,
+      "notes": "LEAP rank 12. Size: M. Kept rather than replaced: US-026/US-216 built keyword matching, and titles plus trigger extraction are new capability. Competitive rationale: MemoMaps and EchoLock market on-device processing; Lociate keeps CLAUDE.md's no-cloud-transcription rule and adds intelligence those listings do not describe. Sources: https://apps.apple.com/app/id6759820884 , https://apps.apple.com/app/id6757409609 . Success metric: category correction rate < 10%; feature_gate:ai paywall triggers >= 15% of upgrades."
+    },
+    {
+      "id": "LEAP-013",
+      "title": "Circles beyond the nuclear family: caregiver roles and expiring guest access",
+      "description": "As the adult child of an ageing parent, or a holiday-rental host, I want a circle where caregivers or guests see the right notes (medication cabinet, Wi-Fi, trash day, the breaker) with read-only or expiring access. household-invite.ts hard-codes MAX_HOUSEHOLD_MEMBERS = 6 with owner and member roles only, and household_members has no expiry.",
+      "acceptanceCriteria": [
+        "A new numbered migration adds household_members.role value viewer and expires_at; RLS lets viewers read but not insert or update household loci, and excludes rows past expires_at",
+        "The owner can create a guest invite with an expiry (reusing LEAP-001 links); on expiry the guest loses read access server-side and the client removes those geofences on next sync",
+        "The owner marks loci 'guest-visible'; guests see only those",
+        "Household creation offers templates: Family, Caregiving, Rental guests, each setting default roles and suggested categories",
+        "Viewer and guest seats do not count toward the 6-member cap; the member cap stays enforced in the accept route",
+        "backend/tests/10_rls_isolation_test.sql and a vitest cover: viewer cannot insert, expired guest cannot read, guest cannot read non-guest-visible loci"
+      ],
+      "priority": 232,
+      "passes": false,
+      "notes": "LEAP rank 13. Size: M. Depends on LEAP-001. Competitive rationale: Life360 was reported by The Markup (2021) to sell location data and has been called stalkerware in press coverage; Lociate circles share notes about places without tracking anyone. Sources: https://en.wikipedia.org/wiki/Life360 , https://apps.apple.com/us/app/life360-find-friends-family/id384830320 . Success metric: >= 15% of households use a non-family template or guest invite by month 4; guest -> creates own locus >= 10%."
+    },
+    {
+      "id": "LEAP-014",
+      "title": "In-app referral: give a friend a free month of Premium, get one when they subscribe",
+      "description": "As a paying user, I want a personal link that gives a friend a month of Premium and earns me a month when they start paying. The household invite (LEAP-001) spreads inside a family; nothing rewards spreading Lociate to friends, neighbours or a dog walker, and no referral code path exists in either client or the edge sidecar.",
+      "acceptanceCriteria": [
+        "A new numbered migration creates referrals(code, referrer_user_id, referee_user_id, created_at, referee_converted_at, reward_granted_at) with RLS: users read only rows where they are referrer or referee",
+        "Each user has one stable code shared as https://lociate.app/open/r/<code>; the universal-link handler and the onboarding paste prompt from LEAP-001 accept it",
+        "Redeeming at signup extends the referee's premium_trial_ends_at (LEAP-003) by 30 days; a self-referral or a second redemption on the same account is refused, covered by vitest",
+        "When the referee's first paid RevenueCat event arrives at sync-subscription.ts, the referrer is granted a one-month reward through a RevenueCat promotional entitlement (or users.premium_bonus_until feeding effective_tier); a vitest proves the grant happens once",
+        "Settings shows the user's link, how many friends joined and months earned",
+        "Events referral_link_shared, referral_redeemed and referral_rewarded fire on both clients"
+      ],
+      "priority": 233,
+      "passes": false,
+      "notes": "LEAP rank 14. Size: M. New story, replacing the draft's standalone ranking story (folded into LEAP-005). Depends on LEAP-001 link handling and LEAP-003 trial column. Stays inside rule 4: an invite to install, no shared content. Competitive rationale: no referral program appeared on the indie listings reviewed; this is a growth bet measured by the events above, not a claim about competitors. Sources: https://apps.apple.com/bz/app/waypin/id6479329104 , https://apps.apple.com/app/id6759820884 . Success metric: >= 10% of new installs arrive via a referral link by month 3; referred users convert to paid at >= the organic rate."
+    },
+    {
+      "id": "LEAP-015",
+      "title": "Resurfacing digest: a weekly push that brings back real notes and household activity, including lapsed users",
+      "description": "As a user, I want the weekly nudge to say 'Sam left 2 notes you haven't heard' or 'A year ago you left a note at this trailhead', not a count. push-digest.ts (US-068) sends counts and skips anyone without activity in 30 days (lines 42-73), so the users most likely to churn hear nothing, and it runs on one server cron at 10:00 Sunday regardless of time zone.",
+      "acceptanceCriteria": [
+        "push-digest.ts composes per-user content from unheard household loci (LEAP-005 locus_receipts), anniversaries ('a year ago here') and loci near places visited on that weekday; counts are the fallback only",
+        "Users inactive 30+ days get a re-engagement variant instead of being skipped, capped at one per 14 days",
+        "A users.time_zone column (new numbered migration) is set by both clients and the digest sends at 10:00 local",
+        "Tapping the push deep-links to the specific locus or household list, not the root",
+        "Settings on both platforms offers digest off / weekly / household-only",
+        "edge-functions/test/push-digest.test.ts covers active, lapsed and household-only users and asserts no transcription text appears for loci the recipient cannot read under RLS",
+        "digest_sent and digest_opened carry the variant"
+      ],
+      "priority": 234,
+      "passes": false,
+      "notes": "LEAP rank 15. Size: M. Reworks US-068. Competitive rationale: Life360's retention is described as driven by household activity alerts (Umbrex profile, RevenueCat podcast); Lociate can alert on household notes without tracking anyone. Whether indie rivals have any server-side engagement was not verified, so no claim is made. Sources: https://umbrex.com/resources/company-profiles/life360/ , https://www.revenuecat.com/blog/growth/giordano-contestabile-life360-sub-club-podcast-2026 . Success metric: digest open rate >= 20%; lapsed-user reactivation >= 8% per send."
+    },
+    {
+      "id": "LEAP-016",
+      "title": "Photo and short-video place-notes: show where the valve is, not just say it",
+      "description": "As a user, I want to attach a photo or a 10-second clip to a voice note ('the shutoff valve is behind this panel'), so the household sees exactly what I meant on arrival. Lociate stores audio only (005_storage_bucket.sql, M4A); TagTrail's listing advertises text, image or voice tags.",
+      "acceptanceCriteria": [
+        "The post-record sheet lets the user add up to 3 photos or one clip <= 10 s on iOS and Android",
+        "Media is encrypted at rest on device as audio is (US-096), uploaded under per-user or household paths, with storage policies in a new numbered migration matching loci RLS and covered by backend/tests",
+        "Arrival notifications show the first photo as a rich attachment (iOS notification attachment, Android BigPictureStyle); LocusDetailView and the LEAP-006 web player show media",
+        "EXIF location and device metadata are stripped before upload; a unit test asserts it",
+        "Free tier stays voice-only; media is gated to effective_tier premium or family",
+        "Data export (US-131) includes media and account deletion (account-delete.ts) removes it from storage, each with a test"
+      ],
+      "priority": 235,
+      "passes": false,
+      "notes": "LEAP rank 16. Size: M. Competitive rationale: TagTrail lists image tags but no sharing was found on its listing; adding visuals keeps Lociate the only app reviewed with voice + visual + household + proximity. Sources: https://apps.apple.com/mx/app/tagtrail/id6749494325 , https://apps.apple.com/app/id6759820884 . Success metric: >= 30% of shared loci include media; media-gate paywall triggers convert >= 10%."
+    },
+    {
+      "id": "LEAP-017",
+      "title": "Parking autopilot and hands-free car capture (CarPlay and Android Auto where entitled)",
+      "description": "As a driver, I want Lociate to offer 'save parking here' the moment I leave the car and read the gate or store note aloud as I pull in, without touching my phone. Parking is a seeded category in AICategoryService and a headline use case, yet capture needs the phone in hand. The disconnect trigger works without any car entitlement; CarPlay and Android Auto templates depend on Apple and Google granting a category, so they are a second phase.",
+      "acceptanceCriteria": [
+        "On iOS, CMMotionActivity automotive -> walking transitions (and optionally CarPlay/Bluetooth audio-route disconnect) offer a one-tap 'Save parking here' notification creating a parking locus; Android does the same with Activity Recognition transitions; unit tests cover the transition detector",
+        "Saved parking loci default to fire_mode next_visit (LEAP-005) and auto-archive after return",
+        "A CarPlay entitlement request (driving task category) is filed and recorded in LAUNCH_CHECKLIST.md; only if granted, a CarPlay template scene offers 'Save parking spot' and lists nearby notes",
+        "Android Auto support through the Car App Library ships under the same condition",
+        "Arrival notes in a car are spoken via AVSpeechSynthesizer / TextToSpeech or play the recording, respecting quiet hours (US-054); no free-text entry in any car UI",
+        "locus_created carries capture_source=car or motion; locus_triggered carries surface=car"
+      ],
+      "priority": 236,
+      "passes": false,
+      "notes": "LEAP rank 17. Size: L. Reworked so the high-value part (motion-based parking capture) does not wait on an entitlement that a notes app may not get. Competitive rationale: the draft said Android Auto users were 'left with nothing'; that is not supported and was removed. What is sourced: Google ended Assistant location reminders in 2022, and no indie geofence app reviewed lists CarPlay. Sources: https://www.pymnts.com/news/2022/google-stops-location-based-reminders/ , https://www.techradar.com/news/google-slated-to-axe-location-based-reminders-from-assistant . Success metric: >= 20% of parking-category loci created by the autopilot or car surface within 3 months."
+    },
+    {
+      "id": "LEAP-018",
+      "title": "Lociate for Crews: a per-seat team plan for field work (gate codes, dog in yard, meter behind shed)",
+      "description": "As a property manager, pest-control owner or home inspector, I want my crew to hear the site note when they pull up, with admin control and an audit trail. The household model caps at 6 and has no admin roles or audit view; AuditLogEntry exists for auth events only (US-149). This opens a segment that pays per seat while staying private and invite-only under rule 4.",
+      "acceptanceCriteria": [
+        "A new numbered migration adds workspaces(id, name, owner_id, seat_limit, plan) and workspace_members(workspace_id, user_id, role admin|member|viewer) with RLS; loci gain an optional workspace_id",
+        "Admins invite by link (LEAP-001 machinery), remove members and transfer ownership; a removed member loses access to workspace loci on the next request, proven by an RLS test",
+        "Workspace loci join members' geofence rotation with their own badge and map filter on iOS and Android",
+        "An admin view lists create/edit/delete/heard events per locus (from a new audit table plus LEAP-005 locus_receipts) and exports CSV",
+        "crew_seat_monthly and crew_seat_yearly products are defined; seat count is enforced server-side on accept with a vitest",
+        "web/src/pages/crews.astro describes the plan with a contact form posting to LEAP-011's Pages Function",
+        "backend/tests covers cross-workspace isolation"
+      ],
+      "priority": 237,
+      "passes": false,
+      "notes": "LEAP rank 18. Size: XL. Ranked lower than the draft did: the segment is unvalidated and needs sales effort the consumer stories do not. Competitive rationale: removed the draft's unsourced claim about field-service tools; what is sourced is that Life360 targets families and caps Place Alerts by tier (2 places on its Silver tier per its listing). Sources: https://apps.apple.com/us/app/life360-find-friends-family/id384830320 , https://umbrex.com/resources/company-profiles/life360/ . Success metric: 10 paying crews of >= 3 seats within 6 months of launch; ARPA >= $30/mo."
+    },
+    {
+      "id": "LEAP-019",
+      "title": "Apple Watch and Wear OS companions: wrist capture and arrival playback",
+      "description": "As a user with my phone in a bag, I want to raise my wrist, tap once to record a place note, and have arrival notes show and play on my watch. A voice-first, location-triggered product suits the wrist, and the Xcode project has no watch target today.",
+      "acceptanceCriteria": [
+        "A watchOS target is added through scripts/generate-xcodeproj.py (so the project stays generated) that records audio and hands it to the phone via WatchConnectivity for transcription and save, with an offline queue",
+        "A complication and Smart Stack widget show the nearest locus in range and start capture",
+        "Arrival notifications on the watch include a play action for the note audio",
+        "A Wear OS module provides capture, a tile listing nearby notes and arrival playback through the phone app",
+        "Tier limits apply to watch captures exactly as on the phone (effective_tier)",
+        "CI builds both watch targets; locus_created carries capture_source=watch"
+      ],
+      "priority": 238,
+      "passes": false,
+      "notes": "LEAP rank 19. Size: L. Corrected the draft: there is no XcodeGen project config; the repo generates the project with scripts/generate-xcodeproj.py. Ranking dependency on the dropped ranker story removed. Competitive rationale: WayPin, MemoMaps, Drop-A-Pin and EchoLock listings show no watch app. Sources: https://mwm.ai/apps/drop-a-pin/6759992717 , https://apps.apple.com/bz/app/waypin/id6479329104 . Success metric: >= 15% of premium users capture from the watch monthly; watch users' 90-day retention +10 pts."
+    },
+    {
+      "id": "LEAP-020",
+      "title": "End-to-end encrypted household notes and a published privacy ledger",
+      "description": "As a privacy-conscious family, I want shared notes (gate codes, where the spare key is) encrypted so Lociate's server cannot read them, and a plain list of what leaves my phone. Audio is encrypted at rest on device (US-096) but transcriptions and audio are stored readable on the self-hosted Supabase. Lociate needs an account for sync and households, so it has to prove privacy rather than claim it.",
+      "acceptanceCriteria": [
+        "Each household has a symmetric key generated on the owner's device and wrapped per member with that member's device public key (Keychain on iOS, Keystore on Android); transcription and audio of E2EE loci are encrypted client-side before upload",
+        "The server stores ciphertext plus the fields geofencing needs (coordinates, radius, category); a vitest and a backend/tests case assert transcription holds ciphertext for E2EE loci",
+        "Invite acceptance (LEAP-001) wraps the key for the new member; removing a member rotates the household key",
+        "Features needing server plaintext (LEAP-004 summaries, LEAP-009 server Ask, LEAP-015 digest text) skip E2EE loci and the UI says why",
+        "web/src/pages/privacy-ledger.astro lists every data flow (what, where, who processes it: self-hosted Supabase, Anthropic opt-in, APNs/FCM, RevenueCat, TelemetryDeck) and a Settings screen mirrors it",
+        "A recovery code is shown once when E2EE is enabled; the UI states before enabling that without it E2EE notes are unrecoverable"
+      ],
+      "priority": 239,
+      "passes": false,
+      "notes": "LEAP rank 20. Size: XL. Competitive rationale: MemoMaps and EchoLock market on-device, no-account privacy; Life360 has a reported data-sale history; E2EE household sharing is a claim neither camp makes on the pages reviewed. Sources: https://apps.apple.com/app/id6759820884 , https://apps.apple.com/app/id6757409609 , https://en.wikipedia.org/wiki/Life360 . Success metric: >= 40% of Family households enable E2EE; privacy cited in >= 20% of positive reviews by month 6."
     }
   ]
 }
